@@ -42,3 +42,6 @@ all_found_questions.json
 scratch_transcription.txt
 sample_layout.jpg
 test_p*.jpg
+*test*.jpg
+crop_*.jpg
+p*.jpg

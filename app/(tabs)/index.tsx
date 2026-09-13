@@ -40,7 +40,8 @@ import {
   Settings,
   Clock,
   Database,
-  Tag
+  Tag,
+  ExternalLink
 } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import Svg, { Circle, Path } from 'react-native-svg';
@@ -116,24 +117,83 @@ const calculateTabSubjects = (progress: Record<string, SyllabusProgress>, tracki
   const mains = calc(MAINS_SYLLABUS, mainsKeys, mainsColors);
   
   const sourceSyllabus = optionalChoice === 'Anthropology' ? ANTHROPOLOGY_SYLLABUS : optionalChoice === 'Medical Science' ? MEDICAL_SCIENCE_SYLLABUS : OPTIONAL_SYLLABUS;
+  const paper1Key = `${optionalChoice} Paper 1`;
+  const paper2Key = `${optionalChoice} Paper 2`;
   const activeOptionalSyllabus = {
-    [`${optionalChoice} Paper 1`]: sourceSyllabus["Paper 1"],
-    [`${optionalChoice} Paper 2`]: sourceSyllabus["Paper 2"]
+    [paper1Key]: sourceSyllabus["Paper 1"],
+    [paper2Key]: sourceSyllabus["Paper 2"]
   };
   const optionalKeys = Object.keys(activeOptionalSyllabus);
   const optionalColors = ['#7C3AED', '#EC4899'];
   const optionalNameMap = {
-    [`${optionalChoice} Paper 1`]: 'Paper 1',
-    [`${optionalChoice} Paper 2`]: 'Paper 2'
+    [paper1Key]: 'Paper 1',
+    [paper2Key]: 'Paper 2'
   };
   const optional = calc(activeOptionalSyllabus, optionalKeys, optionalColors, optionalNameMap);
   
+  // Calculate one level deeper units for Paper 1 and Paper 2
+  const calcUnits = (paperNode: any, paperSubjectKey: string, baseColor: string) => {
+    if (!paperNode || typeof paperNode !== 'object') return [];
+    return Object.keys(paperNode).map((unitKey) => {
+      let total = 0;
+      let completed = 0;
+      const unitData = paperNode[unitKey];
+      if (unitData) {
+        const leaves = getLeafNodes(unitData, `${paperSubjectKey}.${unitKey}`);
+        leaves.forEach(leaf => {
+          const item = progress[leaf.path] || {};
+          if (trackingMethod === 'single') {
+            total += 1;
+            if (item.mastered) completed++;
+          } else {
+            total += 4;
+            if (item.mastered) completed++;
+            if (item.ncert) completed++;
+            if (item.pyqs) completed++;
+            if (item.books) completed++;
+          }
+        });
+      }
+
+      let displayName = unitKey;
+      if (unitKey.startsWith('Unit ')) {
+        displayName = unitKey.replace(' - ', ': ');
+      }
+
+      return {
+        id: `${paperSubjectKey}.${unitKey}`,
+        rawKey: unitKey,
+        name: displayName,
+        percent: total > 0 ? Math.round((completed / total) * 100) : 0,
+        color: baseColor
+      };
+    });
+  };
+
+  const paper1Topics = calcUnits(sourceSyllabus?.["Paper 1"], paper1Key, '#7C3AED');
+  const paper2Topics = calcUnits(sourceSyllabus?.["Paper 2"], paper2Key, '#DB2777');
+
+  const optionalDetailed = {
+    paper1: {
+      key: paper1Key,
+      name: 'Paper 1',
+      percent: optional.find(o => o.id === paper1Key)?.percent || 0,
+      topics: paper1Topics
+    },
+    paper2: {
+      key: paper2Key,
+      name: 'Paper 2',
+      percent: optional.find(o => o.id === paper2Key)?.percent || 0,
+      topics: paper2Topics
+    }
+  };
+
   // Create an Overall list combining all unique subjects
   const overallKeys = Array.from(new Set([...prelimsKeys, ...mainsKeys, ...optionalKeys]));
   const overallColors = [...prelimsColors, ...mainsColors, ...optionalColors];
   const overall = calc({ ...MICRO_SYLLABUS, ...MAINS_SYLLABUS, ...activeOptionalSyllabus }, overallKeys, overallColors, optionalNameMap);
 
-  return { Prelims: prelims, Mains: mains, Optional: optional, Overall: overall };
+  return { Prelims: prelims, Mains: mains, Optional: optional, Overall: overall, optionalDetailed };
 };
 
 const DEFAULT_TAB_SUBJECTS = {
@@ -158,7 +218,33 @@ const DEFAULT_TAB_SUBJECTS = {
     { id: 'Anthropology Paper 1', name: 'Paper 1', percent: 0, color: '#7C3AED' },
     { id: 'Anthropology Paper 2', name: 'Paper 2', percent: 0, color: '#EC4899' },
   ],
-  Overall: [] as any[]
+  Overall: [] as any[],
+  optionalDetailed: {
+    paper1: {
+      key: 'Anthropology Paper 1',
+      name: 'Paper 1',
+      percent: 0,
+      topics: Object.keys(ANTHROPOLOGY_SYLLABUS?.["Paper 1"] || {}).map(u => ({
+        id: `Anthropology Paper 1.${u}`,
+        rawKey: u,
+        name: u.startsWith('Unit ') ? u.replace(' - ', ': ') : u,
+        percent: 0,
+        color: '#7C3AED'
+      }))
+    },
+    paper2: {
+      key: 'Anthropology Paper 2',
+      name: 'Paper 2',
+      percent: 0,
+      topics: Object.keys(ANTHROPOLOGY_SYLLABUS?.["Paper 2"] || {}).map(u => ({
+        id: `Anthropology Paper 2.${u}`,
+        rawKey: u,
+        name: u.startsWith('Unit ') ? u.replace(' - ', ': ') : u,
+        percent: 0,
+        color: '#DB2777'
+      }))
+    }
+  }
 };
 DEFAULT_TAB_SUBJECTS.Overall = [...DEFAULT_TAB_SUBJECTS.Prelims, ...DEFAULT_TAB_SUBJECTS.Mains, ...DEFAULT_TAB_SUBJECTS.Optional];
 
@@ -179,7 +265,6 @@ export default function HomeScreen() {
   });
   const [insights, setInsights] = useState<DailyInsight[]>([]);
   const [insightIndex, setInsightIndex] = useState(0);
-  const [recentNotes, setRecentNotes] = useState<any[]>([]);
   const [addTaskModalVisible, setAddTaskModalVisible] = useState(false);
   const [newTaskTitle, setNewTaskTitle] = useState('');
   const [newTaskTime, setNewTaskTime] = useState('');
@@ -444,17 +529,10 @@ export default function HomeScreen() {
     const loadedInsights = await HomescreenService.getDailyInsights();
     setInsights(loadedInsights);
 
-    const loadedNotes = await HomescreenService.getRecentNotes(userId);
-    setRecentNotes(loadedNotes);
-
-    if (userId) {
-      const progress = await SyllabusService.getProgress(userId);
-      const trackingMethod = await AsyncStorage.getItem('syllabus_tracking_method') as 'single' | 'multi' || 'multi';
-      const optionalChoice = await AsyncStorage.getItem('optional_choice') || 'Anthropology';
-      setTabSubjects(calculateTabSubjects(progress, trackingMethod, optionalChoice));
-    } else {
-      setTabSubjects(DEFAULT_TAB_SUBJECTS);
-    }
+    const progress = userId ? await SyllabusService.getProgress(userId) : {};
+    const trackingMethod = (await AsyncStorage.getItem('syllabus_tracking_method') as 'single' | 'multi') || 'multi';
+    const optionalChoice = (await AsyncStorage.getItem('optional_choice')) || 'Anthropology';
+    setTabSubjects(calculateTabSubjects(progress, trackingMethod, optionalChoice) as any);
   };
 
   const handleSearchSubmit = () => {
@@ -658,23 +736,87 @@ export default function HomeScreen() {
                   </View>
 
                   {/* Interactive Subject Items */}
-                  <View style={styles.subjectGrid}>
-                    {currentSubjects.map((sub, idx) => (
-                      <TouchableOpacity
-                        key={sub.id || sub.name || idx}
-                        style={styles.subjectItem}
-                        onPress={() => router.push({ pathname: '/tracker', params: { subject: sub.id || sub.name, defaultMode: prepTab.toLowerCase() } })}
-                      >
-                        <View style={styles.subjectLabelRow}>
-                          <Text style={styles.subjectName} numberOfLines={1}>{sub.name}</Text>
-                          <Text style={styles.subjectPercent}>{sub.percent}%</Text>
-                        </View>
-                        <View style={styles.progressTrack}>
-                          <View style={[styles.progressFill, { width: `${sub.percent}%`, backgroundColor: sub.color }]} />
-                        </View>
-                      </TouchableOpacity>
-                    ))}
-                  </View>
+                  {prepTab === 'Optional' && tabSubjects.optionalDetailed ? (
+                    <View style={{ flexDirection: 'row', gap: 12, flex: 1 }}>
+                      {/* Left Column: Paper 1 Topics */}
+                      <View style={{ flex: 1, backgroundColor: '#FAF5FF', borderRadius: 12, padding: 10, borderWidth: 1, borderColor: '#F3E8FF' }}>
+                        <TouchableOpacity
+                          style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8, paddingBottom: 4, borderBottomWidth: 1, borderBottomColor: '#E9D5FF' }}
+                          onPress={() => router.push({ pathname: '/tracker', params: { subject: tabSubjects.optionalDetailed.paper1.key, defaultMode: 'optional' } })}
+                        >
+                          <Text style={{ fontSize: 12, fontWeight: '800', color: '#7C3AED' }}>Paper 1</Text>
+                          <Text style={{ fontSize: 11, fontWeight: '800', color: '#7C3AED' }}>
+                            {tabSubjects.optionalDetailed.paper1?.percent ?? 0}%
+                          </Text>
+                        </TouchableOpacity>
+                        <ScrollView style={{ maxHeight: 180 }} showsVerticalScrollIndicator={false} nestedScrollEnabled={true}>
+                          {(tabSubjects.optionalDetailed.paper1?.topics || []).map((topic: any, tIdx: number) => (
+                            <TouchableOpacity
+                              key={topic.id || tIdx}
+                              style={{ marginBottom: 8 }}
+                              onPress={() => router.push({ pathname: '/tracker', params: { subject: tabSubjects.optionalDetailed.paper1.key, defaultMode: 'optional' } })}
+                            >
+                              <View style={styles.subjectLabelRow}>
+                                <Text style={[styles.subjectName, { fontSize: 11 }]} numberOfLines={1}>{topic.name}</Text>
+                                <Text style={[styles.subjectPercent, { fontSize: 11 }]}>{topic.percent}%</Text>
+                              </View>
+                              <View style={styles.progressTrack}>
+                                <View style={[styles.progressFill, { width: `${topic.percent}%`, backgroundColor: '#7C3AED' }]} />
+                              </View>
+                            </TouchableOpacity>
+                          ))}
+                        </ScrollView>
+                      </View>
+
+                      {/* Right Column: Paper 2 Topics */}
+                      <View style={{ flex: 1, backgroundColor: '#FDF2F8', borderRadius: 12, padding: 10, borderWidth: 1, borderColor: '#FCE7F3' }}>
+                        <TouchableOpacity
+                          style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8, paddingBottom: 4, borderBottomWidth: 1, borderBottomColor: '#FBCFE8' }}
+                          onPress={() => router.push({ pathname: '/tracker', params: { subject: tabSubjects.optionalDetailed.paper2.key, defaultMode: 'optional' } })}
+                        >
+                          <Text style={{ fontSize: 12, fontWeight: '800', color: '#DB2777' }}>Paper 2</Text>
+                          <Text style={{ fontSize: 11, fontWeight: '800', color: '#DB2777' }}>
+                            {tabSubjects.optionalDetailed.paper2?.percent ?? 0}%
+                          </Text>
+                        </TouchableOpacity>
+                        <ScrollView style={{ maxHeight: 180 }} showsVerticalScrollIndicator={false} nestedScrollEnabled={true}>
+                          {(tabSubjects.optionalDetailed.paper2?.topics || []).map((topic: any, tIdx: number) => (
+                            <TouchableOpacity
+                              key={topic.id || tIdx}
+                              style={{ marginBottom: 8 }}
+                              onPress={() => router.push({ pathname: '/tracker', params: { subject: tabSubjects.optionalDetailed.paper2.key, defaultMode: 'optional' } })}
+                            >
+                              <View style={styles.subjectLabelRow}>
+                                <Text style={[styles.subjectName, { fontSize: 11 }]} numberOfLines={1}>{topic.name}</Text>
+                                <Text style={[styles.subjectPercent, { fontSize: 11 }]}>{topic.percent}%</Text>
+                              </View>
+                              <View style={styles.progressTrack}>
+                                <View style={[styles.progressFill, { width: `${topic.percent}%`, backgroundColor: '#DB2777' }]} />
+                              </View>
+                            </TouchableOpacity>
+                          ))}
+                        </ScrollView>
+                      </View>
+                    </View>
+                  ) : (
+                    <View style={styles.subjectGrid}>
+                      {currentSubjects.map((sub, idx) => (
+                        <TouchableOpacity
+                          key={sub.id || sub.name || idx}
+                          style={styles.subjectItem}
+                          onPress={() => router.push({ pathname: '/tracker', params: { subject: sub.id || sub.name, defaultMode: prepTab.toLowerCase() } })}
+                        >
+                          <View style={styles.subjectLabelRow}>
+                            <Text style={styles.subjectName} numberOfLines={1}>{sub.name}</Text>
+                            <Text style={styles.subjectPercent}>{sub.percent}%</Text>
+                          </View>
+                          <View style={styles.progressTrack}>
+                            <View style={[styles.progressFill, { width: `${sub.percent}%`, backgroundColor: sub.color }]} />
+                          </View>
+                        </TouchableOpacity>
+                      ))}
+                    </View>
+                  )}
                 </View>
 
                 {/* Donut Ring on Right */}
@@ -787,44 +929,10 @@ export default function HomeScreen() {
             </View>
           </View>
 
-          {/* ── 5. ROW 2 (3 EQUAL COLUMNS) ── */}
+          {/* ── 5. ROW 2 (TODAY TASK LIST + DAILY CHALLENGE) ── */}
           <View style={[styles.rowGrid, { alignItems: 'flex-start' }]}>
-            {/* Recent Notes */}
-            <View style={[styles.card, styles.equalColCard, { overflow: 'hidden', backgroundColor: '#FEFCE8', borderWidth: 1, borderColor: '#FEF08A' }]}>
-              {/* Premium Geometric Backgrounds */}
-              <View style={{ position: 'absolute', right: -30, bottom: -30, width: 120, height: 120, borderRadius: 60, backgroundColor: 'rgba(217, 119, 6, 0.05)', zIndex: 0 }} />
-              
-              <View style={[styles.cardHeaderRow, { zIndex: 1 }]}>
-                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                  <FileText size={20} color="#D97706" style={{ marginRight: 8 }} />
-                  <Text style={styles.cardTitle}>Recent Notes</Text>
-                </View>
-                <TouchableOpacity onPress={() => router.push('/pilot-v2')}>
-                  <Text style={styles.linkText}>View All ›</Text>
-                </TouchableOpacity>
-              </View>
-
-              <View style={{ marginTop: 4 }}>
-                {recentNotes.map((note, idx) => (
-                  <TouchableOpacity
-                    key={note.id || idx}
-                    style={styles.noteRow}
-                    onPress={() => router.push({ pathname: '/pilot-v2', params: { noteId: note.note_id } })}
-                  >
-                    <View style={styles.noteIconWrap}>
-                      <FileText size={15} color="#7C3AED" />
-                    </View>
-                    <View style={{ flex: 1, marginLeft: 10 }}>
-                      <Text style={styles.noteTitle} numberOfLines={1}>{note.title}</Text>
-                      <Text style={styles.noteDate}>{note.updated_at || 'Today, 6:30 PM'}</Text>
-                    </View>
-                  </TouchableOpacity>
-                ))}
-              </View>
-            </View>
-
-            {/* COLUMN 2: Today Task List Card */}
-            <View style={[styles.card, styles.equalColCard, { overflow: 'hidden', backgroundColor: '#F5F3FF', borderWidth: 0 }]}>
+            {/* COLUMN 1: Today Task List Card (Expanded to take full width/focus) */}
+            <View style={[styles.card, { flex: IS_TABLET ? 1.6 : undefined, minHeight: 270, overflow: 'hidden', backgroundColor: '#F5F3FF', borderWidth: 1, borderColor: '#EDE9FE' }]}>
               {/* Premium Geometric Backgrounds */}
               <View style={{ position: 'absolute', top: -40, right: -40, width: 160, height: 160, borderRadius: 80, backgroundColor: 'rgba(124, 58, 237, 0.04)', zIndex: 0 }} />
               
@@ -832,7 +940,7 @@ export default function HomeScreen() {
                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                   <Calendar size={20} color="#7C3AED" style={{ marginRight: 8 }} />
                   <View>
-                    <Text style={styles.cardTitle}>Today</Text>
+                    <Text style={styles.cardTitle}>Today's Tasks</Text>
                     <Text style={styles.cardSubTitle}>{new Date().toLocaleDateString('en-US', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })}</Text>
                   </View>
                 </View>
@@ -894,8 +1002,8 @@ export default function HomeScreen() {
               </View>
             </View>
 
-            {/* Daily PYQ / Arena Challenge */}
-            <View style={[styles.card, styles.equalColCard, { backgroundColor: '#FFF8E7', borderWidth: 1, borderColor: '#FDE68A', padding: 20, overflow: 'hidden', minHeight: 250 }]}>
+            {/* COLUMN 2: Daily PYQ / Arena Challenge */}
+            <View style={[styles.card, { flex: IS_TABLET ? 1.1 : undefined, backgroundColor: '#FFF8E7', borderWidth: 1, borderColor: '#FDE68A', padding: 20, overflow: 'hidden', minHeight: 270 }]}>
               {/* Decorative background shapes */}
               <View style={{ position: 'absolute', right: -20, top: -20, width: 100, height: 100, borderRadius: 50, backgroundColor: 'rgba(217, 119, 6, 0.15)', zIndex: 0 }} />
               <View style={{ position: 'absolute', right: 40, bottom: -30, width: 80, height: 80, borderRadius: 40, backgroundColor: 'rgba(245, 158, 11, 0.1)', zIndex: 0 }} />
@@ -1003,10 +1111,42 @@ export default function HomeScreen() {
                       </View>
                       
                       {showExplanation && inlineQuestion.explanation && (
-                        <View style={{ marginTop: 12, padding: 12, backgroundColor: 'rgba(255,255,255,0.7)', borderRadius: 8 }}>
+                        <View style={{ marginTop: 12, padding: 12, backgroundColor: 'rgba(255,255,255,0.85)', borderRadius: 10, borderWidth: 1, borderColor: '#FDE68A' }}>
                           <Markdown style={{ paragraph: { marginVertical: 0 }, body: { color: '#475569', fontSize: 13, lineHeight: 20 } }}>
                             {inlineQuestion.explanation}
                           </Markdown>
+
+                          <TouchableOpacity
+                            onPress={() => {
+                              router.push({
+                                pathname: '/unified/engine',
+                                params: {
+                                  questionId: inlineQuestion.id,
+                                  testId: inlineQuestion.test_id || inlineQuestion.testId || 'manual',
+                                  mode: 'learning',
+                                  revealAll: '1',
+                                } as any,
+                              });
+                            }}
+                            style={{
+                              flexDirection: 'row',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              marginTop: 12,
+                              paddingVertical: 9,
+                              paddingHorizontal: 14,
+                              backgroundColor: '#FEF3C7',
+                              borderWidth: 1,
+                              borderColor: '#F59E0B',
+                              borderRadius: 8,
+                              gap: 6
+                            }}
+                          >
+                            <ExternalLink size={14} color="#B45309" />
+                            <Text style={{ color: '#B45309', fontSize: 12, fontWeight: '700' }}>
+                              Open in Quiz Engine
+                            </Text>
+                          </TouchableOpacity>
                         </View>
                       )}
                     </View>

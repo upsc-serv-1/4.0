@@ -8,6 +8,22 @@ import MainsFrameworksCard from '../src/components/mains/MainsFrameworksCard';
 import MainsEthicsCard from '../src/components/mains/MainsEthicsCard';
 import MainsTagsView from '../src/components/mains/MainsTagsView';
 import TopperCopiesView from '../src/components/mains/TopperCopiesView';
+import TopperImageViewerModal from '../src/components/mains/TopperImageViewerModal';
+import QuestionBankTopperCard from '../src/components/mains/QuestionBankTopperCard';
+import AttachedTopperStrip from '../src/components/mains/AttachedTopperStrip';
+import { sampleTopperQuestions } from '../src/data/topperSampleData';
+import {
+  isTopperAnswer,
+  isGenuineTopperAnswer,
+  isTopperQuestion,
+  getTopperName,
+  getAir,
+  getTopperPageUrls,
+  normalizeQuestionKey,
+  buildTopperAttachmentMap,
+  getAllTopperQuestions,
+  ConsolidatedAnswer,
+} from '../src/utils/topperHelpers';
 import {
   View,
   Text,
@@ -437,7 +453,7 @@ const getValueAddSub = (va: any): string => va.subtopic || va.subTopic || va.sub
 const getValueAddNano = (va: any): string => va.nanotopic || va.nanoTopic || va.nano_topic || '';
 
 interface MainsFilters {
-  searchAcross: ('Questions' | 'Answers' | 'Value Additions')[];
+  searchAcross: ('Questions' | 'Answers' | 'Value Additions' | 'Topper Copies')[];
   pyqFilter: 'All' | 'PYQ Only' | 'Non-PYQ';
   revisionTags: string;
   institutes: string;
@@ -454,7 +470,7 @@ interface MainsFilters {
 }
 
 const DEFAULT_MAINS_FILTERS: MainsFilters = {
-  searchAcross: ['Questions', 'Value Additions'],
+  searchAcross: ['Questions', 'Value Additions', 'Topper Copies'],
   pyqFilter: 'All',
   revisionTags: 'All',
   institutes: 'All',
@@ -3340,10 +3356,16 @@ const getCleanAvailableAnswers = (answers: any[]) => {
     const name = ans.institute.trim().toLowerCase();
     if (seen.has(name)) return false;
     
-    // Check if the answer text is valid/available
+    // Check if the answer text is valid/available or if it is a topper answer with pages
+    const hasTopperPages = Boolean(
+      ans.is_topper ||
+      ans.topper ||
+      (ans.page_urls && ans.page_urls.length > 0) ||
+      (Array.isArray(ans.pages) && ans.pages.length > 0)
+    );
     const text = ans.answerText || ans.answer_text || '';
     const lower = text.toLowerCase();
-    if (!text.trim() || lower.includes('not covered') || lower.includes('no answer compiled') || lower.includes('no answer text available')) {
+    if (!hasTopperPages && (!text.trim() || lower.includes('not covered') || lower.includes('no answer compiled') || lower.includes('no answer text available'))) {
       return false;
     }
     
@@ -4661,8 +4683,10 @@ function MainsLeftPanel({
             SEARCH IN
           </Text>
           <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 5, paddingHorizontal: 2 }}>
-            {(['Questions', 'Answers', 'Value Additions'] as const).map(opt => {
-              const searchAcrossList = filters.searchAcross || ['Questions', 'Answers', 'Value Additions'];
+            {(['Questions', 'Answers', 'Value Additions', 'Topper Copies'] as const).map(opt => {
+              const searchAcrossList = (filters.searchAcross && filters.searchAcross.length > 0)
+                ? filters.searchAcross
+                : DEFAULT_MAINS_FILTERS.searchAcross;
               const isSelected = searchAcrossList.includes(opt);
               return (
                 <TouchableOpacity
@@ -4684,7 +4708,7 @@ function MainsLeftPanel({
                   style={[styles.sidebarFchip, isSelected && [styles.sidebarFchipSel, { backgroundColor: colors.primary, borderColor: colors.primary }]]}
                 >
                   <Text style={[styles.sidebarFchipText, { color: isSelected ? '#fff' : colors.textSecondary }]}>
-                    {opt === 'Questions' ? 'Question Text' : opt === 'Answers' ? 'Answer Text' : 'Value Adds'}
+                    {opt === 'Questions' ? 'Question Text' : opt === 'Answers' ? 'Answer Text' : opt === 'Value Additions' ? 'Value Adds' : 'Topper Copies'}
                   </Text>
                 </TouchableOpacity>
               );
@@ -5914,12 +5938,60 @@ function QuestionBankView({
     };
   }, [colors, zoomFontSize, keyBoxColor, textColorMode]);
 
-  // View mode selector state: 'all' | 'questions' | 'valueAdd'
-  const [viewMode, setViewMode] = useState<'all' | 'questions' | 'valueAdd'>('all');
+  // View mode selector state: 'all' | 'questions' | 'valueAdd' | 'toppers'
+  const [viewMode, setViewMode] = useState<'all' | 'questions' | 'valueAdd' | 'toppers'>('all');
+
+  // Full-screen Image Viewer Lightbox for Topper Copies
+  const [topperViewerVisible, setTopperViewerVisible] = useState(false);
+  const [topperViewerImages, setTopperViewerImages] = useState<string[]>([]);
+  const [topperViewerIndex, setTopperViewerIndex] = useState(0);
+  const [topperViewerName, setTopperViewerName] = useState('Topper');
+  const [topperViewerAir, setTopperViewerAir] = useState<string | number | undefined>(undefined);
+  const [topperViewerQuestionText, setTopperViewerQuestionText] = useState('');
+
+  const handleOpenTopperViewer = useCallback((
+    images: string[],
+    index: number = 0,
+    name?: string,
+    air?: string | number,
+    qText?: string
+  ) => {
+    if (!images || images.length === 0) return;
+    setTopperViewerImages(images);
+    setTopperViewerIndex(index);
+    setTopperViewerName(name || 'Topper');
+    setTopperViewerAir(air);
+    setTopperViewerQuestionText(qText || '');
+    setTopperViewerVisible(true);
+  }, []);
+
+  // Combined corpus of questions + sample toppers to guard against cache miss
+  const allQuestionsPool = useMemo(() => {
+    const seen = new Set<string>();
+    const pool: ConsolidatedQuestion[] = [];
+    (questions || []).forEach(q => {
+      if (q && q.id && !seen.has(q.id)) {
+        seen.add(q.id);
+        pool.push(q);
+      }
+    });
+    (sampleTopperQuestions || []).forEach(q => {
+      if (q && q.id && !seen.has(q.id)) {
+        seen.add(q.id);
+        pool.push(q);
+      }
+    });
+    return pool;
+  }, [questions]);
+
+  // Lookup map for fast topper attachment: questionKey -> genuine topper answers
+  const topperAttachmentMap = useMemo(() => {
+    return buildTopperAttachmentMap(allQuestionsPool);
+  }, [allQuestionsPool]);
 
   useEffect(() => {
     if (expandedId) {
-      const q = questions.find(item => item.id === expandedId);
+      const q = allQuestionsPool.find(item => item.id === expandedId) || questions.find(item => item.id === expandedId);
       if (q) {
         const cleanAnsList = getCleanAvailableAnswers(q.answers);
         const currentInst = cleanAnsList.length > 0 ? (selectedInstitutes[q.id] || cleanAnsList[0].institute) : undefined;
@@ -5929,13 +6001,13 @@ function QuestionBankView({
       onActiveQuestionChange?.(null);
     }
     return () => onActiveQuestionChange?.(null);
-  }, [expandedId, selectedInstitutes, questions, onActiveQuestionChange]);
+  }, [expandedId, selectedInstitutes, questions, allQuestionsPool, onActiveQuestionChange]);
 
   const [filters, setFilters] = useState<MainsFilters>(() => {
     const base = initialFilters || DEFAULT_MAINS_FILTERS;
     return {
       ...base,
-      searchAcross: base.searchAcross && base.searchAcross.length > 0 ? base.searchAcross : ['Questions', 'Answers', 'Value Additions'],
+      searchAcross: base.searchAcross && base.searchAcross.length > 0 ? base.searchAcross : DEFAULT_MAINS_FILTERS.searchAcross,
     };
   });
 
@@ -5960,7 +6032,7 @@ function QuestionBankView({
         lastSyncedFiltersRef.current = serialized;
         setFilters({
           ...initialFilters,
-          searchAcross: initialFilters.searchAcross && initialFilters.searchAcross.length > 0 ? initialFilters.searchAcross : ['Questions', 'Answers', 'Value Additions'],
+          searchAcross: initialFilters.searchAcross && initialFilters.searchAcross.length > 0 ? initialFilters.searchAcross : DEFAULT_MAINS_FILTERS.searchAcross,
         });
       }
     }
@@ -6211,6 +6283,7 @@ function QuestionBankView({
   // Instead we run filtering asynchronously and show chip visual feedback instantly.
   const [filteredQuestions, setFilteredQuestions] = useState<ConsolidatedQuestion[]>([]);
   const [filteredValueAdds, setFilteredValueAdds] = useState<ValueAdditionItem[]>([]);
+  const [filteredToppers, setFilteredToppers] = useState<ConsolidatedQuestion[]>([]);
   const filterTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const filterVersionRef = useRef(0);
 
@@ -6240,11 +6313,13 @@ function QuestionBankView({
       const selectedTags = filters.revisionTags !== 'All' ? filters.revisionTags.split(',') : null;
       const searchLower = search.trim().toLowerCase();
 
-      // Filter Questions
-      const result = questions.filter(q => {
-        if (version !== filterVersionRef.current) return false; // stale, abort early
-        if (!filters.searchAcross.includes('Questions')) return false;
+      // Search across flags
+      const searchInQuestions = filters.searchAcross.includes('Questions');
+      const searchInAnswers = filters.searchAcross.includes('Answers');
+      const searchInToppers = filters.searchAcross.includes('Topper Copies');
 
+      // Shared matcher for question evaluation against filters
+      const matchesQuestionFilters = (q: ConsolidatedQuestion) => {
         // PYQ Filter
         const isPyq = !!q.is_pyq && String(q.is_pyq).toLowerCase() !== 'false' && String(q.is_pyq) !== '0';
         if (filters.pyqFilter === 'PYQ Only' && !isPyq) return false;
@@ -6269,22 +6344,80 @@ function QuestionBankView({
         }
 
         const subtopicVal = getQuestionSub(q);
-        // Search across fields controlled by the sidebar 'SEARCH IN' toggles
-        const searchInQuestions = filters.searchAcross.includes('Questions');
-        const searchInAnswers = filters.searchAcross.includes('Answers');
-        const qText = searchInQuestions ? (q.questionText?.toLowerCase() || '') : '';
-        const aText = searchInAnswers
-          ? (q.answers || []).map((a: any) => a.answerText || '').join(' ').toLowerCase()
-          : '';
-        const matchSearch = !searchLower ||
-          (searchInQuestions && qText.includes(searchLower)) ||
-          (searchInAnswers && aText.includes(searchLower));
 
-        if (!matchSearch) return false;
+        // Search text matching
+        if (searchLower) {
+          const isTopper = isTopperQuestion(q);
+          const qText = (searchInQuestions || (searchInToppers && isTopper))
+            ? (q.questionText?.toLowerCase() || '')
+            : '';
+          const aText = searchInAnswers
+            ? (q.answers || []).map((a: any) => a.answerText || '').join(' ').toLowerCase()
+            : '';
 
-        // 1. by default dont show optional question unless chose optional in stage filter in sidebar
+          // Syllabus topics matching
+          const qSubject = (q.subject || '').toLowerCase();
+          const qSec = (getQuestionSection(q) || '').toLowerCase();
+          const qMicro = (getQuestionMicro(q) || '').toLowerCase();
+          const qSub = (subtopicVal || '').toLowerCase();
+          const qNano = (getQuestionNano(q) || '').toLowerCase();
+          const qMacro = (q.macrotag || '').toLowerCase();
+          const qMicrotag = (q.microtag || '').toLowerCase();
+          const hPathMatch = Array.isArray(q.hierarchy_path) &&
+            q.hierarchy_path.some((h: any) => String(h).toLowerCase().includes(searchLower));
+          const syllabusMatch =
+            qSubject.includes(searchLower) ||
+            qSec.includes(searchLower) ||
+            qMicro.includes(searchLower) ||
+            qSub.includes(searchLower) ||
+            qNano.includes(searchLower) ||
+            qMacro.includes(searchLower) ||
+            qMicrotag.includes(searchLower) ||
+            hPathMatch;
+
+          // Topper metadata match (candidate name, institute, AIR rank)
+          let topperMatch = false;
+          if (searchInToppers) {
+            const key = normalizeQuestionKey(q);
+            const attached = topperAttachmentMap.get(key) || [];
+            const candidateAnswers = (q.answers || []).concat(attached);
+            const qTopperName = (q.topper_name || '').toLowerCase();
+            const qAir = String(q.air_rank || '').toLowerCase();
+            const directTopperMatch =
+              (qTopperName && qTopperName.includes(searchLower)) ||
+              (qAir && (qAir.includes(searchLower) || ('air ' + qAir).includes(searchLower) || ('air' + qAir).includes(searchLower)));
+
+            topperMatch = directTopperMatch || candidateAnswers.some(a => {
+              if (!isTopperAnswer(a)) return false;
+              const tName = getTopperName(a, q).toLowerCase();
+              const rawAir = getAir(a, q);
+              const tAir = String(rawAir || '').toLowerCase();
+              const inst = (a.institute || '').toLowerCase();
+              return (
+                tName.includes(searchLower) ||
+                tAir.includes(searchLower) ||
+                ('air ' + tAir).includes(searchLower) ||
+                ('air' + tAir).includes(searchLower) ||
+                inst.includes(searchLower)
+              );
+            });
+          }
+
+          const matchSearch =
+            (searchInQuestions && qText.includes(searchLower)) ||
+            (searchInAnswers && aText.includes(searchLower)) ||
+            syllabusMatch ||
+            topperMatch;
+
+          if (!matchSearch) return false;
+        }
+
+        // Paper matching:
+        // By default, paper = All hides Optional questions.
+        // When active search query has length >= 2, search across the full corpus including Optional!
+        // If user explicitly picked specific paper(s), respect that filter.
         const matchPaper = paperFilter.length === 0
-          ? q.paper !== 'Optional'
+          ? (searchLower.length >= 2 ? true : q.paper !== 'Optional')
           : paperFilter.some(pf => {
               const pNorm = pf.trim().toLowerCase().replace(/\s+/g, '');
               const qNorm = (q.paper || '').trim().toLowerCase().replace(/\s+/g, '');
@@ -6338,9 +6471,46 @@ function QuestionBankView({
         if (!matchYear) return false;
 
         return true;
-      });
+      };
 
-      // Filter Value Additions
+      // 1. Filter Questions
+      const result: ConsolidatedQuestion[] = [];
+      const seenQuestionKeys = new Set<string>();
+
+      if (searchInQuestions) {
+        allQuestionsPool.forEach(q => {
+          if (version !== filterVersionRef.current) return;
+          // Separate normal questions from topper copies via domain helper
+          if (isTopperQuestion(q)) return;
+
+          if (matchesQuestionFilters(q)) {
+            result.push(q);
+            const key = normalizeQuestionKey(q);
+            if (key) seenQuestionKeys.add(key);
+          }
+        });
+      }
+
+      // 2. Filter Standalone Topper Copies
+      const topperResult: ConsolidatedQuestion[] = [];
+      if (searchInToppers) {
+        allQuestionsPool.forEach(q => {
+          if (version !== filterVersionRef.current) return;
+          if (!isTopperQuestion(q)) return;
+
+          // Deduplicate: If this topper question's key already matches a normal question in result,
+          // it attaches directly to that question card instead of showing as a duplicate standalone card!
+          const key = normalizeQuestionKey(q);
+          if (key && seenQuestionKeys.has(key)) return;
+
+          if (matchesQuestionFilters(q)) {
+            topperResult.push(q);
+            if (key) seenQuestionKeys.add(key);
+          }
+        });
+      }
+
+      // 3. Filter Value Additions
       const valAddResult = valueAddItems.filter(va => {
         if (version !== filterVersionRef.current) return false; // stale, abort early
         
@@ -6359,7 +6529,7 @@ function QuestionBankView({
           const matchPaper = paperFilter.includes(va.paper || '');
           if (!matchPaper) return false;
         } else {
-          if (va.paper === 'Optional') return false;
+          if (searchLower.length < 2 && va.paper === 'Optional') return false;
         }
 
         // Subject filter
@@ -6371,8 +6541,8 @@ function QuestionBankView({
         // Institute filter
         if (selectedInsts) {
           if (!va.institutes) return false;
-          const vaInstArray = va.institutes.split(',').map(i => i.trim());
-          const matchInst = vaInstArray.some(inst => selectedInsts.includes(inst));
+          const vaInstArray = va.institutes.split(',').map((i: string) => i.trim());
+          const matchInst = vaInstArray.some((inst: string) => selectedInsts.includes(inst));
           if (!matchInst) return false;
         }
 
@@ -6413,7 +6583,7 @@ function QuestionBankView({
       if (version === filterVersionRef.current) {
         const elapsed = Date.now() - startTs;
         if (elapsed > 100) {
-          console.log(`[QuestionBank] filter took ${elapsed}ms for ${questions.length} questions → ${result.length} results`);
+          console.log(`[QuestionBank] filter took ${elapsed}ms: ${result.length} questions, ${topperResult.length} toppers, ${valAddResult.length} VAs`);
         }
         // Sort: PYQ first → Non-PYQ, year descending, GS1→GS2→GS3→GS4, same-subject together
         const paperOrder: Record<string, number> = { GS1: 0, GS2: 1, GS3: 2, GS4: 3, Essay: 4, Optional: 5 };
@@ -6439,34 +6609,136 @@ function QuestionBankView({
           if (secA !== secB) return secA.localeCompare(secB);
           return 0;
         });
+
+        topperResult.sort((a, b) => {
+          const yearA = a.year || a.topper_year || 0;
+          const yearB = b.year || b.topper_year || 0;
+          if (yearA !== yearB) return yearB - yearA;
+          return 0;
+        });
+
         setFilteredQuestions(result);
         setFilteredValueAdds(valAddResult);
+        setFilteredToppers(topperResult);
       }
     }, 0); // defer to next frame
 
     return () => {
       if (filterTimerRef.current) clearTimeout(filterTimerRef.current);
     };
-  }, [search, filters, questions, valueAddItems, userQuestionStates]);
+  }, [search, filters, allQuestionsPool, valueAddItems, userQuestionStates, topperAttachmentMap]);
 
   const activeContent = useMemo(() => {
-    let list: any[] = [];
+    let list: Array<{
+      kind: 'question' | 'valueAdd' | 'topper';
+      data: any;
+      id: string;
+      attachedToppers?: ConsolidatedAnswer[];
+      topperAnswer?: ConsolidatedAnswer;
+    }> = [];
+
+    const getAttachedForQuestion = (q: ConsolidatedQuestion): ConsolidatedAnswer[] => {
+      const key = normalizeQuestionKey(q);
+      const attached = topperAttachmentMap.get(key) || [];
+      const inlineToppers = (q.answers || []).filter(isTopperAnswer);
+      const combined = [...attached];
+      inlineToppers.forEach(ia => {
+        if (!combined.some(a => (a.id && a.id === ia.id) || (a.institute && a.institute === ia.institute))) {
+          combined.push(ia);
+        }
+      });
+      return combined;
+    };
+
+    const getTopperAnswer = (tq: ConsolidatedQuestion): ConsolidatedAnswer | undefined => {
+      return (tq.answers || []).find((a: any) => (a.page_urls && a.page_urls.length > 0) || a.is_topper) || tq.answers?.[0];
+    };
+
     if (viewMode === 'questions') {
-      list = filteredQuestions;
+      list = filteredQuestions.map(q => ({
+        kind: 'question',
+        data: q,
+        attachedToppers: getAttachedForQuestion(q),
+        id: q.id,
+      }));
     } else if (viewMode === 'valueAdd') {
-      list = filteredValueAdds;
+      list = filteredValueAdds.map(va => ({
+        kind: 'valueAdd',
+        data: va,
+        id: va.id,
+      }));
+    } else if (viewMode === 'toppers') {
+      const topperItems: Array<{
+        kind: 'question' | 'valueAdd' | 'topper';
+        data: any;
+        id: string;
+        attachedToppers?: ConsolidatedAnswer[];
+        topperAnswer?: ConsolidatedAnswer;
+      }> = [];
+      const seenIds = new Set<string>();
+      filteredQuestions.forEach(q => {
+        const attached = getAttachedForQuestion(q);
+        if (attached.length > 0 && !seenIds.has(q.id)) {
+          seenIds.add(q.id);
+          topperItems.push({
+            kind: 'question',
+            data: q,
+            attachedToppers: attached,
+            id: q.id,
+          });
+        }
+      });
+      filteredToppers.forEach(tq => {
+        if (!seenIds.has(tq.id)) {
+          seenIds.add(tq.id);
+          topperItems.push({
+            kind: 'topper',
+            data: tq,
+            topperAnswer: getTopperAnswer(tq),
+            id: tq.id,
+          });
+        }
+      });
+      list = topperItems;
     } else {
-      list = [...filteredQuestions, ...filteredValueAdds];
+      // 'all'
+      const allItems: Array<{
+        kind: 'question' | 'valueAdd' | 'topper';
+        data: any;
+        id: string;
+        attachedToppers?: ConsolidatedAnswer[];
+        topperAnswer?: ConsolidatedAnswer;
+      }> = [];
+      filteredQuestions.forEach(q => {
+        allItems.push({
+          kind: 'question',
+          data: q,
+          attachedToppers: getAttachedForQuestion(q),
+          id: q.id,
+        });
+      });
+      filteredValueAdds.forEach(va => {
+        allItems.push({
+          kind: 'valueAdd',
+          data: va,
+          id: va.id,
+        });
+      });
+      filteredToppers.forEach(tq => {
+        allItems.push({
+          kind: 'topper',
+          data: tq,
+          topperAnswer: getTopperAnswer(tq),
+          id: tq.id,
+        });
+      });
+      list = allItems;
     }
 
     // Sort: favorites first for value addition cards
     const sorted = [...list].sort((a, b) => {
-      const isAValAdd = !a.hasOwnProperty('questionText');
-      const isBValAdd = !b.hasOwnProperty('questionText');
-      
-      const aFav = (isAValAdd && vaFavorites.has(a.id)) ? 1 : 0;
-      const bFav = (isBValAdd && vaFavorites.has(b.id)) ? 1 : 0;
-      
+      const aFav = (a.kind === 'valueAdd' && vaFavorites.has(a.id)) ? 1 : 0;
+      const bFav = (b.kind === 'valueAdd' && vaFavorites.has(b.id)) ? 1 : 0;
       if (aFav !== bFav) {
         return bFav - aFav;
       }
@@ -6474,7 +6746,7 @@ function QuestionBankView({
     });
 
     return sorted;
-  }, [viewMode, filteredQuestions, filteredValueAdds, vaFavorites]);
+  }, [viewMode, filteredQuestions, filteredValueAdds, filteredToppers, topperAttachmentMap, vaFavorites]);
 
   return (
     <View style={styles.subContainer}>
@@ -6496,7 +6768,7 @@ function QuestionBankView({
               macrotagOptions={macrotagOptions}
               microtagOptions={microtagOptions}
               isSearchView={false}
-              totalCount={filteredQuestions.length + filteredValueAdds.length}
+              totalCount={filteredQuestions.length + filteredValueAdds.length + filteredToppers.length}
               allInstitutes={allInstitutes}
               allPrograms={allPrograms}
               userTags={userTags}
@@ -6634,7 +6906,7 @@ function QuestionBankView({
                     <View style={[styles.largeSearchInput, { flex: 1, backgroundColor: colors.surface + '66', borderColor: 'rgba(255,255,255,0.7)', height: 60, borderRadius: 20, marginBottom: 0 }]}>
                       <Search size={20} color="#94a3b8" style={{ marginRight: 12 }} />
                       <TextInput
-                        placeholder="Search questions, topics, themes..."
+                        placeholder="Search questions, value adds, topper copies…"
                         placeholderTextColor="#94a3b8"
                         value={search}
                         onChangeText={setSearch}
@@ -6649,36 +6921,61 @@ function QuestionBankView({
                   </View>
 
                   {/* ─── VIEW MODE SWITCHER ─── */}
-                  <View style={{ flexDirection: 'row', gap: 6, marginTop: 6, marginBottom: 2 }}>
-                    {(['all', 'questions', 'valueAdd'] as const).map(mode => {
-                      const labels: Record<string, string> = { all: 'All', questions: 'Questions Only', valueAdd: 'Value Additions Only' };
-                      const counts: Record<string, number> = { all: filteredQuestions.length + filteredValueAdds.length, questions: filteredQuestions.length, valueAdd: filteredValueAdds.length };
-                      const colors_map: Record<string, string> = { all: '#7c3aed', questions: '#3b82f6', valueAdd: '#10b981' };
-                      const isActive = viewMode === mode;
-                      return (
-                        <TouchableOpacity
-                          key={mode}
-                          onPress={() => setViewMode(mode)}
-                          style={[
-                            styles.filterPill,
-                            {
-                              backgroundColor: isActive ? colors_map[mode] : (colors.surface + 'b3'),
-                              borderColor: isActive ? colors_map[mode] : colors.border,
-                              paddingVertical: 5,
-                              paddingHorizontal: 10,
-                            }
-                          ]}
-                        >
-                          <Text style={[styles.filterPillText, { color: isActive ? '#fff' : colors.textSecondary, fontWeight: '700', fontSize: 11 }]}>
-                            {labels[mode]}
-                          </Text>
-                          <View style={{ backgroundColor: isActive ? 'rgba(255,255,255,0.25)' : colors.border, borderRadius: 8, paddingHorizontal: 5, paddingVertical: 1, marginLeft: 5 }}>
-                            <Text style={{ fontSize: 9, fontWeight: '900', color: isActive ? '#fff' : colors.textTertiary }}>{counts[mode]}</Text>
-                          </View>
-                        </TouchableOpacity>
-                      );
-                    })}
-                  </View>
+                  {(() => {
+                    const attachedCount = filteredQuestions.filter(q => {
+                      const key = normalizeQuestionKey(q);
+                      const attached = topperAttachmentMap.get(key);
+                      return (attached && attached.length > 0) || (q.answers || []).some(a => isTopperAnswer(a));
+                    }).length;
+                    const counts: Record<string, number> = {
+                      all: filteredQuestions.length + filteredValueAdds.length + filteredToppers.length,
+                      questions: filteredQuestions.length,
+                      valueAdd: filteredValueAdds.length,
+                      toppers: filteredToppers.length + attachedCount,
+                    };
+                    const labels: Record<string, string> = {
+                      all: 'All',
+                      questions: 'Questions',
+                      valueAdd: 'Value Additions',
+                      toppers: 'Topper Copies',
+                    };
+                    const colors_map: Record<string, string> = {
+                      all: '#7c3aed',
+                      questions: '#3b82f6',
+                      valueAdd: '#10b981',
+                      toppers: '#f97316',
+                    };
+
+                    return (
+                      <View style={{ flexDirection: 'row', gap: 6, marginTop: 6, marginBottom: 2 }}>
+                        {(['all', 'questions', 'valueAdd', 'toppers'] as const).map(mode => {
+                          const isActive = viewMode === mode;
+                          return (
+                            <TouchableOpacity
+                              key={mode}
+                              onPress={() => setViewMode(mode)}
+                              style={[
+                                styles.filterPill,
+                                {
+                                  backgroundColor: isActive ? colors_map[mode] : (colors.surface + 'b3'),
+                                  borderColor: isActive ? colors_map[mode] : colors.border,
+                                  paddingVertical: 5,
+                                  paddingHorizontal: 10,
+                                }
+                              ]}
+                            >
+                              <Text style={[styles.filterPillText, { color: isActive ? '#fff' : colors.textSecondary, fontWeight: '700', fontSize: 11 }]}>
+                                {labels[mode]}
+                              </Text>
+                              <View style={{ backgroundColor: isActive ? 'rgba(255,255,255,0.25)' : colors.border, borderRadius: 8, paddingHorizontal: 5, paddingVertical: 1, marginLeft: 5 }}>
+                                <Text style={{ fontSize: 9, fontWeight: '900', color: isActive ? '#fff' : colors.textTertiary }}>{counts[mode]}</Text>
+                              </View>
+                            </TouchableOpacity>
+                          );
+                        })}
+                      </View>
+                    );
+                  })()}
 
                   {(() => {
                     const hasHierarchyActive = filters.paper !== 'All' || filters.subjects !== 'All' || filters.sections !== 'All' || filters.microtopics !== 'All' || filters.subtopics !== 'All' || filters.nanotopics !== 'All' || filters.macrotags !== 'All' || filters.microtags !== 'All';
@@ -7039,10 +7336,16 @@ function QuestionBankView({
                 </View>
               </View>
             }
-            renderItem={({ item, index }) => {
+            renderItem={({ item, index }: { item: any; index: number }) => {
+              const isTaggedUnion = Boolean(item && (item as any).kind);
+              const kind = isTaggedUnion
+                ? (item as any).kind
+                : ((item as any).category !== undefined && !(item as any).questionText ? 'valueAdd' : 'question');
+              const rawItem = isTaggedUnion ? (item as any).data : item;
+
               // ── VALUE ADDITION CARD ──
-              if ((item as any).category !== undefined && !(item as any).questionText) {
-                const va = item as ValueAdditionItem;
+              if (kind === 'valueAdd' || ((rawItem as any).category !== undefined && !(rawItem as any).questionText)) {
+                const va = rawItem as ValueAdditionItem;
                 return (
                   <View key={va.id} style={[styles.figmaQuestionCard, { backgroundColor: 'rgba(236,253,245,0.7)', borderColor: 'rgba(16,185,129,0.3)', marginBottom: 12, borderWidth: 1.5 }]}>
                     {/* VA Header badge */}
@@ -7074,8 +7377,38 @@ function QuestionBankView({
                 );
               }
 
+              // ── STANDALONE TOPPER CARD ──
+              if (kind === 'topper') {
+                const tq = rawItem as ConsolidatedQuestion;
+                const topperAns = (item as any).topperAnswer || (tq.answers || []).find((a: any) => isTopperAnswer(a)) || tq.answers?.[0];
+                return (
+                  <QuestionBankTopperCard
+                    key={tq.id}
+                    question={tq}
+                    topperAnswer={topperAns}
+                    colors={colors}
+                    isDark={isDark}
+                    zoomFontSize={zoomFontSize}
+                    isBookmarked={savedIds.includes(tq.id)}
+                    onToggleBookmark={onToggleSaved}
+                    onOpenViewer={handleOpenTopperViewer}
+                    onOpenDetailed={onOpenDetailed}
+                  />
+                );
+              }
+
               // ── QUESTION CARD ──
-              const q = item as ConsolidatedQuestion;
+              const q = rawItem as ConsolidatedQuestion;
+              const qKey = normalizeQuestionKey(q);
+              const mapToppers = topperAttachmentMap.get(qKey) || [];
+              const rawAttached = isTaggedUnion ? ((item as any).attachedToppers || []) : [];
+              const inlineToppers = (q.answers || []).filter(isTopperAnswer);
+              const attachedToppers: ConsolidatedAnswer[] = [...rawAttached];
+              [...mapToppers, ...inlineToppers].forEach(top => {
+                if (!attachedToppers.some(a => (a.id && a.id === top.id) || (a.institute && a.institute === top.institute))) {
+                  attachedToppers.push(top);
+                }
+              });
               const isExpanded = expandedId === q.id;
               const isBookmarked = savedIds.includes(q.id);
 
@@ -7132,6 +7465,29 @@ function QuestionBankView({
                             }}>PYQ</Text>
                           </View>
                         )}
+                        {attachedToppers.length > 0 && (
+                          <View style={{
+                            backgroundColor: 'rgba(249, 115, 22, 0.12)',
+                            borderColor: 'rgba(249, 115, 22, 0.35)',
+                            borderWidth: 1,
+                            borderRadius: 6,
+                            paddingHorizontal: 6,
+                            paddingVertical: 1,
+                            marginRight: 8,
+                            flexDirection: 'row',
+                            alignItems: 'center',
+                            gap: 3,
+                          }}>
+                            <Award size={10} color="#ea580c" />
+                            <Text style={{
+                              color: '#ea580c',
+                              fontSize: Math.round(zoomFontSize * 0.65),
+                              fontWeight: '900',
+                            }}>
+                              {attachedToppers.length} TOPPER COP{attachedToppers.length > 1 ? 'IES' : 'Y'}
+                            </Text>
+                          </View>
+                        )}
                         <Text style={[styles.paperBadgeText, { color: '#3b82f6', fontSize: Math.round(zoomFontSize * 0.65) }]}>{q.paper}</Text>
                         {!!q.year && (
                           <>
@@ -7158,6 +7514,17 @@ function QuestionBankView({
                     </View>
                   </TouchableOpacity>
 
+                  {/* ── ATTACHED TOPPER COPIES STRIP ── */}
+                  {attachedToppers.length > 0 && (
+                    <AttachedTopperStrip
+                      question={q}
+                      attachedToppers={attachedToppers}
+                      colors={colors}
+                      isDark={isDark}
+                      onOpenViewer={handleOpenTopperViewer}
+                    />
+                  )}
+
                   {isExpanded && (
                     <View style={[
                       styles.answerContainerSpacious,
@@ -7167,9 +7534,16 @@ function QuestionBankView({
                         borderTopWidth: 1,
                       }
                     ]}>
-                      {q.answers && q.answers.length > 0 ? (() => {
-                        const cleanAnsList = getCleanAvailableAnswers(q.answers);
-                        if (cleanAnsList.length === 0) {
+                      {(() => {
+                        const cleanAnsList = getCleanAvailableAnswers(q.answers || []);
+                        const combinedAnsList: ConsolidatedAnswer[] = [...cleanAnsList];
+                        (attachedToppers || []).forEach(at => {
+                          if (!combinedAnsList.some(a => (a.id && a.id === at.id) || (a.institute && a.institute === at.institute))) {
+                            combinedAnsList.push(at);
+                          }
+                        });
+
+                        if (combinedAnsList.length === 0) {
                           return (
                             <View style={{ padding: 12 }}>
                               <Text style={{ fontSize: 13, color: colors.textTertiary, fontStyle: 'italic' }}>
@@ -7179,21 +7553,16 @@ function QuestionBankView({
                           );
                         }
                         
-                        const currentInst = selectedInstitutes[q.id] || cleanAnsList[0].institute;
-                        const activeAnswer = cleanAnsList.find(ans => ans.institute === currentInst) || cleanAnsList[0];
+                        const currentInst = selectedInstitutes[q.id] || combinedAnsList[0].institute;
+                        const activeAnswer = combinedAnsList.find(ans => ans.institute === currentInst) || combinedAnsList[0];
 
                         return (
                           <View>
                             {/* Horizontal Tab Bar of Institutes & Copy Button */}
                             <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 12 }}>
                               <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ flex: 1, marginRight: 8 }}>
-                                {cleanAnsList.map(ans => {
-                                  const isTopperAns = Boolean(
-                                    (ans as any).is_topper ||
-                                    (ans as any).topper ||
-                                    ans.institute?.toLowerCase().includes('topper') ||
-                                    ans.institute?.toUpperCase().includes('AIR')
-                                  );
+                                {combinedAnsList.map(ans => {
+                                  const isTopperAns = isTopperAnswer(ans);
                                   const isSelected = currentInst === ans.institute;
                                   const activeColor = isTopperAns ? '#f97316' : '#3b82f6';
 
@@ -7253,8 +7622,135 @@ function QuestionBankView({
                               </TouchableOpacity>
                             </View>
 
-                            {/* Render Answer Text in Markdown */}
+                            {/* Render Answer Text / Topper Handwritten Pages */}
                             {(() => {
+                              const isCurTopper = isTopperAnswer(activeAnswer);
+                              const topperPages = isCurTopper ? getTopperPageUrls(activeAnswer) : [];
+                              const topperName = getTopperName(activeAnswer, q);
+                              const topperAir = getAir(activeAnswer, q);
+
+                              if (isCurTopper && topperPages.length > 0) {
+                                return (
+                                  <View style={{ marginTop: 8 }}>
+                                    {/* Topper Header Row */}
+                                    <View style={{
+                                      flexDirection: 'row',
+                                      alignItems: 'center',
+                                      justifyContent: 'space-between',
+                                      marginBottom: 10,
+                                      paddingHorizontal: 4,
+                                    }}>
+                                      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, flexWrap: 'wrap', flex: 1 }}>
+                                        <Award size={14} color="#ea580c" />
+                                        <Text style={{ fontSize: 13, fontWeight: '800', color: '#ea580c' }}>
+                                          {topperName}
+                                        </Text>
+                                        {topperAir !== undefined && (
+                                          <View style={{
+                                            backgroundColor: '#ffedd5',
+                                            paddingHorizontal: 6,
+                                            paddingVertical: 1,
+                                            borderRadius: 4,
+                                            borderWidth: 0.5,
+                                            borderColor: '#fdba74'
+                                          }}>
+                                            <Text style={{ fontSize: 10, fontWeight: '800', color: '#c2410c' }}>
+                                              AIR {topperAir}
+                                            </Text>
+                                          </View>
+                                        )}
+                                        <Text style={{ fontSize: 11, color: colors.textTertiary }}>
+                                          · {topperPages.length} {topperPages.length === 1 ? 'page' : 'pages'}
+                                        </Text>
+                                      </View>
+
+                                      <TouchableOpacity
+                                        activeOpacity={0.7}
+                                        onPress={() => handleOpenTopperViewer(topperPages, 0, topperName, topperAir, q.questionText)}
+                                        style={{
+                                          flexDirection: 'row',
+                                          alignItems: 'center',
+                                          gap: 4,
+                                          paddingHorizontal: 10,
+                                          paddingVertical: 5,
+                                          borderRadius: 8,
+                                          backgroundColor: isDark ? 'rgba(249, 115, 22, 0.15)' : '#ffedd5',
+                                          borderWidth: 0.5,
+                                          borderColor: '#fdba74',
+                                        }}
+                                      >
+                                        <ExternalLink size={12} color="#ea580c" />
+                                        <Text style={{ fontSize: 11, fontWeight: '700', color: '#ea580c' }}>
+                                          Fullscreen Gallery
+                                        </Text>
+                                      </TouchableOpacity>
+                                    </View>
+
+                                    {/* Large Handwritten Page Previews - Direct Tap opens full-screen at that index */}
+                                    <ScrollView
+                                      horizontal
+                                      showsHorizontalScrollIndicator={false}
+                                      contentContainerStyle={{ gap: 10, paddingVertical: 4, paddingHorizontal: 2 }}
+                                    >
+                                      {topperPages.map((url, pIdx) => {
+                                        const resolvedUri = TopperImageCacheService.resolveImageUri(url);
+                                        return (
+                                          <TouchableOpacity
+                                            key={`page-${pIdx}`}
+                                            activeOpacity={0.85}
+                                            onPress={() => handleOpenTopperViewer(topperPages, pIdx, topperName, topperAir, q.questionText)}
+                                            style={{
+                                              width: 125,
+                                              height: 168,
+                                              borderRadius: 10,
+                                              overflow: 'hidden',
+                                              borderWidth: 1.5,
+                                              borderColor: isDark ? 'rgba(255, 255, 255, 0.2)' : 'rgba(234, 88, 12, 0.35)',
+                                              backgroundColor: isDark ? '#1e293b' : '#ffffff',
+                                              shadowColor: '#ea580c',
+                                              shadowOffset: { width: 0, height: 2 },
+                                              shadowOpacity: 0.15,
+                                              shadowRadius: 4,
+                                              elevation: 3,
+                                            }}
+                                          >
+                                            <ExpoImage
+                                              source={{ uri: resolvedUri }}
+                                              style={{ width: '100%', height: '100%' }}
+                                              contentFit="cover"
+                                              cachePolicy="memory-disk"
+                                              transition={150}
+                                            />
+                                            <View style={{
+                                              position: 'absolute',
+                                              bottom: 4,
+                                              right: 4,
+                                              backgroundColor: 'rgba(0, 0, 0, 0.75)',
+                                              paddingHorizontal: 6,
+                                              paddingVertical: 2,
+                                              borderRadius: 4,
+                                            }}>
+                                              <Text style={{ fontSize: 10, fontWeight: '800', color: '#ffffff' }}>
+                                                Page {pIdx + 1}
+                                              </Text>
+                                            </View>
+                                          </TouchableOpacity>
+                                        );
+                                      })}
+                                    </ScrollView>
+
+                                    {/* If non-empty textual content is available in answerText, show below */}
+                                    {!!activeAnswer.answerText && !activeAnswer.answerText.trim().startsWith('[Handwritten Topper Copy') && (
+                                      <View style={{ marginTop: 14 }}>
+                                        <Markdown key={`${keyBoxMode}-${keyBoxColor}-${textColorMode}-${zoomFontSize}`} style={dynamicMarkdownStyles} rules={getMarkdownRules(colors, isDark)}>
+                                          {cleanMarkdown(activeAnswer.answerText, keyBoxMode)}
+                                        </Markdown>
+                                      </View>
+                                    )}
+                                  </View>
+                                );
+                              }
+
                               const parsed = parseIntroductoryBox(activeAnswer.answerText);
                               if (parsed) {
                                 const approachZoom = Math.round(14 * zoomScale);
@@ -7288,13 +7784,7 @@ function QuestionBankView({
                             })()}
                           </View>
                         );
-                      })() : (
-                        <View style={{ padding: 12 }}>
-                          <Text style={{ fontSize: 13, color: colors.textTertiary, fontStyle: 'italic' }}>
-                            No solved answers available for this question.
-                          </Text>
-                        </View>
-                      )}
+                      })()}
                       {renderTaxonomyStrip(q, colors, isDark)}
                     </View>
                   )}
@@ -7352,6 +7842,16 @@ function QuestionBankView({
           colors={colors}
         />
       )}
+
+      <TopperImageViewerModal
+        visible={topperViewerVisible}
+        onClose={() => setTopperViewerVisible(false)}
+        images={topperViewerImages}
+        initialIndex={topperViewerIndex}
+        topperName={topperViewerName}
+        air={topperViewerAir}
+        questionText={topperViewerQuestionText}
+      />
     </View>
   );
 }
@@ -9427,7 +9927,12 @@ function ValueAdditionView({
 
 function countActiveMainsFilters(f: MainsFilters): number {
   let count = 0;
-  if (f.searchAcross.length < 3) count++;
+  const defaultAcross = DEFAULT_MAINS_FILTERS.searchAcross;
+  const isSearchAcrossModified =
+    !f.searchAcross ||
+    f.searchAcross.length !== defaultAcross.length ||
+    !defaultAcross.every(opt => f.searchAcross.includes(opt));
+  if (isSearchAcrossModified) count++;
   if (f.pyqFilter !== 'All') count++;
   if (f.revisionTags !== 'All') count++;
   if (f.institutes !== 'All') count++;
@@ -9532,6 +10037,30 @@ function MainsAISearchView({
 
   // Sidebar specific subject filter (client-side)
   const [sidebarSubjectFilter, setSidebarSubjectFilter] = useState<string | null>(null);
+
+  // Full-screen Image Viewer Lightbox for Topper Copies in Search
+  const [topperViewerVisible, setTopperViewerVisible] = useState(false);
+  const [topperViewerImages, setTopperViewerImages] = useState<string[]>([]);
+  const [topperViewerIndex, setTopperViewerIndex] = useState(0);
+  const [topperViewerName, setTopperViewerName] = useState('Topper');
+  const [topperViewerAir, setTopperViewerAir] = useState<string | number | undefined>(undefined);
+  const [topperViewerQuestionText, setTopperViewerQuestionText] = useState('');
+
+  const handleOpenTopperViewer = useCallback((
+    images: string[],
+    index: number = 0,
+    name?: string,
+    air?: string | number,
+    qText?: string
+  ) => {
+    if (!images || images.length === 0) return;
+    setTopperViewerImages(images);
+    setTopperViewerIndex(index);
+    setTopperViewerName(name || 'Topper');
+    setTopperViewerAir(air);
+    setTopperViewerQuestionText(qText || '');
+    setTopperViewerVisible(true);
+  }, []);
 
   const sortedResults = useMemo(() => {
     return [...results].sort((a, b) => {
@@ -9927,9 +10456,11 @@ function MainsAISearchView({
       const showQuestions = activeFilters.pyqFilter === 'All' || activeFilters.pyqFilter === 'PYQ Only';
       const searchQuestions = activeFilters.searchAcross.includes('Questions');
       const searchAnswers = activeFilters.searchAcross.includes('Answers');
- 
-      if (showQuestions && (searchQuestions || searchAnswers)) {
-        questions.forEach(q => {
+      const searchToppers = activeFilters.searchAcross.includes('Topper Copies');
+
+      if (showQuestions && (searchQuestions || searchAnswers || searchToppers)) {
+        const searchPool = (questions || []).concat((sampleTopperQuestions || []).filter(st => !(questions || []).some(q => q.id === st.id)));
+        searchPool.forEach(q => {
           // Hard Filters
           if (activeFilters.paper !== 'All' && !activeFilters.paper.split('|').includes(q.paper)) return;
           if (activeFilters.subjects !== 'All' && !activeFilters.subjects.split('|').includes(q.subject)) return;
@@ -10003,6 +10534,33 @@ function MainsAISearchView({
               }
             }
 
+            // Match in topper copies
+            if (searchToppers) {
+              const isTopper = isTopperQuestion(q);
+              if (isTopper && qText.includes(kw)) {
+                score += 2 * weight;
+                kwMatched = true;
+              }
+              const qTopper = (q.topper_name || '').toLowerCase();
+              const qAir = String(q.air_rank || '').toLowerCase();
+              if (qTopper.includes(kw) || qAir.includes(kw) || ('air ' + qAir).includes(kw)) {
+                score += 2 * weight;
+                kwMatched = true;
+              }
+              const candidateAnswers = q.answers || [];
+              candidateAnswers.forEach((a: any) => {
+                if (isTopperAnswer(a)) {
+                  const tName = getTopperName(a, q).toLowerCase();
+                  const rawAir = getAir(a, q);
+                  const tAir = String(rawAir || '').toLowerCase();
+                  if (tName.includes(kw) || tAir.includes(kw) || ('air ' + tAir).includes(kw)) {
+                    score += 2 * weight;
+                    kwMatched = true;
+                  }
+                }
+              });
+            }
+
             if (!kwMatched && engineMode === 'AI+Fuzzy') {
               // Fuzzy checks
               if (qText.length > 5 && kw.length > 3 && (qText.includes(kw.substring(0, 4)) || kw.includes(qText.substring(0, 4)))) {
@@ -10012,7 +10570,8 @@ function MainsAISearchView({
           });
 
           if (score > 0) {
-            matchedResults.push({ ...q, type: 'question', score });
+            const isTopper = isTopperQuestion(q);
+            matchedResults.push({ ...q, type: isTopper ? 'topper' : 'question', score });
           }
         });
       }
@@ -10299,13 +10858,14 @@ function MainsAISearchView({
             <View style={styles.filterGroup}>
               <Text style={[styles.filterGroupTitle, { color: colors.textTertiary }]}>SEARCH ACROSS</Text>
               <View style={styles.chipsWrap}>
-                {(['Questions', 'Answers', 'Value Additions'] as const).map(opt => {
-                  const isSelected = pendingFilters.searchAcross.includes(opt);
+                {(['Questions', 'Answers', 'Value Additions', 'Topper Copies'] as const).map(opt => {
+                  const currentList = pendingFilters.searchAcross || DEFAULT_MAINS_FILTERS.searchAcross;
+                  const isSelected = currentList.includes(opt);
                   return (
                     <TouchableOpacity
                       key={opt}
                       onPress={() => {
-                        const list = [...pendingFilters.searchAcross];
+                        const list = [...currentList];
                         const next = isSelected ? list.filter(i => i !== opt) : [...list, opt];
                         setPendingFilters(p => ({ ...p, searchAcross: next.length > 0 ? next : ['Questions'] }));
                       }}
@@ -11182,6 +11742,24 @@ function MainsAISearchView({
               </View>
             ) : (
               sortedResults.map((item, idx) => {
+                if (item.type === 'topper') {
+                  const topperAns = (item.answers || []).find((a: any) => isTopperAnswer(a)) || item.answers?.[0];
+                  return (
+                    <QuestionBankTopperCard
+                      key={item.id}
+                      question={item}
+                      topperAnswer={topperAns}
+                      colors={colors}
+                      isDark={isDark}
+                      zoomFontSize={Math.round(15 * (isTablet ? 1.1 : 1))}
+                      isBookmarked={savedQuestionIds.includes(item.id)}
+                      onToggleBookmark={onToggleBookmark}
+                      onOpenViewer={handleOpenTopperViewer}
+                      onOpenDetailed={onOpenDetailed}
+                    />
+                  );
+                }
+
                 if (item.type === 'question') {
                   const isExpanded = expandedId === item.id;
                   const isBookmarked = savedQuestionIds.includes(item.id);
@@ -11263,43 +11841,173 @@ function MainsAISearchView({
                             }
                             const currentInst = localSelectedAnswerInst[item.id] || cleanAnsList[0].institute;
                             const activeAnswer = cleanAnsList.find((ans: any) => ans.institute === currentInst) || cleanAnsList[0];
+                            const isCurTopper = isTopperAnswer(activeAnswer);
+                            const topperPages = isCurTopper ? getTopperPageUrls(activeAnswer) : [];
+                            const topperName = getTopperName(activeAnswer, item);
+                            const topperAir = getAir(activeAnswer, item);
 
                             return (
                               <View>
                                 <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: 12 }}>
-                                  {cleanAnsList.map((ans: any) => (
-                                    <TouchableOpacity
-                                      key={ans.institute}
-                                      onPress={() => setLocalSelectedAnswerInst(prev => ({ ...prev, [item.id]: ans.institute }))}
-                                      style={[
-                                        styles.segmentButton,
-                                        {
-                                          marginRight: 6,
-                                          paddingHorizontal: 12,
-                                          paddingVertical: 6,
-                                          borderRadius: 8,
-                                          borderWidth: 0.5,
-                                          borderColor: currentInst === ans.institute ? '#3b82f6' : colors.border
-                                        },
-                                        currentInst === ans.institute
-                                          ? { backgroundColor: '#3b82f6' }
-                                          : { backgroundColor: colors.surface + '88' }
-                                      ]}
-                                    >
-                                      <Text
-                                        style={{
-                                          fontSize: 12,
-                                          fontWeight: '800',
-                                          color: currentInst === ans.institute ? '#ffffff' : colors.textTertiary
-                                        }}
+                                  {cleanAnsList.map((ans: any) => {
+                                    const isTopperAns = isTopperAnswer(ans);
+                                    const isSelected = currentInst === ans.institute;
+                                    const activeColor = isTopperAns ? '#f97316' : '#3b82f6';
+                                    return (
+                                      <TouchableOpacity
+                                        key={ans.institute}
+                                        onPress={() => setLocalSelectedAnswerInst(prev => ({ ...prev, [item.id]: ans.institute }))}
+                                        style={[
+                                          styles.segmentButton,
+                                          {
+                                            marginRight: 6,
+                                            paddingHorizontal: 12,
+                                            paddingVertical: 6,
+                                            borderRadius: 8,
+                                            borderWidth: 0.5,
+                                            borderColor: isSelected ? activeColor : (isTopperAns ? 'rgba(249, 115, 22, 0.4)' : colors.border),
+                                            flexDirection: 'row',
+                                            alignItems: 'center',
+                                            gap: 4,
+                                          },
+                                          isSelected
+                                            ? { backgroundColor: activeColor }
+                                            : { backgroundColor: isTopperAns ? 'rgba(249, 115, 22, 0.08)' : colors.surface + '88' }
+                                        ]}
                                       >
-                                        {ans.institute}
-                                      </Text>
-                                    </TouchableOpacity>
-                                  ))}
+                                        {isTopperAns && (
+                                          <Award size={12} color={isSelected ? '#ffffff' : '#f97316'} />
+                                        )}
+                                        <Text
+                                          style={{
+                                            fontSize: 12,
+                                            fontWeight: '800',
+                                            color: isSelected ? '#ffffff' : (isTopperAns ? '#ea580c' : colors.textTertiary)
+                                          }}
+                                        >
+                                          {ans.institute}
+                                        </Text>
+                                      </TouchableOpacity>
+                                    );
+                                  })}
                                 </ScrollView>
 
-                                {(() => {
+                                {isCurTopper && topperPages.length > 0 ? (
+                                  <View style={{ marginTop: 8 }}>
+                                    <View style={{
+                                      flexDirection: 'row',
+                                      alignItems: 'center',
+                                      justifyContent: 'space-between',
+                                      marginBottom: 10,
+                                      paddingHorizontal: 4,
+                                    }}>
+                                      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                                        <Award size={14} color="#ea580c" />
+                                        <Text style={{ fontSize: 13, fontWeight: '800', color: '#ea580c' }}>
+                                          {topperName}
+                                        </Text>
+                                        {topperAir !== undefined && (
+                                          <View style={{
+                                            backgroundColor: '#ffedd5',
+                                            paddingHorizontal: 6,
+                                            paddingVertical: 1,
+                                            borderRadius: 4,
+                                            borderWidth: 0.5,
+                                            borderColor: '#fdba74'
+                                          }}>
+                                            <Text style={{ fontSize: 10, fontWeight: '800', color: '#c2410c' }}>
+                                              AIR {topperAir}
+                                            </Text>
+                                          </View>
+                                        )}
+                                        <Text style={{ fontSize: 11, color: colors.textTertiary }}>
+                                          · {topperPages.length} {topperPages.length === 1 ? 'page' : 'pages'}
+                                        </Text>
+                                      </View>
+
+                                      <TouchableOpacity
+                                        activeOpacity={0.7}
+                                        onPress={() => handleOpenTopperViewer(topperPages, 0, topperName, topperAir, item.questionText)}
+                                        style={{
+                                          flexDirection: 'row',
+                                          alignItems: 'center',
+                                          gap: 4,
+                                          paddingHorizontal: 10,
+                                          paddingVertical: 5,
+                                          borderRadius: 8,
+                                          backgroundColor: isDark ? 'rgba(249, 115, 22, 0.15)' : '#ffedd5',
+                                          borderWidth: 0.5,
+                                          borderColor: '#fdba74',
+                                        }}
+                                      >
+                                        <ExternalLink size={12} color="#ea580c" />
+                                        <Text style={{ fontSize: 11, fontWeight: '700', color: '#ea580c' }}>
+                                          Fullscreen Gallery
+                                        </Text>
+                                      </TouchableOpacity>
+                                    </View>
+
+                                    <ScrollView
+                                      horizontal
+                                      showsHorizontalScrollIndicator={false}
+                                      contentContainerStyle={{ gap: 10, paddingVertical: 4, paddingHorizontal: 2 }}
+                                    >
+                                      {topperPages.map((url: string, pIdx: number) => {
+                                        const resolvedUri = TopperImageCacheService.resolveImageUri(url);
+                                        return (
+                                          <TouchableOpacity
+                                            key={`search-page-${pIdx}`}
+                                            activeOpacity={0.85}
+                                            onPress={() => handleOpenTopperViewer(topperPages, pIdx, topperName, topperAir, item.questionText)}
+                                            style={{
+                                              width: 125,
+                                              height: 168,
+                                              borderRadius: 10,
+                                              overflow: 'hidden',
+                                              borderWidth: 1.5,
+                                              borderColor: isDark ? 'rgba(255, 255, 255, 0.2)' : 'rgba(234, 88, 12, 0.35)',
+                                              backgroundColor: isDark ? '#1e293b' : '#ffffff',
+                                              shadowColor: '#ea580c',
+                                              shadowOffset: { width: 0, height: 2 },
+                                              shadowOpacity: 0.15,
+                                              shadowRadius: 4,
+                                              elevation: 3,
+                                            }}
+                                          >
+                                            <ExpoImage
+                                              source={{ uri: resolvedUri }}
+                                              style={{ width: '100%', height: '100%' }}
+                                              contentFit="cover"
+                                              cachePolicy="memory-disk"
+                                              transition={150}
+                                            />
+                                            <View style={{
+                                              position: 'absolute',
+                                              bottom: 4,
+                                              right: 4,
+                                              backgroundColor: 'rgba(0, 0, 0, 0.75)',
+                                              paddingHorizontal: 6,
+                                              paddingVertical: 2,
+                                              borderRadius: 4,
+                                            }}>
+                                              <Text style={{ fontSize: 10, fontWeight: '800', color: '#ffffff' }}>
+                                                Page {pIdx + 1}
+                                              </Text>
+                                            </View>
+                                          </TouchableOpacity>
+                                        );
+                                      })}
+                                    </ScrollView>
+
+                                    {!!activeAnswer.answerText && !activeAnswer.answerText.trim().startsWith('[Handwritten Topper Copy') && (
+                                      <View style={{ marginTop: 14 }}>
+                                        <Markdown key={`${keyBoxMode}-${keyBoxColor}-${textColorMode}`} style={getMarkdownStyles(colors)} rules={getMarkdownRules(colors, isDark)}>
+                                          {cleanMarkdown(activeAnswer.answerText, keyBoxMode)}
+                                        </Markdown>
+                                      </View>
+                                    )}
+                                  </View>
+                                ) : (() => {
                                   const parsed = parseIntroductoryBox(activeAnswer.answerText);
                                   if (parsed) {
                                     const remText = activeAnswer.answerText.replace(parsed.rawMatch, '').trim();
@@ -11389,6 +12097,16 @@ function MainsAISearchView({
         microtagOptions={microtagOptions}
         isTablet={isTablet}
         questions={questions}
+      />
+
+      <TopperImageViewerModal
+        visible={topperViewerVisible}
+        onClose={() => setTopperViewerVisible(false)}
+        images={topperViewerImages}
+        initialIndex={topperViewerIndex}
+        topperName={topperViewerName}
+        air={topperViewerAir}
+        questionText={topperViewerQuestionText}
       />
     </View>
   );

@@ -42,6 +42,10 @@ export interface ConsolidatedQuestion {
   program_name?: string;
   cognitive_tag?: string;
   action_words?: string;
+  is_topper_copy?: boolean;
+  topper_name?: string;
+  air_rank?: number | string;
+  topper_year?: number;
 }
 
 export function normalizePaper(paper: string | null | undefined): string {
@@ -302,11 +306,15 @@ export async function fetchMainsQuestionsFromSupabase(): Promise<ConsolidatedQue
     program_name: q.program_name,
     cognitive_tag: q.cognitive_tag || q.cognitiveTags || q.cognitivetag,
     action_words: q.action_words || q.actionWords || q.actionwords,
+    is_topper_copy: q.is_topper_copy,
+    topper_name: q.topper_name,
+    air_rank: q.air_rank,
+    topper_year: q.topper_year,
     answers: (q.answers || []).map((ans: any) => {
       const inst = ans.institute || '';
-      let topper = ans.topper || ans.topper_name || '';
-      let air = ans.air ? String(ans.air) : '';
-      let isTopper = Boolean(ans.is_topper || topper || air);
+      let topper = ans.topper || ans.topper_name || q.topper_name || '';
+      let air = ans.air ? String(ans.air) : (ans.air_rank ? String(ans.air_rank) : (q.air_rank ? String(q.air_rank) : ''));
+      let isTopper = Boolean(ans.is_topper || q.is_topper_copy || topper || air);
       if (!isTopper && inst) {
         const airMatch = inst.match(/(.*?)\s*\(AIR\s*(\d+)\)/i);
         if (airMatch) {

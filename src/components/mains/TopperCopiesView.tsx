@@ -1,9 +1,10 @@
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   TouchableOpacity,
+  Pressable,
   ScrollView,
   TextInput,
   Dimensions,
@@ -12,6 +13,7 @@ import {
   Modal,
   ActivityIndicator,
   useWindowDimensions,
+  ListRenderItem,
 } from 'react-native';
 import { Image as ExpoImage } from 'expo-image';
 import {
@@ -33,9 +35,15 @@ import {
   RefreshCw,
 } from 'lucide-react-native';
 import { ConsolidatedQuestion, ConsolidatedAnswer } from '../../data/mainsConsolidatedLoader';
-import { sampleTopperQuestions } from '../../data/topperSampleData';
 import TopperImageViewerModal from './TopperImageViewerModal';
 import { TopperImageCacheService } from '../../services/TopperImageCacheService';
+import {
+  isGenuineTopperAnswer,
+  getTopperName,
+  getAir,
+  getTopperPageUrls,
+  getAllTopperQuestions,
+} from '../../utils/topperHelpers';
 
 interface TopperCopiesViewProps {
   colors: any;
@@ -73,56 +81,9 @@ const PRESET_REVIEW_TAGS = [
 
 /**
  * Strict helper to identify genuine topper answers (Requirement R1).
- * Filters out regular institute series (Level Up, PW Only, IES) that merely contain scanned images.
+ * Re-exported from shared domain helper for backward compatibility.
  */
-export function isGenuineTopperAnswer(a: ConsolidatedAnswer | undefined | null): boolean {
-  if (!a) return false;
-
-  // Explicit boolean flag
-  if (a.is_topper === true) return true;
-
-  // Guard against institute names accidentally stored in topper field
-  if (a.topper && a.topper.trim().length > 0) {
-    const t = a.topper.toLowerCase().trim();
-    const nonTopperInstitutes = [
-      'level up',
-      'level up ias',
-      'pw only',
-      'pw onlyias',
-      'ies',
-      'ies master',
-      'forumias',
-      'forum ias',
-      'vision ias',
-      'visionias',
-      'vajiram',
-      'vajiram & ravi',
-      'vajiram and ravi',
-      'drishti',
-      'drishti ias',
-      'next ias',
-      'unacademy',
-      'insights ias',
-      'iasbaba',
-      'shankar ias',
-    ];
-    if (!nonTopperInstitutes.some(inst => t === inst || t.startsWith(inst + ' '))) {
-      return true;
-    }
-  }
-
-  // Explicit AIR rank
-  if (a.air !== undefined && a.air !== null && String(a.air).trim() !== '') return true;
-
-  // Institute field containing explicit AIR or topper keywords
-  if (a.institute) {
-    const inst = a.institute.trim();
-    if (/\bAIR\s*\d+\b/i.test(inst)) return true;
-    if (/\btopper\b/i.test(inst)) return true;
-  }
-
-  return false;
-}
+export { isGenuineTopperAnswer };
 
 // Multi-select toggle helper matching Question Bank
 const toggleFilterValue = (
@@ -181,97 +142,116 @@ function SidebarFilterRow({
 
   return (
     <View style={{ marginVertical: 3 }}>
-      {/* Accordion Header */}
-      <TouchableOpacity
+      {/* Collapsible Header matching Question Bank */}
+      <Pressable
         onPress={() => setExpanded(!expanded)}
-        activeOpacity={0.7}
-        style={[
-          styles.accordionHeader,
-          {
-            backgroundColor: !isAll ? 'rgba(249, 115, 22, 0.08)' : colors.surface,
-            borderColor: !isAll ? '#f97316' : colors.border,
-          },
+        style={({ pressed }) => [
+          styles.sidebarSectionHeader,
+          (expanded || !isAll) && styles.sidebarSectionHeaderActive,
+          { opacity: pressed ? 0.75 : 1 },
         ]}
       >
-        <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1, marginRight: 8 }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1, gap: 8 }}>
           <Text
             style={[
-              styles.accordionLabel,
-              { color: !isAll ? '#f97316' : colors.textPrimary },
+              styles.sidebarHeaderLabel,
+              { color: isAll ? colors.textTertiary : '#f97316' },
             ]}
             numberOfLines={1}
           >
             {label}
           </Text>
-          {!isAll && (
-            <View style={[styles.accordionBadge, { backgroundColor: '#f97316' }]}>
-              <Text style={[styles.accordionBadgeText, { color: '#ffffff' }]}>
-                {selectedList.length}
-              </Text>
-            </View>
-          )}
+          <View
+            style={[
+              styles.sidebarHeaderBadge,
+              { backgroundColor: isAll ? colors.border + '60' : '#f97316' },
+            ]}
+          >
+            <Text
+              style={[
+                styles.sidebarHeaderBadgeText,
+                { color: isAll ? colors.textTertiary : '#ffffff' },
+              ]}
+            >
+              {isAll ? items.length : `${selectedList.length}/${items.length}`}
+            </Text>
+          </View>
         </View>
-        {expanded ? (
-          <ChevronUp size={16} color={!isAll ? '#f97316' : colors.textSecondary} />
-        ) : (
-          <ChevronDown size={16} color={!isAll ? '#f97316' : colors.textSecondary} />
-        )}
-      </TouchableOpacity>
+
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, flexShrink: 0, marginLeft: 8 }}>
+          <View
+            style={[
+              styles.sidebarChevronCircle,
+              { backgroundColor: expanded ? 'rgba(249, 115, 22, 0.12)' : 'transparent' },
+            ]}
+          >
+            {expanded ? (
+              <ChevronUp size={13} color={colors.textSecondary} />
+            ) : (
+              <ChevronDown size={13} color={colors.textTertiary} />
+            )}
+          </View>
+        </View>
+      </Pressable>
 
       {/* Collapsed Summary */}
       {!expanded && !isAll && (
-        <View style={{ paddingHorizontal: 4, paddingTop: 2, paddingBottom: 4 }}>
-          <Text style={{ fontSize: 11, color: '#f97316', fontWeight: '500' }} numberOfLines={1}>
+        <View style={{ paddingHorizontal: 6, paddingTop: 2, paddingBottom: 4 }}>
+          <Text style={{ fontSize: 10, color: '#f97316', fontWeight: '600' }} numberOfLines={1}>
             {selectedList.map(s => `${itemPrefix}${s}`).join(', ')}
           </Text>
         </View>
       )}
 
-      {/* Accordion Content */}
+      {/* Accordion Content with Question Bank-style Round Button Chips */}
       {expanded && (
-        <View style={styles.accordionContent}>
+        <View style={styles.sidebarChipsContainer}>
           {/* 'All' Pill */}
-          <TouchableOpacity
+          <Pressable
             onPress={() => onSelect('All')}
-            style={[
-              styles.filterPill,
+            style={({ pressed }) => [
+              styles.sidebarFchip,
               {
                 backgroundColor: isAll ? '#f97316' : colors.surface,
                 borderColor: isAll ? '#f97316' : colors.border,
               },
+              isAll && styles.sidebarFchipSel,
+              { opacity: pressed ? 0.75 : 1 },
             ]}
           >
             <Text
               style={[
-                styles.filterPillText,
-                { color: isAll ? '#ffffff' : colors.textSecondary, fontWeight: isAll ? '700' : '500' },
+                styles.sidebarFchipText,
+                { color: isAll ? '#ffffff' : colors.textSecondary },
               ]}
             >
               All
             </Text>
-          </TouchableOpacity>
+            {isAll && <Check size={10} color="#ffffff" style={{ marginLeft: 4 }} />}
+          </Pressable>
 
           {/* Individual Items */}
           {items.map(item => {
             const isSelected = selectedList.includes(item);
             return (
-              <TouchableOpacity
+              <Pressable
                 key={item}
                 onPress={() => onSelect(toggleFilterValue(selected, item, delimiter))}
-                style={[
-                  styles.filterPill,
+                style={({ pressed }) => [
+                  styles.sidebarFchip,
                   {
                     backgroundColor: isSelected ? '#f97316' : colors.surface,
                     borderColor: isSelected ? '#f97316' : colors.border,
                   },
+                  isSelected && styles.sidebarFchipSel,
+                  { opacity: pressed ? 0.75 : 1 },
                 ]}
               >
                 <Text
                   style={[
-                    styles.filterPillText,
+                    styles.sidebarFchipText,
                     {
                       color: isSelected ? '#ffffff' : colors.textSecondary,
-                      fontWeight: isSelected ? '700' : '500',
                     },
                   ]}
                   numberOfLines={1}
@@ -279,7 +259,8 @@ function SidebarFilterRow({
                   {itemPrefix}
                   {item}
                 </Text>
-              </TouchableOpacity>
+                {isSelected && <Check size={10} color="#ffffff" style={{ marginLeft: 4 }} />}
+              </Pressable>
             );
           })}
         </View>
@@ -317,8 +298,6 @@ export default function TopperCopiesView({
   const [selectedSubtopic, setSelectedSubtopic] = useState('All');
   const [selectedNanotopic, setSelectedNanotopic] = useState('All');
   const [selectedTopper, setSelectedTopper] = useState('All');
-  const [selectedYear, setSelectedYear] = useState('All');
-  const [selectedMarks, setSelectedMarks] = useState('All');
   const [selectedCognitive, setSelectedCognitive] = useState('All');
   const [selectedActionWord, setSelectedActionWord] = useState('All');
   const [selectedReviewTag, setSelectedReviewTag] = useState('All');
@@ -342,25 +321,7 @@ export default function TopperCopiesView({
 
   // 1. Data Purity (Requirement R1): Strict Topper Copies Ingestion
   const allTopperQuestions = useMemo(() => {
-    const combined = [...(questions || []), ...sampleTopperQuestions];
-    const seen = new Set<string>();
-    const uniqueList: ConsolidatedQuestion[] = [];
-    for (const item of combined) {
-      if (!seen.has(item.id)) {
-        seen.add(item.id);
-        uniqueList.push(item);
-      }
-    }
-
-    // Must have at least one genuine topper answer with scanned pages
-    return uniqueList.filter(q => {
-      if (!q.answers || q.answers.length === 0) return false;
-      return q.answers.some(a => {
-        if (!isGenuineTopperAnswer(a)) return false;
-        const pageUrls = a.page_urls || (a as any).image_urls;
-        return Boolean(pageUrls && pageUrls.length > 0);
-      });
-    });
+    return getAllTopperQuestions(questions || []);
   }, [questions]);
 
   // Determine if Optional labeling applies
@@ -399,7 +360,7 @@ export default function TopperCopiesView({
     const paperFilter = selectedPaper !== 'All' ? selectedPaper.split('|') : [];
     const set = new Set<string>();
     allTopperQuestions.forEach(q => {
-      const matchPaper = paperFilter.length === 0 || paperFilter.includes(q.paper);
+      const matchPaper = paperFilter.length === 0 || (q.paper ? paperFilter.includes(q.paper) : false);
       if (matchPaper && q.subject) set.add(q.subject);
     });
     return Array.from(set).sort();
@@ -410,8 +371,8 @@ export default function TopperCopiesView({
     const subjectFilter = selectedSubject !== 'All' ? selectedSubject.split('|') : [];
     const set = new Set<string>();
     allTopperQuestions.forEach(q => {
-      const matchPaper = paperFilter.length === 0 || paperFilter.includes(q.paper);
-      const matchSubject = subjectFilter.length === 0 || subjectFilter.includes(q.subject);
+      const matchPaper = paperFilter.length === 0 || (q.paper ? paperFilter.includes(q.paper) : false);
+      const matchSubject = subjectFilter.length === 0 || (q.subject ? subjectFilter.includes(q.subject) : false);
       if (matchPaper && matchSubject && q.sectionGroup) {
         set.add(q.sectionGroup);
       }
@@ -425,9 +386,9 @@ export default function TopperCopiesView({
     const sectionFilter = selectedSection !== 'All' ? selectedSection.split('|') : [];
     const set = new Set<string>();
     allTopperQuestions.forEach(q => {
-      const matchPaper = paperFilter.length === 0 || paperFilter.includes(q.paper);
-      const matchSubject = subjectFilter.length === 0 || subjectFilter.includes(q.subject);
-      const matchSection = sectionFilter.length === 0 || sectionFilter.includes(q.sectionGroup);
+      const matchPaper = paperFilter.length === 0 || (q.paper ? paperFilter.includes(q.paper) : false);
+      const matchSubject = subjectFilter.length === 0 || (q.subject ? subjectFilter.includes(q.subject) : false);
+      const matchSection = sectionFilter.length === 0 || (q.sectionGroup ? sectionFilter.includes(q.sectionGroup) : false);
       if (matchPaper && matchSubject && matchSection && q.microTopic) {
         set.add(q.microTopic);
       }
@@ -442,10 +403,10 @@ export default function TopperCopiesView({
     const microFilter = selectedMicrotopic !== 'All' ? selectedMicrotopic.split('|') : [];
     const set = new Set<string>();
     allTopperQuestions.forEach(q => {
-      const matchPaper = paperFilter.length === 0 || paperFilter.includes(q.paper);
-      const matchSubject = subjectFilter.length === 0 || subjectFilter.includes(q.subject);
-      const matchSection = sectionFilter.length === 0 || sectionFilter.includes(q.sectionGroup);
-      const matchMicro = microFilter.length === 0 || microFilter.includes(q.microTopic);
+      const matchPaper = paperFilter.length === 0 || (q.paper ? paperFilter.includes(q.paper) : false);
+      const matchSubject = subjectFilter.length === 0 || (q.subject ? subjectFilter.includes(q.subject) : false);
+      const matchSection = sectionFilter.length === 0 || (q.sectionGroup ? sectionFilter.includes(q.sectionGroup) : false);
+      const matchMicro = microFilter.length === 0 || (q.microTopic ? microFilter.includes(q.microTopic) : false);
       if (matchPaper && matchSubject && matchSection && matchMicro && q.subTopic) {
         set.add(q.subTopic);
       }
@@ -461,11 +422,11 @@ export default function TopperCopiesView({
     const subFilter = selectedSubtopic !== 'All' ? selectedSubtopic.split('|') : [];
     const set = new Set<string>();
     allTopperQuestions.forEach(q => {
-      const matchPaper = paperFilter.length === 0 || paperFilter.includes(q.paper);
-      const matchSubject = subjectFilter.length === 0 || subjectFilter.includes(q.subject);
-      const matchSection = sectionFilter.length === 0 || sectionFilter.includes(q.sectionGroup);
-      const matchMicro = microFilter.length === 0 || microFilter.includes(q.microTopic);
-      const matchSub = subFilter.length === 0 || subFilter.includes(q.subTopic);
+      const matchPaper = paperFilter.length === 0 || (q.paper ? paperFilter.includes(q.paper) : false);
+      const matchSubject = subjectFilter.length === 0 || (q.subject ? subjectFilter.includes(q.subject) : false);
+      const matchSection = sectionFilter.length === 0 || (q.sectionGroup ? sectionFilter.includes(q.sectionGroup) : false);
+      const matchMicro = microFilter.length === 0 || (q.microTopic ? microFilter.includes(q.microTopic) : false);
+      const matchSub = subFilter.length === 0 || (q.subTopic ? subFilter.includes(q.subTopic) : false);
       if (matchPaper && matchSubject && matchSection && matchMicro && matchSub && q.nanoTopic) {
         set.add(q.nanoTopic);
       }
@@ -473,54 +434,74 @@ export default function TopperCopiesView({
     return Array.from(set).sort();
   }, [allTopperQuestions, selectedPaper, selectedSubject, selectedSection, selectedMicrotopic, selectedSubtopic]);
 
-  // Topper names (strictly genuine toppers only)
+  // Questions filtered strictly by active syllabus hierarchy selections (Paper, Subject, Section, Unit/Microtopic, Subtopic, Nanotopic)
+  const hierarchyFilteredQuestions = useMemo(() => {
+    const paperFilter = selectedPaper !== 'All' ? selectedPaper.split('|') : [];
+    const subjectFilter = selectedSubject !== 'All' ? selectedSubject.split('|') : [];
+    const sectionFilter = selectedSection !== 'All' ? selectedSection.split('|') : [];
+    const microFilter = selectedMicrotopic !== 'All' ? selectedMicrotopic.split('|') : [];
+    const subFilter = selectedSubtopic !== 'All' ? selectedSubtopic.split('|') : [];
+    const nanoFilter = selectedNanotopic !== 'All' ? selectedNanotopic.split('|') : [];
+
+    if (
+      paperFilter.length === 0 &&
+      subjectFilter.length === 0 &&
+      sectionFilter.length === 0 &&
+      microFilter.length === 0 &&
+      subFilter.length === 0 &&
+      nanoFilter.length === 0
+    ) {
+      return allTopperQuestions;
+    }
+
+    return allTopperQuestions.filter(q => {
+      if (paperFilter.length > 0 && (!q.paper || !paperFilter.includes(q.paper))) return false;
+      if (subjectFilter.length > 0 && (!q.subject || !subjectFilter.includes(q.subject))) return false;
+      if (sectionFilter.length > 0 && (!q.sectionGroup || !sectionFilter.includes(q.sectionGroup))) return false;
+      if (microFilter.length > 0 && (!q.microTopic || !microFilter.includes(q.microTopic))) return false;
+      if (subFilter.length > 0 && (!q.subTopic || !subFilter.includes(q.subTopic))) return false;
+      if (nanoFilter.length > 0 && (!q.nanoTopic || !nanoFilter.includes(q.nanoTopic))) return false;
+      return true;
+    });
+  }, [
+    allTopperQuestions,
+    selectedPaper,
+    selectedSubject,
+    selectedSection,
+    selectedMicrotopic,
+    selectedSubtopic,
+    selectedNanotopic,
+  ]);
+
+  // Topper names (strictly genuine toppers who wrote answers for the selected syllabus topics)
   const topperOptions = useMemo(() => {
     const set = new Set<string>();
-    allTopperQuestions.forEach(q => {
+    hierarchyFilteredQuestions.forEach(q => {
       q.answers?.forEach(a => {
         if (isGenuineTopperAnswer(a)) {
-          let name = a.topper?.trim();
-          if (!name && a.institute) {
-            name = a.institute.replace(/\s*\(AIR\s*\d+\)/i, '').replace(/topper:?\s*/i, '').trim();
-          }
-          if (name) set.add(name);
+          const name = getTopperName(a);
+          if (name && name !== 'Topper') set.add(name);
         }
       });
     });
     return Array.from(set).sort();
-  }, [allTopperQuestions]);
-
-  const yearOptions = useMemo(() => {
-    const set = new Set<string>();
-    allTopperQuestions.forEach(q => {
-      if (q.year) set.add(String(q.year));
-    });
-    return Array.from(set).sort((a, b) => Number(b) - Number(a));
-  }, [allTopperQuestions]);
-
-  const marksOptions = useMemo(() => {
-    const set = new Set<string>();
-    allTopperQuestions.forEach(q => {
-      if (q.marks) set.add(String(q.marks) + 'M');
-    });
-    return Array.from(set).sort((a, b) => parseInt(a, 10) - parseInt(b, 10));
-  }, [allTopperQuestions]);
+  }, [hierarchyFilteredQuestions]);
 
   const cognitiveOptions = useMemo(() => {
     const set = new Set<string>();
-    allTopperQuestions.forEach(q => {
+    hierarchyFilteredQuestions.forEach(q => {
       if (q.cognitive_tag) set.add(q.cognitive_tag);
     });
     return Array.from(set).sort();
-  }, [allTopperQuestions]);
+  }, [hierarchyFilteredQuestions]);
 
   const actionWordOptions = useMemo(() => {
     const set = new Set<string>();
-    allTopperQuestions.forEach(q => {
+    hierarchyFilteredQuestions.forEach(q => {
       if (q.action_words && q.action_words !== 'N/A') set.add(q.action_words);
     });
     return Array.from(set).sort();
-  }, [allTopperQuestions]);
+  }, [hierarchyFilteredQuestions]);
 
   // Review Tag Options for Sidebar (Requirement R5)
   const reviewTagOptions = useMemo(() => {
@@ -535,32 +516,29 @@ export default function TopperCopiesView({
     return Array.from(set).sort();
   }, [userTags, userQuestionStates]);
 
+  // Auto-prune selectedTopper if active topper selection is not in the filtered topperOptions
+  useEffect(() => {
+    if (selectedTopper !== 'All') {
+      const currentList = selectedTopper.split('|');
+      const valid = currentList.filter(t => topperOptions.includes(t));
+      if (valid.length === 0) {
+        setSelectedTopper('All');
+      } else if (valid.length !== currentList.length) {
+        setSelectedTopper(valid.join('|'));
+      }
+    }
+  }, [topperOptions, selectedTopper]);
+
   // 3. Filter Questions Matching Selections & Strict Search (Requirement R1)
   const filteredQuestions = useMemo(() => {
-    const paperFilter = selectedPaper !== 'All' ? selectedPaper.split('|') : [];
-    const subjectFilter = selectedSubject !== 'All' ? selectedSubject.split('|') : [];
-    const sectionFilter = selectedSection !== 'All' ? selectedSection.split('|') : [];
-    const microFilter = selectedMicrotopic !== 'All' ? selectedMicrotopic.split('|') : [];
-    const subFilter = selectedSubtopic !== 'All' ? selectedSubtopic.split('|') : [];
-    const nanoFilter = selectedNanotopic !== 'All' ? selectedNanotopic.split('|') : [];
     const topperFilter = selectedTopper !== 'All' ? selectedTopper.split('|') : [];
-    const yearFilter = selectedYear !== 'All' ? selectedYear.split('|') : [];
-    const marksFilter = selectedMarks !== 'All' ? selectedMarks.split('|') : [];
     const cogFilter = selectedCognitive !== 'All' ? selectedCognitive.split('|') : [];
     const actFilter = selectedActionWord !== 'All' ? selectedActionWord.split('|') : [];
     const tagFilter = selectedReviewTag !== 'All' ? selectedReviewTag.split('|') : [];
 
     const qTerm = searchQuery.trim().toLowerCase();
 
-    return allTopperQuestions.filter(q => {
-      if (paperFilter.length > 0 && (!q.paper || !paperFilter.includes(q.paper))) return false;
-      if (subjectFilter.length > 0 && (!q.subject || !subjectFilter.includes(q.subject))) return false;
-      if (sectionFilter.length > 0 && (!q.sectionGroup || !sectionFilter.includes(q.sectionGroup))) return false;
-      if (microFilter.length > 0 && (!q.microTopic || !microFilter.includes(q.microTopic))) return false;
-      if (subFilter.length > 0 && (!q.subTopic || !subFilter.includes(q.subTopic))) return false;
-      if (nanoFilter.length > 0 && (!q.nanoTopic || !nanoFilter.includes(q.nanoTopic))) return false;
-      if (yearFilter.length > 0 && !yearFilter.includes(String(q.year))) return false;
-      if (marksFilter.length > 0 && !marksFilter.includes(String(q.marks) + 'M')) return false;
+    return hierarchyFilteredQuestions.filter(q => {
       if (cogFilter.length > 0 && !cogFilter.includes(q.cognitive_tag || '')) return false;
       if (actFilter.length > 0 && !actFilter.includes(q.action_words || '')) return false;
 
@@ -568,10 +546,7 @@ export default function TopperCopiesView({
       if (topperFilter.length > 0) {
         const matchesTopper = q.answers?.some(a => {
           if (!isGenuineTopperAnswer(a)) return false;
-          let name = a.topper?.trim();
-          if (!name && a.institute) {
-            name = a.institute.replace(/\s*\(AIR\s*\d+\)/i, '').replace(/topper:?\s*/i, '').trim();
-          }
+          const name = getTopperName(a);
           return name ? topperFilter.includes(name) : false;
         });
         if (!matchesTopper) return false;
@@ -598,17 +573,9 @@ export default function TopperCopiesView({
       return true;
     });
   }, [
-    allTopperQuestions,
+    hierarchyFilteredQuestions,
     searchQuery,
-    selectedPaper,
-    selectedSubject,
-    selectedSection,
-    selectedMicrotopic,
-    selectedSubtopic,
-    selectedNanotopic,
     selectedTopper,
-    selectedYear,
-    selectedMarks,
     selectedCognitive,
     selectedActionWord,
     selectedReviewTag,
@@ -640,8 +607,6 @@ export default function TopperCopiesView({
     setSelectedSubtopic('All');
     setSelectedNanotopic('All');
     setSelectedTopper('All');
-    setSelectedYear('All');
-    setSelectedMarks('All');
     setSelectedCognitive('All');
     setSelectedActionWord('All');
     setSelectedReviewTag('All');
@@ -656,8 +621,6 @@ export default function TopperCopiesView({
     selectedSubtopic !== 'All' ||
     selectedNanotopic !== 'All' ||
     selectedTopper !== 'All' ||
-    selectedYear !== 'All' ||
-    selectedMarks !== 'All' ||
     selectedCognitive !== 'All' ||
     selectedActionWord !== 'All' ||
     selectedReviewTag !== 'All' ||
@@ -675,192 +638,182 @@ export default function TopperCopiesView({
     };
 
     return (
-      <ScrollView showsVerticalScrollIndicator={true} style={styles.sidebarScroll}>
+      <ScrollView
+        showsVerticalScrollIndicator={true}
+        style={styles.sidebarScroll}
+        contentContainerStyle={{ paddingBottom: 60, paddingTop: isTablet ? 6 : 0 }}
+      >
+        {/* Header matching Question Bank */}
         <View style={styles.sidebarHeader}>
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
             <View style={{ width: 3, height: 16, borderRadius: 2, backgroundColor: '#f97316' }} />
             <Text style={[styles.sidebarTitle, { color: colors.textPrimary }]}>
-              SYLLABUS & FILTERS
+              FILTERS
             </Text>
+            <View style={[styles.sidebarCountBadge, { backgroundColor: colors.border + '60' }]}>
+              <Text style={[styles.sidebarCountBadgeText, { color: colors.textTertiary }]}>{filteredQuestions.length}</Text>
+            </View>
           </View>
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginRight: isTablet ? 36 : 0 }}>
             {hasActiveFilters && (
               <TouchableOpacity onPress={handleResetFilters} style={styles.resetButton}>
                 <Text style={styles.resetButtonText}>Reset All</Text>
               </TouchableOpacity>
             )}
-            {/* Sleek Chevron Collapse Button (Requirement R2) */}
-            {isTablet && (
-              <TouchableOpacity
-                onPress={() => setSidebarCollapsed(true)}
-                style={[styles.collapseSidebarBtn, { borderColor: colors.border }]}
-                accessibilityLabel="Collapse Sidebar"
-              >
-                <ChevronLeft size={18} color={colors.textSecondary} />
-              </TouchableOpacity>
-            )}
           </View>
         </View>
 
-        {/* 1. Paper */}
-        <SidebarFilterRow
-          label="PAPER"
-          items={paperOptions}
-          selected={selectedPaper}
-          onSelect={(val) => {
-            setSelectedPaper(val);
-            setSelectedSubject('All');
-            setSelectedSection('All');
-            setSelectedMicrotopic('All');
-            setSelectedSubtopic('All');
-            setSelectedNanotopic('All');
-          }}
-          colors={colors}
-          defaultExpanded={true}
-        />
+        {/* ── GROUP: SYLLABUS ── */}
+        <View style={{ marginBottom: 4, marginTop: 4 }}>
+          <Text style={styles.sidebarGroupLabel}>
+            SYLLABUS
+          </Text>
 
-        {/* 2. Subject */}
-        <SidebarFilterRow
-          label="SUBJECT"
-          items={subjectOptions}
-          selected={selectedSubject}
-          onSelect={(val) => {
-            setSelectedSubject(val);
-            setSelectedSection('All');
-            setSelectedMicrotopic('All');
-            setSelectedSubtopic('All');
-            setSelectedNanotopic('All');
-          }}
-          colors={colors}
-          visible={selectedPaper !== 'All'}
-          defaultExpanded={true}
-        />
-
-        {/* 3. Section Group / Optional Paper */}
-        <SidebarFilterRow
-          label={labels.section.toUpperCase()}
-          items={sectionOptions}
-          selected={selectedSection}
-          onSelect={(val) => {
-            setSelectedSection(val);
-            setSelectedMicrotopic('All');
-            setSelectedSubtopic('All');
-            setSelectedNanotopic('All');
-          }}
-          colors={colors}
-          visible={selectedSubject !== 'All'}
-          defaultExpanded={true}
-        />
-
-        {/* 4. Unit / Microtopic */}
-        <SidebarFilterRow
-          label={labels.microtopic.toUpperCase()}
-          items={microtopicOptions}
-          selected={selectedMicrotopic}
-          onSelect={(val) => {
-            setSelectedMicrotopic(val);
-            setSelectedSubtopic('All');
-            setSelectedNanotopic('All');
-          }}
-          colors={colors}
-          visible={selectedSection !== 'All'}
-          defaultExpanded={true}
-        />
-
-        {/* 5. Subtopic / Macro Topic */}
-        <SidebarFilterRow
-          label={labels.subtopic.toUpperCase()}
-          items={subtopicOptions}
-          selected={selectedSubtopic}
-          onSelect={(val) => {
-            setSelectedSubtopic(val);
-            setSelectedNanotopic('All');
-          }}
-          colors={colors}
-          visible={selectedMicrotopic !== 'All'}
-          defaultExpanded={true}
-        />
-
-        {/* 6. 5th Layer: Nanotopic / Nano Theme / Topic */}
-        <SidebarFilterRow
-          label={labels.nanotopic.toUpperCase()}
-          items={nanotopicOptions}
-          selected={selectedNanotopic}
-          onSelect={setSelectedNanotopic}
-          colors={colors}
-          visible={selectedSubtopic !== 'All' && nanotopicOptions.length > 0}
-          defaultExpanded={true}
-        />
-
-        <View style={styles.sidebarDivider} />
-
-        {/* Topper Filter */}
-        <SidebarFilterRow
-          label="TOPPER / RANK"
-          items={topperOptions}
-          selected={selectedTopper}
-          onSelect={setSelectedTopper}
-          colors={colors}
-          defaultExpanded={false}
-          itemPrefix="🏆 "
-        />
-
-        {/* Review Tags Filter (Requirement R5) */}
-        {reviewTagOptions.length > 0 && (
+          {/* 1. Paper */}
           <SidebarFilterRow
-            label="REVIEW TAGS"
-            items={reviewTagOptions}
-            selected={selectedReviewTag}
-            onSelect={setSelectedReviewTag}
+            label="PAPER"
+            items={paperOptions}
+            selected={selectedPaper}
+            onSelect={(val) => {
+              setSelectedPaper(val);
+              setSelectedSubject('All');
+              setSelectedSection('All');
+              setSelectedMicrotopic('All');
+              setSelectedSubtopic('All');
+              setSelectedNanotopic('All');
+            }}
+            colors={colors}
+            defaultExpanded={true}
+          />
+
+          {/* 2. Subject */}
+          <SidebarFilterRow
+            label="SUBJECT"
+            items={subjectOptions}
+            selected={selectedSubject}
+            onSelect={(val) => {
+              setSelectedSubject(val);
+              setSelectedSection('All');
+              setSelectedMicrotopic('All');
+              setSelectedSubtopic('All');
+              setSelectedNanotopic('All');
+            }}
+            colors={colors}
+            visible={selectedPaper !== 'All'}
+            defaultExpanded={true}
+          />
+
+          {/* 3. Section Group / Optional Paper */}
+          <SidebarFilterRow
+            label={labels.section.toUpperCase()}
+            items={sectionOptions}
+            selected={selectedSection}
+            onSelect={(val) => {
+              setSelectedSection(val);
+              setSelectedMicrotopic('All');
+              setSelectedSubtopic('All');
+              setSelectedNanotopic('All');
+            }}
+            colors={colors}
+            visible={selectedSubject !== 'All'}
+            defaultExpanded={true}
+          />
+
+          {/* 4. Unit / Microtopic */}
+          <SidebarFilterRow
+            label={labels.microtopic.toUpperCase()}
+            items={microtopicOptions}
+            selected={selectedMicrotopic}
+            onSelect={(val) => {
+              setSelectedMicrotopic(val);
+              setSelectedSubtopic('All');
+              setSelectedNanotopic('All');
+            }}
+            colors={colors}
+            visible={selectedSection !== 'All'}
+            defaultExpanded={true}
+          />
+
+          {/* 5. Subtopic / Macro Topic */}
+          <SidebarFilterRow
+            label={labels.subtopic.toUpperCase()}
+            items={subtopicOptions}
+            selected={selectedSubtopic}
+            onSelect={(val) => {
+              setSelectedSubtopic(val);
+              setSelectedNanotopic('All');
+            }}
+            colors={colors}
+            visible={selectedMicrotopic !== 'All'}
+            defaultExpanded={true}
+          />
+
+          {/* 6. 5th Layer: Nanotopic / Nano Theme / Topic */}
+          <SidebarFilterRow
+            label={labels.nanotopic.toUpperCase()}
+            items={nanotopicOptions}
+            selected={selectedNanotopic}
+            onSelect={setSelectedNanotopic}
+            colors={colors}
+            visible={selectedSubtopic !== 'All' && nanotopicOptions.length > 0}
+            defaultExpanded={true}
+          />
+        </View>
+
+        {/* ── GROUP: TOPPERS & DIRECTIVES ── */}
+        <View style={{ marginBottom: 4, marginTop: 10 }}>
+          <Text style={styles.sidebarGroupLabel}>
+            TOPPERS & DIRECTIVES
+          </Text>
+
+          {/* Topper Filter */}
+          <SidebarFilterRow
+            label="TOPPER / RANK"
+            items={topperOptions}
+            selected={selectedTopper}
+            onSelect={setSelectedTopper}
             colors={colors}
             defaultExpanded={false}
-            itemPrefix="🏷️ "
+            itemPrefix="🏆 "
           />
-        )}
 
-        {/* Exam Year Filter */}
-        <SidebarFilterRow
-          label="EXAM YEAR"
-          items={yearOptions}
-          selected={selectedYear}
-          onSelect={setSelectedYear}
-          colors={colors}
-          defaultExpanded={false}
-        />
+          {/* Review Tags Filter (Requirement R5) */}
+          {reviewTagOptions.length > 0 && (
+            <SidebarFilterRow
+              label="REVIEW TAGS"
+              items={reviewTagOptions}
+              selected={selectedReviewTag}
+              onSelect={setSelectedReviewTag}
+              colors={colors}
+              defaultExpanded={false}
+              itemPrefix="🏷️ "
+            />
+          )}
 
-        {/* Marks Filter */}
-        <SidebarFilterRow
-          label="MARKS"
-          items={marksOptions}
-          selected={selectedMarks}
-          onSelect={setSelectedMarks}
-          colors={colors}
-          defaultExpanded={false}
-        />
+          {/* Cognitive Directive */}
+          {cognitiveOptions.length > 0 && (
+            <SidebarFilterRow
+              label="DIRECTIVE (COGNITIVE)"
+              items={cognitiveOptions}
+              selected={selectedCognitive}
+              onSelect={setSelectedCognitive}
+              colors={colors}
+              defaultExpanded={false}
+            />
+          )}
 
-        {/* Cognitive Directive */}
-        {cognitiveOptions.length > 0 && (
-          <SidebarFilterRow
-            label="DIRECTIVE (COGNITIVE)"
-            items={cognitiveOptions}
-            selected={selectedCognitive}
-            onSelect={setSelectedCognitive}
-            colors={colors}
-            defaultExpanded={false}
-          />
-        )}
-
-        {/* Action Words */}
-        {actionWordOptions.length > 0 && (
-          <SidebarFilterRow
-            label="ACTION WORD"
-            items={actionWordOptions}
-            selected={selectedActionWord}
-            onSelect={setSelectedActionWord}
-            colors={colors}
-            defaultExpanded={false}
-          />
-        )}
+          {/* Action Words */}
+          {actionWordOptions.length > 0 && (
+            <SidebarFilterRow
+              label="ACTION WORD"
+              items={actionWordOptions}
+              selected={selectedActionWord}
+              onSelect={setSelectedActionWord}
+              colors={colors}
+              defaultExpanded={false}
+            />
+          )}
+        </View>
 
         {/* Sync Mains Database Button (Requirement R4) */}
         {onForceSync && (
@@ -892,22 +845,13 @@ export default function TopperCopiesView({
   };
 
   // Render Question Card (Requirements R1, R2, R4, R5)
-  const renderQuestionCard = ({ item }: { item: ConsolidatedQuestion }) => {
+  const renderQuestionCard: ListRenderItem<ConsolidatedQuestion> = ({ item }) => {
     // Strictly find genuine topper answer (Requirement R1)
     const topperAnswer = item.answers?.find(a => isGenuineTopperAnswer(a));
     if (!topperAnswer) return null;
 
-    const topperName =
-      topperAnswer.topper?.trim() ||
-      (topperAnswer.institute
-        ? topperAnswer.institute.replace(/\s*\(AIR\s*\d+\)/i, '').replace(/topper:?\s*/i, '').trim()
-        : 'Topper');
-
-    let air = topperAnswer.air;
-    if (!air && topperAnswer.institute) {
-      const airMatch = topperAnswer.institute.match(/AIR\s*(\d+)/i);
-      if (airMatch) air = airMatch[1];
-    }
+    const topperName = getTopperName(topperAnswer);
+    const air = getAir(topperAnswer);
 
     let topperSubtitle = '';
     if (air && item.year) {
@@ -918,7 +862,7 @@ export default function TopperCopiesView({
       topperSubtitle = ` (${item.year})`;
     }
 
-    const pageUrls: string[] = topperAnswer.page_urls || (topperAnswer as any).image_urls || [];
+    const pageUrls: string[] = getTopperPageUrls(topperAnswer);
     const isSaved = Array.isArray(savedIds)
       ? savedIds.includes(item.id)
       : Boolean((savedIds as Set<string>)?.has?.(item.id));
@@ -1126,14 +1070,15 @@ export default function TopperCopiesView({
               {Array.from(new Set([...PRESET_REVIEW_TAGS, ...(userTags || [])])).map(t => {
                 const assigned = activeTags.includes(t);
                 return (
-                  <TouchableOpacity
+                  <Pressable
                     key={t}
                     onPress={() => onToggleQuestionTag(item.id, t)}
-                    style={[
+                    style={({ pressed }) => [
                       styles.inlineTagItem,
                       {
                         backgroundColor: assigned ? '#f97316' : colors.surface,
                         borderColor: assigned ? '#f97316' : colors.border,
+                        opacity: pressed ? 0.75 : 1,
                       },
                     ]}
                   >
@@ -1146,7 +1091,7 @@ export default function TopperCopiesView({
                     >
                       {t}
                     </Text>
-                  </TouchableOpacity>
+                  </Pressable>
                 );
               })}
             </View>
@@ -1203,17 +1148,7 @@ export default function TopperCopiesView({
             </View>
           </View>
 
-          {/* Sleek Restore Sidebar Button when collapsed on Tablet (Requirement R2) */}
-          {isTablet && sidebarCollapsed && (
-            <TouchableOpacity
-              onPress={() => setSidebarCollapsed(false)}
-              style={[styles.restoreSidebarBtn, { backgroundColor: colors.surface, borderColor: colors.border }]}
-              accessibilityLabel="Restore Sidebar"
-            >
-              <ChevronRight size={16} color="#f97316" />
-              <Text style={[styles.restoreSidebarBtnText, { color: colors.textPrimary }]}>Filters</Text>
-            </TouchableOpacity>
-          )}
+          {/* Clean header: floating button on feed handles restore */}
         </View>
 
         {/* Mobile-Only Filter Button (Requirement R2: Redundant header filter removed from Tablet) */}
@@ -1269,12 +1204,41 @@ export default function TopperCopiesView({
               { backgroundColor: colors.surface, borderRightColor: colors.border },
             ]}
           >
+            {/* Floating Close Button matching Question Bank */}
+            <TouchableOpacity
+              onPress={() => setSidebarCollapsed(true)}
+              style={[
+                styles.floatingCloseSidebarBtn,
+                { backgroundColor: colors.surface, borderColor: colors.border },
+              ]}
+              accessibilityLabel="Collapse Sidebar"
+            >
+              <ChevronLeft size={18} color={colors.textSecondary} />
+            </TouchableOpacity>
+
             {renderSidebarContent()}
           </View>
         )}
 
         {/* Question Feed (Expands to 100% width when sidebar collapsed) */}
         <View style={styles.feedContainer}>
+          {/* Floating Expand Filters Button when collapsed on Tablet (matching Question Bank) */}
+          {isTablet && sidebarCollapsed && (
+            <TouchableOpacity
+              onPress={() => setSidebarCollapsed(false)}
+              style={[
+                styles.floatingExpandSidebarBtn,
+                {
+                  backgroundColor: colors.surface + 'f0',
+                  borderColor: colors.border,
+                },
+              ]}
+              accessibilityLabel="Restore Filters Sidebar"
+            >
+              <ChevronRight size={18} color="#f97316" />
+              <Text style={[styles.floatingExpandSidebarBtnText, { color: colors.textPrimary }]}>Filters</Text>
+            </TouchableOpacity>
+          )}
           {filteredQuestions.length === 0 ? (
             <View style={styles.emptyStateContainer}>
               <Award size={48} color={colors.textTertiary} style={{ marginBottom: 12 }} />
@@ -1404,32 +1368,48 @@ const styles = StyleSheet.create({
     fontSize: 11,
     fontWeight: '700',
   },
-  restoreSidebarBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 6,
-    paddingHorizontal: 10,
+  floatingCloseSidebarBtn: {
+    position: 'absolute',
+    top: 14,
+    right: 12,
+    zIndex: 100,
+    padding: 6,
     borderRadius: 8,
     borderWidth: 1,
-    gap: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 3,
   },
-  restoreSidebarBtnText: {
+  floatingExpandSidebarBtn: {
+    position: 'absolute',
+    left: 16,
+    top: 14,
+    zIndex: 100,
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 16,
+    borderWidth: 1,
+    gap: 5,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.12,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  floatingExpandSidebarBtnText: {
     fontSize: 12,
     fontWeight: '700',
-  },
-  collapseSidebarBtn: {
-    padding: 4,
-    borderRadius: 6,
-    borderWidth: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
   },
   filterTriggerBtn: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingVertical: 6,
     paddingHorizontal: 12,
-    borderRadius: 8,
+    borderRadius: 12,
     borderWidth: 1,
     gap: 6,
   },
@@ -1446,8 +1426,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     borderWidth: 1,
-    borderRadius: 10,
-    paddingHorizontal: 12,
+    borderRadius: 16,
+    paddingHorizontal: 14,
     height: 42,
   },
   searchInput: {
@@ -1460,8 +1440,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
   },
   tabletSidebar: {
-    width: 300,
+    width: 290,
     borderRightWidth: 1,
+    position: 'relative',
   },
   sidebarScroll: {
     flex: 1,
@@ -1471,13 +1452,104 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: 12,
+    marginBottom: 8,
     paddingHorizontal: 2,
   },
   sidebarTitle: {
     fontSize: 11,
+    fontWeight: '800',
+    letterSpacing: 0.8,
+  },
+  sidebarCountBadge: {
+    borderRadius: 8,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+  },
+  sidebarCountBadgeText: {
+    fontSize: 9,
+    fontWeight: '800',
+  },
+  sidebarGroupLabel: {
+    fontSize: 8,
     fontWeight: '900',
-    letterSpacing: 1.2,
+    letterSpacing: 1.5,
+    paddingHorizontal: 4,
+    marginBottom: 4,
+    opacity: 0.6,
+  },
+  sidebarSectionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: 8,
+    paddingHorizontal: 10,
+    borderRadius: 10,
+    borderWidth: 0.5,
+    borderColor: 'transparent',
+    marginVertical: 1,
+  },
+  sidebarSectionHeaderActive: {
+    backgroundColor: 'rgba(249, 115, 22, 0.06)',
+    borderColor: 'rgba(249, 115, 22, 0.15)',
+  },
+  sidebarHeaderLabel: {
+    fontSize: 10,
+    fontWeight: '800',
+    letterSpacing: 1,
+  },
+  sidebarHeaderBadge: {
+    borderRadius: 8,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+  },
+  sidebarHeaderBadgeText: {
+    fontSize: 8,
+    fontWeight: '800',
+  },
+  sidebarChevronCircle: {
+    width: 18,
+    height: 18,
+    borderRadius: 9,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  sidebarChipsContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 5,
+    paddingTop: 6,
+    paddingBottom: 6,
+    paddingHorizontal: 2,
+  },
+  sidebarFchip: {
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(0,0,0,0.06)',
+    backgroundColor: 'rgba(255,255,255,0.7)',
+    marginBottom: 4,
+    marginRight: 4,
+    flexDirection: 'row',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOpacity: 0.02,
+    shadowRadius: 3,
+    shadowOffset: { width: 0, height: 1 },
+    elevation: Platform.OS === 'ios' ? 1 : 0,
+  },
+  sidebarFchipSel: {
+    backgroundColor: '#f97316',
+    borderColor: '#f97316',
+    shadowColor: '#f97316',
+    shadowOpacity: 0.18,
+    shadowRadius: 6,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: Platform.OS === 'ios' ? 2 : 0,
+  },
+  sidebarFchipText: {
+    fontSize: 10,
+    fontWeight: '700',
   },
   sidebarDivider: {
     height: 1,
@@ -1506,58 +1578,16 @@ const styles = StyleSheet.create({
     gap: 6,
     paddingVertical: 8,
     paddingHorizontal: 12,
-    borderRadius: 8,
+    borderRadius: 12,
     borderWidth: 1,
   },
   syncBtnText: {
     fontSize: 12,
     fontWeight: '600',
   },
-  accordionHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingVertical: 8,
-    paddingHorizontal: 10,
-    borderRadius: 8,
-    borderWidth: 0.5,
-  },
-  accordionLabel: {
-    fontSize: 10,
-    fontWeight: '900',
-    letterSpacing: 1,
-  },
-  accordionBadge: {
-    borderRadius: 10,
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    marginLeft: 6,
-  },
-  accordionBadgeText: {
-    fontSize: 9,
-    fontWeight: '800',
-  },
-  accordionContent: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 6,
-    paddingTop: 8,
-    paddingBottom: 6,
-    paddingHorizontal: 2,
-  },
-  filterPill: {
-    paddingVertical: 5,
-    paddingHorizontal: 10,
-    borderRadius: 6,
-    borderWidth: 1,
-    maxWidth: '100%',
-  },
-  filterPillText: {
-    fontSize: 12,
-    fontWeight: '500',
-  },
   feedContainer: {
     flex: 1,
+    position: 'relative',
   },
   listContent: {
     padding: 16,
@@ -1568,14 +1598,14 @@ const styles = StyleSheet.create({
     gap: 16,
   },
   card: {
-    borderRadius: 12,
-    borderWidth: 1,
-    padding: 16,
+    borderRadius: 20,
+    borderWidth: 1.2,
+    padding: 18,
     elevation: 2,
-    shadowColor: '#000000',
+    shadowColor: '#64748b',
     shadowOpacity: 0.05,
-    shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 6,
+    shadowOffset: { width: 0, height: 4 },
+    shadowRadius: 10,
   },
   cardTwoColumn: {
     flex: 1,
@@ -1609,7 +1639,7 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
   },
   pageThumbWrapper: {
-    borderRadius: 8,
+    borderRadius: 10,
     overflow: 'hidden',
     borderWidth: 1,
     position: 'relative',
@@ -1635,7 +1665,7 @@ const styles = StyleSheet.create({
   },
   emptyPagesBox: {
     padding: 12,
-    borderRadius: 8,
+    borderRadius: 10,
     alignItems: 'center',
     marginVertical: 6,
   },
@@ -1653,8 +1683,8 @@ const styles = StyleSheet.create({
   activeTagChip: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 3,
-    paddingHorizontal: 8,
+    paddingVertical: 4,
+    paddingHorizontal: 9,
     borderRadius: 12,
     borderWidth: 1,
   },
@@ -1673,7 +1703,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingTop: 10,
+    paddingTop: 12,
     borderTopWidth: 1,
   },
   cardActionsLeft: {
@@ -1684,12 +1714,12 @@ const styles = StyleSheet.create({
   cardActionBtn: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 5,
-    paddingHorizontal: 10,
-    borderRadius: 6,
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 12,
     borderWidth: 1,
     borderColor: 'rgba(150, 150, 150, 0.25)',
-    gap: 4,
+    gap: 5,
   },
   cardActionBtnText: {
     fontSize: 12,
@@ -1697,11 +1727,12 @@ const styles = StyleSheet.create({
   },
   saveButton: {
     padding: 6,
+    borderRadius: 12,
   },
   inlineTagPicker: {
     marginTop: 10,
     padding: 12,
-    borderRadius: 8,
+    borderRadius: 14,
     borderWidth: 1,
   },
   inlineTagPickerTitle: {
@@ -1720,9 +1751,9 @@ const styles = StyleSheet.create({
   inlineTagItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 4,
-    paddingHorizontal: 8,
-    borderRadius: 6,
+    paddingVertical: 5,
+    paddingHorizontal: 10,
+    borderRadius: 12,
     borderWidth: 1,
   },
   inlineTagItemText: {
@@ -1739,8 +1770,8 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 12,
     paddingVertical: 4,
-    paddingHorizontal: 8,
-    borderRadius: 6,
+    paddingHorizontal: 10,
+    borderRadius: 10,
     borderWidth: 1,
     height: 32,
   },
@@ -1750,8 +1781,8 @@ const styles = StyleSheet.create({
     gap: 4,
     backgroundColor: '#f97316',
     paddingVertical: 6,
-    paddingHorizontal: 10,
-    borderRadius: 6,
+    paddingHorizontal: 12,
+    borderRadius: 10,
   },
   customTagAddBtnText: {
     fontSize: 11,
@@ -1779,7 +1810,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#f97316',
     paddingVertical: 8,
     paddingHorizontal: 16,
-    borderRadius: 8,
+    borderRadius: 12,
   },
   emptyResetBtnText: {
     color: '#ffffff',

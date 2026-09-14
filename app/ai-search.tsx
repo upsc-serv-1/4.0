@@ -69,6 +69,7 @@ type SearchResult = {
   exam_group?: string;
   exam_stage?: string;
   test_id?: string;
+  exam_info?: any;
   tests?: { id?: string; institute?: string; series?: string; program_name?: string };
   // Merger outputs
   _explanations?: Array<{ source: string; program: string; text: string; year: string; answer: string }>;
@@ -329,8 +330,8 @@ export default function AISearchTab() {
   const [filterOpen, setFilterOpen]     = useState(false);
   const [pendingFilters, setPendingFilters] = useState<Filters>(DEFAULT_FILTERS);
 
-  // ── Engine mode: AI (default) | Matching (fuzzy) | Exact ─────────────────
-  const [searchEngineMode, setSearchEngineMode] = useState<SearchEngineMode>('AI');
+  // ── Engine mode: AI | Matching (fuzzy - default) | Exact ─────────────────
+  const [searchEngineMode, setSearchEngineMode] = useState<SearchEngineMode>('Matching');
 
   const [subjectOptions, setSubjectOptions]     = useState<string[]>([]);
   const [sectionOptions, setSectionOptions]     = useState<string[]>([]);

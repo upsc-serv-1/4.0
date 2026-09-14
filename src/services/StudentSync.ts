@@ -1,6 +1,9 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { supabase } from '../lib/supabase';
 import { isQuestionStateEmpty } from './isQuestionStateEmpty';
+import { KVStore } from '../lib/kvStore';
+import { NetworkStatus } from '../lib/networkStatus';
+import { AUTH_SESSION_KEY } from '../context/AuthContext';
 
 const PENDING_WRITES_KEY = '@pending_writes';
 const USER_STATES_PREFIX = '@user_states_';
@@ -165,13 +168,32 @@ class StudentSyncService {
         return;
       }
 
+      if (NetworkStatus.isOffline()) {
+        this.processing = false;
+        return;
+      }
+
       console.log(`[Sync] Processing ${queue.length} pending writes`);
-      const { data: { session } } = await supabase.auth.getSession();
-      const currentUserId = session?.user?.id;
+      let currentUserId: string | undefined;
+      try {
+        const { data } = await supabase.auth.getSession();
+        currentUserId = data?.session?.user?.id;
+      } catch {}
+
+      if (!currentUserId) {
+        const cached = KVStore.getJson<any>(AUTH_SESSION_KEY);
+        currentUserId = cached?.user?.id;
+      }
+
+      if (!currentUserId) {
+        // Without an identifiable user, pause processing rather than discarding writes
+        this.processing = false;
+        return;
+      }
 
       for (const item of queue) {
         // SAFETY: Discard items that don't match current session user
-        if (!currentUserId || item.payload.userId !== currentUserId) {
+        if (item.payload.userId !== currentUserId) {
           console.warn(`[Sync] Discarding stale item for user ${item.payload.userId}`);
           queue = queue.filter(i => i.id !== item.id);
           await AsyncStorage.setItem(PENDING_WRITES_KEY, JSON.stringify(queue));

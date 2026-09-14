@@ -45,3 +45,6 @@ test_p*.jpg
 *test*.jpg
 crop_*.jpg
 p*.jpg
+
+# Internal agent logs
+.agents/

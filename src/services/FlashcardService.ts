@@ -8,6 +8,7 @@ import { CardReviewsRepo } from '../repositories/card_reviews.repo';
 import { StudySessionsRepo } from '../repositories/study_sessions.repo';
 import { OfflineManager } from './OfflineManager';
 import { logDiagEvent } from '../../app/offline-diag';
+import { serializeImageUrls } from '../utils/imageHelpers';
 
 export type CardSource =
   | { kind: 'question'; question_id: string }
@@ -579,7 +580,7 @@ export class FlashcardSvc {
    * explanation the user was viewing at save time, instead of re-deriving
    * from the question row at review time.
    */
-  static async createFromQuestion(userId: string, q: any, activeAnswerText?: string) {
+  static async createFromQuestion(userId: string, q: any, activeAnswerText?: string, backImageUrl?: string | null) {
     const opts = q.options ?? {};
     const optionLines = Object.entries(opts).map(([k, v]) => `(${k.toUpperCase()}) ${v}`).join('\n');
     const front_text = `${q.question_text || q.questionText || ''}\n\n${optionLines}`.trim();
@@ -590,8 +591,14 @@ export class FlashcardSvc {
     const explanation = explanationFromActive || q.explanation_markdown || q.explanation || '';
     const back_text = [correctText, explanation].filter(Boolean).join('\n\n');
 
+    let resolvedBackImage = backImageUrl || q.back_image_url || null;
+    if (!resolvedBackImage && Array.isArray(q.page_urls) && q.page_urls.length > 0) {
+      resolvedBackImage = serializeImageUrls(q.page_urls);
+    }
+
     return this.createCard(userId, {
       front_text, back_text,
+      back_image_url: resolvedBackImage,
       subject: q.subject || 'General',
       section_group: q.section_group || 'General',
       microtopic: q.micro_topic || q.microtopic || 'General',
@@ -603,8 +610,8 @@ export class FlashcardSvc {
   }
 
   /** @deprecated use createFromQuestion */
-  static async createFlashcardFromQuestion(userId: string, q: any) {
-    return this.createFromQuestion(userId, q);
+  static async createFlashcardFromQuestion(userId: string, q: any, activeAnswerText?: string, backImageUrl?: string | null) {
+    return this.createFromQuestion(userId, q, activeAnswerText, backImageUrl);
   }
 
   static async createFromNoteBlock(userId: string, params: {

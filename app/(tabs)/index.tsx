@@ -41,7 +41,9 @@ import {
   Clock,
   Database,
   Tag,
-  ExternalLink
+  ExternalLink,
+  PenTool,
+  Layers
 } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import Svg, { Circle, Path } from 'react-native-svg';
@@ -712,135 +714,135 @@ export default function HomeScreen() {
                   <BarChart3 size={20} color="#2563EB" style={{ marginRight: 8 }} />
                   <Text style={styles.cardTitle}>My Preparation</Text>
                 </TouchableOpacity>
-                <TouchableOpacity onPress={() => router.push('/tracker')}>
-                  <Text style={styles.linkText}>View Syllabus ›</Text>
-                </TouchableOpacity>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+                  {/* Compact Progress Mini-Ring Badge */}
+                  <View style={styles.headerProgressBadge}>
+                    <Svg width={26} height={26} viewBox="0 0 32 32">
+                      <Circle cx="16" cy="16" r="12" stroke="#E2E8F0" strokeWidth="3.5" fill="none" />
+                      <Circle
+                        cx="16"
+                        cy="16"
+                        r="12"
+                        stroke="#10B981"
+                        strokeWidth="3.5"
+                        fill="none"
+                        strokeDasharray="75.4"
+                        strokeDashoffset={75.4 * (1 - Math.min(100, Math.max(0, overallCompletion)) / 100)}
+                        strokeLinecap="round"
+                        transform="rotate(-90 16 16)"
+                      />
+                    </Svg>
+                    <View style={{ marginLeft: 6 }}>
+                      <Text style={styles.miniRingPercent}>{overallCompletion}%</Text>
+                      <Text style={styles.miniRingLabel}>Completed</Text>
+                    </View>
+                  </View>
+
+                  <TouchableOpacity onPress={() => router.push('/tracker')}>
+                    <Text style={styles.linkText}>View Syllabus ›</Text>
+                  </TouchableOpacity>
+                </View>
               </View>
 
-              <View style={styles.prepContentRow}>
-                <View style={{ flex: 1 }}>
-                  {/* Tab Selector */}
-                  <View style={styles.tabBar}>
-                    {(['Prelims', 'Mains', 'Optional', 'Overall'] as const).map((tab) => (
+              <View style={{ width: '100%' }}>
+                {/* Tab Selector */}
+                <View style={styles.tabBar}>
+                  {(['Prelims', 'Mains', 'Optional', 'Overall'] as const).map((tab) => (
+                    <TouchableOpacity
+                      key={tab}
+                      style={[styles.tabItem, prepTab === tab && styles.activeTabItem]}
+                      onPress={() => {
+                        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                        setPrepTab(tab);
+                      }}
+                    >
+                      <Text style={[styles.tabText, prepTab === tab && styles.activeTabText]} numberOfLines={1}>{tab}</Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+
+                {/* Interactive Subject Items */}
+                {prepTab === 'Optional' && tabSubjects.optionalDetailed ? (
+                  <View style={{ flexDirection: 'row', gap: 12, width: '100%' }}>
+                    {/* Left Column: Paper 1 Topics */}
+                    <View style={{ flex: 1, backgroundColor: '#FAF5FF', borderRadius: 12, padding: 10, borderWidth: 1, borderColor: '#F3E8FF' }}>
                       <TouchableOpacity
-                        key={tab}
-                        style={[styles.tabItem, prepTab === tab && styles.activeTabItem]}
-                        onPress={() => {
-                          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                          setPrepTab(tab);
-                        }}
+                        style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8, paddingBottom: 4, borderBottomWidth: 1, borderBottomColor: '#E9D5FF' }}
+                        onPress={() => router.push({ pathname: '/tracker', params: { subject: tabSubjects.optionalDetailed.paper1.key, defaultMode: 'optional' } })}
                       >
-                        <Text style={[styles.tabText, prepTab === tab && styles.activeTabText]} numberOfLines={1}>{tab}</Text>
+                        <Text style={{ fontSize: 12, fontWeight: '800', color: '#7C3AED' }}>Paper 1</Text>
+                        <Text style={{ fontSize: 11, fontWeight: '800', color: '#7C3AED' }}>
+                          {tabSubjects.optionalDetailed.paper1?.percent ?? 0}%
+                        </Text>
+                      </TouchableOpacity>
+                      <ScrollView style={{ maxHeight: 180 }} showsVerticalScrollIndicator={false} nestedScrollEnabled={true}>
+                        {(tabSubjects.optionalDetailed.paper1?.topics || []).map((topic: any, tIdx: number) => (
+                          <TouchableOpacity
+                            key={topic.id || tIdx}
+                            style={{ marginBottom: 8 }}
+                            onPress={() => router.push({ pathname: '/tracker', params: { subject: tabSubjects.optionalDetailed.paper1.key, defaultMode: 'optional' } })}
+                          >
+                            <View style={styles.subjectLabelRow}>
+                              <Text style={[styles.subjectName, { fontSize: 11, flex: 1, marginRight: 8 }]} numberOfLines={1}>{topic.name}</Text>
+                              <Text style={[styles.subjectPercent, { fontSize: 11 }]}>{topic.percent}%</Text>
+                            </View>
+                            <View style={styles.progressTrack}>
+                              <View style={[styles.progressFill, { width: `${topic.percent}%`, backgroundColor: '#7C3AED' }]} />
+                            </View>
+                          </TouchableOpacity>
+                        ))}
+                      </ScrollView>
+                    </View>
+
+                    {/* Right Column: Paper 2 Topics */}
+                    <View style={{ flex: 1, backgroundColor: '#FDF2F8', borderRadius: 12, padding: 10, borderWidth: 1, borderColor: '#FCE7F3' }}>
+                      <TouchableOpacity
+                        style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8, paddingBottom: 4, borderBottomWidth: 1, borderBottomColor: '#FBCFE8' }}
+                        onPress={() => router.push({ pathname: '/tracker', params: { subject: tabSubjects.optionalDetailed.paper2.key, defaultMode: 'optional' } })}
+                      >
+                        <Text style={{ fontSize: 12, fontWeight: '800', color: '#DB2777' }}>Paper 2</Text>
+                        <Text style={{ fontSize: 11, fontWeight: '800', color: '#DB2777' }}>
+                          {tabSubjects.optionalDetailed.paper2?.percent ?? 0}%
+                        </Text>
+                      </TouchableOpacity>
+                      <ScrollView style={{ maxHeight: 180 }} showsVerticalScrollIndicator={false} nestedScrollEnabled={true}>
+                        {(tabSubjects.optionalDetailed.paper2?.topics || []).map((topic: any, tIdx: number) => (
+                          <TouchableOpacity
+                            key={topic.id || tIdx}
+                            style={{ marginBottom: 8 }}
+                            onPress={() => router.push({ pathname: '/tracker', params: { subject: tabSubjects.optionalDetailed.paper2.key, defaultMode: 'optional' } })}
+                          >
+                            <View style={styles.subjectLabelRow}>
+                              <Text style={[styles.subjectName, { fontSize: 11, flex: 1, marginRight: 8 }]} numberOfLines={1}>{topic.name}</Text>
+                              <Text style={[styles.subjectPercent, { fontSize: 11 }]}>{topic.percent}%</Text>
+                            </View>
+                            <View style={styles.progressTrack}>
+                              <View style={[styles.progressFill, { width: `${topic.percent}%`, backgroundColor: '#DB2777' }]} />
+                            </View>
+                          </TouchableOpacity>
+                        ))}
+                      </ScrollView>
+                    </View>
+                  </View>
+                ) : (
+                  <View style={styles.subjectGrid}>
+                    {currentSubjects.map((sub, idx) => (
+                      <TouchableOpacity
+                        key={sub.id || sub.name || idx}
+                        style={styles.subjectItem}
+                        onPress={() => router.push({ pathname: '/tracker', params: { subject: sub.id || sub.name, defaultMode: prepTab.toLowerCase() } })}
+                      >
+                        <View style={styles.subjectLabelRow}>
+                          <Text style={[styles.subjectName, { flex: 1, marginRight: 8 }]} numberOfLines={1}>{sub.name}</Text>
+                          <Text style={styles.subjectPercent}>{sub.percent}%</Text>
+                        </View>
+                        <View style={styles.progressTrack}>
+                          <View style={[styles.progressFill, { width: `${sub.percent}%`, backgroundColor: sub.color }]} />
+                        </View>
                       </TouchableOpacity>
                     ))}
                   </View>
-
-                  {/* Interactive Subject Items */}
-                  {prepTab === 'Optional' && tabSubjects.optionalDetailed ? (
-                    <View style={{ flexDirection: 'row', gap: 12, flex: 1 }}>
-                      {/* Left Column: Paper 1 Topics */}
-                      <View style={{ flex: 1, backgroundColor: '#FAF5FF', borderRadius: 12, padding: 10, borderWidth: 1, borderColor: '#F3E8FF' }}>
-                        <TouchableOpacity
-                          style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8, paddingBottom: 4, borderBottomWidth: 1, borderBottomColor: '#E9D5FF' }}
-                          onPress={() => router.push({ pathname: '/tracker', params: { subject: tabSubjects.optionalDetailed.paper1.key, defaultMode: 'optional' } })}
-                        >
-                          <Text style={{ fontSize: 12, fontWeight: '800', color: '#7C3AED' }}>Paper 1</Text>
-                          <Text style={{ fontSize: 11, fontWeight: '800', color: '#7C3AED' }}>
-                            {tabSubjects.optionalDetailed.paper1?.percent ?? 0}%
-                          </Text>
-                        </TouchableOpacity>
-                        <ScrollView style={{ maxHeight: 180 }} showsVerticalScrollIndicator={false} nestedScrollEnabled={true}>
-                          {(tabSubjects.optionalDetailed.paper1?.topics || []).map((topic: any, tIdx: number) => (
-                            <TouchableOpacity
-                              key={topic.id || tIdx}
-                              style={{ marginBottom: 8 }}
-                              onPress={() => router.push({ pathname: '/tracker', params: { subject: tabSubjects.optionalDetailed.paper1.key, defaultMode: 'optional' } })}
-                            >
-                              <View style={styles.subjectLabelRow}>
-                                <Text style={[styles.subjectName, { fontSize: 11 }]} numberOfLines={1}>{topic.name}</Text>
-                                <Text style={[styles.subjectPercent, { fontSize: 11 }]}>{topic.percent}%</Text>
-                              </View>
-                              <View style={styles.progressTrack}>
-                                <View style={[styles.progressFill, { width: `${topic.percent}%`, backgroundColor: '#7C3AED' }]} />
-                              </View>
-                            </TouchableOpacity>
-                          ))}
-                        </ScrollView>
-                      </View>
-
-                      {/* Right Column: Paper 2 Topics */}
-                      <View style={{ flex: 1, backgroundColor: '#FDF2F8', borderRadius: 12, padding: 10, borderWidth: 1, borderColor: '#FCE7F3' }}>
-                        <TouchableOpacity
-                          style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8, paddingBottom: 4, borderBottomWidth: 1, borderBottomColor: '#FBCFE8' }}
-                          onPress={() => router.push({ pathname: '/tracker', params: { subject: tabSubjects.optionalDetailed.paper2.key, defaultMode: 'optional' } })}
-                        >
-                          <Text style={{ fontSize: 12, fontWeight: '800', color: '#DB2777' }}>Paper 2</Text>
-                          <Text style={{ fontSize: 11, fontWeight: '800', color: '#DB2777' }}>
-                            {tabSubjects.optionalDetailed.paper2?.percent ?? 0}%
-                          </Text>
-                        </TouchableOpacity>
-                        <ScrollView style={{ maxHeight: 180 }} showsVerticalScrollIndicator={false} nestedScrollEnabled={true}>
-                          {(tabSubjects.optionalDetailed.paper2?.topics || []).map((topic: any, tIdx: number) => (
-                            <TouchableOpacity
-                              key={topic.id || tIdx}
-                              style={{ marginBottom: 8 }}
-                              onPress={() => router.push({ pathname: '/tracker', params: { subject: tabSubjects.optionalDetailed.paper2.key, defaultMode: 'optional' } })}
-                            >
-                              <View style={styles.subjectLabelRow}>
-                                <Text style={[styles.subjectName, { fontSize: 11 }]} numberOfLines={1}>{topic.name}</Text>
-                                <Text style={[styles.subjectPercent, { fontSize: 11 }]}>{topic.percent}%</Text>
-                              </View>
-                              <View style={styles.progressTrack}>
-                                <View style={[styles.progressFill, { width: `${topic.percent}%`, backgroundColor: '#DB2777' }]} />
-                              </View>
-                            </TouchableOpacity>
-                          ))}
-                        </ScrollView>
-                      </View>
-                    </View>
-                  ) : (
-                    <View style={styles.subjectGrid}>
-                      {currentSubjects.map((sub, idx) => (
-                        <TouchableOpacity
-                          key={sub.id || sub.name || idx}
-                          style={styles.subjectItem}
-                          onPress={() => router.push({ pathname: '/tracker', params: { subject: sub.id || sub.name, defaultMode: prepTab.toLowerCase() } })}
-                        >
-                          <View style={styles.subjectLabelRow}>
-                            <Text style={styles.subjectName} numberOfLines={1}>{sub.name}</Text>
-                            <Text style={styles.subjectPercent}>{sub.percent}%</Text>
-                          </View>
-                          <View style={styles.progressTrack}>
-                            <View style={[styles.progressFill, { width: `${sub.percent}%`, backgroundColor: sub.color }]} />
-                          </View>
-                        </TouchableOpacity>
-                      ))}
-                    </View>
-                  )}
-                </View>
-
-                {/* Donut Ring on Right */}
-                <View style={styles.ringContainer}>
-                  <Svg width={96} height={96} viewBox="0 0 100 100">
-                    <Circle cx="50" cy="50" r="40" stroke="#E2E8F0" strokeWidth="8" fill="none" />
-                    <Circle
-                      cx="50"
-                      cy="50"
-                      r="40"
-                      stroke="#10B981"
-                      strokeWidth="8"
-                      fill="none"
-                      strokeDasharray="251.2"
-                      strokeDashoffset={251.2 * (1 - overallCompletion / 100)}
-                      strokeLinecap="round"
-                      transform="rotate(-90 50 50)"
-                    />
-                  </Svg>
-                  <View style={styles.ringTextWrap}>
-                    <Text style={styles.ringPercentTxt}>{overallCompletion}%</Text>
-                    <Text style={styles.ringSubTxt}>Completed</Text>
-                  </View>
-                </View>
+                )}
               </View>
             </View>
 
@@ -852,45 +854,46 @@ export default function HomeScreen() {
               </View>
 
               <ScrollView style={{ flex: 1, maxHeight: 230 }} contentContainerStyle={styles.quickGrid} showsVerticalScrollIndicator={false}>
-                <TouchableOpacity style={[styles.quickTile, { backgroundColor: '#F3E8FF' }]} onPress={() => router.push('/pilot-v2')}>
-                  <FileText size={22} color="#7C3AED" />
-                  <Text style={[styles.quickTileTitle, { color: '#6B21A8' }]}>Create Note</Text>
+                {/* 1. Prelims Arena (Tab icon: Target) */}
+                <TouchableOpacity style={[styles.quickTile, { backgroundColor: '#FEF2F2' }]} onPress={() => router.push('/unified/arena')}>
+                  <Target size={22} color="#EF4444" />
+                  <Text style={[styles.quickTileTitle, { color: '#991B1B' }]}>Prelims Arena</Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity style={[styles.quickTile, { backgroundColor: '#FEF2F2' }]} onPress={() => router.push('/flashcards')}>
-                  <Flame size={22} color="#EF4444" />
-                  <Text style={[styles.quickTileTitle, { color: '#991B1B' }]}>Due Cards</Text>
+                {/* 2. Question Bank (Tab icon: PenTool) */}
+                <TouchableOpacity style={[styles.quickTile, { backgroundColor: '#FFF1F2' }]} onPress={() => router.push({ pathname: '/mains', params: { initialScreen: 'questions' } })}>
+                  <PenTool size={22} color="#F43F5E" />
+                  <Text style={[styles.quickTileTitle, { color: '#9F1239' }]}>Question Bank</Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity style={[styles.quickTile, { backgroundColor: '#D1FAE5' }]} onPress={() => router.push('/ai-search')}>
-                  <Sparkles size={22} color="#059669" />
-                  <Text style={[styles.quickTileTitle, { color: '#065F46' }]}>Ask AI</Text>
+                {/* 3. Heatmap (Tab icon: BarChart3) */}
+                <TouchableOpacity style={[styles.quickTile, { backgroundColor: '#FFFBEB' }]} onPress={() => router.push('/pyq')}>
+                  <BarChart3 size={22} color="#F59E0B" />
+                  <Text style={[styles.quickTileTitle, { color: '#B45309' }]}>Heatmap</Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity style={[styles.quickTile, { backgroundColor: '#FFEDD5' }]} onPress={() => router.push('/pyq')}>
-                  <Map size={22} color="#EA580C" />
-                  <Text style={[styles.quickTileTitle, { color: '#9A3412' }]}>Heatmap</Text>
+                {/* 4. Due Cards (Tab icon: Layers) */}
+                <TouchableOpacity style={[styles.quickTile, { backgroundColor: '#F5F3FF' }]} onPress={() => router.push('/flashcards')}>
+                  <Layers size={22} color="#8B5CF6" />
+                  <Text style={[styles.quickTileTitle, { color: '#5B21B6' }]}>Due Cards</Text>
                 </TouchableOpacity>
 
-                {/* New Shortcuts */}
-                <TouchableOpacity style={[styles.quickTile, { backgroundColor: '#E0F2FE' }]} onPress={() => router.push('/tracker')}>
-                  <LayoutList size={22} color="#0284C7" />
-                  <Text style={[styles.quickTileTitle, { color: '#0369A1' }]}>Syllabus</Text>
+                {/* 5. Syllabus (Tab icon: LayoutList) */}
+                <TouchableOpacity style={[styles.quickTile, { backgroundColor: '#FFF7ED' }]} onPress={() => router.push('/tracker')}>
+                  <LayoutList size={22} color="#F97316" />
+                  <Text style={[styles.quickTileTitle, { color: '#C2410C' }]}>Syllabus</Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity style={[styles.quickTile, { backgroundColor: '#FCE7F3' }]} onPress={() => router.push({ pathname: '/mains', params: { initialScreen: 'questions' } })}>
-                  <Database size={22} color="#DB2777" />
-                  <Text style={[styles.quickTileTitle, { color: '#BE185D' }]}>Question Bank</Text>
+                {/* 6. Prelims Ask AI (Tab icon: Search) */}
+                <TouchableOpacity style={[styles.quickTile, { backgroundColor: '#EEF2FF' }]} onPress={() => router.push('/ai-search')}>
+                  <Search size={22} color="#6366F1" />
+                  <Text style={[styles.quickTileTitle, { color: '#4338CA' }]}>Prelims Ask AI</Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity style={[styles.quickTile, { backgroundColor: '#FEF9C3' }]} onPress={() => router.push('/unified/arena')}>
-                  <Target size={22} color="#CA8A04" />
-                  <Text style={[styles.quickTileTitle, { color: '#A16207' }]}>Prelims Arena</Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity style={[styles.quickTile, { backgroundColor: '#ECFCCB' }]} onPress={() => router.push('/tags')}>
-                  <Tag size={22} color="#65A30D" />
-                  <Text style={[styles.quickTileTitle, { color: '#4D7C0F' }]}>Revision Tags</Text>
+                {/* 7. Revision Tags (Tab icon: Tag) */}
+                <TouchableOpacity style={[styles.quickTile, { backgroundColor: '#ECFEFF' }]} onPress={() => router.push('/tags')}>
+                  <Tag size={22} color="#06B6D4" />
+                  <Text style={[styles.quickTileTitle, { color: '#0E7490' }]}>Revision Tags</Text>
                 </TouchableOpacity>
               </ScrollView>
             </View>
@@ -1548,6 +1551,18 @@ const styles = StyleSheet.create({
   subjectPercent: { fontSize: 12, color: '#64748B', fontWeight: '700' },
   progressTrack: { height: 6, backgroundColor: '#F1F5F9', borderRadius: 3, overflow: 'hidden' },
   progressFill: { height: '100%', borderRadius: 3 },
+  headerProgressBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#F0FDF4',
+    paddingVertical: 3,
+    paddingHorizontal: 8,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: '#DCFCE7',
+  },
+  miniRingPercent: { fontSize: 11, fontWeight: '800', color: '#065F46', lineHeight: 13 },
+  miniRingLabel: { fontSize: 8, fontWeight: '600', color: '#10B981', lineHeight: 9, textTransform: 'uppercase' },
   ringContainer: { width: 96, alignItems: 'center', justifyContent: 'center', marginLeft: 12 },
   ringTextWrap: { position: 'absolute', alignItems: 'center' },
   ringPercentTxt: { fontSize: 20, fontWeight: '800', color: '#0F172A' },

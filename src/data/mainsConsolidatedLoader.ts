@@ -2,6 +2,12 @@ export interface ConsolidatedAnswer {
   id: string;
   institute: string;
   answerText: string;
+  topper?: string;
+  air?: number | string;
+  is_topper?: boolean;
+  score?: string;
+  page_urls?: string[];
+  marks?: number;
 }
 
 export interface ConsolidatedQuestion {
@@ -34,6 +40,8 @@ export interface ConsolidatedQuestion {
   institute?: string;
   program_id?: string;
   program_name?: string;
+  cognitive_tag?: string;
+  action_words?: string;
 }
 
 export function normalizePaper(paper: string | null | undefined): string {
@@ -196,6 +204,14 @@ for (let i = 1; i <= 15; i++) {
   forumMGPQuestions = forumMGPQuestions.concat(loadMGP(pad));
 }
 
+let sampleTopperQuestions: ConsolidatedQuestion[] = [];
+try {
+  const topperData = require('./topperSampleData');
+  sampleTopperQuestions = topperData.sampleTopperQuestions || [];
+} catch (e) {
+  console.log('[MainsLoader] Topper sample data not found or failed to load:', e);
+}
+
 // Standardize and export
 export const mainsConsolidatedQuestions: ConsolidatedQuestion[] = [
   ...gs1Questions.map((q: any) => ({ ...q, is_pyq: q.is_pyq ?? true, subject: normalizeSubject(q.subject), paper: resolvePaper(q) })),
@@ -207,6 +223,7 @@ export const mainsConsolidatedQuestions: ConsolidatedQuestion[] = [
   ...socio1Questions.map((q: any) => ({ ...q, is_pyq: q.is_pyq ?? true, subject: normalizeSubject(q.subject), paper: resolvePaper(q) })),
   ...socio2Questions.map((q: any) => ({ ...q, is_pyq: q.is_pyq ?? true, subject: normalizeSubject(q.subject), paper: resolvePaper(q) })),
   ...forumMGPQuestions.map((q: any) => ({ ...q, is_pyq: q.is_pyq ?? false, subject: normalizeSubject(q.subject), paper: resolvePaper(q) })),
+  ...sampleTopperQuestions.map((q: any) => ({ ...q, is_pyq: q.is_pyq ?? true, subject: normalizeSubject(q.subject), paper: resolvePaper(q) })),
 ];
 
 import { supabase } from '../lib/supabase';
@@ -283,11 +300,46 @@ export async function fetchMainsQuestionsFromSupabase(): Promise<ConsolidatedQue
     institute: q.institute,
     program_id: q.program_id,
     program_name: q.program_name,
-    answers: (q.answers || []).map((ans: any) => ({
-      id: ans.id,
-      institute: ans.institute,
-      answerText: ans.answer_text,
-    }))
+    cognitive_tag: q.cognitive_tag || q.cognitiveTags || q.cognitivetag,
+    action_words: q.action_words || q.actionWords || q.actionwords,
+    answers: (q.answers || []).map((ans: any) => {
+      const inst = ans.institute || '';
+      let topper = ans.topper || ans.topper_name || '';
+      let air = ans.air ? String(ans.air) : '';
+      let isTopper = Boolean(ans.is_topper || topper || air);
+      if (!isTopper && inst) {
+        const airMatch = inst.match(/(.*?)\s*\(AIR\s*(\d+)\)/i);
+        if (airMatch) {
+          isTopper = true;
+          topper = airMatch[1].replace(/topper:?\s*/i, '').trim();
+          air = airMatch[2];
+        } else if (inst.toLowerCase().includes('topper')) {
+          isTopper = true;
+          topper = inst.replace(/topper:?\s*/i, '').trim();
+        }
+      }
+
+      const answerText = ans.answer_text || '';
+      let pageUrls: string[] = ans.page_urls || ans.image_urls || [];
+      if ((!pageUrls || pageUrls.length === 0) && answerText) {
+        const imgMatches = [...answerText.matchAll(/!\[.*?\]\((https?:\/\/[^\)]+)\)/g)].map(m => m[1]);
+        if (imgMatches.length > 0) {
+          pageUrls = imgMatches;
+        }
+      }
+
+      return {
+        id: ans.id,
+        institute: ans.institute,
+        answerText: ans.answer_text,
+        topper: topper || undefined,
+        air: air || undefined,
+        is_topper: isTopper || undefined,
+        score: ans.score,
+        marks: ans.marks,
+        page_urls: pageUrls.length > 0 ? pageUrls : undefined,
+      };
+    })
   }));
 
   if (mapped.length > 0) {

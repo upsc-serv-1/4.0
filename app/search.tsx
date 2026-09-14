@@ -54,12 +54,16 @@ import { SharedQuestionCard } from '../src/components/unified/SharedQuestionCard
 import {
   mainsConsolidatedQuestions,
   ConsolidatedQuestion,
-  fetchMainsQuestionsFromSupabase
+  fetchMainsQuestionsFromSupabase,
+  getInitialMainsQuestions,
+  normalizePaper,
+  resolvePaper,
 } from '../src/data/mainsConsolidatedLoader';
 import {
   mainsConsolidatedValueAdd,
   ValueAdditionItem,
-  fetchValueAdditionFromSupabase
+  fetchValueAdditionFromSupabase,
+  getInitialValueAdditions,
 } from '../src/data/mainsValueAdditionLoader';
 import { DetailedQuestionView, ValueAddCardBody, getMarkdownRules, parseIntroductoryBox } from './mains';
 import { buildMarkdownStyles } from '../src/utils/markdownUtils';
@@ -67,6 +71,7 @@ import { ThemeSwitcher } from '../src/components/ThemeSwitcher';
 import { getPYQCategorization } from '../src/utils/questionUtils';
 import { fetchBestAnswer, BestAnswer } from '../src/services/BestAnswerService';
 import { supabase } from '../src/lib/supabase';
+import { KVStore } from '../src/lib/kvStore';
 import * as Clipboard from 'expo-clipboard';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
@@ -82,6 +87,9 @@ type UnifiedSearchResult = {
   year?: number;
   score: number;
   rawItem: any;
+  matchedInQuestion?: boolean;
+  matchedInExplanation?: boolean;
+  matchedInOptions?: boolean;
 };
 
 type UnifiedFilters = {
@@ -98,6 +106,19 @@ type UnifiedFilters = {
   searchAcross: ('Question' | 'Explanation' | 'Options')[];
 };
 
+export function matchesSearchScope(item: UnifiedSearchResult, searchAcross: ('Question' | 'Explanation' | 'Options')[]): boolean {
+  if (!searchAcross || searchAcross.length === 0) return true;
+  const searchQuestion = searchAcross.includes('Question');
+  const searchExplanation = searchAcross.includes('Explanation');
+  const searchOptions = searchAcross.includes('Options');
+
+  let ok = false;
+  if (searchQuestion && item.matchedInQuestion) ok = true;
+  if (searchExplanation && item.matchedInExplanation) ok = true;
+  if (searchOptions && item.matchedInOptions) ok = true;
+  return ok;
+}
+
 const DEFAULT_FILTERS: UnifiedFilters = {
   showPrelims: true,
   showMains: true,
@@ -109,8 +130,113 @@ const DEFAULT_FILTERS: UnifiedFilters = {
   mainsPapers: [],
   institutes: [],
   programmes: [],
-  searchAcross: ['Question'],
+  searchAcross: ['Question', 'Explanation', 'Options'],
 };
+
+export const PAPER_OPTIONS = ['GS1', 'GS2', 'GS3', 'GS4', 'Essay', 'Optional'] as const;
+
+// Canonicalize subjects across Prelims, Mains, and Value Add to eliminate duplication
+export function canonicalizeSubject(sub: string | null | undefined): string {
+  if (!sub) return '';
+  const clean = String(sub).trim();
+  if (!clean) return '';
+  const lower = clean.toLowerCase();
+
+  // Ethics, Integrity & Aptitude
+  if (lower.includes('ethics') || lower.includes('integrity') || lower.includes('aptitude')) {
+    return 'Ethics, Integrity & Aptitude';
+  }
+  // Polity & Governance
+  if (
+    lower === 'polity' || 
+    lower === 'indian polity' || 
+    lower.includes('governance') || 
+    lower.includes('constitution') || 
+    lower === 'polity & governance'
+  ) {
+    return 'Polity & Governance';
+  }
+  // Economy
+  if (lower === 'economy' || lower === 'indian economy' || lower.includes('economic')) {
+    return 'Economy';
+  }
+  // Science & Technology
+  if (
+    lower.includes('science') || 
+    lower.includes('technology') || 
+    lower === 's&t' || 
+    lower.includes('science & technology') || 
+    lower.includes('science and tech')
+  ) {
+    return 'Science & Technology';
+  }
+  // History & Culture
+  if (
+    lower.includes('history') || 
+    lower.includes('ancient') || 
+    lower.includes('medieval') || 
+    lower.includes('modern') || 
+    lower.includes('art & culture') || 
+    lower.includes('art and culture') || 
+    lower.includes('culture')
+  ) {
+    return 'History & Culture';
+  }
+  // Geography
+  if (lower.includes('geography')) {
+    return 'Geography';
+  }
+  // Environment & Ecology
+  if (lower.includes('environment') || lower.includes('ecology') || lower.includes('biodiversity')) {
+    return 'Environment';
+  }
+  // International Relations
+  if (lower.includes('international relations') || lower === 'ir' || lower.includes('international')) {
+    return 'International Relations';
+  }
+  // Social Justice
+  if (lower.includes('social justice') || lower === 'justice') {
+    return 'Social Justice';
+  }
+  // Society
+  if (lower.includes('society') || lower.includes('social issues') || lower === 'indian society') {
+    return 'Indian Society';
+  }
+  // Internal Security
+  if (lower.includes('security') || lower.includes('internal security')) {
+    return 'Internal Security';
+  }
+  // Disaster Management
+  if (lower.includes('disaster') || lower === 'dm') {
+    return 'Disaster Management';
+  }
+  // Agriculture
+  if (lower.includes('agri') || lower.includes('agriculture')) {
+    return 'Agriculture';
+  }
+  // Anthropology
+  if (lower.includes('anthro')) {
+    return 'Anthropology';
+  }
+  // Sociology
+  if (lower.includes('socio')) {
+    return 'Sociology';
+  }
+  // Current Affairs
+  if (lower.includes('current') || lower.includes('ca')) {
+    return 'Current Affairs';
+  }
+  // Essay
+  if (lower.includes('essay')) {
+    return 'Essay';
+  }
+
+  // Proper Title Casing fallback
+  return clean
+    .split(/\s+/)
+    .map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
+    .join(' ');
+}
 
 // Subject color mapper from Prelims AI search
 function getSubjectColor(sub: string): string {
@@ -182,9 +308,11 @@ const cleanMainsMarkdownText = (text: string | undefined | null): string => {
 };
 
 const getUniqueValueAddItems = (items: any[]): any[] => {
+  if (!items || !items.length) return [];
   const seen = new Set<string>();
   return items.filter(item => {
-    const fingerprint = [
+    if (!item) return false;
+    const fingerprint = item.id || [
       item.category,
       item.title || '',
       item.context || '',
@@ -229,17 +357,27 @@ function getValueAddItemTextContent(va: any): string {
     va.mnemonicKeyword || '',
     va.frameworkGuide || '',
     va.rawContent || '',
+    va.content_markdown || '',
+    va.content || '',
+    va.description || '',
+    va.tags || '',
+    va.subject || '',
+    va.sectionGroup || va.section_group || '',
+    va.microtopic || va.microTopic || '',
+    va.subtopic || va.subTopic || '',
     va.examples || '',
     va.data_points || '',
+    va.core_values || '',
+    va.category || '',
   ];
   
-  if (va.mnemonicExpansion) {
+  if (va.mnemonicExpansion && Array.isArray(va.mnemonicExpansion)) {
     va.mnemonicExpansion.forEach((item: any) => {
       parts.push(item.letter || '', item.meaning || '', item.detail || '');
     });
   }
   
-  if (va.frameworkBoxes) {
+  if (va.frameworkBoxes && Array.isArray(va.frameworkBoxes)) {
     va.frameworkBoxes.forEach((box: any) => {
       parts.push(box.label || '', box.description || '');
     });
@@ -254,19 +392,20 @@ function getValueAddItemTextContent(va: any): string {
       ed.impact || '',
       ed.values || '',
       ed.keywordDefinition || '',
-      ed.keywordExample || ''
+      ed.keywordExample || '',
+      ed.comparisonNonTableContent || ''
     );
-    if (ed.dimensionsList) {
+    if (Array.isArray(ed.dimensionsList)) {
       parts.push(...ed.dimensionsList);
     }
-    if (ed.comparisonPoints) {
+    if (Array.isArray(ed.comparisonPoints)) {
       ed.comparisonPoints.forEach((p: any) => {
         parts.push(p.criteria || '', p.termA || '', p.termB || '');
       });
     }
   }
 
-  return parts.join(' ');
+  return parts.filter(Boolean).join(' ');
 }
 
 const wholeWordRegex = (word: string): RegExp =>
@@ -275,8 +414,24 @@ const wholeWordRegex = (word: string): RegExp =>
 const hasWholeWord = (text: string, word: string): boolean =>
   wholeWordRegex(word).test(text);
 
+export const STOP_WORDS = new Set([
+  'the', 'and', 'for', 'are', 'but', 'not', 'you', 'all', 'any', 'can', 'her', 'was', 'one',
+  'our', 'out', 'day', 'get', 'has', 'him', 'his', 'how', 'man', 'new', 'now', 'old', 'see',
+  'two', 'way', 'who', 'boy', 'did', 'its', 'let', 'put', 'say', 'she', 'too', 'use', 'with',
+  'from', 'that', 'this', 'what', 'which', 'when', 'where', 'will', 'they', 'them', 'these',
+  'those', 'been', 'have', 'were', 'about', 'would', 'there', 'their'
+]);
+
+export const textMatchesKeyword = (text: string, kw: string): boolean => {
+  if (!text || !kw) return false;
+  if (kw.length <= 4) {
+    return hasWholeWord(text, kw);
+  }
+  return hasWholeWord(text, kw) || text.toLowerCase().includes(kw.toLowerCase());
+};
+
 function highlightKeywords(text: string, allKeywords: string[]): React.ReactNode {
-  const matchingKws = allKeywords.filter(k => k.length > 2 && hasWholeWord(text, k));
+  const matchingKws = allKeywords.filter(k => k.length > 2 && textMatchesKeyword(text, k));
   if (!matchingKws.length) return <Text>{text}</Text>;
   const escaped = matchingKws.map(k => k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
   const pattern = new RegExp(`(${escaped.join('|')})`, 'gi');
@@ -299,29 +454,29 @@ function buildContextSnippet(
   if (!text && !options && !explanation) return null;
 
   if (rawTerm && rawTerm.length > 2) {
-    const rawWords = rawTerm.toLowerCase().split(/\s+/).filter(w => w.length > 2);
+    const rawWords = rawTerm.toLowerCase().split(/\s+/).filter(w => w.length > 2 && !STOP_WORDS.has(w));
     for (const word of rawWords) {
-      if (hasWholeWord(text || '', word)) {
+      if (textMatchesKeyword(text || '', word)) {
         return buildSnippetFromField(text || '', word, '', maxContextWords);
       }
     }
   }
 
-  const textKw = keywords.find(k => k.length > 2 && hasWholeWord(text || '', k));
+  const textKw = keywords.find(k => k.length > 2 && textMatchesKeyword(text || '', k));
   if (textKw) {
     return buildSnippetFromField(text || '', textKw, '', maxContextWords);
   }
 
   if (options) {
     const optsText = Object.entries(options).map(([k, v]) => `${k}: ${v}`).join(' ');
-    const optsKw = keywords.find(k => k.length > 2 && hasWholeWord(optsText, k));
+    const optsKw = keywords.find(k => k.length > 2 && textMatchesKeyword(optsText, k));
     if (optsKw) {
       return buildSnippetFromField(optsText, optsKw, '(Options)', maxContextWords);
     }
   }
 
   if (explanation) {
-    const explKw = keywords.find(k => k.length > 2 && hasWholeWord(explanation, k));
+    const explKw = keywords.find(k => k.length > 2 && textMatchesKeyword(explanation, k));
     if (explKw) {
       return buildSnippetFromField(explanation, explKw, '(Explanation)', maxContextWords);
     }
@@ -337,12 +492,13 @@ function buildSnippetFromField(
   label: string,
   maxContextWords: number,
 ): React.ReactNode {
-  const match = fieldText.match(wholeWordRegex(keyword));
+  const match = fieldText.match(keyword.length <= 4 ? wholeWordRegex(keyword) : new RegExp(keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i'));
   if (!match || match.index === undefined) {
     return <Text>{fieldText.slice(0, 120)}</Text>;
   }
   const matchIdx = match.index;
   const matchEnd = matchIdx + match[0].length;
+  const matchedWord = match[0];
   const beforeText = fieldText.slice(0, matchIdx);
   const beforeWords = beforeText.split(/\s+/).filter(Boolean);
   const contextBefore = beforeWords.slice(-maxContextWords).join(' ');
@@ -356,9 +512,9 @@ function buildSnippetFromField(
   const prefix = hasMoreBefore ? '... ' : '';
   const suffix = hasMoreAfter ? ' ...' : '';
   const labelPrefix = label ? `${label} ` : '';
-  const snippet = `${labelPrefix}${prefix}${contextBefore} ${keyword} ${contextAfter}${suffix}`;
+  const snippet = `${labelPrefix}${prefix}${contextBefore} ${matchedWord} ${contextAfter}${suffix}`;
 
-  return highlightKeywords(snippet, [keyword]);
+  return highlightKeywords(snippet, [keyword, matchedWord]);
 }
 
 const getCleanAvailableAnswers = (answers: any[]): any[] => {
@@ -487,7 +643,7 @@ export default function IntegratedSearchScreen() {
 
   // Core Search States
   const [query, setQuery] = useState('');
-  const [searchEngineMode, setSearchEngineMode] = useState<'AI' | 'AI+Fuzzy' | 'Matching' | 'Exact'>('AI');
+  const [searchEngineMode, setSearchEngineMode] = useState<'AI' | 'AI+Fuzzy' | 'Matching' | 'Exact'>('Matching');
   const [loading, setLoading] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
   const [results, setResults] = useState<UnifiedSearchResult[]>([]);
@@ -572,11 +728,12 @@ export default function IntegratedSearchScreen() {
   // Filter Panel States
   const [filterOpen, setFilterOpen] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarSubjectFilter, setSidebarSubjectFilter] = useState<string | null>(null);
   const [filters, setFilters] = useState<UnifiedFilters>(DEFAULT_FILTERS);
 
-  // Live Sync / Offline Loader States
-  const [mainsQuestions, setMainsQuestions] = useState<ConsolidatedQuestion[]>(mainsConsolidatedQuestions);
-  const [mainsValueAdd, setMainsValueAdd] = useState<ValueAdditionItem[]>(mainsConsolidatedValueAdd);
+  // Live Sync / Offline Loader States - synchronously hydrate from KVStore cache on boot
+  const [mainsQuestions, setMainsQuestions] = useState<ConsolidatedQuestion[]>(() => getInitialMainsQuestions());
+  const [mainsValueAdd, setMainsValueAdd] = useState<ValueAdditionItem[]>(() => getInitialValueAdditions());
 
   // Load search history from local storage
   useEffect(() => {
@@ -605,19 +762,43 @@ export default function IntegratedSearchScreen() {
   const baseFontSizeRef = useRef(16);
   const previewScrollRef = useRef<ScrollView>(null);
 
-  // Load Mains data from Supabase if online
+  // Load Mains data from Supabase if online, with fallback to KVStore
   useEffect(() => {
+    let isMounted = true;
     const syncData = async () => {
+      // Re-check cache once KVStore finishes hydrating
+      await KVStore.ready();
+      if (!isMounted) return;
+      if (mainsQuestions.length === 0) {
+        const q = getInitialMainsQuestions();
+        if (q && q.length > 0) setMainsQuestions(q);
+      }
+      if (mainsValueAdd.length === 0) {
+        const va = getInitialValueAdditions();
+        if (va && va.length > 0) setMainsValueAdd(va);
+      }
+
       try {
         const liveQ = await fetchMainsQuestionsFromSupabase();
-        if (liveQ && liveQ.length > 0) setMainsQuestions(liveQ);
-      } catch {}
+        if (isMounted && liveQ && liveQ.length > 0) {
+          setMainsQuestions(liveQ);
+          console.log('[SearchScreen] Loaded live questions from Supabase:', liveQ.length);
+        }
+      } catch (e) {
+        console.log('[SearchScreen] Questions Supabase sync skipped/failed:', e);
+      }
       try {
         const liveVA = await fetchValueAdditionFromSupabase();
-        if (liveVA && liveVA.length > 0) setMainsValueAdd(liveVA);
-      } catch {}
+        if (isMounted && liveVA && liveVA.length > 0) {
+          setMainsValueAdd(liveVA);
+          console.log('[SearchScreen] Loaded live value additions from Supabase:', liveVA.length);
+        }
+      } catch (e) {
+        console.log('[SearchScreen] Value additions Supabase sync skipped/failed:', e);
+      }
     };
     syncData();
+    return () => { isMounted = false; };
   }, []);
 
   // Fetch best answer for Mains detailed preview
@@ -646,61 +827,362 @@ export default function IntegratedSearchScreen() {
     return allPre.filter((q: any) => q.course === selectedCourse);
   }, [selectedCourse]);
 
-  // Aggregate subjects dynamically - ONLY for the selected course!
+  // Aggregate subjects dynamically - INTERCONNECTED with active stages, papers, and search results!
   const subjectOptions = useMemo(() => {
     const subjects = new Set<string>();
-    // Prelims source
-    coursePrelims.forEach((q: any) => { if (q.subject) subjects.add(q.subject); });
 
-    // Mains source
-    mainsQuestions.forEach(q => { if (q.subject) subjects.add(q.subject); });
-    mainsValueAdd.forEach(va => { if (va.subject) subjects.add(va.subject); });
+    if (hasSearched && results.length > 0) {
+      // In active search results: aggregate subjects from results matching active stages & papers
+      results.forEach(r => {
+        if (r.type === 'prelims' && !filters.showPrelims) return;
+        if (r.type === 'mains' && !filters.showMains) return;
+        if (r.type === 'value_add' && !filters.showValueAdd) return;
+
+        if (filters.mainsPapers.length > 0) {
+          if (r.type === 'mains' || r.type === 'value_add') {
+            const normP = normalizePaper(r.paper);
+            if (!normP || !filters.mainsPapers.some(p => normalizePaper(p) === normP || p === r.paper)) return;
+          } else {
+            return; // Prelims excluded when paper filter is active
+          }
+        }
+
+        if (filters.pyqFilter === 'PYQ Only') {
+          const isPyq = r.type === 'prelims' ? r.rawItem?.is_pyq : (r.rawItem?.is_pyq || r.rawItem?.isPyq);
+          if (!isPyq) return;
+        } else if (filters.pyqFilter === 'Non-PYQ') {
+          const isPyq = r.type === 'prelims' ? r.rawItem?.is_pyq : (r.rawItem?.is_pyq || r.rawItem?.isPyq);
+          if (isPyq) return;
+        }
+
+        const canon = canonicalizeSubject(r.subject);
+        if (canon) subjects.add(canon);
+      });
+
+      // Ensure any currently selected subjects remain in options so they can be toggled/deselected
+      filters.subjects.forEach(s => {
+        const canon = canonicalizeSubject(s);
+        if (canon) subjects.add(canon);
+      });
+    } else {
+      // Prior to search: aggregate from dataset filtered by active stages and papers
+      if (filters.showPrelims && filters.mainsPapers.length === 0) {
+        coursePrelims.forEach((q: any) => {
+          const canon = canonicalizeSubject(q.subject);
+          if (canon) subjects.add(canon);
+        });
+      }
+
+      if (filters.showMains) {
+        mainsQuestions.forEach(q => {
+          const normP = normalizePaper(q.paper);
+          if (filters.mainsPapers.length > 0 && (!normP || !filters.mainsPapers.some(p => normalizePaper(p) === normP || p === q.paper))) return;
+          const canon = canonicalizeSubject(q.subject);
+          if (canon) subjects.add(canon);
+        });
+      }
+
+      if (filters.showValueAdd) {
+        mainsValueAdd.forEach(va => {
+          const normP = normalizePaper(va.paper);
+          if (filters.mainsPapers.length > 0 && (!normP || !filters.mainsPapers.some(p => normalizePaper(p) === normP || p === va.paper))) return;
+          const canon = canonicalizeSubject(va.subject);
+          if (canon) subjects.add(canon);
+        });
+      }
+    }
 
     return ['All', ...Array.from(subjects).sort()];
-  }, [mainsQuestions, mainsValueAdd, coursePrelims]);
+  }, [mainsQuestions, mainsValueAdd, coursePrelims, filters.showPrelims, filters.showMains, filters.showValueAdd, filters.mainsPapers, filters.pyqFilter, filters.subjects, hasSearched, results]);
 
-  // Aggregate unique institutes dynamically
+  // Aggregate unique institutes dynamically - INTERCONNECTED with active stages & search results
   const instituteOptions = useMemo(() => {
     const insts = new Set<string>();
-    coursePrelims.forEach((q: any) => {
-      const tests = Array.isArray(q.tests) ? q.tests[0] : q.tests;
-      const inst = tests?.institute || q.provider || q.source?.institute || '';
-      if (inst) insts.add(inst);
-    });
 
-    mainsQuestions.forEach(q => { if (q.institute) insts.add(q.institute); });
+    if (hasSearched && results.length > 0) {
+      results.forEach(r => {
+        if (r.type === 'prelims' && !filters.showPrelims) return;
+        if (r.type === 'mains' && !filters.showMains) return;
+        if (r.type === 'value_add') return; // value add has no institutes
+        if (filters.mainsPapers.length > 0) {
+          if (r.type === 'mains') {
+            const normP = normalizePaper(r.paper);
+            if (!normP || !filters.mainsPapers.some(p => normalizePaper(p) === normP || p === r.paper)) return;
+          } else {
+            return;
+          }
+        }
+        if (filters.subjects.length > 0 && (!r.subject || !filters.subjects.includes(r.subject))) return;
+
+        const inst = r.rawItem?.institute || (Array.isArray(r.rawItem?.tests) ? r.rawItem.tests[0]?.institute : r.rawItem?.tests?.institute) || '';
+        if (inst) insts.add(inst);
+      });
+      filters.institutes.forEach(i => insts.add(i));
+    } else {
+      if (filters.showPrelims && filters.mainsPapers.length === 0) {
+        coursePrelims.forEach((q: any) => {
+          if (filters.subjects.length > 0 && (!q.subject || !filters.subjects.includes(q.subject))) return;
+          const tests = Array.isArray(q.tests) ? q.tests[0] : q.tests;
+          const inst = tests?.institute || q.provider || q.source?.institute || '';
+          if (inst) insts.add(inst);
+        });
+      }
+
+      if (filters.showMains) {
+        mainsQuestions.forEach(q => {
+          const normP = normalizePaper(q.paper);
+          if (filters.mainsPapers.length > 0 && (!normP || !filters.mainsPapers.some(p => normalizePaper(p) === normP || p === q.paper))) return;
+          if (filters.subjects.length > 0 && (!q.subject || !filters.subjects.includes(q.subject))) return;
+          if (q.institute) insts.add(q.institute);
+        });
+      }
+    }
 
     return ['All', ...Array.from(insts).sort()];
-  }, [mainsQuestions, coursePrelims]);
+  }, [mainsQuestions, coursePrelims, filters.showPrelims, filters.showMains, filters.mainsPapers, filters.subjects, filters.institutes, hasSearched, results]);
 
   const programmeOptions = useMemo(() => {
     const progs = new Set<string>();
-    
-    // 1. Prelims questions
-    coursePrelims.forEach((q: any) => {
-      const tests = Array.isArray(q.tests) ? q.tests[0] : q.tests;
-      const inst = tests?.institute || q.provider || q.source?.institute || '';
-      
-      if (filters.institutes.length > 0 && !filters.institutes.includes(inst)) {
-        return;
-      }
-      
-      const prog = tests?.program_name || q.program_name || '';
-      if (prog) progs.add(prog);
-    });
 
-    // 2. Mains questions
-    mainsQuestions.forEach((q: any) => {
-      const inst = q.institute || '';
-      if (filters.institutes.length > 0 && !filters.institutes.includes(inst)) {
-        return;
+    if (hasSearched && results.length > 0) {
+      results.forEach(r => {
+        if (r.type === 'prelims' && !filters.showPrelims) return;
+        if (r.type === 'mains' && !filters.showMains) return;
+        if (r.type === 'value_add') return;
+
+        const inst = r.rawItem?.institute || (Array.isArray(r.rawItem?.tests) ? r.rawItem.tests[0]?.institute : r.rawItem?.tests?.institute) || '';
+        if (filters.institutes.length > 0 && !filters.institutes.includes(inst)) return;
+
+        const prog = r.rawItem?.program_name || (Array.isArray(r.rawItem?.tests) ? r.rawItem.tests[0]?.program_name : r.rawItem?.tests?.program_name) || '';
+        if (prog) progs.add(prog);
+      });
+      filters.programmes.forEach(p => progs.add(p));
+    } else {
+      // 1. Prelims questions
+      if (filters.showPrelims && filters.mainsPapers.length === 0) {
+        coursePrelims.forEach((q: any) => {
+          const tests = Array.isArray(q.tests) ? q.tests[0] : q.tests;
+          const inst = tests?.institute || q.provider || q.source?.institute || '';
+          if (filters.institutes.length > 0 && !filters.institutes.includes(inst)) return;
+          const prog = tests?.program_name || q.program_name || '';
+          if (prog) progs.add(prog);
+        });
       }
-      const prog = q.program_name || '';
-      if (prog) progs.add(prog);
-    });
+
+      // 2. Mains questions
+      if (filters.showMains) {
+        mainsQuestions.forEach((q: any) => {
+          const normP = normalizePaper(q.paper);
+          if (filters.mainsPapers.length > 0 && (!normP || !filters.mainsPapers.some(p => normalizePaper(p) === normP || p === q.paper))) return;
+          const inst = q.institute || '';
+          if (filters.institutes.length > 0 && !filters.institutes.includes(inst)) return;
+          const prog = q.program_name || '';
+          if (prog) progs.add(prog);
+        });
+      }
+    }
 
     return ['All', ...Array.from(progs).sort()];
-  }, [coursePrelims, filters.institutes, mainsQuestions]);
+  }, [coursePrelims, filters.institutes, filters.showPrelims, filters.showMains, filters.mainsPapers, filters.programmes, mainsQuestions, hasSearched, results]);
+
+  // Real-time subjects in results for quick drill-down (respects active stages & papers)
+  const allResultSubjects = useMemo(() => {
+    const subs = new Set<string>();
+    results.forEach(r => {
+      if (r.type === 'prelims' && !filters.showPrelims) return;
+      if (r.type === 'mains' && !filters.showMains) return;
+      if (r.type === 'value_add' && !filters.showValueAdd) return;
+
+      if (filters.mainsPapers.length > 0) {
+        if (r.type === 'mains' || r.type === 'value_add') {
+          const normP = normalizePaper(r.paper);
+          if (!normP || !filters.mainsPapers.some(p => normalizePaper(p) === normP || p === r.paper)) return;
+        } else {
+          return;
+        }
+      }
+
+      const canon = canonicalizeSubject(r.subject);
+      if (canon) subs.add(canon);
+    });
+    return Array.from(subs).sort();
+  }, [results, filters.showPrelims, filters.showMains, filters.showValueAdd, filters.mainsPapers]);
+
+  // Real-time match counts for subjects, papers, institutes, and stages from search results
+  // All counts are fully REACTIVE and INTERCONNECTED with all active filters!
+  const resultCounts = useMemo(() => {
+    const subjectCounts: Record<string, number> = {};
+    const paperCounts: Record<string, number> = {};
+    const instituteCounts: Record<string, number> = {};
+    const stageCounts = { prelims: 0, mains: 0, value_add: 0 };
+
+    const matchesPyq = (item: UnifiedSearchResult) => {
+      if (filters.pyqFilter === 'All') return true;
+      const isPyq = item.type === 'prelims' ? item.rawItem?.is_pyq : (item.rawItem?.is_pyq || item.rawItem?.isPyq);
+      if (filters.pyqFilter === 'PYQ Only') return !!isPyq;
+      if (filters.pyqFilter === 'Non-PYQ') return !isPyq;
+      return true;
+    };
+
+    const matchesNcert = (item: UnifiedSearchResult) => {
+      if (filters.ncertFilter === 'All') return true;
+      if (item.type === 'prelims') {
+        const v = item.rawItem?.is_ncert;
+        const isNcert = v === true || v === 1 || ['true', '1', 'yes'].includes(String(v).trim().toLowerCase());
+        return filters.ncertFilter === 'NCERT Only' ? isNcert : !isNcert;
+      }
+      return true;
+    };
+
+    const matchesInstitute = (item: UnifiedSearchResult) => {
+      if (filters.institutes.length === 0) return true;
+      if (item.type === 'prelims') {
+        const tests = Array.isArray(item.rawItem?.tests) ? item.rawItem.tests[0] : item.rawItem?.tests;
+        const inst = tests?.institute || item.rawItem?.provider || item.rawItem?.source?.institute || '';
+        return filters.institutes.includes(inst);
+      }
+      if (item.type === 'mains') {
+        return item.rawItem?.institute && filters.institutes.includes(item.rawItem.institute);
+      }
+      return false;
+    };
+
+    const matchesProgramme = (item: UnifiedSearchResult) => {
+      if (filters.programmes.length === 0) return true;
+      if (item.type === 'prelims') {
+        const tests = Array.isArray(item.rawItem?.tests) ? item.rawItem.tests[0] : item.rawItem?.tests;
+        const prog = tests?.program_name || item.rawItem?.program_name || '';
+        return filters.programmes.includes(prog);
+      }
+      if (item.type === 'mains') {
+        return item.rawItem?.program_name && filters.programmes.includes(item.rawItem.program_name);
+      }
+      return false;
+    };
+
+    const matchesKeywordsExclusion = (item: UnifiedSearchResult) => {
+      if (excludedKeywords.size === 0) return true;
+      const titleLower = item.title.toLowerCase();
+      const subLower = (item.subtitle || '').toLowerCase();
+      return !Array.from(excludedKeywords).some(ek => titleLower.includes(ek) || subLower.includes(ek));
+    };
+
+    const matchesSidebarSubject = (item: UnifiedSearchResult) => {
+      if (!sidebarSubjectFilter) return true;
+      return canonicalizeSubject(item.subject) === canonicalizeSubject(sidebarSubjectFilter);
+    };
+
+    const matchesScope = (item: UnifiedSearchResult) => matchesSearchScope(item, filters.searchAcross);
+
+    // 1. Calculate Stage Counts (reflecting all other active filters: paper, subject, pyq, inst, prog, exclusion, scope)
+    results.forEach(r => {
+      if (!matchesScope(r) || !matchesPyq(r) || !matchesNcert(r) || !matchesKeywordsExclusion(r) || !matchesSidebarSubject(r)) return;
+      if (filters.subjects.length > 0) {
+        const itemSub = canonicalizeSubject(r.subject);
+        if (!itemSub || !filters.subjects.some(s => canonicalizeSubject(s) === itemSub)) return;
+      }
+
+      if (r.type === 'prelims') {
+        if (filters.mainsPapers.length === 0 && matchesInstitute(r) && matchesProgramme(r)) {
+          stageCounts.prelims++;
+        }
+      } else if (r.type === 'mains') {
+        const normP = normalizePaper(r.paper);
+        if (filters.mainsPapers.length > 0 && (!normP || !filters.mainsPapers.some(p => normalizePaper(p) === normP || p === r.paper))) return;
+        if (matchesInstitute(r) && matchesProgramme(r)) {
+          stageCounts.mains++;
+        }
+      } else if (r.type === 'value_add') {
+        const normP = normalizePaper(r.paper);
+        if (filters.mainsPapers.length > 0 && (!normP || !filters.mainsPapers.some(p => normalizePaper(p) === normP || p === r.paper))) return;
+        stageCounts.value_add++;
+      }
+    });
+
+    // 2. Calculate Paper Counts (for GS1, GS2, GS3, GS4, Essay, Optional)
+    // CRITICAL: Respects filters.showMains and filters.showValueAdd!
+    // If user deselects Value Addition, Value Additions are NOT counted in paperCounts.
+    results.forEach(r => {
+      if (!r.paper) return;
+      if (r.type === 'mains' && !filters.showMains) return;
+      if (r.type === 'value_add' && !filters.showValueAdd) return;
+      if (r.type === 'prelims') return; // prelims has no paper
+
+      if (!matchesScope(r) || !matchesPyq(r) || !matchesKeywordsExclusion(r) || !matchesSidebarSubject(r)) return;
+      if (filters.subjects.length > 0) {
+        const itemSub = canonicalizeSubject(r.subject);
+        if (!itemSub || !filters.subjects.some(s => canonicalizeSubject(s) === itemSub)) return;
+      }
+      if (r.type === 'mains' && (!matchesInstitute(r) || !matchesProgramme(r))) return;
+
+      const normPaper = normalizePaper(r.paper);
+      if (!normPaper) return;
+      paperCounts[normPaper] = (paperCounts[normPaper] || 0) + 1;
+    });
+
+    // 3. Calculate Subject Counts (reflecting active stages, paper filter, pyq, inst, scope, etc.)
+    results.forEach(r => {
+      const canon = canonicalizeSubject(r.subject);
+      if (!canon) return;
+      if (r.type === 'prelims' && !filters.showPrelims) return;
+      if (r.type === 'mains' && !filters.showMains) return;
+      if (r.type === 'value_add' && !filters.showValueAdd) return;
+      if (!matchesScope(r)) return;
+
+      if (filters.mainsPapers.length > 0) {
+        if (r.type === 'mains' || r.type === 'value_add') {
+          const normP = normalizePaper(r.paper);
+          if (!normP || !filters.mainsPapers.some(p => normalizePaper(p) === normP || p === r.paper)) return;
+        } else {
+          return;
+        }
+      }
+
+      if (!matchesPyq(r) || !matchesNcert(r) || !matchesKeywordsExclusion(r)) return;
+      if (!matchesInstitute(r) || !matchesProgramme(r)) return;
+
+      subjectCounts[canon] = (subjectCounts[canon] || 0) + 1;
+    });
+
+    // 4. Calculate Institute Counts (reflecting active stages, paper filter, subjects, scope, etc.)
+    results.forEach(r => {
+      if (r.type === 'prelims' && !filters.showPrelims) return;
+      if (r.type === 'mains' && !filters.showMains) return;
+      if (r.type === 'value_add') return;
+      if (!matchesScope(r)) return;
+
+      if (filters.mainsPapers.length > 0) {
+        if (r.type === 'mains') {
+          const normP = normalizePaper(r.paper);
+          if (!normP || !filters.mainsPapers.some(p => normalizePaper(p) === normP || p === r.paper)) return;
+        } else {
+          return;
+        }
+      }
+
+      if (filters.subjects.length > 0 && (!r.subject || !filters.subjects.includes(r.subject))) return;
+      if (!matchesPyq(r) || !matchesNcert(r) || !matchesKeywordsExclusion(r) || !matchesSidebarSubject(r)) return;
+
+      const inst = r.rawItem?.institute || (Array.isArray(r.rawItem?.tests) ? r.rawItem.tests[0]?.institute : r.rawItem?.tests?.institute) || '';
+      if (inst) instituteCounts[inst] = (instituteCounts[inst] || 0) + 1;
+    });
+
+    return { subjectCounts, paperCounts, instituteCounts, stageCounts };
+  }, [
+    results,
+    filters.showPrelims,
+    filters.showMains,
+    filters.showValueAdd,
+    filters.mainsPapers,
+    filters.subjects,
+    filters.institutes,
+    filters.programmes,
+    filters.pyqFilter,
+    filters.ncertFilter,
+    filters.searchAcross,
+    excludedKeywords,
+    sidebarSubjectFilter,
+  ]);
 
   // Execute integrated search
   const runIntegratedSearch = async (
@@ -718,24 +1200,31 @@ export default function IntegratedSearchScreen() {
     setHasSearched(true);
     setExcludedKeywords(new Set());
     setExpandedIds(new Set());
+    setSidebarSubjectFilter(null);
 
     try {
-      let keywordsList: string[] = [currentQuery.toLowerCase()];
+      const cleanQuery = currentQuery.toLowerCase().trim();
+      const userWords = cleanQuery
+        .replace(/[^a-z0-9\s]/g, ' ')
+        .split(/\s+/)
+        .filter(w => w.length > 2 && !STOP_WORDS.has(w));
+      let keywordsList: string[] = [...new Set([cleanQuery, ...userWords])];
       let displayKeywords: string[] = [];
       
       if (mode === 'AI' || mode === 'AI+Fuzzy') {
         try {
           const aiResult = await aiExpandSearchQuery(currentQuery);
           if (aiResult && aiResult.keywords && aiResult.keywords.length > 0) {
-            displayKeywords = aiResult.keywords.map(k => k.toLowerCase());
-            const userWords = currentQuery.toLowerCase().replace(/[^a-z0-9\s]/g, '').split(/\s+/).filter(w => w.length > 2);
-            keywordsList = [...new Set([currentQuery.toLowerCase(), ...userWords, ...displayKeywords])];
+            displayKeywords = aiResult.keywords
+              .map(k => k.toLowerCase().trim())
+              .filter(k => Boolean(k) && !STOP_WORDS.has(k));
+            keywordsList = [...new Set([cleanQuery, ...userWords, ...displayKeywords])];
           }
         } catch (err) {
           console.warn('[UnifiedSearch] query expansion failed:', err);
         }
       }
-      setKeywords(displayKeywords.length > 0 ? displayKeywords : [currentQuery.toLowerCase()]);
+      setKeywords(displayKeywords.length > 0 ? displayKeywords : (userWords.length > 0 ? userWords : [cleanQuery]));
 
       const matchedResults: UnifiedSearchResult[] = [];
 
@@ -749,84 +1238,179 @@ export default function IntegratedSearchScreen() {
 
       preQs.forEach((q: any) => {
         let score = 0;
-        const qText = searchQuestion ? String(q.question_text || '').toLowerCase() : '';
-        const qExpl = searchExplanation ? String(q.explanation_markdown || q.explanation || '').toLowerCase() : '';
+        const qText = String(q.question_text || '').toLowerCase();
+        const qExpl = String(q.explanation_markdown || q.explanation || '').toLowerCase();
         const optsObj = q.options || {};
-        const optsText = searchOptions
-          ? `${q.option_a || ''} ${q.option_b || ''} ${q.option_c || ''} ${q.option_d || ''} ${Object.values(optsObj).join(' ')}`.toLowerCase()
-          : '';
+        const optsText = `${q.option_a || ''} ${q.option_b || ''} ${q.option_c || ''} ${q.option_d || ''} ${Object.values(optsObj).join(' ')}`.toLowerCase();
+
+        let matchedInQ = false;
+        let matchedInExpl = false;
+        let matchedInOpts = false;
 
         keywordsList.forEach((kw, index) => {
           const weight = index === 0 ? 3 : 1;
-          if (qText && qText.includes(kw)) score += 2 * weight;
-          if (qExpl && qExpl.includes(kw)) score += 0.5 * weight;
-          if (optsText && optsText.includes(kw)) score += 0.5 * weight;
+          const kwInQ = qText ? textMatchesKeyword(qText, kw) : false;
+          const kwInExpl = qExpl ? textMatchesKeyword(qExpl, kw) : false;
+          const kwInOpts = optsText ? textMatchesKeyword(optsText, kw) : false;
+
+          if (kwInQ) {
+            score += 2 * weight;
+            matchedInQ = true;
+          }
+          if (kwInExpl) {
+            score += 0.5 * weight;
+            matchedInExpl = true;
+          }
+          if (kwInOpts) {
+            score += 0.5 * weight;
+            matchedInOpts = true;
+          }
         });
 
-        if (score > 0) {
+        const hasScopeMatch = (searchQuestion && matchedInQ) || (searchExplanation && matchedInExpl) || (searchOptions && matchedInOpts);
+
+        if (hasScopeMatch && score > 0) {
           matchedResults.push({
             id: `prelims_${q.id}`,
             type: 'prelims',
             title: q.question_text,
             subtitle: q.explanation_markdown || '',
-            subject: q.subject,
+            subject: canonicalizeSubject(q.subject),
             year: q.exam_year,
             score,
             rawItem: q,
+            matchedInQuestion: matchedInQ,
+            matchedInExplanation: matchedInExpl,
+            matchedInOptions: matchedInOpts,
           });
         }
       });
 
-      // B. MAINS SEARCH
-      mainsQuestions.forEach((q) => {
+      // B. MAINS SEARCH (Cached + Live synced)
+      await KVStore.ready();
+      let sourceMains = mainsQuestions.length > 0 ? mainsQuestions : getInitialMainsQuestions();
+      if ((!sourceMains || sourceMains.length === 0) && activeFilters.showMains) {
+        try {
+          const liveQ = await fetchMainsQuestionsFromSupabase();
+          if (liveQ && liveQ.length > 0) {
+            sourceMains = liveQ;
+            setMainsQuestions(liveQ);
+          }
+        } catch (e) {
+          console.log('[UnifiedSearch] on-demand mains questions fetch failed:', e);
+        }
+      }
+
+      sourceMains.forEach((q: any) => {
         let score = 0;
-        const qText = searchQuestion ? String(q.questionText || '').toLowerCase() : '';
-        const ansText = searchExplanation ? (q.answers || []).map(a => a.answerText || '').join(' ').toLowerCase() : '';
+        const rawQBody = String(q.questionText || q.question_text || q.question || q.question_body || '').trim();
+        const qText = (rawQBody || String(q.title || '')).toLowerCase();
+
+        const answersList = q.answers || [];
+        let directAns = '';
+        if (q.model_answer) directAns += ' ' + q.model_answer;
+        if (q.answer_text) directAns += ' ' + q.answer_text;
+        if (q.synopsis) directAns += ' ' + q.synopsis;
+
+        const ansText = `${answersList.map((a: any) => `${a.answerText || a.answer_text || a.content || ''} ${a.synopsis || ''}`).join(' ')} ${directAns}`.toLowerCase();
+        const metaText = `${q.subject || ''} ${q.sectionGroup || q.section_group || ''} ${q.microTopic || q.microtopic || ''} ${q.subTopic || q.subtopic || ''} ${q.macrotag || ''} ${q.microtag || ''}`.toLowerCase();
+
+        let matchedInQ = false;
+        let matchedInAns = false;
 
         keywordsList.forEach((kw, index) => {
           const weight = index === 0 ? 3 : 1;
-          if (qText && qText.includes(kw)) score += 2 * weight;
-          if (ansText && ansText.includes(kw)) score += 0.5 * weight;
+          const kwInQ = qText ? textMatchesKeyword(qText, kw) : false;
+          const kwInAns = ansText ? textMatchesKeyword(ansText, kw) : false;
+
+          if (kwInQ) {
+            score += 2 * weight;
+            matchedInQ = true;
+          }
+          if (kwInAns) {
+            score += 1.5 * weight;
+            matchedInAns = true;
+          }
+          // metaText ONLY adds bonus relevance if the active target scope actually matched!
+          if ((matchedInQ || matchedInAns) && metaText && textMatchesKeyword(metaText, kw)) {
+            score += 0.5 * weight;
+          }
         });
 
-        if (score > 0) {
+        const hasScopeMatch = (searchQuestion && matchedInQ) || (searchExplanation && matchedInAns);
+
+        if (hasScopeMatch && score > 0) {
           matchedResults.push({
             id: `mains_${q.id}`,
             type: 'mains',
-            title: q.questionText,
-            subtitle: (q.answers || []).map(a => a.answerText || '').join(' '),
-            subject: q.subject,
-            paper: q.paper,
-            year: q.year,
+            title: q.questionText || q.question_text || q.title || 'Mains Question',
+            subtitle: answersList.map((a: any) => a.answerText || a.answer_text || '').filter(Boolean).join(' ') || metaText,
+            subject: canonicalizeSubject(q.subject),
+            paper: resolvePaper(q),
+            year: q.year || q.exam_year,
             score,
             rawItem: q,
+            matchedInQuestion: matchedInQ,
+            matchedInExplanation: matchedInAns,
+            matchedInOptions: false,
           });
         }
       });
 
       // C. VALUE ADDITION SEARCH (Comprehensive field index search)
-      const uniqueVA = getUniqueValueAddItems(mainsValueAdd);
-      uniqueVA.forEach((va) => {
+      let sourceVA = mainsValueAdd.length > 0 ? mainsValueAdd : getInitialValueAdditions();
+      if ((!sourceVA || sourceVA.length === 0) && activeFilters.showValueAdd) {
+        try {
+          const liveVA = await fetchValueAdditionFromSupabase();
+          if (liveVA && liveVA.length > 0) {
+            sourceVA = liveVA;
+            setMainsValueAdd(liveVA);
+          }
+        } catch (e) {
+          console.log('[UnifiedSearch] on-demand value add fetch failed:', e);
+        }
+      }
+
+      const uniqueVA = getUniqueValueAddItems(sourceVA);
+      uniqueVA.forEach((va: any) => {
         let score = 0;
-        const titleLower = (va.title || '').toLowerCase();
+        const titleLower = String(va.title || '').toLowerCase();
         const textContent = getValueAddItemTextContent(va).toLowerCase();
+
+        let matchedInTitle = false;
+        let matchedInContent = false;
 
         keywordsList.forEach((kw, index) => {
           const weight = index === 0 ? 3 : 1;
-          if (titleLower.includes(kw)) score += 2 * weight;
-          if (textContent.includes(kw)) score += 0.5 * weight;
+          // In Value Add: 'Question' corresponds to the title/heading, 'Explanation' corresponds to content/notes
+          const kwInTitle = titleLower ? textMatchesKeyword(titleLower, kw) : false;
+          const kwInContent = textContent ? textMatchesKeyword(textContent, kw) : false;
+
+          if (kwInTitle) {
+            score += 2 * weight;
+            matchedInTitle = true;
+          }
+          if (kwInContent) {
+            score += 1.5 * weight;
+            matchedInContent = true;
+          }
         });
 
-        if (score > 0) {
+        const hasScopeMatch = (searchQuestion && matchedInTitle) || (searchExplanation && matchedInContent);
+
+        if (hasScopeMatch && score > 0) {
           matchedResults.push({
             id: `valueadd_${va.id}`,
             type: 'value_add',
             title: va.title || 'Untitled Value Add',
-            subtitle: va.rawContent || va.context || '',
-            subject: va.subject,
-            paper: va.paper,
+            subtitle: va.rawContent || va.content_markdown || va.context || va.description || '',
+            subject: canonicalizeSubject(va.subject),
+            paper: resolvePaper(va) || normalizePaper(va.paper) || 'GS1',
             score,
             rawItem: va,
+            matchedInQuestion: matchedInTitle,
+            matchedInExplanation: matchedInContent,
+            matchedInOptions: false,
           });
         }
       });
@@ -837,7 +1421,9 @@ export default function IntegratedSearchScreen() {
       if (currentQuery) {
         setSearchHistory(prev => {
           const next = [currentQuery, ...prev.filter(h => h.toLowerCase() !== currentQuery.toLowerCase())].slice(0, 10);
-          AsyncStorage.setItem('integrated_search_history', JSON.stringify(next));
+          try {
+            KVStore.setJson('@unified_search_history', next);
+          } catch {}
           return next;
         });
       }
@@ -873,6 +1459,9 @@ export default function IntegratedSearchScreen() {
   const sortedAndFilteredResults = useMemo(() => {
     let list = [...results];
 
+    // Filter by active search scope ("SEARCH IN": Question, Explanation, Options)
+    list = list.filter(item => matchesSearchScope(item, filters.searchAcross));
+
     // Filter by search stages
     list = list.filter(item => {
       if (item.type === 'prelims' && !filters.showPrelims) return false;
@@ -883,7 +1472,11 @@ export default function IntegratedSearchScreen() {
 
     // Filter by subject
     if (filters.subjects.length > 0) {
-      list = list.filter(item => item.subject && filters.subjects.includes(item.subject));
+      list = list.filter(item => {
+        if (!item.subject) return false;
+        const normSub = canonicalizeSubject(item.subject);
+        return filters.subjects.some(s => canonicalizeSubject(s) === normSub);
+      });
     }
 
     // Filter by PYQ status
@@ -924,7 +1517,8 @@ export default function IntegratedSearchScreen() {
     if (filters.mainsPapers.length > 0) {
       list = list.filter(item => {
         if (item.type === 'mains' || item.type === 'value_add') {
-          return item.paper && filters.mainsPapers.includes(item.paper);
+          const normP = normalizePaper(item.paper);
+          return filters.mainsPapers.some(p => normalizePaper(p) === normP || p === item.paper);
         }
         return false;
       });
@@ -980,6 +1574,12 @@ export default function IntegratedSearchScreen() {
       });
     }
 
+    // Sidebar specific subject drill-down (matching ai-search and mains)
+    if (sidebarSubjectFilter) {
+      const normSide = canonicalizeSubject(sidebarSubjectFilter);
+      list = list.filter(r => r.subject && canonicalizeSubject(r.subject) === normSide);
+    }
+
     // Sort logic from Mains Question Bank (Primary & Secondary fallbacks)
     const paperOrder: Record<string, number> = { GS1: 0, GS2: 1, GS3: 2, GS4: 3, Essay: 4, Optional: 5 };
 
@@ -1024,7 +1624,7 @@ export default function IntegratedSearchScreen() {
     });
 
     return list;
-  }, [results, filters, excludedKeywords, sortMode]);
+  }, [results, filters, excludedKeywords, sortMode, sidebarSubjectFilter]);
 
   const activeResults = sortedAndFilteredResults;
 
@@ -1105,14 +1705,18 @@ export default function IntegratedSearchScreen() {
       }
     }
 
-    // Build context snippet depending on type (no answer/explanation leaked beforehand)
+    // Build context snippet depending on type and active search scope
     let snippetComponent: React.ReactNode;
     if (item.type === 'prelims') {
-      snippetComponent = buildContextSnippet(item.rawItem.question_text, keywords, item.rawItem.options, null, query);
+      const expl = filters.searchAcross.includes('Explanation') ? (item.rawItem.explanation_markdown || item.rawItem.explanation) : null;
+      const opts = filters.searchAcross.includes('Options') ? item.rawItem.options : null;
+      snippetComponent = buildContextSnippet(item.rawItem.question_text, keywords, opts, expl, query);
     } else if (item.type === 'mains') {
-      snippetComponent = buildContextSnippet(item.rawItem.questionText, keywords, null, null, query);
+      const expl = filters.searchAcross.includes('Explanation') ? item.subtitle : null;
+      snippetComponent = buildContextSnippet(item.rawItem.questionText || item.title, keywords, null, expl, query);
     } else {
-      snippetComponent = buildContextSnippet(item.rawItem.title, keywords, null, null, query);
+      const expl = filters.searchAcross.includes('Explanation') ? item.subtitle : null;
+      snippetComponent = buildContextSnippet(item.rawItem.title, keywords, null, expl, query);
     }
 
     // Build PYQ details for Prelims questions
@@ -1310,12 +1914,38 @@ export default function IntegratedSearchScreen() {
       if (value === 'All') {
         return { ...p, [key]: [] };
       }
+      if (key === 'subjects') {
+        const canonicalVal = canonicalizeSubject(value);
+        const isSel = p.subjects.some(s => canonicalizeSubject(s) === canonicalVal);
+        const next = isSel
+          ? p.subjects.filter(s => canonicalizeSubject(s) !== canonicalVal)
+          : [...p.subjects.filter(s => canonicalizeSubject(s) !== canonicalVal), canonicalVal];
+        return { ...p, subjects: next };
+      }
       const current = p[key];
       const next = current.includes(value)
         ? current.filter(x => x !== value)
         : [...current, value];
       return { ...p, [key]: next };
     });
+  };
+
+  const toggleStage = (key: 'showPrelims' | 'showMains' | 'showValueAdd') => {
+    setFilters(p => {
+      const nextVal = !p[key];
+      const next = { ...p, [key]: nextVal };
+      // If Prelims turned off, reset prelims-only options
+      if (!next.showPrelims) {
+        next.ncertFilter = 'All';
+        next.examCategory = 'All';
+      }
+      // If both Mains and ValueAdd turned off, reset mainsPapers
+      if (!next.showMains && !next.showValueAdd) {
+        next.mainsPapers = [];
+      }
+      return next;
+    });
+    setSidebarSubjectFilter(null);
   };
 
   const mdStyles = buildMarkdownStyles(
@@ -1327,52 +1957,228 @@ export default function IntegratedSearchScreen() {
   );
   const mdRules = getMarkdownRules(colors, isDark, setZoomImageUri);
 
-  const renderFilterGroupHeader = (key: string, label: string) => {
+  const renderFilterGroupHeader = (key: string, label: string, badgeCount?: string | number, isActive?: boolean) => {
     const isCollapsed = collapsedFilters[key] ?? true;
     return (
       <TouchableOpacity
         onPress={() => setCollapsedFilters(p => ({ ...p, [key]: !isCollapsed }))}
-        style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 10, borderBottomWidth: 0.5, borderBottomColor: colors.border, marginBottom: isCollapsed ? 12 : 8 }}
+        style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          paddingVertical: 10,
+          borderBottomWidth: 0.5,
+          borderBottomColor: isActive ? colors.primary + '60' : colors.border,
+          marginBottom: isCollapsed ? 12 : 8,
+          backgroundColor: isActive && !isCollapsed ? colors.primary + '0a' : 'transparent',
+          borderRadius: 8,
+          paddingHorizontal: 4,
+        }}
       >
-        <Text style={{ fontSize: 10, fontWeight: '800', color: colors.textTertiary, letterSpacing: 1 }}>{label}</Text>
-        {isCollapsed ? <ChevronDown size={14} color={colors.textTertiary} /> : <ChevronUp size={14} color={colors.textTertiary} />}
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, flex: 1 }}>
+          <Text style={{ fontSize: 10, fontWeight: '800', color: isActive ? colors.primary : colors.textTertiary, letterSpacing: 1 }}>
+            {label}
+          </Text>
+          {badgeCount !== undefined && (
+            <View style={{ backgroundColor: isActive ? colors.primary : colors.border + '60', borderRadius: 8, paddingHorizontal: 6, paddingVertical: 2 }}>
+              <Text style={{ fontSize: 8, fontWeight: '800', color: isActive ? '#fff' : colors.textTertiary }}>
+                {badgeCount}
+              </Text>
+            </View>
+          )}
+        </View>
+        {isCollapsed ? <ChevronDown size={14} color={colors.textTertiary} /> : <ChevronUp size={14} color={isActive ? colors.primary : colors.textTertiary} />}
       </TouchableOpacity>
     );
   };
 
   const LeftPanelFilters = (
-    <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 16 }}>
-      {/* 1. Search Stages (Always open by default) */}
+    <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 16 }} showsVerticalScrollIndicator={true}>
+      {/* 0. Live Search Stats Panel (matching ai-search and mains) */}
+      {hasSearched && results.length > 0 && (
+        <View style={{ marginBottom: 14, paddingBottom: 12, borderBottomWidth: 0.5, borderBottomColor: colors.border }}>
+          <Text style={{ fontSize: 10, fontWeight: '800', color: colors.textTertiary, letterSpacing: 1, marginBottom: 8 }}>
+            RESULT BREAKDOWN
+          </Text>
+          <View style={{ flexDirection: 'row', gap: 6 }}>
+            <View style={{ flex: 1, padding: 8, borderRadius: 10, backgroundColor: colors.surfaceStrong, alignItems: 'center' }}>
+              <Text style={{ fontSize: 16, fontWeight: '800', color: colors.textPrimary }}>{activeResults.length}</Text>
+              <Text style={{ fontSize: 9, fontWeight: '600', color: colors.textTertiary }}>Total</Text>
+            </View>
+            <View style={{ flex: 1, padding: 8, borderRadius: 10, backgroundColor: '#DCFCE7', alignItems: 'center' }}>
+              <Text style={{ fontSize: 16, fontWeight: '800', color: '#15803D' }}>{activeResults.filter(r => r.type === 'prelims').length}</Text>
+              <Text style={{ fontSize: 9, fontWeight: '600', color: '#166534' }}>Prelims</Text>
+            </View>
+            <View style={{ flex: 1, padding: 8, borderRadius: 10, backgroundColor: '#FFEDD5', alignItems: 'center' }}>
+              <Text style={{ fontSize: 16, fontWeight: '800', color: '#C2410C' }}>{activeResults.filter(r => r.type === 'mains').length}</Text>
+              <Text style={{ fontSize: 9, fontWeight: '600', color: '#9A3412' }}>Mains</Text>
+            </View>
+            <View style={{ flex: 1, padding: 8, borderRadius: 10, backgroundColor: '#F3E8FF', alignItems: 'center' }}>
+              <Text style={{ fontSize: 16, fontWeight: '800', color: '#7E22CE' }}>{activeResults.filter(r => r.type === 'value_add').length}</Text>
+              <Text style={{ fontSize: 9, fontWeight: '600', color: '#6B21A8' }}>Value Adds</Text>
+            </View>
+          </View>
+        </View>
+      )}
+
+      {/* 0.1 Interactive Keywords Exclusion Section (matching ai-search and mains) */}
+      {keywords.length > 0 && (
+        <View style={{ marginBottom: 14, paddingBottom: 12, borderBottomWidth: 0.5, borderBottomColor: colors.border }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+              <Sparkles size={12} color="#7C3AED" />
+              <Text style={{ fontSize: 10, fontWeight: '800', color: '#7C3AED', letterSpacing: 1 }}>
+                {keywords.length - excludedKeywords.size}/{keywords.length} KEYWORDS
+              </Text>
+            </View>
+            {excludedKeywords.size > 0 && (
+              <TouchableOpacity onPress={() => setExcludedKeywords(new Set())}>
+                <Text style={{ fontSize: 10, fontWeight: '700', color: '#EF4444' }}>Reset</Text>
+              </TouchableOpacity>
+            )}
+          </View>
+          <Text style={{ fontSize: 10, color: colors.textTertiary, marginBottom: 8 }}>
+            💡 Tap to exclude keywords from search
+          </Text>
+          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 5 }}>
+            {keywords.map((kw, i) => {
+              const isExcluded = excludedKeywords.has(kw);
+              return (
+                <TouchableOpacity
+                  key={i}
+                  onPress={() => toggleExcludedKeyword(kw)}
+                  style={[
+                    styles.pill,
+                    {
+                      backgroundColor: isExcluded ? (isDark ? '#334155' : '#F1F5F9') : '#EDE9FE',
+                      borderColor: isExcluded ? colors.border : '#C4B5FD',
+                      opacity: isExcluded ? 0.5 : 1,
+                      paddingVertical: 4,
+                      paddingHorizontal: 8,
+                    }
+                  ]}
+                >
+                  <Text style={{
+                    fontSize: 11,
+                    fontWeight: '600',
+                    color: isExcluded ? colors.textTertiary : '#7C3AED',
+                    textDecorationLine: isExcluded ? 'line-through' : 'none',
+                  }}>
+                    {kw}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+        </View>
+      )}
+
+      {/* 0.2 Quick Subject Drill-down in Search Results (matching ai-search and mains) */}
+      {hasSearched && results.length > 0 && allResultSubjects.length > 0 && (
+        <View style={{ marginBottom: 14, paddingBottom: 12, borderBottomWidth: 0.5, borderBottomColor: colors.border }}>
+          <Text style={{ fontSize: 10, fontWeight: '800', color: colors.textTertiary, letterSpacing: 1, marginBottom: 8 }}>
+            BY SUBJECT IN RESULTS
+          </Text>
+          {sidebarSubjectFilter && (
+            <TouchableOpacity
+              style={{ flexDirection: 'row', alignItems: 'center', gap: 6, paddingVertical: 4, paddingHorizontal: 10, borderRadius: 12, backgroundColor: '#FEE2E2', borderWidth: 1, borderColor: '#FCA5A5', marginBottom: 8, alignSelf: 'flex-start' }}
+              onPress={() => setSidebarSubjectFilter(null)}
+            >
+              <X size={12} color="#EF4444" />
+              <Text style={{ fontSize: 11, fontWeight: '700', color: '#DC2626' }}>Clear: {sidebarSubjectFilter}</Text>
+            </TouchableOpacity>
+          )}
+          <View style={{ gap: 6 }}>
+            {allResultSubjects.map(sub => {
+              const canonSub = canonicalizeSubject(sub);
+              const count = resultCounts.subjectCounts[canonSub] ?? 0;
+              const isSelected = sidebarSubjectFilter ? canonicalizeSubject(sidebarSubjectFilter) === canonSub : false;
+              const color = getSubjectColor(canonSub);
+              return (
+                <TouchableOpacity
+                  key={canonSub}
+                  onPress={() => setSidebarSubjectFilter(isSelected ? null : canonSub)}
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    paddingVertical: 6,
+                    paddingHorizontal: 10,
+                    borderRadius: 10,
+                    borderWidth: 1,
+                    borderColor: isSelected ? colors.primary : colors.border,
+                    backgroundColor: isSelected ? colors.primary + '15' : colors.surface,
+                  }}
+                >
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, flex: 1 }}>
+                    <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: color }} />
+                    <Text style={{ fontSize: 12, fontWeight: isSelected ? '700' : '500', color: isSelected ? colors.primary : colors.textPrimary }} numberOfLines={1}>
+                      {sub}
+                    </Text>
+                  </View>
+                  <View style={{ backgroundColor: isSelected ? colors.primary : colors.border + '60', borderRadius: 8, paddingHorizontal: 6, paddingVertical: 1 }}>
+                    <Text style={{ fontSize: 10, fontWeight: '800', color: isSelected ? '#fff' : colors.textTertiary }}>
+                      {count}
+                    </Text>
+                  </View>
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+        </View>
+      )}
+
+      {/* 1. Search Stages */}
       <View style={styles.filterGroup}>
-        {renderFilterGroupHeader('searchStages', 'SEARCH STAGES')}
+        {renderFilterGroupHeader(
+          'searchStages', 
+          'SEARCH STAGES', 
+          `${(filters.showPrelims ? 1 : 0) + (filters.showMains ? 1 : 0) + (filters.showValueAdd ? 1 : 0)}/3`,
+          !filters.showPrelims || !filters.showMains || !filters.showValueAdd
+        )}
         {!collapsedFilters.searchStages && (
           <View>
             <TouchableOpacity
-              onPress={() => setFilters(p => ({ ...p, showPrelims: !p.showPrelims }))}
+              onPress={() => toggleStage('showPrelims')}
               style={styles.checkboxRow}
             >
               <View style={[styles.checkbox, filters.showPrelims && { backgroundColor: colors.primary, borderColor: colors.primary }]}>
                 {filters.showPrelims && <Check size={12} color="#fff" />}
               </View>
-              <Text style={{ fontSize: 13, fontWeight: '600', color: colors.textSecondary }}>Prelims Questions</Text>
+              <Text style={{ fontSize: 13, fontWeight: '600', color: colors.textSecondary, flex: 1 }}>Prelims Questions</Text>
+              {hasSearched && (
+                <Text style={{ fontSize: 11, fontWeight: '700', color: colors.textTertiary }}>
+                  {resultCounts.stageCounts.prelims}
+                </Text>
+              )}
             </TouchableOpacity>
             <TouchableOpacity
-              onPress={() => setFilters(p => ({ ...p, showMains: !p.showMains }))}
+              onPress={() => toggleStage('showMains')}
               style={styles.checkboxRow}
             >
               <View style={[styles.checkbox, filters.showMains && { backgroundColor: colors.primary, borderColor: colors.primary }]}>
                 {filters.showMains && <Check size={12} color="#fff" />}
               </View>
-              <Text style={{ fontSize: 13, fontWeight: '600', color: colors.textSecondary }}>Mains Questions</Text>
+              <Text style={{ fontSize: 13, fontWeight: '600', color: colors.textSecondary, flex: 1 }}>Mains Questions</Text>
+              {hasSearched && (
+                <Text style={{ fontSize: 11, fontWeight: '700', color: colors.textTertiary }}>
+                  {resultCounts.stageCounts.mains}
+                </Text>
+              )}
             </TouchableOpacity>
             <TouchableOpacity
-              onPress={() => setFilters(p => ({ ...p, showValueAdd: !p.showValueAdd }))}
+              onPress={() => toggleStage('showValueAdd')}
               style={styles.checkboxRow}
             >
               <View style={[styles.checkbox, filters.showValueAdd && { backgroundColor: colors.primary, borderColor: colors.primary }]}>
                 {filters.showValueAdd && <Check size={12} color="#fff" />}
               </View>
-              <Text style={{ fontSize: 13, fontWeight: '600', color: colors.textSecondary }}>Value Additions</Text>
+              <Text style={{ fontSize: 13, fontWeight: '600', color: colors.textSecondary, flex: 1 }}>Value Additions</Text>
+              {hasSearched && (
+                <Text style={{ fontSize: 11, fontWeight: '700', color: colors.textTertiary }}>
+                  {resultCounts.stageCounts.value_add}
+                </Text>
+              )}
             </TouchableOpacity>
           </View>
         )}
@@ -1380,7 +2186,12 @@ export default function IntegratedSearchScreen() {
 
       {/* 2. PYQ Status */}
       <View style={styles.filterGroup}>
-        {renderFilterGroupHeader('pyqStatus', 'PYQ STATUS')}
+        {renderFilterGroupHeader(
+          'pyqStatus', 
+          'PYQ STATUS', 
+          filters.pyqFilter !== 'All' ? filters.pyqFilter : 'All',
+          filters.pyqFilter !== 'All'
+        )}
         {!collapsedFilters.pyqStatus && (
           <View style={styles.chipsWrap}>
             {(['All', 'PYQ Only', 'Non-PYQ'] as const).map(opt => {
@@ -1399,39 +2210,72 @@ export default function IntegratedSearchScreen() {
         )}
       </View>
 
-      {/* 3. Subject Filter */}
+      {/* 3. Subject Filter with Live Facet Counts */}
       <View style={styles.filterGroup}>
-        {renderFilterGroupHeader('subject', 'SUBJECT')}
+        {renderFilterGroupHeader(
+          'subject', 
+          'SUBJECT', 
+          filters.subjects.length === 0 ? 'All' : `${filters.subjects.length}/${Math.max(subjectOptions.length - 1, 1)}`,
+          filters.subjects.length > 0
+        )}
         {!collapsedFilters.subject && (
-          <View style={styles.chipsWrap}>
-            <TouchableOpacity
-              onPress={() => toggleFilterChip('subjects', 'All')}
-              style={[styles.fchip, filters.subjects.length === 0 && { backgroundColor: colors.primary, borderColor: colors.primary }]}
-            >
-              <Text style={[styles.fchipText, { color: filters.subjects.length === 0 ? '#fff' : colors.textSecondary }]}>All</Text>
-              {filters.subjects.length === 0 && <Check size={10} color="#fff" style={{ marginLeft: 4 }} />}
-            </TouchableOpacity>
-            {subjectOptions.filter(x => x !== 'All').map(sub => {
-              const isSelected = filters.subjects.includes(sub);
-              return (
-                <TouchableOpacity
-                  key={sub}
-                  onPress={() => toggleFilterChip('subjects', sub)}
-                  style={[styles.fchip, isSelected && { backgroundColor: colors.primary, borderColor: colors.primary }]}
-                >
-                  <Text style={[styles.fchipText, { color: isSelected ? '#fff' : colors.textSecondary }]}>{sub}</Text>
-                  {isSelected && <Check size={10} color="#fff" style={{ marginLeft: 4 }} />}
-                </TouchableOpacity>
-              );
-            })}
+          <View>
+            {filters.subjects.length > 0 && (
+              <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginBottom: 8 }}>
+                {filters.subjects.map(s => (
+                  <TouchableOpacity
+                    key={s}
+                    onPress={() => toggleFilterChip('subjects', s)}
+                    style={{ flexDirection: 'row', alignItems: 'center', gap: 4, paddingVertical: 3, paddingHorizontal: 8, borderRadius: 10, backgroundColor: '#FEE2E2', borderWidth: 1, borderColor: '#FCA5A5' }}
+                  >
+                    <X size={10} color="#EF4444" />
+                    <Text style={{ fontSize: 10, fontWeight: '700', color: '#DC2626' }}>Clear: {s}</Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            )}
+            <View style={styles.chipsWrap}>
+              <TouchableOpacity
+                onPress={() => toggleFilterChip('subjects', 'All')}
+                style={[styles.fchip, filters.subjects.length === 0 && { backgroundColor: colors.primary, borderColor: colors.primary }]}
+              >
+                <Text style={[styles.fchipText, { color: filters.subjects.length === 0 ? '#fff' : colors.textSecondary }]}>All</Text>
+                {filters.subjects.length === 0 && <Check size={10} color="#fff" style={{ marginLeft: 4 }} />}
+              </TouchableOpacity>
+              {subjectOptions.filter(x => x !== 'All').map(sub => {
+                const canonSub = canonicalizeSubject(sub);
+                const isSelected = filters.subjects.some(s => canonicalizeSubject(s) === canonSub);
+                const count = resultCounts.subjectCounts[canonSub] ?? 0;
+                return (
+                  <TouchableOpacity
+                    key={canonSub}
+                    onPress={() => toggleFilterChip('subjects', canonSub)}
+                    style={[styles.fchip, isSelected && { backgroundColor: colors.primary, borderColor: colors.primary }]}
+                  >
+                    <Text style={[styles.fchipText, { color: isSelected ? '#fff' : colors.textSecondary }]}>{sub}</Text>
+                    {hasSearched && (
+                      <Text style={{ fontSize: 9, fontWeight: '700', marginLeft: 4, color: isSelected ? '#fff' : colors.textTertiary }}>
+                        ({count})
+                      </Text>
+                    )}
+                    {isSelected && <Check size={10} color="#fff" style={{ marginLeft: 4 }} />}
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
           </View>
         )}
       </View>
 
-      {/* 4. Paper (Mains) filter */}
-      {filters.showMains && (
+      {/* 4. Paper (Mains) filter with Live Facet Counts */}
+      {(filters.showMains || filters.showValueAdd) && (
         <View style={styles.filterGroup}>
-          {renderFilterGroupHeader('mainsPaper', 'PAPER (MAINS)')}
+          {renderFilterGroupHeader(
+            'mainsPaper', 
+            'PAPER (MAINS)', 
+            filters.mainsPapers.length === 0 ? 'All' : `${filters.mainsPapers.length}/${PAPER_OPTIONS.length}`,
+            filters.mainsPapers.length > 0
+          )}
           {!collapsedFilters.mainsPaper && (
             <View style={styles.chipsWrap}>
               <TouchableOpacity
@@ -1441,8 +2285,9 @@ export default function IntegratedSearchScreen() {
                 <Text style={[styles.fchipText, { color: filters.mainsPapers.length === 0 ? '#fff' : colors.textSecondary }]}>All</Text>
                 {filters.mainsPapers.length === 0 && <Check size={10} color="#fff" style={{ marginLeft: 4 }} />}
               </TouchableOpacity>
-              {(['GS1', 'GS2', 'GS3', 'GS4', 'Essay'] as const).map(opt => {
+              {PAPER_OPTIONS.map(opt => {
                 const isSelected = filters.mainsPapers.includes(opt);
+                const count = resultCounts.paperCounts[opt] ?? 0;
                 return (
                   <TouchableOpacity
                     key={opt}
@@ -1450,6 +2295,11 @@ export default function IntegratedSearchScreen() {
                     style={[styles.fchip, isSelected && { backgroundColor: colors.primary, borderColor: colors.primary }]}
                   >
                     <Text style={[styles.fchipText, { color: isSelected ? '#fff' : colors.textSecondary }]}>{opt}</Text>
+                    {hasSearched && (
+                      <Text style={{ fontSize: 9, fontWeight: '700', marginLeft: 4, color: isSelected ? '#fff' : colors.textTertiary }}>
+                        ({count})
+                      </Text>
+                    )}
                     {isSelected && <Check size={10} color="#fff" style={{ marginLeft: 4 }} />}
                   </TouchableOpacity>
                 );
@@ -1459,9 +2309,14 @@ export default function IntegratedSearchScreen() {
         </View>
       )}
 
-      {/* 5. Institute Filter */}
+      {/* 5. Institute Filter with Live Facet Counts */}
       <View style={styles.filterGroup}>
-        {renderFilterGroupHeader('institute', 'INSTITUTE')}
+        {renderFilterGroupHeader(
+          'institute', 
+          'INSTITUTE', 
+          filters.institutes.length === 0 ? 'All' : `${filters.institutes.length}/${Math.max(instituteOptions.length - 1, 1)}`,
+          filters.institutes.length > 0
+        )}
         {!collapsedFilters.institute && (
           <View style={styles.chipsWrap}>
             <TouchableOpacity
@@ -1473,6 +2328,7 @@ export default function IntegratedSearchScreen() {
             </TouchableOpacity>
             {instituteOptions.filter(x => x !== 'All').map(inst => {
               const isSelected = filters.institutes.includes(inst);
+              const count = resultCounts.instituteCounts[inst] ?? 0;
               return (
                 <TouchableOpacity
                   key={inst}
@@ -1480,6 +2336,11 @@ export default function IntegratedSearchScreen() {
                   style={[styles.fchip, isSelected && { backgroundColor: colors.primary, borderColor: colors.primary }]}
                 >
                   <Text style={[styles.fchipText, { color: isSelected ? '#fff' : colors.textSecondary }]}>{inst}</Text>
+                  {hasSearched && (
+                    <Text style={{ fontSize: 9, fontWeight: '700', marginLeft: 4, color: isSelected ? '#fff' : colors.textTertiary }}>
+                      ({count})
+                    </Text>
+                  )}
                   {isSelected && <Check size={10} color="#fff" style={{ marginLeft: 4 }} />}
                 </TouchableOpacity>
               );
@@ -1490,7 +2351,12 @@ export default function IntegratedSearchScreen() {
 
       {/* 6. Programme Filter */}
       <View style={styles.filterGroup}>
-        {renderFilterGroupHeader('programme', 'PROGRAMME')}
+        {renderFilterGroupHeader(
+          'programme', 
+          'PROGRAMME', 
+          filters.programmes.length === 0 ? 'All' : `${filters.programmes.length}/${Math.max(programmeOptions.length - 1, 1)}`,
+          filters.programmes.length > 0
+        )}
         {!collapsedFilters.programme && (
           <View style={styles.chipsWrap}>
             <TouchableOpacity
@@ -1519,7 +2385,7 @@ export default function IntegratedSearchScreen() {
 
       {/* 7. Search Scope ("SEARCH IN") */}
       <View style={styles.filterGroup}>
-        {renderFilterGroupHeader('searchScope', 'SEARCH IN')}
+        {renderFilterGroupHeader('searchScope', 'SEARCH IN', `${filters.searchAcross.length}/3`)}
         {!collapsedFilters.searchScope && (
           <View style={styles.chipsWrap}>
             {([
@@ -1532,12 +2398,15 @@ export default function IntegratedSearchScreen() {
                 <TouchableOpacity
                   key={opt.key}
                   onPress={() => {
-                    setFilters(p => {
-                      const next = p.searchAcross.includes(opt.key)
-                        ? p.searchAcross.filter(x => x !== opt.key)
-                        : [...p.searchAcross, opt.key];
-                      return next.length > 0 ? { ...p, searchAcross: next } : p;
-                    });
+                    const next = filters.searchAcross.includes(opt.key)
+                      ? filters.searchAcross.filter(x => x !== opt.key)
+                      : [...filters.searchAcross, opt.key];
+                    if (next.length === 0) return;
+                    const newFilters = { ...filters, searchAcross: next };
+                    setFilters(newFilters);
+                    if (hasSearched && query.trim()) {
+                      runIntegratedSearch(query, newFilters, searchEngineMode);
+                    }
                   }}
                   style={[styles.fchip, isSelected && { backgroundColor: colors.primary, borderColor: colors.primary }]}
                 >
@@ -1552,7 +2421,7 @@ export default function IntegratedSearchScreen() {
       {/* 8. NCERT Filters (only if Prelims enabled, collapsed by default) */}
       {filters.showPrelims && (
         <View style={styles.filterGroup}>
-          {renderFilterGroupHeader('ncert', 'NCERT FILTER (PRELIMS)')}
+          {renderFilterGroupHeader('ncert', 'NCERT FILTER (PRELIMS)', filters.ncertFilter !== 'All' ? filters.ncertFilter : undefined, filters.ncertFilter !== 'All')}
           {!collapsedFilters.ncert && (
             <View style={styles.chipsWrap}>
               {(['All', 'NCERT Only', 'Non-NCERT'] as const).map(opt => {
@@ -1864,7 +2733,7 @@ export default function IntegratedSearchScreen() {
             colors={['#e0f2fe', '#fef3c7', '#fce7f3', '#d1fae5']}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
-            style={StyleSheet.absoluteFillObject}
+            style={StyleSheet.absoluteFill}
           />
         )}
 
@@ -2045,6 +2914,41 @@ export default function IntegratedSearchScreen() {
           </View>
         </View>
       )}
+
+      {/* Floating Sidebar Toggle Button (matching ai-search and mains) */}
+      <TouchableOpacity
+        testID="search-toggle-sidebar"
+        onPress={() => {
+          if (IS_IPAD) {
+            setSidebarOpen(!sidebarOpen);
+          } else {
+            setFilterOpen(!filterOpen);
+          }
+        }}
+        style={{
+          position: 'absolute',
+          bottom: 24,
+          left: 20,
+          width: 44,
+          height: 44,
+          borderRadius: 22,
+          backgroundColor: (IS_IPAD ? sidebarOpen : filterOpen) ? (isDark ? '#475569' : '#64748B') : colors.primary,
+          alignItems: 'center',
+          justifyContent: 'center',
+          shadowColor: colors.primary,
+          shadowOpacity: 0.35,
+          shadowRadius: 8,
+          shadowOffset: { width: 0, height: 4 },
+          elevation: 6,
+          zIndex: 9999,
+        }}
+      >
+        {(IS_IPAD ? sidebarOpen : filterOpen) ? (
+          <ChevronLeft size={20} color="#fff" />
+        ) : (
+          <SlidersHorizontal size={18} color="#fff" />
+        )}
+      </TouchableOpacity>
 
       {/* Mobile Filter Modal */}
       <Modal

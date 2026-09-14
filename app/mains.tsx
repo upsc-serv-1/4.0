@@ -7,6 +7,7 @@ import MainsMnemonicsCard from '../src/components/mains/MainsMnemonicsCard';
 import MainsFrameworksCard from '../src/components/mains/MainsFrameworksCard';
 import MainsEthicsCard from '../src/components/mains/MainsEthicsCard';
 import MainsTagsView from '../src/components/mains/MainsTagsView';
+import TopperCopiesView from '../src/components/mains/TopperCopiesView';
 import {
   View,
   Text,
@@ -79,6 +80,7 @@ import {
   Edit,
   Maximize2,
   RefreshCw,
+  Award,
 } from 'lucide-react-native';
 import { useTheme } from '../src/context/ThemeContext';
 import { useAuth } from '../src/context/AuthContext';
@@ -93,6 +95,8 @@ import { useFlashcardAction } from '../src/hooks/useFlashcardAction';
 import { AddToFlashcardSheet } from '../src/components/flashcards/AddToFlashcardSheet';
 import { StudentSync } from '../src/services/StudentSync';
 import { KVStore } from '../src/lib/kvStore';
+import { TopperImageCacheService } from '../src/services/TopperImageCacheService';
+import { serializeImageUrls } from '../src/utils/imageHelpers';
 import { useTagStore } from '../src/store/tagStore';
 import * as Haptics from 'expo-haptics';
 import { PinchGestureHandler, PanGestureHandler, State as GHState } from 'react-native-gesture-handler';
@@ -550,7 +554,7 @@ export function MainsScreenInner() {
     vaId?: string;
   }>();
 
-  const [currentScreen, setCurrentScreen] = useState<'hub' | 'questions' | 'value-add' | 'search' | 'detailed-question' | 'revision-tags'>('hub');
+  const [currentScreen, setCurrentScreen] = useState<'hub' | 'questions' | 'value-add' | 'search' | 'detailed-question' | 'revision-tags' | 'topper-copies'>('hub');
   const [sessionFilters, setSessionFilters] = useState<MainsFilters | null>(null);
 
   // ── Persist QB filters across tab switches ──
@@ -663,8 +667,12 @@ export function MainsScreenInner() {
       }
       setCurrentScreen('questions');
     } else if (params.initialScreen === 'value-add' || params.initialScreen === 'value-addition') {
+      cameFromExternalRoute.current = true;
       setCurrentScreen('value-add');
       setValueAddCategory(params.category || null);
+      setValueAddOrigin(params.category ? 'submodules' : 'hub');
+    } else if (params.initialScreen === 'topper-copies' || params.initialScreen === 'toppers') {
+      setCurrentScreen('topper-copies');
     }
   }, [
     params.initialScreen,
@@ -685,6 +693,7 @@ export function MainsScreenInner() {
   const [previousScreen, setPreviousScreen] = useState<'questions' | 'search'>('questions');
   const [detailedQuestion, setDetailedQuestion] = useState<ConsolidatedQuestion | null>(null);
   const [valueAddCategory, setValueAddCategory] = useState<string | null>(null);
+  const [valueAddOrigin, setValueAddOrigin] = useState<'hub' | 'submodules' | null>(null);
   const [detailedStudyTags, setDetailedStudyTags] = useState<string[]>([]);
   const [detailedConfidence, setDetailedConfidence] = useState<string | null>(null);
   const [detailedDifficulty, setDetailedDifficulty] = useState<string | null>(null);
@@ -711,8 +720,23 @@ export function MainsScreenInner() {
         setPendingAction(data.action);
         return;
       }
-      if (currentScreen === 'value-add' && valueAddCategory !== null) {
-        setValueAddCategory(null);
+      if (currentScreen === 'value-add') {
+        if (cameFromExternalRoute.current) {
+          cameFromExternalRoute.current = false;
+          setCurrentScreen('hub');
+          setValueAddCategory(null);
+          setValueAddOrigin(null);
+          navigation.dispatch(data.action);
+          return;
+        }
+        if (valueAddCategory !== null && valueAddOrigin === 'submodules') {
+          setValueAddCategory(null);
+          setValueAddOrigin('hub');
+        } else {
+          setCurrentScreen('hub');
+          setValueAddCategory(null);
+          setValueAddOrigin(null);
+        }
       } else if (currentScreen === 'detailed-question') {
         if (cameFromExternalRoute.current) {
           // User jumped straight to a detailed question from an external screen
@@ -741,7 +765,7 @@ export function MainsScreenInner() {
         } else {
           setCurrentScreen('hub');
         }
-      } else if (currentScreen === 'value-add') {
+      } else if (currentScreen === 'topper-copies') {
         setCurrentScreen('hub');
       } else {
         setCurrentScreen('hub');
@@ -752,8 +776,23 @@ export function MainsScreenInner() {
   useFocusEffect(
     useCallback(() => {
       const onBackPress = () => {
-        if (currentScreen === 'value-add' && valueAddCategory !== null) {
+        if (currentScreen === 'value-add') {
+          if (cameFromExternalRoute.current) {
+            cameFromExternalRoute.current = false;
+            setCurrentScreen('hub');
+            setValueAddCategory(null);
+            setValueAddOrigin(null);
+            navigation.goBack();
+            return true;
+          }
+          if (valueAddCategory !== null && valueAddOrigin === 'submodules') {
+            setValueAddCategory(null);
+            setValueAddOrigin('hub');
+            return true;
+          }
+          setCurrentScreen('hub');
           setValueAddCategory(null);
+          setValueAddOrigin(null);
           return true;
         }
         if (currentScreen === 'detailed-question') {
@@ -778,7 +817,7 @@ export function MainsScreenInner() {
 
       const subscription = BackHandler.addEventListener('hardwareBackPress', onBackPress);
       return () => subscription.remove();
-    }, [currentScreen, valueAddCategory, previousScreen, router])
+    }, [currentScreen, valueAddCategory, valueAddOrigin, previousScreen, router, navigation])
   );
 
   useEffect(() => {
@@ -792,8 +831,23 @@ export function MainsScreenInner() {
       const { translationX, x, velocityX } = event.nativeEvent;
       const startX = x - translationX;
       if (startX < 50 && translationX > 80 && velocityX > 100) {
-        if (currentScreen === 'value-add' && valueAddCategory !== null) {
-          setValueAddCategory(null);
+        if (currentScreen === 'value-add') {
+          if (cameFromExternalRoute.current) {
+            cameFromExternalRoute.current = false;
+            setCurrentScreen('hub');
+            setValueAddCategory(null);
+            setValueAddOrigin(null);
+            router.back();
+            return;
+          }
+          if (valueAddCategory !== null && valueAddOrigin === 'submodules') {
+            setValueAddCategory(null);
+            setValueAddOrigin('hub');
+          } else {
+            setCurrentScreen('hub');
+            setValueAddCategory(null);
+            setValueAddOrigin(null);
+          }
         } else if (currentScreen === 'detailed-question') {
           if (cameFromExternalRoute.current) {
             // Came from PYQ heatmap directly — swipe back should exit to PYQ Analysis
@@ -818,7 +872,7 @@ export function MainsScreenInner() {
           } else {
             setCurrentScreen('hub');
           }
-        } else if (currentScreen === 'value-add') {
+        } else {
           setCurrentScreen('hub');
         }
       }
@@ -1014,6 +1068,41 @@ export function MainsScreenInner() {
     }
   };
 
+  const handleToggleQuestionTag = async (questionId: string, tag: string) => {
+    if (!questionId || !session?.user?.id) return;
+    const existing = userQuestionStates[questionId]?.reviewTags || [];
+    const newTags = existing.includes(tag)
+      ? existing.filter(t => t !== tag)
+      : [...existing, tag];
+
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
+
+    setUserQuestionStates(prev => ({
+      ...prev,
+      [questionId]: {
+        confidence: prev[questionId]?.confidence || null,
+        difficulty: prev[questionId]?.difficulty || null,
+        reviewTags: newTags,
+      }
+    }));
+
+    if (detailedQuestion?.id === questionId) {
+      setDetailedStudyTags(newTags);
+    }
+
+    try {
+      await StudentSync.enqueue('mains_question_state', {
+        userId: session.user.id,
+        questionId: questionId,
+        testId: 'manual',
+        patch: { review_tags: newTags }
+      });
+      useTagStore.getState().bump({ type: 'add', tag, at: Date.now() });
+    } catch (err) {
+      console.error("Tag Sync Error:", err);
+    }
+  };
+
 
   const handleCreateDetailedTag = async (createdTag: string) => {
     if (!createdTag.trim() || !session?.user?.id) return;
@@ -1119,6 +1208,16 @@ export function MainsScreenInner() {
       microtopic: item.microtopic || item.microTopic || item.title || 'General',
     };
     handleAddToFlashcards(dummyQuestion, back, true);
+  }, [handleAddToFlashcards]);
+
+  const handleTopperFlashcard = useCallback((item: any, topperAns: any) => {
+    const frontText = item.questionText || '';
+    const topperName = topperAns?.topper || topperAns?.institute || 'Topper';
+    const air = topperAns?.air ? ` (AIR ${topperAns.air})` : '';
+    const backText = `**Topper Answer (${topperName}${air})**\n\n${topperAns?.answerText || ''}`;
+    const pageUrls = topperAns?.page_urls || topperAns?.image_urls || [];
+    const backImageUrl = serializeImageUrls(pageUrls);
+    handleAddToFlashcards(item, backText, true, backImageUrl);
   }, [handleAddToFlashcards]);
 
   const handleDeleteBestAnswer = () => {
@@ -1662,6 +1761,11 @@ export function MainsScreenInner() {
       if (liveQuestions && liveQuestions.length > 0) {
         setQuestions(liveQuestions);
         console.log('[MainsScreen] Force sync questions loaded:', liveQuestions.length);
+        try {
+          await TopperImageCacheService.syncAllTopperImages(liveQuestions);
+        } catch (imgSyncErr) {
+          console.warn('[MainsScreen] Topper image sync warning:', imgSyncErr);
+        }
       }
       
       if (liveValueAdd && liveValueAdd.length > 0) {
@@ -1950,12 +2054,27 @@ export function MainsScreenInner() {
                 )}
               </TouchableOpacity>
             </View>
-          ) : (currentScreen !== 'detailed-question' && currentScreen !== 'revision-tags') ? (
+          ) : (currentScreen !== 'detailed-question' && currentScreen !== 'revision-tags' && currentScreen !== 'topper-copies') ? (
             <TouchableOpacity
               onPress={() => {
-                if (currentScreen === 'value-add' && valueAddCategory !== null) {
-                  setTimeout(() => setValueAddCategory(null), 0);
-                } else if (currentScreen !== 'hub') {
+                if (currentScreen === 'value-add') {
+                  if (cameFromExternalRoute.current) {
+                    cameFromExternalRoute.current = false;
+                    setCurrentScreen('hub');
+                    setValueAddCategory(null);
+                    setValueAddOrigin(null);
+                    router.back();
+                    return;
+                  }
+                  if (valueAddCategory !== null && valueAddOrigin === 'submodules') {
+                    setValueAddCategory(null);
+                    setValueAddOrigin('hub');
+                  } else {
+                    setCurrentScreen('hub');
+                    setValueAddCategory(null);
+                    setValueAddOrigin(null);
+                  }
+                } else if ((currentScreen as string) !== 'hub') {
                   setCurrentScreen('hub');
                 } else {
                   router.navigate('/(tabs)');
@@ -1965,15 +2084,15 @@ export function MainsScreenInner() {
             >
               <ChevronLeft size={20} color={colors.textPrimary} />
               <Text style={[styles.backButtonText, { color: colors.textSecondary }]}>
-                {currentScreen === 'value-add' && valueAddCategory !== null 
+                {currentScreen === 'value-add' && valueAddCategory !== null && valueAddOrigin === 'submodules'
                   ? 'Back' 
-                  : currentScreen !== 'hub' ? 'Hub' : 'Home'}
+                  : (currentScreen as string) !== 'hub' ? 'Hub' : 'Home'}
               </Text>
             </TouchableOpacity>
           ) : null}
 
           {/* Top-Right Shortcuts (PYQ & Flashcards) */}
-          {currentScreen !== 'detailed-question' && currentScreen !== 'revision-tags' && (
+          {currentScreen !== 'detailed-question' && currentScreen !== 'revision-tags' && currentScreen !== 'topper-copies' && (
             <View
               style={{
                 position: 'absolute',
@@ -2030,13 +2149,40 @@ export function MainsScreenInner() {
           {/* Screen Switching */}
           {currentScreen === 'hub' && (
             <HubView
-              onSelect={setCurrentScreen}
+              onSelect={(scr: any) => {
+                if (scr === 'value-add') {
+                  setValueAddCategory(null);
+                  setValueAddOrigin('hub');
+                }
+                setCurrentScreen(scr);
+              }}
               onSelectVaHub={(category?: string) => {
                 setValueAddCategory(category ?? 'va_hub');
+                setValueAddOrigin('hub');
                 setCurrentScreen('value-add');
               }}
               colors={colors}
               isTablet={isTablet}
+            />
+          )}
+          {currentScreen === 'topper-copies' && (
+            <TopperCopiesView
+              colors={colors}
+              isTablet={isTablet}
+              insets={insets}
+              questions={questions}
+              onBack={() => setCurrentScreen('hub')}
+              savedIds={savedQuestionIds}
+              onToggleSaved={toggleBookmark}
+              flashcardedIds={flashcardedIds}
+              savingFlashcard={savingFlashcard}
+              onAddFlashcard={handleTopperFlashcard}
+              userTags={userTags}
+              userQuestionStates={userQuestionStates}
+              onToggleQuestionTag={handleToggleQuestionTag}
+              onCreateTag={handleCreateDetailedTag}
+              onForceSync={handleForceSync}
+              syncing={syncingMains}
             />
           )}
           {currentScreen === 'questions' && (
@@ -2086,7 +2232,12 @@ export function MainsScreenInner() {
               insets={insets}
               valueAddItems={valueAddItems}
               activeCategory={valueAddCategory}
-              setActiveCategory={setValueAddCategory}
+              setActiveCategory={(cat: string | null) => {
+                setValueAddCategory(cat);
+                if (cat !== null) {
+                  setValueAddOrigin('submodules');
+                }
+              }}
               onAddFlashcardClick={handleValueAddFlashcard}
               valueAddTags={valueAddTags}
               userTags={userTags}
@@ -2215,8 +2366,9 @@ export function MainsScreenInner() {
           userId={session?.user?.id || ''}
           hint={aff.hint}
           onPlaced={(deckId) => {
-            if (detailedQuestion) {
-              handleFlashcardPlaced(aff.cardId!, detailedQuestion.id);
+            const targetId = aff.targetQuestionId || detailedQuestion?.id;
+            if (targetId && aff.cardId) {
+              handleFlashcardPlaced(aff.cardId, targetId);
             }
             setAff(prev => ({ ...prev, visible: false }));
           }}
@@ -2734,6 +2886,13 @@ function HubView({
       description: 'Official PYQs & model answers',
       color: '#3b82f6',
       icon: Library,
+    },
+    {
+      id: 'topper-copies',
+      title: 'Topper Copies Hub',
+      description: 'Handwritten topper answers & AIR breakdown',
+      color: '#f97316',
+      icon: Award,
     },
     {
       id: 'va-hub',
@@ -7028,36 +7187,53 @@ function QuestionBankView({
                             {/* Horizontal Tab Bar of Institutes & Copy Button */}
                             <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 12 }}>
                               <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ flex: 1, marginRight: 8 }}>
-                                {cleanAnsList.map(ans => (
-                                  <TouchableOpacity
-                                    key={ans.institute}
-                                    onPress={() => setSelectedInstitutes(prev => ({ ...prev, [q.id]: ans.institute }))}
-                                    style={[
-                                      styles.segmentButton,
-                                      {
-                                        marginRight: 6,
-                                        paddingHorizontal: 12,
-                                        paddingVertical: 6,
-                                        borderRadius: 8,
-                                        borderWidth: 0.5,
-                                        borderColor: currentInst === ans.institute ? '#3b82f6' : colors.border
-                                      },
-                                      currentInst === ans.institute
-                                        ? { backgroundColor: '#3b82f6' }
-                                        : { backgroundColor: colors.surface + '88' }
-                                    ]}
-                                  >
-                                    <Text
-                                      style={{
-                                        fontSize: 12,
-                                        fontWeight: '800',
-                                        color: currentInst === ans.institute ? '#ffffff' : colors.textTertiary
-                                      }}
+                                {cleanAnsList.map(ans => {
+                                  const isTopperAns = Boolean(
+                                    (ans as any).is_topper ||
+                                    (ans as any).topper ||
+                                    ans.institute?.toLowerCase().includes('topper') ||
+                                    ans.institute?.toUpperCase().includes('AIR')
+                                  );
+                                  const isSelected = currentInst === ans.institute;
+                                  const activeColor = isTopperAns ? '#f97316' : '#3b82f6';
+
+                                  return (
+                                    <TouchableOpacity
+                                      key={ans.institute}
+                                      onPress={() => setSelectedInstitutes(prev => ({ ...prev, [q.id]: ans.institute }))}
+                                      style={[
+                                        styles.segmentButton,
+                                        {
+                                          marginRight: 6,
+                                          paddingHorizontal: 12,
+                                          paddingVertical: 6,
+                                          borderRadius: 8,
+                                          borderWidth: 0.5,
+                                          borderColor: isSelected ? activeColor : (isTopperAns ? 'rgba(249, 115, 22, 0.4)' : colors.border),
+                                          flexDirection: 'row',
+                                          alignItems: 'center',
+                                          gap: 4,
+                                        },
+                                        isSelected
+                                          ? { backgroundColor: activeColor }
+                                          : { backgroundColor: isTopperAns ? 'rgba(249, 115, 22, 0.08)' : colors.surface + '88' }
+                                      ]}
                                     >
-                                      {ans.institute}
-                                    </Text>
-                                  </TouchableOpacity>
-                                ))}
+                                      {isTopperAns && (
+                                        <Award size={12} color={isSelected ? '#ffffff' : '#f97316'} />
+                                      )}
+                                      <Text
+                                        style={{
+                                          fontSize: 12,
+                                          fontWeight: '800',
+                                          color: isSelected ? '#ffffff' : (isTopperAns ? '#ea580c' : colors.textTertiary)
+                                        }}
+                                      >
+                                        {ans.institute}
+                                      </Text>
+                                    </TouchableOpacity>
+                                  );
+                                })}
                               </ScrollView>
                               
                               <TouchableOpacity
@@ -9334,7 +9510,7 @@ function MainsAISearchView({
   const { session } = useAuth();
 
   const [query, setQuery] = useState('');
-  const [searchEngineMode, setSearchEngineMode] = useState<'AI' | 'AI+Fuzzy' | 'Matching' | 'Exact'>('AI');
+  const [searchEngineMode, setSearchEngineMode] = useState<'AI' | 'AI+Fuzzy' | 'Matching' | 'Exact'>('Matching');
   const [loading, setLoading] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
   const [masterResults, setMasterResults] = useState<any[]>([]);

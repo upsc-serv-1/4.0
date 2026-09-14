@@ -16,6 +16,8 @@
  * Effective:  online  =  realOnline  AND  NOT simulatedOffline  AND  NOT forcedOffline
  */
 
+import NetInfo from '@react-native-community/netinfo';
+
 type Listener = (online: boolean) => void;
 
 class NetworkStatusService {
@@ -73,6 +75,19 @@ class NetworkStatusService {
 }
 
 export const NetworkStatus = new NetworkStatusService();
+
+// Eagerly sync NetInfo immediately on module load so NetworkStatus is accurate right from app startup
+try {
+  NetInfo.fetch().then((state) => {
+    const isReal = Boolean(state.isConnected && state.isInternetReachable !== false);
+    NetworkStatus.setRealOnline(isReal);
+  }).catch(() => {});
+
+  NetInfo.addEventListener((state) => {
+    const isReal = Boolean(state.isConnected && state.isInternetReachable !== false);
+    NetworkStatus.setRealOnline(isReal);
+  });
+} catch {}
 
 /** Convenience helper — `if (isOnline()) { ... }`. */
 export const isOnline = (): boolean => NetworkStatus.isOnline();

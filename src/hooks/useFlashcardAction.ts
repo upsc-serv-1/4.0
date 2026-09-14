@@ -14,6 +14,7 @@ export interface FlashcardFlowState {
   visible: boolean;
   cardId: string | null;
   hint: FlashcardHint;
+  targetQuestionId?: string | null;
 }
 
 export function useFlashcardAction(userId: string | undefined) {
@@ -22,10 +23,16 @@ export function useFlashcardAction(userId: string | undefined) {
   const [aff, setAff] = useState<FlashcardFlowState>({
     visible: false,
     cardId: null,
+    targetQuestionId: null,
     hint: { subject: 'General', section_group: 'General', microtopic: 'General' },
   });
 
-  const handleAddToFlashcards = async (q: any, activeAnswerText?: string, isMains = false) => {
+  const handleAddToFlashcards = async (
+    q: any,
+    activeAnswerText?: string,
+    isMains = false,
+    backImageUrl?: string | null
+  ) => {
     if (!userId) {
       Alert.alert('Error', 'User not authenticated');
       return;
@@ -35,7 +42,7 @@ export function useFlashcardAction(userId: string | undefined) {
     
     try {
       // 1. Create or resolve the flashcard
-      const cardId = await FlashcardSvc.createFromQuestion(userId, q, activeAnswerText);
+      const cardId = await FlashcardSvc.createFromQuestion(userId, q, activeAnswerText, backImageUrl);
       
       // 2. DO NOT add to flashcardedIds yet - only add after successful placement
       // (handled by onPlaced callback)
@@ -46,6 +53,7 @@ export function useFlashcardAction(userId: string | undefined) {
       setAff({
         visible: true,
         cardId,
+        targetQuestionId: q.id,
         hint: {
           subject: q.subject || 'General',
           section_group: q.section_group || q.sectionGroup || 'General',

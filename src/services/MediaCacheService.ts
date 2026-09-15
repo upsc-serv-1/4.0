@@ -273,6 +273,11 @@ class MediaCacheServiceClass {
   /**
    * Bulk-cache a list of URLs with progress + cancellation.
    * Skips anything already on disk, so re-running is cheap.
+   *
+   * Downloads run in small parallel batches. A strictly serial loop made this
+   * take ~1 minute per image on device (each round-trip serialised behind the
+   * previous one); batching mirrors TopperImageCacheService.syncAllTopperImages
+   * and is the difference between a usable and an unusable download.
    */
   public async cacheUrls(
     urls: string[],
@@ -283,22 +288,48 @@ class MediaCacheServiceClass {
     let skipped = 0;
     let failed = 0;
     const total = urls.length;
-    const index = this.loadIndex();
 
-    for (let i = 0; i < total; i++) {
-      if (shouldCancel?.()) break;
-      const url = urls[i];
+    // Ensure the directory + index exist before the read-only pre-pass.
+    await this.init();
 
-      if (index[url]?.localUri) {
-        skipped += 1;
-      } else {
-        const before = index[url]?.localUri;
-        const result = await this.cacheUrl(url);
-        if (result && result !== url) done += 1;
-        else if (!before) failed += 1;
-      }
-      onProgress?.(i + 1, total, skipped);
+    // Separating cached from pending lets us report skipped work immediately
+    // instead of walking the whole list one item at a time.
+    const pending: string[] = [];
+    const seen = new Set<string>();
+    for (const url of urls) {
+      if (!url || seen.has(url)) continue;
+      seen.add(url);
+      if (this.isCached(url)) skipped += 1;
+      else pending.push(url);
     }
+    onProgress?.(skipped, total, skipped);
+
+    const BATCH_SIZE = 5;
+    let completed = skipped;
+
+    for (let i = 0; i < pending.length; i += BATCH_SIZE) {
+      if (shouldCancel?.()) break;
+      const batch = pending.slice(i, i + BATCH_SIZE);
+
+      const results = await Promise.all(
+        batch.map(async (url) => {
+          const localUri = await this.cacheUrl(url);
+          return { url, ok: Boolean(localUri) && localUri !== url };
+        })
+      );
+
+      for (const r of results) {
+        if (r.ok) done += 1;
+        else failed += 1;
+      }
+
+      completed += batch.length;
+      onProgress?.(completed, total, skipped);
+    }
+
+    // Single index flush at the end — writing on every image was redundant work
+    // during a bulk run.
+    this.saveIndex(this.loadIndex());
 
     return { done, skipped, failed };
   }
@@ -325,6 +356,31 @@ class MediaCacheServiceClass {
   public async getCacheSize(): Promise<number> {
     const index = this.loadIndex();
     return Object.values(index).reduce((sum, r) => sum + (r.fileSizeBytes || 0), 0);
+  }
+
+  /**
+   * Forget specific URLs: delete their files and drop them from the index.
+   *
+   * Used when clearing one logical category (e.g. flashcard photos) that shares
+   * this cache with other content — a full `clearCache()` would also evict
+   * question images that the user still wants offline.
+   */
+  public forget(urls: string[]): void {
+    if (!urls?.length || Platform.OS === 'web') return;
+    const index = this.loadIndex();
+    let changed = false;
+
+    for (const url of urls) {
+      const record = index[url];
+      if (!record) continue;
+      delete index[url];
+      changed = true;
+      if (record.localUri) {
+        FileSystem.deleteAsync(record.localUri, { idempotent: true }).catch(() => {});
+      }
+    }
+
+    if (changed) this.saveIndex(index);
   }
 
   /** Wipe both the index and the files. */
@@ -359,4 +415,68 @@ export function collectCardMediaUrls(rows: any[]): string[] {
     MediaCacheServiceClass.collectUrlsFromCard(row).forEach((u) => all.add(u));
   }
   return Array.from(all);
+}
+
+/**
+ * Collect image URLs from mains value-add items.
+ *
+ * Covers `diagramImagePath` (a bare R2 path or comma-separated list, NOT a full
+ * URL — it is resolved by `getDiagramUri`), `ethicsData.diagramsList[].imagePath`,
+ * and any Markdown images embedded in the item's text.
+ *
+ * Path-style entries are expanded to full R2 URLs here so the cache index matches
+ * what the renderer resolves to.
+ */
+export function collectValueAddMediaUrls(items: any[]): string[] {
+  const R2_BASE = 'https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev';
+  const found = new Set<string>();
+
+  const toAbsolute = (raw: unknown): string | null => {
+    if (!raw || typeof raw !== 'string') return null;
+    const p = raw.trim();
+    if (!p) return null;
+    if (/^https?:\/\//i.test(p) || p.startsWith('data:')) return p;
+    return `${R2_BASE}/${p.replace(/^\//, '')}`;
+  };
+
+  const scanText = (value: unknown) => {
+    if (typeof value !== 'string') return;
+    let m: RegExpExecArray | null;
+    MD_IMAGE_RE.lastIndex = 0;
+    while ((m = MD_IMAGE_RE.exec(value))) {
+      const abs = toAbsolute(m[1]);
+      if (abs && isRemoteImageUrl(abs)) found.add(abs);
+    }
+    HTML_IMG_RE.lastIndex = 0;
+    while ((m = HTML_IMG_RE.exec(value))) {
+      const abs = toAbsolute(m[1]);
+      if (abs && isRemoteImageUrl(abs)) found.add(abs);
+    }
+  };
+
+  for (const item of items || []) {
+    // diagramImagePath may hold several comma-separated paths.
+    const diagram = item?.diagramImagePath;
+    if (typeof diagram === 'string' && diagram.trim()) {
+      diagram.split(',').forEach((part: string) => {
+        const abs = toAbsolute(part);
+        if (abs && isRemoteImageUrl(abs)) found.add(abs);
+      });
+    }
+
+    const diagramsList = item?.ethicsData?.diagramsList;
+    if (Array.isArray(diagramsList)) {
+      diagramsList.forEach((d: any) => {
+        const abs = toAbsolute(d?.imagePath);
+        if (abs && isRemoteImageUrl(abs)) found.add(abs);
+      });
+    }
+
+    scanText(item?.rawContent);
+    scanText(item?.frameworkGuide);
+    scanText(item?.context);
+    scanText(item?.introduction);
+  }
+
+  return Array.from(found);
 }

@@ -37,8 +37,7 @@ export default function AttachedTopperStrip({
   const activeAir = getAir(activeTopper, question);
   const activePages = getTopperPageUrls(activeTopper);
 
-  const previewPages = activePages.slice(0, 3);
-  const remainingCount = activePages.length - 3;
+  const previewPages = activePages;
 
   return (
     <View
@@ -144,11 +143,14 @@ export default function AttachedTopperStrip({
         </TouchableOpacity>
       </View>
 
-      {/* 2. Thumbnail Previews (2-3 images) */}
+      {/* 2. Thumbnail Previews */}
       {previewPages.length > 0 ? (
-        <View style={styles.thumbnailsRow}>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.thumbnailsRow}
+        >
           {previewPages.map((url, pIdx) => {
-            const isLastOfThree = pIdx === 2 && remainingCount > 0;
             const resolvedUri = TopperImageCacheService.resolveImageUri(url);
 
             return (
@@ -170,19 +172,13 @@ export default function AttachedTopperStrip({
                   contentFit="cover"
                   cachePolicy="memory-disk"
                 />
-                {isLastOfThree ? (
-                  <View style={styles.moreOverlay}>
-                    <Text style={styles.moreOverlayText}>+{remainingCount}</Text>
-                  </View>
-                ) : (
-                  <View style={styles.pageBadge}>
-                    <Text style={styles.pageBadgeText}>p.{pIdx + 1}</Text>
-                  </View>
-                )}
+                <View style={styles.pageBadge}>
+                  <Text style={styles.pageBadgeText}>p.{pIdx + 1}</Text>
+                </View>
               </TouchableOpacity>
             );
           })}
-        </View>
+        </ScrollView>
       ) : (
         <TouchableOpacity
           onPress={() => onOpenViewer(activePages, 0, activeName, activeAir, question.questionText)}
@@ -265,6 +261,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 8,
     marginTop: 8,
+    paddingRight: 12,
   },
   thumbnailWrapper: {
     width: 60,

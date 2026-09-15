@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { Image as ExpoImage } from 'expo-image';
 import { Bookmark, ExternalLink } from 'lucide-react-native';
 import type { ConsolidatedQuestion, ConsolidatedAnswer } from '../../data/mainsConsolidatedLoader';
@@ -127,9 +127,8 @@ export default function QuestionBankTopperCard({
   }
   const rankYearStr = rankYearParts.join(' - ');
 
-  // 2. Overlapping Thumbnail strip calculations (first 3, 68x90, radius 7, overlapping, +N if more)
-  const previewUrls = pageUrls.slice(0, 3);
-  const remainingCount = pageUrls.length - 3;
+  // 2. Thumbnail strip calculations (show all pages)
+  const previewUrls = pageUrls;
 
   const handleOpenAt = (idx: number) => {
     if (pageUrls.length > 0) {
@@ -232,10 +231,12 @@ export default function QuestionBankTopperCard({
 
       {/* 3. Overlapping Thumbnail Row */}
       {previewUrls.length > 0 ? (
-        <View style={styles.thumbnailRow}>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.thumbnailRow}
+        >
           {previewUrls.map((url, idx) => {
-            const isLast = idx === previewUrls.length - 1;
-            const showMore = isLast && remainingCount > 0;
             const resolvedUri = TopperImageCacheService.resolveImageUri(url);
 
             return (
@@ -263,15 +264,10 @@ export default function QuestionBankTopperCard({
                 <View style={styles.pageNumberBadge}>
                   <Text style={styles.pageNumberText}>p.{idx + 1}</Text>
                 </View>
-                {showMore && (
-                  <View style={styles.moreOverlay}>
-                    <Text style={styles.moreOverlayText}>+{remainingCount}</Text>
-                  </View>
-                )}
               </TouchableOpacity>
             );
           })}
-        </View>
+        </ScrollView>
       ) : (
         <TouchableOpacity
           onPress={() => handleOpenAt(0)}
@@ -365,6 +361,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     paddingVertical: 2,
+    paddingRight: 14,
   },
   thumbnailWrapper: {
     width: 68,

@@ -989,6 +989,59 @@ export async function fetchValueAdditionFromSupabase(): Promise<ValueAdditionIte
 
 export const MAINS_VALUE_ADD_CACHE_KEY = '@mains_cached_value_add_v2';
 
+/** Tables that make up the value-add corpus. */
+const VALUE_ADD_TABLES = [
+  'mains_data_facts',
+  'mains_intro_conclusions',
+  'mains_essay_value_add',
+  'mains_ethics_value_add',
+  'mains_mnemonics',
+  'mains_frameworks',
+  'mains_keywords',
+  'mains_case_studies',
+  'mains_sc_judgments',
+] as const;
+
+/**
+ * Cheap change detector for the value-add corpus.
+ *
+ * These tables have no `updated_at` column, so a true row-level delta is not
+ * possible. Instead we fetch only the `id` column from each table (small
+ * payload) and build a fingerprint. Comparing it against the stored value tells
+ * us whether anything was added or removed, so a no-change refresh transfers
+ * just the id lists rather than every row.
+ *
+ * Limitation: an in-place edit that preserves both the id set and the row count
+ * will not be detected. The UI offers "Re-download value-adds" to force a full
+ * fetch when needed.
+ */
+export async function fetchValueAddFingerprint(): Promise<string> {
+  const results = await Promise.all(
+    VALUE_ADD_TABLES.map(async (table) => {
+      try {
+        const { data, error } = await supabase.from(table).select('id');
+        if (error) return `${table}:error`;
+        const ids = (data || [])
+          .map((r: any) => String(r.id))
+          .sort();
+        return `${table}:${ids.length}:${ids.join(',')}`;
+      } catch {
+        return `${table}:error`;
+      }
+    })
+  );
+  return results.join('|');
+}
+
+/** Stable hash so we don't store a huge fingerprint string in MMKV. */
+export function hashFingerprint(input: string): string {
+  let h = 0;
+  for (let i = 0; i < input.length; i++) {
+    h = (Math.imul(31, h) + input.charCodeAt(i)) | 0;
+  }
+  return (h >>> 0).toString(36);
+}
+
 export function getInitialValueAdditions(): ValueAdditionItem[] {
   try {
     const cached = KVStore.getJson<ValueAdditionItem[]>(MAINS_VALUE_ADD_CACHE_KEY);

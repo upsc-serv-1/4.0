@@ -17,7 +17,15 @@ import { supabase } from '../lib/supabase';
 import { KVStore } from '../lib/kvStore';
 import { NetworkStatus } from '../lib/networkStatus';
 import { QuestionCache } from './QuestionCache';
-import { MediaCacheService, collectQuestionMediaUrls, collectCardMediaUrls } from './MediaCacheService';
+import { MediaCacheService, collectQuestionMediaUrls, collectCardMediaUrls, collectValueAddMediaUrls } from './MediaCacheService';
+import { TopperImageCacheService } from './TopperImageCacheService';
+import { MAINS_QUESTIONS_CACHE_KEY, fetchMainsQuestionsFromSupabase } from '../data/mainsConsolidatedLoader';
+import {
+  MAINS_VALUE_ADD_CACHE_KEY,
+  fetchValueAdditionFromSupabase,
+  fetchValueAddFingerprint,
+  hashFingerprint,
+} from '../data/mainsValueAdditionLoader';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // ─── Storage Keys ────────────────────────────────────────────────
@@ -88,6 +96,23 @@ export interface OfflineMetadata {
   totalMedia?: number;
   totalMediaCached?: number;
   mediaPhaseCancelled?: boolean;
+
+  // ── Per-category bookkeeping (drives the three Profile download rows) ──
+  /** Questions + value-adds. */
+  lastCatalogSync?: number | null;
+  totalValueAdds?: number;
+  /** Mains questions (separate corpus from the prelims question bank). */
+  totalMainsQuestions?: number;
+  /** Mains topper answer-sheet images (+ question-embedded images). */
+  lastTopperImageSync?: number | null;
+  totalTopperImages?: number;
+  topperImageCount?: number;
+  /** Flashcard front/back photos. */
+  lastCardImageSync?: number | null;
+  totalCardImages?: number;
+  cardImageCount?: number;
+  /** Fingerprint of the value-add id set, used to detect author changes. */
+  valueAddFingerprint?: string | null;
 }
 
 export interface SyncProgress {
@@ -109,22 +134,96 @@ const DEFAULT_META: OfflineMetadata = {
   totalCards: 0,
 };
 
+// ─── Sync categories ─────────────────────────────────────────────
+/**
+ * Offline content is downloaded in independent categories so the user can
+ * control what they pull (and how much space it costs). Each category has its
+ * own cancellation flag and in-flight promise: cancelling a slow topper-image
+ * download must not abort a card-image download running alongside it.
+ */
+export type SyncCategory = 'catalog' | 'topperImages' | 'cardImages';
+
+interface CategoryState {
+  cancelled: boolean;
+  promise: Promise<any> | null;
+}
+
+/** Progress phases that belong to a given category, for UI labelling. */
+export const CATEGORY_PHASES: Record<SyncCategory, string[]> = {
+  catalog: ['tests', 'questions', 'valueadds', 'states', 'notes', 'attempts', 'cards', 'media'],
+  topperImages: ['topper', 'media'],
+  cardImages: ['media'],
+};
+
 // ─── Service ─────────────────────────────────────────────────────
 class OfflineManagerService {
-  private _cancelled = false;
-  private _fullSyncPromise: Promise<void> | null = null;
+  private _categories: Record<SyncCategory, CategoryState> = {
+    catalog: { cancelled: false, promise: null },
+    topperImages: { cancelled: false, promise: null },
+    cardImages: { cancelled: false, promise: null },
+  };
   currentSyncProgress: SyncProgress | null = null;
+
+  /** True when the given category has been asked to stop. */
+  private _isCancelled(cat: SyncCategory): boolean {
+    return this._categories[cat].cancelled;
+  }
+
+  /**
+   * Run `work` as the category's exclusive in-flight operation. A second call
+   * while one is running subscribes to the existing promise instead of
+   * starting a duplicate download.
+   */
+  private _runCategory<T>(
+    cat: SyncCategory,
+    work: (report: (p: SyncProgress) => void) => Promise<T>,
+    onProgress?: (p: SyncProgress) => void
+  ): Promise<T> {
+    const state = this._categories[cat];
+    if (state.promise) {
+      if (onProgress) {
+        const unsub = this.onSyncProgress(onProgress);
+        if (this.currentSyncProgress) {
+          try { onProgress(this.currentSyncProgress); } catch {}
+        }
+        (state.promise as Promise<any>).finally(unsub);
+      }
+      return state.promise as Promise<T>;
+    }
+
+    state.cancelled = false;
+    if (onProgress) this._syncListeners.add(onProgress);
+
+    const report = (p: SyncProgress) => {
+      this.currentSyncProgress = p;
+      this._notifyListeners(p);
+    };
+
+    const promise = work(report)
+      .finally(() => {
+        state.promise = null;
+        if (onProgress) this._syncListeners.delete(onProgress);
+      });
+    state.promise = promise;
+    return promise;
+  }
+
+  /** True when any category currently has a download in flight. */
+  isCategoryRunning(cat: SyncCategory): boolean {
+    return this._categories[cat].promise !== null;
+  }
 
   private async fetchAllRows(
     table: string,
     applyFilters?: (query: any) => any,
-    chunk = 1000
+    chunk = 1000,
+    cat: SyncCategory = 'catalog'
   ): Promise<any[]> {
     const rows: any[] = [];
     let from = 0;
 
     while (true) {
-      if (this._cancelled) return rows;
+      if (this._isCancelled(cat)) return rows;
 
       let query = supabase
         .from(table)
@@ -171,7 +270,18 @@ class OfflineManagerService {
   }
 
   // ── Cancel support ────────────────────────────────────────────
-  cancelSync() { this._cancelled = true; this.currentSyncProgress = null; }
+  /** Cancel one category, leaving the others running. */
+  cancelCategory(cat: SyncCategory) {
+    this._categories[cat].cancelled = true;
+  }
+
+  /** Cancel every in-flight category and clear the progress indicator. */
+  cancelSync() {
+    (Object.keys(this._categories) as SyncCategory[]).forEach((c) => {
+      this._categories[c].cancelled = true;
+    });
+    this.currentSyncProgress = null;
+  }
 
   // ── Multi-listener support ────────────────────────────────────
   private _syncListeners: Set<(p: SyncProgress) => void> = new Set();
@@ -192,44 +302,27 @@ class OfflineManagerService {
     onProgress?: (p: SyncProgress) => void,
     selectedCourse?: string
   ) {
-    // If a sync is already in progress, subscribe the new listener and return the existing promise
-    if (this._fullSyncPromise) {
-      if (onProgress) {
-        const unsub = this.onSyncProgress(onProgress);
-        // Send current progress immediately so the UI doesn't show stale state
-        if (this.currentSyncProgress) {
-          try { onProgress(this.currentSyncProgress); } catch {}
-        }
-        this._fullSyncPromise.finally(unsub);
-      }
-      return this._fullSyncPromise;
-    }
-
-    if (onProgress) this._syncListeners.add(onProgress);
-
-    this._fullSyncPromise = this.runFullSync(userId, (p) => {
-      this.currentSyncProgress = p;
-      this._notifyListeners(p);
-    }, selectedCourse).finally(() => {
-      this._fullSyncPromise = null;
-      this._syncListeners.clear();
-    });
-    return this._fullSyncPromise;
+    return this._runCategory(
+      'catalog',
+      (report) => this.runFullSync(userId, report, selectedCourse),
+      onProgress
+    );
   }
 
-  private async runFullSync(
+  /**
+   * Download the tests catalogue and every question for the active course,
+   * skipping tests that are already fully cached. Returns the question count.
+   *
+   * Extracted from `runFullSync` so the standalone "Download questions" action
+   * and the full download share one code path.
+   */
+  private async downloadCourseCatalog(
     userId: string,
-    onProgress: (p: SyncProgress) => void,
+    report: (p: SyncProgress) => void,
     selectedCourse?: string
-  ) {
-    this._cancelled = false;
-    this.currentSyncProgress = null;
+  ): Promise<number> {
+    const cancelled = () => this._isCancelled('catalog');
     let totalQuestions = 0;
-
-    const report = (p: SyncProgress) => {
-      this.currentSyncProgress = p;
-      onProgress(p);
-    };
 
     // ──────── 1. TESTS ──────────────────────────────────────────
     report({ phase: 'tests', current: 0, total: 1, detail: 'Fetching test catalogue...' });
@@ -239,7 +332,7 @@ class OfflineManagerService {
 
     KVStore.setJson(OFFLINE_TESTS_KEY, allTests);
     report({ phase: 'tests', current: 1, total: 1, detail: `${allTests.length} tests saved` });
-    if (this._cancelled) return;
+    if (cancelled()) return totalQuestions;
 
     // Resolve course preference
     let course = selectedCourse;
@@ -251,13 +344,13 @@ class OfflineManagerService {
     }
     if (!course) course = 'Civil Services';
 
-    // Only download questions for the active course (e.g. skip Civil Services when studying Medical Science)
+    // Only download questions for the active course
     const testsToSync = allTests.filter((t: any) => t.course === course);
 
     // ──────── 2. QUESTIONS (chunked by test) ────────────────────
     const totalTests = testsToSync.length;
     for (let i = 0; i < totalTests; i++) {
-      if (this._cancelled) return;
+      if (cancelled()) return totalQuestions;
       const test = testsToSync[i];
       report({
         phase: 'questions',
@@ -297,7 +390,36 @@ class OfflineManagerService {
       }
     }
     report({ phase: 'questions', current: totalTests, total: totalTests, detail: `${totalQuestions} questions saved` });
-    if (this._cancelled) return;
+    return totalQuestions;
+  }
+
+  private async runFullSync(
+    userId: string,
+    report: (p: SyncProgress) => void,
+    selectedCourse?: string
+  ) {
+    this.currentSyncProgress = null;
+    const cancelled = () => this._isCancelled('catalog');
+
+    // ──────── 1+2. TESTS & QUESTIONS ────────────────────────────
+    const totalQuestions = await this.downloadCourseCatalog(userId, report, selectedCourse);
+    if (cancelled()) return;
+
+    // Mains questions + value-adds (separate corpus from the prelims bank).
+    await this.downloadMainsCorpus(report);
+    if (cancelled()) return;
+
+    // Re-read for the media phase and metadata below.
+    const allTests = this.getOfflineTestsSync();
+    let course = selectedCourse;
+    if (!course) {
+      try {
+        const stored = await AsyncStorage.getItem('selectedCourse');
+        if (stored) course = stored;
+      } catch {}
+    }
+    if (!course) course = 'Civil Services';
+    const testsToSync = allTests.filter((t: any) => t.course === course);
 
     // ──────── 3. USER QUESTION STATES (paginated) ───────────────
     report({ phase: 'states', current: 0, total: 1, detail: 'Fetching your tags, bookmarks & notes...' });
@@ -307,7 +429,7 @@ class OfflineManagerService {
       let from = 0;
       const CHUNK = 1000;
       while (true) {
-        if (this._cancelled) return;
+        if (cancelled()) return;
         const { data, error } = await supabase
           .from('question_states')
           .select('*')
@@ -325,7 +447,7 @@ class OfflineManagerService {
       console.warn('[Offline] Failed to fetch question_states', err);
     }
     report({ phase: 'states', current: 1, total: 1, detail: `${totalStates} question states saved` });
-    if (this._cancelled) return;
+    if (cancelled()) return;
 
     // ──────── 4. USER NOTES ─────────────────────────────────────
     report({ phase: 'notes', current: 0, total: 1, detail: 'Fetching your notebooks...' });
@@ -343,7 +465,7 @@ class OfflineManagerService {
       console.warn('[Offline] Failed to fetch user_notes', err);
     }
     report({ phase: 'notes', current: 1, total: 1, detail: `${totalNotes} notebooks saved` });
-    if (this._cancelled) return;
+    if (cancelled()) return;
 
     // ──────── 5. TEST ATTEMPTS ──────────────────────────────────
     report({ phase: 'attempts', current: 0, total: 1, detail: 'Fetching your test attempts...' });
@@ -363,7 +485,7 @@ class OfflineManagerService {
       console.warn('[Offline] Failed to fetch test_attempts', err);
     }
     report({ phase: 'attempts', current: 1, total: 1, detail: `${totalAttempts} attempts saved` });
-    if (this._cancelled) return;
+    if (cancelled()) return;
 
     // ──────── 6. FLASHCARD DATA ─────────────────────────────────
     report({ phase: 'cards', current: 0, total: 1, detail: 'Fetching your flashcards...' });
@@ -449,11 +571,11 @@ class OfflineManagerService {
     // question re-downloads.
     let totalMedia = 0;
     try {
-      if (!this._cancelled) {
+      if (!cancelled()) {
         await MediaCacheService.init();
         const rows: any[] = [];
         for (const test of testsToSync) {
-          if (this._cancelled) break;
+          if (cancelled()) break;
           rows.push(...QuestionCache.getCachedQuestionsSync(test.id));
         }
         const urls = collectQuestionMediaUrls(rows);
@@ -478,13 +600,13 @@ class OfflineManagerService {
                 : `Images ${done}/${total}`,
             });
           },
-          () => this._cancelled
+          cancelled
         );
         report({
           phase: 'media',
           current: totalMedia,
           total: totalMedia,
-          detail: this._cancelled
+          detail: cancelled()
             ? `Image download stopped — ${result.skipped} cached`
             : `${result.done} new images cached (${result.skipped} already present)`,
         });
@@ -492,7 +614,7 @@ class OfflineManagerService {
     } catch (err) {
       console.warn('[Offline] Media cache phase failed', err);
     }
-    if (this._cancelled) {
+    if (cancelled()) {
       // Media is resumable and cheap to re-run; record that so Profile can
       // offer "Download remaining images" without re-fetching questions.
       await this.setMetadata({
@@ -520,6 +642,71 @@ class OfflineManagerService {
       mediaPhaseCancelled: false,
     });
     report({ phase: 'done', current: 1, total: 1, detail: 'All data downloaded!' });
+  }
+
+  /**
+   * Mains corpus: questions + value-adds (+ their diagram images).
+   *
+   * Kept as a private step of the catalog category rather than a separate
+   * public method, because calling another catalog-category method while the
+   * category lock is held would make `_runCategory` return the caller's own
+   * in-flight promise (an await-itself deadlock).
+   */
+  private async downloadMainsCorpus(
+    report: (p: SyncProgress) => void
+  ): Promise<{ mainsQuestions: number; valueAdds: number }> {
+    let mainsQuestions = 0;
+    let valueAdds = 0;
+
+    report({ phase: 'questions', current: 0, total: 1, detail: 'Fetching mains questions...' });
+    try {
+      const mains = await fetchMainsQuestionsFromSupabase();
+      if (mains.length > 0) {
+        KVStore.setJson(MAINS_QUESTIONS_CACHE_KEY, mains);
+        mainsQuestions = mains.length;
+      }
+    } catch (err) {
+      console.warn('[Offline] Mains question download failed', err);
+    }
+
+    try {
+      report({ phase: 'valueadds', current: 0, total: 1, detail: 'Fetching value-adds...' });
+      const items = await fetchValueAdditionFromSupabase();
+      KVStore.setJson(MAINS_VALUE_ADD_CACHE_KEY, items);
+      valueAdds = items.length;
+
+      const urls = collectValueAddMediaUrls(items);
+      if (urls.length > 0 && !this._isCancelled('catalog')) {
+        await MediaCacheService.init();
+        await MediaCacheService.cacheUrls(
+          urls,
+          (done, total) => {
+            report({
+              phase: 'valueadds',
+              current: done,
+              total,
+              detail: `Value-add images ${done}/${total}`,
+            });
+          },
+          () => this._isCancelled('catalog')
+        );
+      }
+    } catch (err) {
+      console.warn('[Offline] Value-add download failed', err);
+    }
+
+    let fingerprint: string | null = null;
+    try {
+      fingerprint = hashFingerprint(await fetchValueAddFingerprint());
+    } catch { /* offline — leave unset */ }
+
+    await this.setMetadata({
+      totalMainsQuestions: mainsQuestions,
+      totalValueAdds: valueAdds,
+      valueAddFingerprint: fingerprint,
+    });
+
+    return { mainsQuestions, valueAdds };
   }
 
   /** Independently sync flashcards incrementally (used by pull-to-refresh and auto-sync) */
@@ -715,15 +902,20 @@ class OfflineManagerService {
     onProgress?: (p: SyncProgress) => void,
     selectedCourse?: string
   ): Promise<{ newTests: number; updatedTests: number; unchangedTests: number }> {
-    const report = (p: SyncProgress) => {
-      this.currentSyncProgress = p;
-      this._notifyListeners(p);
-      if (onProgress) { try { onProgress(p); } catch {} }
-    };
+    return this._runCategory(
+      'catalog',
+      (report) => this.runCatalogDelta(userId, report, selectedCourse),
+      onProgress
+    );
+  }
 
-    this._cancelled = false;
+  private async runCatalogDelta(
+    userId: string,
+    report: (p: SyncProgress) => void,
+    selectedCourse?: string
+  ): Promise<{ newTests: number; updatedTests: number; unchangedTests: number }> {
+    const cancelled = () => this._isCancelled('catalog');
     const meta = await this.getMetadata();
-    const sinceScan = meta.lastCatalogScan ?? null;
 
     let course = selectedCourse;
     if (!course) {
@@ -765,7 +957,7 @@ class OfflineManagerService {
 
     const total = courseTests.length;
     for (let i = 0; i < total; i++) {
-      if (this._cancelled) return { newTests, updatedTests, unchangedTests };
+      if (cancelled()) return { newTests, updatedTests, unchangedTests };
       const test = courseTests[i];
       report({
         phase: 'questions',
@@ -816,7 +1008,7 @@ class OfflineManagerService {
       total,
       detail: `${downloadedQuestions} questions fetched (${unchangedTests} tests unchanged)`,
     });
-    if (this._cancelled) return { newTests, updatedTests, unchangedTests };
+    if (cancelled()) return { newTests, updatedTests, unchangedTests };
 
     // Pull user rows too so tags/notes/progress land in the same pass.
     await this.syncUserData(userId);
@@ -827,11 +1019,11 @@ class OfflineManagerService {
     // costs nothing here.
     let totalMedia = meta.totalMedia ?? 0;
     try {
-      if (!this._cancelled) {
+      if (!cancelled()) {
         await MediaCacheService.init();
         const rows: any[] = [];
         for (const test of courseTests) {
-          if (this._cancelled) break;
+          if (cancelled()) break;
           rows.push(...QuestionCache.getCachedQuestionsSync(test.id));
         }
         const urls = collectQuestionMediaUrls(rows);
@@ -851,7 +1043,7 @@ class OfflineManagerService {
               detail: `Images ${done}/${t} (${skipped} already saved)`,
             });
           },
-          () => this._cancelled
+          cancelled
         );
         if (result.done > 0) {
           console.log(`[Offline] Refresh cached ${result.done} new image(s)`);
@@ -887,49 +1079,295 @@ class OfflineManagerService {
   /**
    * Resume the image phase only. Reuses the already-cached questions — it
    * never re-fetches rows from Supabase, so the cost is purely R2 bandwidth.
+   *
+   * Kept for the existing Profile "Download remaining images" row; new UI
+   * should prefer `downloadTopperImages` / `downloadCardImages`.
    */
   async downloadRemainingMedia(
     onProgress?: (p: SyncProgress) => void
   ): Promise<{ done: number; skipped: number; failed: number }> {
-    const report = (p: SyncProgress) => {
-      this.currentSyncProgress = p;
-      this._notifyListeners(p);
-      if (onProgress) { try { onProgress(p); } catch {} }
-    };
+    return this.downloadTopperImages(onProgress);
+  }
 
-    this._cancelled = false;
-    await MediaCacheService.init();
+  // ── PER-CATEGORY IMAGE DOWNLOADS ──────────────────────────────
+  /**
+   * Topper copies (mains answer sheets) plus any images embedded in question
+   * explanations. Idempotent: URLs already on disk are skipped, so this doubles
+   * as the "Download remaining images" resume path.
+   */
+  async downloadTopperImages(
+    onProgress?: (p: SyncProgress) => void
+  ): Promise<{ done: number; skipped: number; failed: number }> {
+    return this._runCategory(
+      'topperImages',
+      async (report) => {
+        const cancelled = () => this._isCancelled('topperImages');
+        await MediaCacheService.init();
 
-    const rows = this.getOfflineQuestionsAllSync();
-    const urls = collectQuestionMediaUrls(rows);
-    // Include flashcard photos so "Download remaining images" also finishes
-    // any card images the cancelled run missed.
-    const cards = KVStore.getJson<any[]>(CARDS_PREFIX) ?? [];
-    for (const u of collectCardMediaUrls(cards)) {
-      if (!urls.includes(u)) urls.push(u);
-    }
-    report({ phase: 'media', current: 0, total: urls.length, detail: 'Caching images...' });
+        // 1. Mains topper answer-sheet pages (multi-page A4 images).
+        const mainsQuestions = KVStore.getJson<any[]>(MAINS_QUESTIONS_CACHE_KEY) ?? [];
+        let topperDone = 0;
+        let topperFailed = 0;
+        if (mainsQuestions.length > 0 && !cancelled()) {
+          try {
+            const res = await TopperImageCacheService.syncAllTopperImages(
+              mainsQuestions,
+              (current, total) => {
+                report({
+                  phase: 'topper',
+                  current,
+                  total,
+                  detail: `Topper copies ${current}/${total}`,
+                });
+              }
+            );
+            topperDone = res.success;
+            topperFailed = res.failed;
+          } catch (err) {
+            console.warn('[Offline] Topper image sync failed', err);
+          }
+        }
 
-    const result = await MediaCacheService.cacheUrls(
-      urls,
-      (done, total, skipped) => {
+        // 2. Images embedded in question text/explanations.
+        const urls = collectQuestionMediaUrls(this.getOfflineQuestionsAllSync());
+        const mediaResult = await MediaCacheService.cacheUrls(
+          urls,
+          (done, total, skipped) => {
+            report({
+              phase: 'media',
+              current: done,
+              total,
+              detail: `Question images ${done}/${total} (${skipped} already saved)`,
+            });
+          },
+          cancelled
+        );
+
+        await this.setMetadata({
+          lastTopperImageSync: Date.now(),
+          totalTopperImages: topperDone + topperFailed,
+          topperImageCount: TopperImageCacheService.cachedCount(),
+          totalMedia: urls.length,
+          totalMediaCached: MediaCacheService.cachedCount(),
+          mediaPhaseCancelled: false,
+        });
+        report({ phase: 'done', current: 1, total: 1, detail: 'Topper images downloaded!' });
+        return mediaResult;
+      },
+      onProgress
+    );
+  }
+
+  /**
+   * Flashcard front/back photos. Reads `@cards_all` only — never hits Supabase,
+   * so the cost is purely R2 bandwidth. Skips URLs already on disk.
+   */
+  async downloadCardImages(
+    onProgress?: (p: SyncProgress) => void
+  ): Promise<{ done: number; skipped: number; failed: number }> {
+    return this._runCategory(
+      'cardImages',
+      async (report) => {
+        const cancelled = () => this._isCancelled('cardImages');
+        await MediaCacheService.init();
+
+        const cards = KVStore.getJson<any[]>(CARDS_PREFIX) ?? [];
+        const urls = collectCardMediaUrls(cards);
+
         report({
           phase: 'media',
-          current: done,
-          total,
-          detail: `Images ${done}/${total} (${skipped} already saved)`,
+          current: 0,
+          total: urls.length,
+          detail: urls.length === 0 ? 'No flashcard images found' : 'Caching flashcard images...',
         });
-      },
-      () => this._cancelled
-    );
 
-    await this.setMetadata({
-      totalMedia: urls.length,
-      totalMediaCached: MediaCacheService.cachedCount(),
-      mediaPhaseCancelled: false,
-    });
-    report({ phase: 'done', current: 1, total: 1, detail: 'Images downloaded!' });
-    return result;
+        const result = await MediaCacheService.cacheUrls(
+          urls,
+          (done, total, skipped) => {
+            report({
+              phase: 'media',
+              current: done,
+              total,
+              detail: `Flashcard images ${done}/${total} (${skipped} already saved)`,
+            });
+          },
+          cancelled
+        );
+
+        await this.setMetadata({
+          lastCardImageSync: Date.now(),
+          totalCardImages: urls.length,
+          cardImageCount: urls.filter((u) => MediaCacheService.isCached(u)).length,
+        });
+        report({ phase: 'done', current: 1, total: 1, detail: 'Flashcard images downloaded!' });
+        return result;
+      },
+      onProgress
+    );
+  }
+
+  /**
+   * Topper-image delta. Only downloads URLs that are not already on disk, so a
+   * no-change refresh transfers nothing beyond the local index lookup.
+   */
+  async refreshTopperImagesDelta(onProgress?: (p: SyncProgress) => void) {
+    return this.downloadTopperImages(onProgress);
+  }
+
+  /** Flashcard-image delta. `cacheUrls` skips cached URLs by construction. */
+  async refreshCardImagesDelta(onProgress?: (p: SyncProgress) => void) {
+    return this.downloadCardImages(onProgress);
+  }
+
+  // ── VALUE-ADDS ────────────────────────────────────────────────
+  /**
+   * Download the question bank for the active course, plus the mains value-add
+   * corpus. Reuses `downloadCourseCatalog` so already-cached tests are skipped —
+   * this doubles as a top-up for a partially-downloaded bank.
+   */
+  async downloadQuestions(
+    userId: string,
+    selectedCourse?: string,
+    onProgress?: (p: SyncProgress) => void
+  ): Promise<{ questions: number; valueAdds: number; mainsQuestions: number }> {
+    return this._runCategory(
+      'catalog',
+      async (report) => {
+        const questions = await this.downloadCourseCatalog(userId, report, selectedCourse);
+        // Mains corpus (questions + value-adds + diagram images).
+        const { mainsQuestions, valueAdds } = await this.downloadMainsCorpus(report);
+
+        await this.setMetadata({ lastCatalogSync: Date.now() });
+        return { questions, valueAdds, mainsQuestions };
+      },
+      onProgress
+    );
+  }
+
+  /**
+   * Download (or force re-download) the mains value-add corpus. Value-adds are
+   * small JSON rows, so this is cheap compared to the question bank — the only
+   * expensive part is their diagram images, which are cached via MediaCacheService.
+   */
+  async downloadValueAdds(
+    onProgress?: (p: SyncProgress) => void
+  ): Promise<{ total: number }> {
+    return this._runCategory(
+      'catalog',
+      async (report) => {
+        const cancelled = () => this._isCancelled('catalog');
+        report({ phase: 'valueadds', current: 0, total: 1, detail: 'Fetching value-adds...' });
+
+        const items = await fetchValueAdditionFromSupabase();
+        if (cancelled()) return { total: items.length };
+
+        KVStore.setJson(MAINS_VALUE_ADD_CACHE_KEY, items);
+
+        // Cache their diagram images so ethics/framework visuals work offline.
+        let imageCount = 0;
+        try {
+          const urls = collectValueAddMediaUrls(items);
+          if (urls.length > 0) {
+            await MediaCacheService.init();
+            const res = await MediaCacheService.cacheUrls(
+              urls,
+              (done, total) => {
+                report({
+                  phase: 'valueadds',
+                  current: done,
+                  total,
+                  detail: `Value-add images ${done}/${total}`,
+                });
+              },
+              cancelled
+            );
+            imageCount = res.done + res.skipped;
+          }
+        } catch (err) {
+          console.warn('[Offline] Value-add image caching failed', err);
+        }
+
+        let fingerprint: string | null = null;
+        try {
+          fingerprint = hashFingerprint(await fetchValueAddFingerprint());
+        } catch { /* offline — leave fingerprint unset */ }
+
+        await this.setMetadata({
+          lastCatalogSync: Date.now(),
+          totalValueAdds: items.length,
+          valueAddFingerprint: fingerprint,
+          totalMedia: MediaCacheService.cachedCount(),
+        });
+        report({
+          phase: 'done',
+          current: 1,
+          total: 1,
+          detail: `${items.length} value-adds saved (${imageCount} images)`,
+        });
+        return { total: items.length };
+      },
+      onProgress
+    );
+  }
+
+  /**
+   * Value-add delta. Compares a cheap id-only fingerprint against the stored one
+   * and only re-fetches the corpus when something was added or removed.
+   *
+   * These tables have no `updated_at`, so an in-place edit preserving the id set
+   * is undetectable — use `downloadValueAdds` to force a full refresh.
+   */
+  async refreshValueAddsDelta(
+    onProgress?: (p: SyncProgress) => void
+  ): Promise<{ changed: boolean; total: number }> {
+    return this._runCategory(
+      'catalog',
+      async (report) => {
+        const meta = await this.getMetadata();
+        const cached = KVStore.getJson<any[]>(MAINS_VALUE_ADD_CACHE_KEY) ?? [];
+        report({ phase: 'valueadds', current: 0, total: 1, detail: 'Checking value-adds...' });
+
+        let remoteFingerprint = '';
+        try {
+          remoteFingerprint = hashFingerprint(await fetchValueAddFingerprint());
+        } catch {
+          // Offline / probe failed: keep whatever we have.
+          return { changed: false, total: cached.length };
+        }
+
+        if (remoteFingerprint === meta.valueAddFingerprint) {
+          report({ phase: 'done', current: 1, total: 1, detail: 'Value-adds already up to date' });
+          return { changed: false, total: cached.length };
+        }
+
+        const items = await fetchValueAdditionFromSupabase();
+        KVStore.setJson(MAINS_VALUE_ADD_CACHE_KEY, items);
+
+        try {
+          const urls = collectValueAddMediaUrls(items);
+          if (urls.length > 0) {
+            await MediaCacheService.init();
+            await MediaCacheService.cacheUrls(urls, undefined, () => this._isCancelled('catalog'));
+          }
+        } catch (err) {
+          console.warn('[Offline] Value-add image refresh failed', err);
+        }
+
+        await this.setMetadata({
+          lastCatalogSync: Date.now(),
+          totalValueAdds: items.length,
+          valueAddFingerprint: remoteFingerprint,
+        });
+        report({
+          phase: 'done',
+          current: 1,
+          total: 1,
+          detail: `${items.length} value-adds updated`,
+        });
+        return { changed: true, total: items.length };
+      },
+      onProgress
+    );
   }
 
   // ── READERS (all synchronous via KVStore) ─────────────────────
@@ -1192,9 +1630,54 @@ class OfflineManagerService {
   }
 
   // ── CLEAR ─────────────────────────────────────────────────────
+  /**
+   * Remove the mains caches that live outside the generic prefixes.
+   *
+   * These were previously missed by `clearAllOfflineData`, so mains questions and
+   * value-adds kept loading offline after a clear — the data was still in MMKV.
+   */
+  private clearMainsCaches() {
+    KVStore.delete(MAINS_QUESTIONS_CACHE_KEY);
+    KVStore.delete(MAINS_VALUE_ADD_CACHE_KEY);
+    KVStore.deletePrefix('@mains_');
+  }
+
+  /**
+   * Clear one category's on-disk cache without touching the others. Lets a user
+   * reclaim space from the (large) topper pages while keeping questions offline.
+   */
+  async clearCategoryCache(category: 'topperImages' | 'cardImages') {
+    if (category === 'topperImages') {
+      await TopperImageCacheService.clearCache();
+      // Topper pages are referenced by the mains question rows; clearing the
+      // images must not leave the (large) mains catalogue behind either, or the
+      // user sees "cleared" but still has mains content offline.
+      this.clearMainsCaches();
+      await this.setMetadata({
+        lastTopperImageSync: null,
+        totalTopperImages: 0,
+        topperImageCount: 0,
+        totalMediaCached: MediaCacheService.cachedCount(),
+      });
+      return;
+    }
+    // Flashcard images share the general media cache with question images, so we
+    // only forget the card-owned entries rather than wiping the whole folder.
+    const cards = KVStore.getJson<any[]>(CARDS_PREFIX) ?? [];
+    const urls = collectCardMediaUrls(cards);
+    MediaCacheService.forget(urls);
+    await this.setMetadata({
+      lastCardImageSync: null,
+      totalCardImages: 0,
+      cardImageCount: 0,
+    });
+  }
+
   async clearAllOfflineData() {
     await QuestionCache.clearCache();
     try { await MediaCacheService.clearCache(); } catch { /* best-effort */ }
+    try { await TopperImageCacheService.clearCache(); } catch { /* best-effort */ }
+    this.clearMainsCaches();
     KVStore.delete(OFFLINE_META_KEY);
     KVStore.delete(OFFLINE_TESTS_KEY);
     KVStore.delete(OFFLINE_METADATA_CONSOLIDATED_KEY);

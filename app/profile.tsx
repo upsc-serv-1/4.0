@@ -52,6 +52,10 @@ import { useTheme } from '../src/context/ThemeContext';
 import { useAuth } from '../src/context/AuthContext';
 import { DEFAULT_ANALYTICS_LAYOUT, loadAnalyticsLayout, moveLayoutItem, saveAnalyticsLayout } from '../src/utils/analyticsLayout';
 import { OfflineManager, SyncProgress, OfflineMetadata } from '../src/services/OfflineManager';
+import { KVStore } from '../src/lib/kvStore';
+import { MediaCacheService } from '../src/services/MediaCacheService';
+import { MAINS_QUESTIONS_CACHE_KEY } from '../src/data/mainsConsolidatedLoader';
+import { NetworkStatus } from '../src/lib/networkStatus';
 import { ThemeSwitcher } from '../src/components/ThemeSwitcher';
 import { useProfile } from '../src/context/ProfileContext';
 import { useCourse } from '../src/context/CourseContext';
@@ -195,6 +199,12 @@ export default function Profile() {
 
   // ── Offline Mode State ────────────────────────────────────
   const [offlineMeta, setOfflineMeta] = useState<OfflineMetadata | null>(null);
+  const [downloadStats, setDownloadStats] = useState<{
+    questions:    { done: number; total: number };
+    images:       { done: number; total: number };
+    valueAdds:    { done: number; total: number };
+    topperCopies: { done: number; total: number };
+  } | null>(null);
   const [syncModalVisible, setSyncModalVisible] = useState(false);
   const [isSyncing, setIsSyncing] = useState(false);
   const [syncProgress, setSyncProgress] = useState<SyncProgress>({ phase: 'tests', current: 0, total: 1, detail: '' });
@@ -207,6 +217,62 @@ export default function Profile() {
   const { selectedCourse, setSelectedCourse } = useCourse();
   const AVAILABLE_COURSES = ['Civil Services', 'Medical Science'] as const;
 
+  const TOTALS_CACHE_KEY = 'download_totals_cache_v1';
+
+  const refreshDownloadStats = useCallback(async () => {
+    try {
+      const questionsDone = (OfflineManager.getOfflineQuestionsAllSync() ?? []).length;
+      const imagesDone    = MediaCacheService.cachedCount();
+      const valueAddsDone = (KVStore.getJson<any[]>('@mains_cached_value_add_v2') ?? []).length;
+
+      const cachedMains = KVStore.getJson<any[]>(MAINS_QUESTIONS_CACHE_KEY) ?? [];
+      const topperCopiesDone = cachedMains.filter((q: any) =>
+        Array.isArray(q?.answers) &&
+        q.answers.some((a: any) =>
+          a?.is_topper === true ||
+          (Array.isArray(a?.page_urls) && a.page_urls.length > 0)
+        )
+      ).length;
+
+      const prev = KVStore.getJson<{
+        questions: number; images: number; valueAdds: number; topperCopies: number;
+      }>(TOTALS_CACHE_KEY) ?? { questions: 0, images: 0, valueAdds: 0, topperCopies: 0 };
+
+      let questionsTotal      = Math.max(prev.questions,    questionsDone);
+      const imagesTotal       = Math.max(prev.images,       imagesDone);
+      const valueAddsTotal    = Math.max(prev.valueAdds,    valueAddsDone);
+      const topperCopiesTotal = Math.max(prev.topperCopies, topperCopiesDone);
+
+      if (!NetworkStatus.isOnline || NetworkStatus.isOnline()) {
+        try {
+          const qRes = await supabase
+            .from('questions')
+            .select('id', { count: 'exact', head: true })
+            .eq('course', selectedCourse);
+          if (typeof qRes.count === 'number' && qRes.count > 0) {
+            questionsTotal = qRes.count;
+          }
+        } catch { /* keep previous */ }
+      }
+
+      KVStore.setJson(TOTALS_CACHE_KEY, {
+        questions: questionsTotal,
+        images: imagesTotal,
+        valueAdds: valueAddsTotal,
+        topperCopies: topperCopiesTotal,
+      });
+
+      setDownloadStats({
+        questions:    { done: questionsDone,    total: questionsTotal },
+        images:       { done: imagesDone,       total: imagesTotal },
+        valueAdds:    { done: valueAddsDone,    total: valueAddsTotal },
+        topperCopies: { done: topperCopiesDone, total: topperCopiesTotal },
+      });
+    } catch (e) {
+      console.warn('[Profile] refreshDownloadStats failed', e);
+    }
+  }, [selectedCourse]);
+
   useEffect(() => {
     AsyncStorage.getItem('optional_choice').then(val => {
       if (val) setOptional(val);
@@ -214,6 +280,10 @@ export default function Profile() {
     loadAnalyticsLayout().then(setAnalyticsLayout);
     OfflineManager.getMetadata().then(setOfflineMeta);
   }, []);
+
+  useEffect(() => {
+    refreshDownloadStats();
+  }, [refreshDownloadStats]);
 
   // Load AI provider for badge
   useEffect(() => {
@@ -245,9 +315,18 @@ export default function Profile() {
         }
         RNAnimated.timing(progressAnim, { toValue: target, duration: 300, useNativeDriver: false }).start();
       }, selectedCourse);
-      setSyncDone(true);
+      // NOTE: value-adds and mains questions are NOT fetched separately here.
+      // `syncAllContent` owns the 'catalog' category; calling another
+      // catalog-category method while it holds the lock made `_runCategory`
+      // return its own in-flight promise, so this function awaited itself and
+      // the modal never reached the "done" state. They are folded into
+      // `syncAllContent` instead.
+      // Refresh metadata BEFORE flipping to the done state, otherwise the
+      // completion summary renders stale/empty counts.
       const meta = await OfflineManager.getMetadata();
       setOfflineMeta(meta);
+      await refreshDownloadStats();
+      setSyncDone(true);
     } catch (err: any) {
       Alert.alert('Download Failed', err.message || 'Something went wrong');
     } finally {
@@ -276,6 +355,7 @@ export default function Profile() {
       );
       const meta = await OfflineManager.getMetadata();
       setOfflineMeta(meta);
+      await refreshDownloadStats();
       setSyncDone(true);
       if (result.newTests === 0 && result.updatedTests === 0) {
         Alert.alert('Already up to date', `No new or changed tests. ${result.unchangedTests} tests checked.`);
@@ -300,6 +380,7 @@ export default function Profile() {
       const result = await OfflineManager.downloadRemainingMedia((p) => setSyncProgress(p));
       const meta = await OfflineManager.getMetadata();
       setOfflineMeta(meta);
+      await refreshDownloadStats();
       Alert.alert('Done', `${result.done} new images cached, ${result.skipped} already present.`);
     } catch (err: any) {
       Alert.alert('Error', err?.message || 'Image download failed.');
@@ -307,6 +388,92 @@ export default function Profile() {
       setIsMediaSyncing(false);
     }
   };
+
+  // ── Per-category actions ──────────────────────────────────────
+  const [activeCategory, setActiveCategory] = useState<string | null>(null);
+
+  /** Generic runner: shows the modal, drives one category, then reports. */
+  const runCategoryAction = async (
+    category: string,
+    label: string,
+    work: (onProgress: (p: SyncProgress) => void) => Promise<string>
+  ) => {
+    if (!session?.user?.id) return;
+    setActiveCategory(category);
+    setSyncModalVisible(true);
+    setIsSyncing(true);
+    setSyncDone(false);
+    progressAnim.setValue(0);
+    try {
+      const detail = await work((p) => {
+        setSyncProgress(p);
+        const frac: Record<string, number> = {
+          tests: 0.1, questions: 0.7, valueadds: 0.85, topper: 0.8, media: 0.9, done: 1,
+        };
+        let target = frac[p.phase] ?? 0;
+        if (p.total > 0 && (p.phase === 'questions' || p.phase === 'media' || p.phase === 'topper')) {
+          target = Math.max(target - 0.2, 0.05) + (p.current / p.total) * 0.25;
+        }
+        RNAnimated.timing(progressAnim, { toValue: target, duration: 250, useNativeDriver: false }).start();
+      });
+      setSyncDone(true);
+      setOfflineMeta(await OfflineManager.getMetadata());
+      Alert.alert(label, detail);
+    } catch (err: any) {
+      Alert.alert(`${label} failed`, err?.message || 'Something went wrong');
+    } finally {
+      setIsSyncing(false);
+      setActiveCategory(null);
+    }
+  };
+
+  const handleDownloadQuestions = () =>
+    runCategoryAction('questions', 'Questions downloaded', async (report) => {
+      const r = await OfflineManager.downloadQuestions(session!.user!.id, selectedCourse, report);
+      return `${r.questions.toLocaleString()} questions and ${r.valueAdds.toLocaleString()} value-adds are ready offline.`;
+    });
+
+  const handleRefreshQuestions = () =>
+    runCategoryAction('questions', 'Check complete', async (report) => {
+      const catalog = await OfflineManager.refreshCatalogDelta(session!.user!.id, report, selectedCourse);
+      const va = await OfflineManager.refreshValueAddsDelta(report);
+      const parts: string[] = [];
+      parts.push(
+        catalog.newTests + catalog.updatedTests === 0
+          ? `No new tests (${catalog.unchangedTests} checked)`
+          : `${catalog.newTests} new, ${catalog.updatedTests} updated`
+      );
+      parts.push(va.changed ? `Value-adds updated (${va.total})` : 'Value-adds unchanged');
+      return parts.join('. ') + '.';
+    });
+
+  const handleDownloadTopperImages = () =>
+    runCategoryAction('topperImages', 'Topper images downloaded', async (report) => {
+      const r = await OfflineManager.downloadTopperImages(report);
+      return `${r.done} new images cached, ${r.skipped} already present.`;
+    });
+
+  const handleRefreshTopperImages = () =>
+    runCategoryAction('topperImages', 'Check complete', async (report) => {
+      const r = await OfflineManager.refreshTopperImagesDelta(report);
+      return r.done === 0
+        ? `Already up to date (${r.skipped} images present).`
+        : `${r.done} new images downloaded.`;
+    });
+
+  const handleDownloadCardImages = () =>
+    runCategoryAction('cardImages', 'Flashcard images downloaded', async (report) => {
+      const r = await OfflineManager.downloadCardImages(report);
+      return `${r.done} new images cached, ${r.skipped} already present.`;
+    });
+
+  const handleRefreshCardImages = () =>
+    runCategoryAction('cardImages', 'Check complete', async (report) => {
+      const r = await OfflineManager.refreshCardImagesDelta(report);
+      return r.done === 0
+        ? `Already up to date (${r.skipped} images present).`
+        : `${r.done} new images downloaded.`;
+    });
 
   const handleClearOffline = () => {
     Alert.alert('Clear All Offline Data?', 'This will remove all cached questions and user data from your device. You can re-download anytime.', [
@@ -317,6 +484,28 @@ export default function Profile() {
         Alert.alert('Done', 'All offline data cleared.');
       }},
     ]);
+  };
+
+  /** Free space for one category without touching the others. */
+  const handleClearCategory = (category: 'topperImages' | 'cardImages') => {
+    const isTopper = category === 'topperImages';
+    const label = isTopper ? 'topper images' : 'flashcard images';
+    Alert.alert(
+      `Clear ${label}?`,
+      `Removes only the cached ${label}. Questions, value-adds and your notes are kept.`,
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Clear',
+          style: 'destructive',
+          onPress: async () => {
+            await OfflineManager.clearCategoryCache(category);
+            setOfflineMeta(await OfflineManager.getMetadata());
+            Alert.alert('Done', `Cached ${label} cleared.`);
+          },
+        },
+      ]
+    );
   };
 
   const updateAnalyticsOrder = async (bucket: 'review' | 'overall', index: number, direction: -1 | 1) => {
@@ -560,37 +749,137 @@ export default function Profile() {
         {/* ── DATA & OFFLINE SECTION ─────────────────────────── */}
         <Text style={[styles.small, { color: colors.textTertiary, marginTop: 24, marginBottom: 12 }]}>DATA & OFFLINE</Text>
         <View style={[styles.settingsGroup, { backgroundColor: colors.surface + '50', borderColor: colors.border }]}>
-          <Row 
+          <Row
             testID="profile-download"
             icon={<Download color={colors.primary} size={20} />}
-            label="Download for offline"
-            sub={offlineMeta?.lastFullSync ? `Last downloaded: ${OfflineManager.formatSyncAge(offlineMeta.lastFullSync)}` : 'Questions + all answer images'}
+            label="Download everything"
+            sub={offlineMeta?.lastFullSync ? `Last downloaded: ${OfflineManager.formatSyncAge(offlineMeta.lastFullSync)}` : 'Questions, value-adds & every image'}
             onPress={startFullDownload}
           />
-          <Row 
+          <Row
             testID="profile-refresh"
             icon={<RefreshCw color={colors.primary} size={20} />}
             label="Check for updates"
             sub={offlineMeta?.lastCatalogScan ? `Checked: ${OfflineManager.formatSyncAge(offlineMeta.lastCatalogScan)}` : 'New tests, images & your data'}
             onPress={handleRefreshSync}
           />
-          {offlineMeta?.mediaPhaseCancelled ? (
-            <Row 
-              testID="profile-download-images"
-              icon={<ImageIcon color={colors.primary} size={20} />}
-              label="Download remaining images"
-              sub={isMediaSyncing ? 'Caching images...' : 'Previous image download was cancelled'}
-              onPress={handleDownloadRemainingImages}
-            />
-          ) : null}
-          <Row 
+          <Row
             testID="profile-clear-cache"
             icon={<Trash2 color="#ef4444" size={20} />}
             label="Clear offline data"
             sub={offlineMeta?.totalQuestions ? `${offlineMeta.totalQuestions.toLocaleString()} questions cached` : 'No data cached'}
             onPress={handleClearOffline}
+            isLast
           />
-          <Row 
+        </View>
+
+        {/* ── 1. QUESTIONS & VALUE-ADDS ──────────────────────── */}
+        <Text style={[styles.small, { color: colors.textTertiary, marginTop: 24, marginBottom: 12 }]}>QUESTIONS & VALUE-ADDS</Text>
+        <View style={[styles.settingsGroup, { backgroundColor: colors.surface + '50', borderColor: colors.border }]}>
+          <Row
+            testID="profile-download-questions"
+            icon={<BookOpen color={colors.primary} size={20} />}
+            label="Download questions"
+            sub={
+              downloadStats
+                ? `${downloadStats.questions.done.toLocaleString()} / ${downloadStats.questions.total > 0 ? downloadStats.questions.total.toLocaleString() : '?'} questions • ${(downloadStats.valueAdds.done ?? 0).toLocaleString()} / ${downloadStats.valueAdds.total > 0 ? downloadStats.valueAdds.total.toLocaleString() : '?'} value-adds`
+                : offlineMeta?.totalQuestions
+                ? `${offlineMeta.totalQuestions.toLocaleString()} questions • ${(offlineMeta.totalValueAdds ?? 0).toLocaleString()} value-adds`
+                : 'Question bank + mains value-adds'
+            }
+            onPress={handleDownloadQuestions}
+          />
+          <Row
+            testID="profile-refresh-questions"
+            icon={<RefreshCw color={colors.textSecondary} size={20} />}
+            label="Check questions for updates"
+            sub={activeCategory === 'questions' && isSyncing ? 'Checking…' : 'Only downloads new or changed items'}
+            onPress={handleRefreshQuestions}
+            isLast
+          />
+        </View>
+
+        {/* ── 2. TOPPER IMAGES ───────────────────────────────── */}
+        <Text style={[styles.small, { color: colors.textTertiary, marginTop: 24, marginBottom: 12 }]}>TOPPER COPIES</Text>
+        <View style={[styles.settingsGroup, { backgroundColor: colors.surface + '50', borderColor: colors.border }]}>
+          <Row
+            testID="profile-download-topper"
+            icon={<ImageIcon color={colors.primary} size={20} />}
+            label="Download topper images"
+            sub={
+              downloadStats
+                ? `${downloadStats.topperCopies.done.toLocaleString()} / ${downloadStats.topperCopies.total > 0 ? downloadStats.topperCopies.total.toLocaleString() : '?'} pages cached`
+                : offlineMeta?.topperImageCount
+                ? `${offlineMeta.topperImageCount.toLocaleString()} pages cached`
+                : 'Answer-sheet pages + diagram images'
+            }
+            onPress={handleDownloadTopperImages}
+          />
+          <Row
+            testID="profile-refresh-topper"
+            icon={<RefreshCw color={colors.textSecondary} size={20} />}
+            label="Check for new topper images"
+            sub={activeCategory === 'topperImages' && isSyncing ? 'Checking…' : 'Skips pages already on device'}
+            onPress={handleRefreshTopperImages}
+          />
+          <Row
+            testID="profile-clear-topper"
+            icon={<Trash2 color="#ef4444" size={20} />}
+            label="Clear topper images"
+            sub="Keep questions, free up the most space"
+            onPress={() => handleClearCategory('topperImages')}
+            isLast
+          />
+        </View>
+
+        {/* ── 3. FLASHCARD IMAGES ────────────────────────────── */}
+        <Text style={[styles.small, { color: colors.textTertiary, marginTop: 24, marginBottom: 12 }]}>FLASHCARD IMAGES</Text>
+        <View style={[styles.settingsGroup, { backgroundColor: colors.surface + '50', borderColor: colors.border }]}>
+          <Row
+            testID="profile-download-card-images"
+            icon={<Layers color={colors.primary} size={20} />}
+            label="Download flashcard images"
+            sub={
+              downloadStats
+                ? `${downloadStats.images.done.toLocaleString()} / ${downloadStats.images.total > 0 ? downloadStats.images.total.toLocaleString() : '?'} photos cached`
+                : offlineMeta?.cardImageCount
+                ? `${offlineMeta.cardImageCount.toLocaleString()} photos cached`
+                : 'Front / back photos on your cards'
+            }
+            onPress={handleDownloadCardImages}
+          />
+          <Row
+            testID="profile-refresh-card-images"
+            icon={<RefreshCw color={colors.textSecondary} size={20} />}
+            label="Check for new flashcard images"
+            sub={activeCategory === 'cardImages' && isSyncing ? 'Checking…' : 'Skips photos already on device'}
+            onPress={handleRefreshCardImages}
+          />
+          <Row
+            testID="profile-clear-card-images"
+            icon={<Trash2 color="#ef4444" size={20} />}
+            label="Clear flashcard images"
+            sub="Keeps your cards, removes cached photos"
+            onPress={() => handleClearCategory('cardImages')}
+            isLast
+          />
+        </View>
+
+        {offlineMeta?.mediaPhaseCancelled ? (
+          <View style={[styles.settingsGroup, { backgroundColor: colors.surface + '50', borderColor: colors.border, marginTop: 12 }]}>
+            <Row
+              testID="profile-download-images"
+              icon={<ImageIcon color="#f59e0b" size={20} />}
+              label="Download remaining images"
+              sub={isMediaSyncing ? 'Caching images...' : 'A previous image download was cancelled'}
+              onPress={handleDownloadRemainingImages}
+              isLast
+            />
+          </View>
+        ) : null}
+
+        <View style={[styles.settingsGroup, { backgroundColor: colors.surface + '50', borderColor: colors.border, marginTop: 12 }]}>
+          <Row
             testID="profile-offline-diag"
             icon={<Wifi color="#8b5cf6" size={20} />}
             label="Offline Diagnostic Test"
@@ -953,6 +1242,8 @@ export default function Profile() {
                 <Text style={[styles.syncDoneDetail, { color: colors.textSecondary }]}>
                   {offlineMeta?.totalQuestions.toLocaleString()} questions • {offlineMeta?.totalStates} tags{"\n"}
                   {offlineMeta?.totalNotes} notebooks • {offlineMeta?.totalAttempts} attempts • {offlineMeta?.totalCards} flashcards
+                  {"\n"}
+                  {(offlineMeta?.totalMainsQuestions ?? 0).toLocaleString()} mains • {offlineMeta?.totalValueAdds ?? 0} value-adds
                 </Text>
                 <TouchableOpacity style={[styles.syncCloseBtn, { backgroundColor: colors.primary }]} onPress={() => setSyncModalVisible(false)}>
                   <Text style={[styles.syncCloseBtnText, { color: colors.buttonText }]}>Done</Text>

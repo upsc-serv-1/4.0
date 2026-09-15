@@ -26,6 +26,7 @@ import { KVStore } from '../src/lib/kvStore';
 import { MediaCacheService } from '../src/services/MediaCacheService';
 import { NetworkStatus } from '../src/lib/networkStatus';
 import { supabase } from '../src/lib/supabase';
+import * as Clipboard from 'expo-clipboard';
 import {
   Wifi,
   WifiOff,
@@ -39,6 +40,7 @@ import {
   Play,
   Square,
   Copy,
+  Check,
   CheckCircle,
   XCircle,
 } from 'lucide-react-native';
@@ -113,6 +115,7 @@ export default function OfflineDiagScreen() {
   const [diagEvents, setDiagEvents] = useState<OfflineDiagEvent[]>([]);
   const [dbResult, setDbResult] = useState<string>('');
   const [dbLoading, setDbLoading] = useState(false);
+  const [copied, setCopied] = useState(false);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const runDbDiagnostics = async () => {
@@ -302,37 +305,51 @@ export default function OfflineDiagScreen() {
     }
   };
 
-  const copyReport = () => {
-    const lines: string[] = [];
-    lines.push('=== OFFLINE DIAGNOSTIC REPORT ===');
-    lines.push('');
-    lines.push('-- Cache Status --');
-    lines.push(`Last Full Sync: ${meta?.lastFullSync ? new Date(meta.lastFullSync).toLocaleString() : 'NEVER'}`);
-    Object.entries(cacheStats).forEach(([k, v]) => lines.push(`  ${k}: ${v}`));
-    lines.push('');
-    lines.push(`KVStore Keys: ${kvKeys.length}`);
-    kvKeys.forEach(k => lines.push(`  ${k}`));
-    lines.push('');
-    lines.push(`-- Blocked Supabase Calls (${blockedCalls.length}) --`);
-    blockedCalls.forEach((c, i) => {
-      lines.push(`  ${i + 1}. [${new Date(c.ts).toLocaleTimeString()}] ${c.url}`);
-    });
-    lines.push('');
-    lines.push(`-- DIAG Events (${diagEvents.length}) --`);
-    diagEvents.forEach((e, i) => {
-      lines.push(`  ${i + 1}. [${new Date(e.ts).toLocaleTimeString()}] ${e.source} | ${e.event} | ${e.detail}`);
-    });
-    lines.push('');
-    const report = lines.join('\n');
+  const copyReport = async () => {
+    try {
+      const lines: string[] = [];
+      lines.push('=== OFFLINE DIAGNOSTIC REPORT ===');
+      lines.push(`Generated: ${new Date().toLocaleString()}`);
+      lines.push('');
+      lines.push('-- Cache Status --');
+      lines.push(`Last Full Sync: ${meta?.lastFullSync ? new Date(meta.lastFullSync).toLocaleString() : 'NEVER'}`);
+      Object.entries(cacheStats).forEach(([k, v]) => lines.push(`  ${k}: ${v}`));
+      lines.push('');
+      lines.push(`KVStore Keys: ${kvKeys.length}`);
+      kvKeys.forEach(k => lines.push(`  ${k}`));
+      lines.push('');
+      lines.push(`-- Blocked Supabase Calls (${blockedCalls.length}) --`);
+      if (blockedCalls.length === 0) {
+        lines.push('  None');
+      } else {
+        blockedCalls.forEach((c, i) => {
+          lines.push(`  ${i + 1}. [${new Date(c.ts).toLocaleTimeString()}] ${c.url}`);
+        });
+      }
+      lines.push('');
+      lines.push(`-- DIAG Events (${diagEvents.length}) --`);
+      if (diagEvents.length === 0) {
+        lines.push('  None');
+      } else {
+        diagEvents.forEach((e, i) => {
+          lines.push(`  ${i + 1}. [${new Date(e.ts).toLocaleTimeString()}] ${e.source} | ${e.event} | ${e.detail}`);
+        });
+      }
+      lines.push('');
+      const report = lines.join('\n');
 
-    // Copy to clipboard via Alert (React Native doesn't have navigator.clipboard easily)
-    Alert.alert(
-      'Diagnostic Report',
-      report.substring(0, 4000),
-      [
-        { text: 'Close', style: 'cancel' },
-      ]
-    );
+      await Clipboard.setStringAsync(report);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2500);
+
+      Alert.alert(
+        'Copied to Clipboard!',
+        'The full diagnostic report has been copied to your clipboard.',
+        [{ text: 'OK' }]
+      );
+    } catch (e: any) {
+      Alert.alert('Copy Failed', 'Could not copy report to clipboard: ' + (e?.message || e));
+    }
   };
 
   const simColor = simulating ? '#ef4444' : '#22c55e';
@@ -461,9 +478,15 @@ export default function OfflineDiagScreen() {
             ))
           )}
           {blockedCalls.length > 0 && (
-            <TouchableOpacity style={[styles.copyBtn, { backgroundColor: colors.primary }]} onPress={copyReport}>
-              <Copy size={16} color="#fff" />
-              <Text style={[styles.copyBtnText, { color: '#fff' }]}>Copy Full Report</Text>
+            <TouchableOpacity 
+              style={[styles.copyBtn, { backgroundColor: copied ? '#10b981' : colors.primary }]} 
+              onPress={copyReport}
+              activeOpacity={0.7}
+            >
+              {copied ? <Check size={16} color="#fff" /> : <Copy size={16} color="#fff" />}
+              <Text style={[styles.copyBtnText, { color: '#fff' }]}>
+                {copied ? 'Copied to Clipboard!' : 'Copy Full Report'}
+              </Text>
             </TouchableOpacity>
           )}
         </View>
@@ -511,6 +534,18 @@ export default function OfflineDiagScreen() {
             8. Copy the report and share it
           </Text>
         </View>
+
+        {/* Global Copy Full Report Button at Bottom */}
+        <TouchableOpacity 
+          style={[styles.copyBtn, { backgroundColor: copied ? '#10b981' : colors.primary, marginTop: 4, marginBottom: 20 }]} 
+          onPress={copyReport}
+          activeOpacity={0.7}
+        >
+          {copied ? <Check size={16} color="#fff" /> : <Copy size={16} color="#fff" />}
+          <Text style={[styles.copyBtnText, { color: '#fff' }]}>
+            {copied ? 'Copied to Clipboard!' : 'Copy Full Diagnostic Report'}
+          </Text>
+        </TouchableOpacity>
 
         <View style={{ height: 60 }} />
       </ScrollView>

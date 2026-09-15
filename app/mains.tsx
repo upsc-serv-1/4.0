@@ -11,7 +11,6 @@ import TopperCopiesView from '../src/components/mains/TopperCopiesView';
 import TopperImageViewerModal from '../src/components/mains/TopperImageViewerModal';
 import QuestionBankTopperCard from '../src/components/mains/QuestionBankTopperCard';
 import AttachedTopperStrip from '../src/components/mains/AttachedTopperStrip';
-import { sampleTopperQuestions } from '../src/data/topperSampleData';
 import {
   isTopperAnswer,
   isGenuineTopperAnswer,
@@ -112,6 +111,7 @@ import { AddToFlashcardSheet } from '../src/components/flashcards/AddToFlashcard
 import { StudentSync } from '../src/services/StudentSync';
 import { KVStore } from '../src/lib/kvStore';
 import { TopperImageCacheService } from '../src/services/TopperImageCacheService';
+import { MediaCacheService } from '../src/services/MediaCacheService';
 import { serializeImageUrls } from '../src/utils/imageHelpers';
 import { useTagStore } from '../src/store/tagStore';
 import * as Haptics from 'expo-haptics';
@@ -3244,13 +3244,19 @@ export const getDiagramUri = (path: string | undefined | null): string => {
   if (!path) return '';
   const r2BaseUrl = 'https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev';
   let cleanPath = path.trim();
-  if (cleanPath.startsWith('http://') || cleanPath.startsWith('https://') || cleanPath.startsWith('data:')) {
-    return cleanPath;
-  }
   if (cleanPath.startsWith('/')) {
     cleanPath = cleanPath.substring(1);
   }
-  return `${r2BaseUrl}/${cleanPath}`;
+  const absolute = cleanPath.startsWith('http://') || cleanPath.startsWith('https://') || cleanPath.startsWith('data:')
+    ? cleanPath
+    : `${r2BaseUrl}/${cleanPath}`;
+  // Offline-first: render from the disk cache when the image was downloaded,
+  // otherwise fall back to the remote URL and lazily cache for next time.
+  const resolved = MediaCacheService.resolveUri(absolute);
+  if (resolved === absolute && /^https?:\/\//i.test(absolute)) {
+    MediaCacheService.ensureCached([absolute]);
+  }
+  return resolved;
 };
 
 /**
@@ -6269,8 +6275,12 @@ function QuestionBankView({
     };
   }, [colors, zoomFontSize, keyBoxColor, textColorMode]);
 
-  // View mode selector state: 'all' | 'questions' | 'valueAdd' | 'toppers'
-  const [viewMode, setViewMode] = useState<'all' | 'questions' | 'valueAdd' | 'toppers'>('all');
+  // View mode selector state: multi-selectable categories ('questions' | 'valueAdd' | 'toppers')
+  const [selectedViewModes, setSelectedViewModes] = useState<Array<'questions' | 'valueAdd' | 'toppers'>>([
+    'questions',
+    'valueAdd',
+    'toppers',
+  ]);
 
   // Group by: 'source' (current: PYQ -> Non-PYQ -> Toppers) vs 'concept' (smart clustering by micro-theme/concept)
   const [groupBy, setGroupBy] = useState<'source' | 'concept'>('source');
@@ -6300,17 +6310,13 @@ function QuestionBankView({
     setTopperViewerVisible(true);
   }, []);
 
-  // Combined corpus of questions + sample toppers to guard against cache miss
+  // Corpus of downloaded questions. Bundled sample data is deliberately NOT
+  // merged in — otherwise mains shows content in airplane mode after the user
+  // cleared offline data, and bundled rows masquerade as downloaded ones.
   const allQuestionsPool = useMemo(() => {
     const seen = new Set<string>();
     const pool: ConsolidatedQuestion[] = [];
     (questions || []).forEach(q => {
-      if (q && q.id && !seen.has(q.id)) {
-        seen.add(q.id);
-        pool.push(q);
-      }
-    });
-    (sampleTopperQuestions || []).forEach(q => {
       if (q && q.id && !seen.has(q.id)) {
         seen.add(q.id);
         pool.push(q);
@@ -6965,33 +6971,38 @@ function QuestionBankView({
       return (tq.answers || []).find((a: any) => (a.page_urls && a.page_urls.length > 0) || a.is_topper) || tq.answers?.[0];
     };
 
-    if (viewMode === 'questions') {
-      list = filteredQuestions.map(q => ({
-        kind: 'question',
-        data: q,
-        attachedToppers: getAttachedForQuestion(q),
-        id: q.id,
-      }));
-    } else if (viewMode === 'valueAdd') {
-      list = filteredValueAdds.map(va => ({
-        kind: 'valueAdd',
-        data: va,
-        id: va.id,
-      }));
-    } else if (viewMode === 'toppers') {
-      const topperItems: Array<{
-        kind: 'question' | 'valueAdd' | 'topper';
-        data: any;
-        id: string;
-        attachedToppers?: ConsolidatedAnswer[];
-        topperAnswer?: ConsolidatedAnswer;
-      }> = [];
-      const seenIds = new Set<string>();
+    const includeQuestions = selectedViewModes.includes('questions');
+    const includeValueAdds = selectedViewModes.includes('valueAdd');
+    const includeToppers = selectedViewModes.includes('toppers');
+
+    const items: Array<{
+      kind: 'question' | 'valueAdd' | 'topper';
+      data: any;
+      id: string;
+      attachedToppers?: ConsolidatedAnswer[];
+      topperAnswer?: ConsolidatedAnswer;
+    }> = [];
+    const seenIds = new Set<string>();
+
+    if (includeQuestions) {
+      filteredQuestions.forEach(q => {
+        if (!seenIds.has(q.id)) {
+          seenIds.add(q.id);
+          items.push({
+            kind: 'question',
+            data: q,
+            attachedToppers: getAttachedForQuestion(q),
+            id: q.id,
+          });
+        }
+      });
+    } else if (includeToppers) {
+      // If questions not selected, but toppers are, include questions with attached toppers
       filteredQuestions.forEach(q => {
         const attached = getAttachedForQuestion(q);
         if (attached.length > 0 && !seenIds.has(q.id)) {
           seenIds.add(q.id);
-          topperItems.push({
+          items.push({
             kind: 'question',
             data: q,
             attachedToppers: attached,
@@ -6999,10 +7010,26 @@ function QuestionBankView({
           });
         }
       });
+    }
+
+    if (includeValueAdds) {
+      filteredValueAdds.forEach(va => {
+        if (!seenIds.has(va.id)) {
+          seenIds.add(va.id);
+          items.push({
+            kind: 'valueAdd',
+            data: va,
+            id: va.id,
+          });
+        }
+      });
+    }
+
+    if (includeToppers) {
       filteredToppers.forEach(tq => {
         if (!seenIds.has(tq.id)) {
           seenIds.add(tq.id);
-          topperItems.push({
+          items.push({
             kind: 'topper',
             data: tq,
             topperAnswer: getTopperAnswer(tq),
@@ -7010,41 +7037,9 @@ function QuestionBankView({
           });
         }
       });
-      list = topperItems;
-    } else {
-      // 'all'
-      const allItems: Array<{
-        kind: 'question' | 'valueAdd' | 'topper';
-        data: any;
-        id: string;
-        attachedToppers?: ConsolidatedAnswer[];
-        topperAnswer?: ConsolidatedAnswer;
-      }> = [];
-      filteredQuestions.forEach(q => {
-        allItems.push({
-          kind: 'question',
-          data: q,
-          attachedToppers: getAttachedForQuestion(q),
-          id: q.id,
-        });
-      });
-      filteredValueAdds.forEach(va => {
-        allItems.push({
-          kind: 'valueAdd',
-          data: va,
-          id: va.id,
-        });
-      });
-      filteredToppers.forEach(tq => {
-        allItems.push({
-          kind: 'topper',
-          data: tq,
-          topperAnswer: getTopperAnswer(tq),
-          id: tq.id,
-        });
-      });
-      list = allItems;
     }
+
+    list = items;
 
     // Sort: favorites first for value addition cards
     const sorted = [...list].sort((a, b) => {
@@ -7120,7 +7115,7 @@ function QuestionBankView({
     }
 
     return sorted;
-  }, [viewMode, filteredQuestions, filteredValueAdds, filteredToppers, topperAttachmentMap, vaFavorites, groupBy, collapsedConcepts]);
+  }, [selectedViewModes, filteredQuestions, filteredValueAdds, filteredToppers, topperAttachmentMap, vaFavorites, groupBy, collapsedConcepts]);
 
   const conceptCounts = useMemo(() => {
     if (groupBy !== 'concept') return {};
@@ -7333,14 +7328,44 @@ function QuestionBankView({
                       toppers: '#f97316',
                     };
 
+                    const isAll = selectedViewModes.length === 3;
+
+                    const handleToggleMode = (mode: 'all' | 'questions' | 'valueAdd' | 'toppers') => {
+                      if (mode === 'all') {
+                        setSelectedViewModes(['questions', 'valueAdd', 'toppers']);
+                        return;
+                      }
+
+                      if (isAll) {
+                        // If all are currently active, selecting a category isolates it
+                        setSelectedViewModes([mode]);
+                        return;
+                      }
+
+                      if (selectedViewModes.includes(mode)) {
+                        if (selectedViewModes.length === 1) {
+                          // If unchecking the only remaining active category, reset to all
+                          setSelectedViewModes(['questions', 'valueAdd', 'toppers']);
+                        } else {
+                          setSelectedViewModes(selectedViewModes.filter(m => m !== mode));
+                        }
+                      } else {
+                        setSelectedViewModes([...selectedViewModes, mode]);
+                      }
+                    };
+
                     return (
-                      <View style={{ flexDirection: 'row', gap: 6, marginTop: 6, marginBottom: 2 }}>
+                      <ScrollView
+                        horizontal
+                        showsHorizontalScrollIndicator={false}
+                        contentContainerStyle={{ flexDirection: 'row', gap: 6, marginTop: 6, marginBottom: 2 }}
+                      >
                         {(['all', 'questions', 'valueAdd', 'toppers'] as const).map(mode => {
-                          const isActive = viewMode === mode;
+                          const isActive = mode === 'all' ? isAll : (!isAll && selectedViewModes.includes(mode));
                           return (
                             <TouchableOpacity
                               key={mode}
-                              onPress={() => setViewMode(mode)}
+                              onPress={() => handleToggleMode(mode)}
                               style={[
                                 styles.filterPill,
                                 {
@@ -7360,7 +7385,7 @@ function QuestionBankView({
                             </TouchableOpacity>
                           );
                         })}
-                      </View>
+                      </ScrollView>
                     );
                   })()}
 
@@ -11015,7 +11040,8 @@ function MainsAISearchView({
       const searchToppers = activeFilters.searchAcross.includes('Topper Copies');
 
       if (showQuestions && (searchQuestions || searchAnswers || searchToppers)) {
-        const searchPool = (questions || []).concat((sampleTopperQuestions || []).filter(st => !(questions || []).some(q => q.id === st.id)));
+        // Only scanned downloaded rows — see allQuestionsPool above.
+        const searchPool = (questions || []);
         searchPool.forEach(q => {
           // Hard Filters
           if (activeFilters.paper !== 'All' && !activeFilters.paper.split('|').includes(q.paper)) return;

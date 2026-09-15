@@ -49,31 +49,45 @@ export class FolderSettingsSvc {
     const hit = memCache.get(userId);
     if (hit && Date.now() - hit.at < CACHE_TTL) return hit.rows;
 
-    // OFFLINE: read from OfflineManager cache
+    // OFFLINE: use the local cache and NEVER touch the network.
+    //
+    // Previously this fell through to Supabase when the cache was empty, so a
+    // deck opened in airplane mode threw a network error that surfaced as
+    // "Could not load queue". An empty result is a legitimate outcome here —
+    // the caller falls back to DEFAULT_SETTINGS — so returning [] is correct.
     if (NetworkStatus.isOffline()) {
       try {
         const cached = OfflineManager.getCollectionSync('folder_algorithm_settings', userId) as any[];
-        if (cached && cached.length > 0) {
-          const rows = cached as FolderSettingsRow[];
-          memCache.set(userId, { at: Date.now(), rows });
-          return rows;
-        }
-      } catch {}
+        const rows = (cached || []) as FolderSettingsRow[];
+        memCache.set(userId, { at: Date.now(), rows });
+        return rows;
+      } catch {
+        memCache.set(userId, { at: Date.now(), rows: [] });
+        return [];
+      }
     }
 
-    const { data, error } = await supabase
-      .from('folder_algorithm_settings')
-      .select('user_id, folder_key, settings, inherit, updated_at')
-      .eq('user_id', userId);
+    try {
+      const { data, error } = await supabase
+        .from('folder_algorithm_settings')
+        .select('user_id, folder_key, settings, inherit, updated_at')
+        .eq('user_id', userId);
 
-    if (error) {
-      console.warn('[FolderSettings] listAll error:', error.message);
+      if (error) {
+        console.warn('[FolderSettings] listAll error:', error.message);
+        memCache.set(userId, { at: Date.now(), rows: [] });
+        return [];
+      }
+      const rows = (data as FolderSettingsRow[]) || [];
+      memCache.set(userId, { at: Date.now(), rows });
+      return rows;
+    } catch (err) {
+      // Network dropped mid-call — degrade to defaults rather than throwing into
+      // the deck loader's catch-all alert.
+      console.warn('[FolderSettings] listAll failed, using defaults:', err);
       memCache.set(userId, { at: Date.now(), rows: [] });
       return [];
     }
-    const rows = (data as FolderSettingsRow[]) || [];
-    memCache.set(userId, { at: Date.now(), rows });
-    return rows;
   }
 
   static invalidate(userId: string) { memCache.delete(userId); }

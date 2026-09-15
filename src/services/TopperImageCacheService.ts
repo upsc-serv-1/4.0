@@ -2,6 +2,7 @@ import { Platform, Dimensions } from 'react-native';
 import * as FileSystem from 'expo-file-system/legacy';
 import { Image as ExpoImage } from 'expo-image';
 import { KVStore } from '../lib/kvStore';
+import { getTopperPageUrls } from '../utils/topperHelpers';
 
 export interface TopperImageCacheRecord {
   remoteUrl: string;
@@ -97,6 +98,11 @@ class TopperImageCacheServiceClass {
     if (!url || Platform.OS === 'web') return false;
     const index = this.loadIndex();
     return Boolean(index[url]?.localUri);
+  }
+
+  /** Number of topper pages currently indexed on disk. */
+  public cachedCount(): number {
+    return Object.keys(this.loadIndex()).length;
   }
 
   public getImageDimensions(
@@ -230,7 +236,11 @@ class TopperImageCacheServiceClass {
     for (const q of questions) {
       const answers = q.answers || [];
       for (const a of answers) {
-        const pageUrls: string[] = a.page_urls || a.image_urls || [];
+        // Use the shared resolver rather than reading `page_urls` directly.
+        // Answer rows store these as arrays, JSON strings, delimiter-separated
+        // strings, OR only as markdown images inside answerText — reading only
+        // the array form silently produced "0 images" for most questions.
+        const pageUrls: string[] = getTopperPageUrls(a);
         pageUrls.forEach((url, idx) => {
           if (url && typeof url === 'string' && !seenUrls.has(url)) {
             seenUrls.add(url);

@@ -208,13 +208,24 @@ for (let i = 1; i <= 15; i++) {
   forumMGPQuestions = forumMGPQuestions.concat(loadMGP(pad));
 }
 
-let sampleTopperQuestions: ConsolidatedQuestion[] = [];
-try {
-  const topperData = require('./topperSampleData');
-  sampleTopperQuestions = topperData.sampleTopperQuestions || [];
-} catch (e) {
-  console.log('[MainsLoader] Topper sample data not found or failed to load:', e);
-}
+/**
+ * Bundled mains questions must NOT be served as if they were downloaded.
+ *
+ * `topperSampleData.json` holds ~205 questions hardcoded into the app binary.
+ * Merging them into the catalogue meant mains kept showing questions in
+ * airplane mode after "Clear offline data" — the user could not tell bundled
+ * content from downloaded content, and it inflated the effective question bank
+ * by hundreds of rows on every device.
+ *
+ * They are intentionally excluded. Mains content now comes only from a real
+ * download (KVStore cache) or the live fetch.
+ *
+ * This loader also deliberately does NOT require `./topperSampleData`: that
+ * module imported this one back, forming a cycle that could throw at bundle
+ * load on screens which only wanted a markdown helper from app/mains.tsx.
+ * Consumers that genuinely want the samples import `topperSampleData` directly.
+ */
+const BUNDLED_SAMPLE_QUESTIONS: ConsolidatedQuestion[] = [];
 
 // Standardize and export
 export const mainsConsolidatedQuestions: ConsolidatedQuestion[] = [
@@ -227,7 +238,7 @@ export const mainsConsolidatedQuestions: ConsolidatedQuestion[] = [
   ...socio1Questions.map((q: any) => ({ ...q, is_pyq: q.is_pyq ?? true, subject: normalizeSubject(q.subject), paper: resolvePaper(q) })),
   ...socio2Questions.map((q: any) => ({ ...q, is_pyq: q.is_pyq ?? true, subject: normalizeSubject(q.subject), paper: resolvePaper(q) })),
   ...forumMGPQuestions.map((q: any) => ({ ...q, is_pyq: q.is_pyq ?? false, subject: normalizeSubject(q.subject), paper: resolvePaper(q) })),
-  ...sampleTopperQuestions.map((q: any) => ({ ...q, is_pyq: q.is_pyq ?? true, subject: normalizeSubject(q.subject), paper: resolvePaper(q) })),
+  ...BUNDLED_SAMPLE_QUESTIONS,
 ];
 
 import { supabase } from '../lib/supabase';

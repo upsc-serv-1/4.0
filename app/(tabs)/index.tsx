@@ -416,6 +416,34 @@ const DEFAULT_TAB_SUBJECTS = {
 };
 DEFAULT_TAB_SUBJECTS.Overall = [...DEFAULT_TAB_SUBJECTS.Prelims, ...DEFAULT_TAB_SUBJECTS.Mains, ...DEFAULT_TAB_SUBJECTS.Optional];
 
+const VALID_PREP_TABS = ['Prelims', 'Mains', 'Optional', 'Overall'] as const;
+type PrepTab = (typeof VALID_PREP_TABS)[number];
+const PREP_TAB_KEY = '@home_prep_tab_v1';
+
+const readSavedPrepTab = (): PrepTab => {
+  try {
+    const saved = KVStore.getJson<string>(PREP_TAB_KEY);
+    if (saved && (VALID_PREP_TABS as readonly string[]).includes(saved)) {
+      return saved as PrepTab;
+    }
+  } catch {}
+  return 'Prelims';
+};
+
+const VALID_MAINS_FILTERS = ['all', 'gs1', 'gs2', 'gs3', 'gs4'] as const;
+type MainsFilter = (typeof VALID_MAINS_FILTERS)[number];
+const MAINS_FILTER_KEY = '@home_mains_filter_v1';
+
+const readSavedMainsFilter = (): MainsFilter => {
+  try {
+    const saved = KVStore.getJson<string>(MAINS_FILTER_KEY);
+    if (saved && (VALID_MAINS_FILTERS as readonly string[]).includes(saved)) {
+      return saved as MainsFilter;
+    }
+  } catch {}
+  return 'all';
+};
+
 export default function HomeScreen() {
   const { session } = useAuth();
   const userId = session?.user?.id;
@@ -424,8 +452,8 @@ export default function HomeScreen() {
 
   const [tabSubjects, setTabSubjects] = useState(DEFAULT_TAB_SUBJECTS);
   const [searchQuery, setSearchQuery] = useState('');
-  const [prepTab, setPrepTab] = useState<'Prelims' | 'Mains' | 'Optional' | 'Overall'>('Prelims');
-  const [mainsFilter, setMainsFilter] = useState<'all' | 'gs1' | 'gs2' | 'gs3' | 'gs4'>('all');
+  const [prepTab, setPrepTab] = useState<PrepTab>(readSavedPrepTab);
+  const [mainsFilter, setMainsFilter] = useState<MainsFilter>(readSavedMainsFilter);
   const [tasks, setTasks] = useState<DailyTask[]>([]);
   const [streak, setStreak] = useState<StudyStreak>({
     current_streak: 0,
@@ -678,6 +706,14 @@ export default function HomeScreen() {
     }
   };
 
+  useEffect(() => {
+    try { KVStore.setJson(PREP_TAB_KEY, prepTab); } catch {}
+  }, [prepTab]);
+
+  useEffect(() => {
+    try { KVStore.setJson(MAINS_FILTER_KEY, mainsFilter); } catch {}
+  }, [mainsFilter]);
+
   useFocusEffect(
     useCallback(() => {
       let isActive = true;
@@ -756,7 +792,13 @@ export default function HomeScreen() {
     await HomescreenService.saveStudyStreak(newStreakObj, userId);
   };
 
+  // Resolve the avatar image. `AVATAR_MAP[avatarId]` is undefined for an id the
+  // map does not know (legacy/synced ids), which previously rendered a 44x44
+  // `overflow:'hidden'` box with no background — i.e. an invisible profile
+  // button. Fall back to the initial-based tile so the button is always tappable
+  // and visible, online or offline.
   const avatarSource = avatarId ? AVATAR_MAP[avatarId] : undefined;
+  const avatarInitial = (name || 'A').trim().charAt(0).toUpperCase() || 'A';
   const currentInsight = insights[insightIndex] || insights[0];
   const currentSubjects = tabSubjects[prepTab] || [];
   const overallCompletion = Math.round(
@@ -810,20 +852,21 @@ export default function HomeScreen() {
                 <View style={styles.notifBadge} />
               </TouchableOpacity>
               
-              <TouchableOpacity style={styles.avatarWrap} onPress={() => router.push('/profile')}>
+              <TouchableOpacity
+                style={[styles.avatarWrap, { backgroundColor: '#2563EB' }]}
+                onPress={() => router.push('/profile')}
+                accessibilityRole="button"
+                accessibilityLabel="Open profile"
+              >
                 {avatarSource ? (
                   <Image source={avatarSource} style={styles.avatarImage} />
                 ) : (
-                  <View style={styles.avatarFallback}><Text style={styles.avatarFallbackTxt}>{name[0]}</Text></View>
+                  <View style={styles.avatarFallback}>
+                    <Text style={styles.avatarFallbackTxt}>{avatarInitial}</Text>
+                  </View>
                 )}
               </TouchableOpacity>
 
-              <View style={styles.taglineContainer}>
-                <Text style={styles.taglineText}>STUDY</Text>
-                <Text style={styles.taglineText}>SERVE</Text>
-                <Text style={styles.taglineText}>TRANSFORM</Text>
-                <LinearGradient colors={['#F97316', '#FFFFFF', '#16A34A']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={styles.taglineBar} />
-              </View>
             </View>
           </View>
 

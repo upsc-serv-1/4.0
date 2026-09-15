@@ -226,13 +226,15 @@ export default function Profile() {
       const valueAddsDone = (KVStore.getJson<any[]>('@mains_cached_value_add_v2') ?? []).length;
 
       const cachedMains = KVStore.getJson<any[]>(MAINS_QUESTIONS_CACHE_KEY) ?? [];
-      const topperCopiesDone = cachedMains.filter((q: any) =>
-        Array.isArray(q?.answers) &&
-        q.answers.some((a: any) =>
-          a?.is_topper === true ||
-          (Array.isArray(a?.page_urls) && a.page_urls.length > 0)
-        )
-      ).length;
+      let topperCopiesDone = 0;
+      cachedMains.forEach((q: any) => {
+        if (Array.isArray(q?.answers)) {
+          const hasTopperCopy = q.answers.some((a: any) => a?.is_topper === true);
+          if (hasTopperCopy) {
+            topperCopiesDone++;
+          }
+        }
+      });
 
       const prev = KVStore.getJson<{
         questions: number; images: number; valueAdds: number; topperCopies: number;
@@ -418,6 +420,7 @@ export default function Profile() {
       });
       setSyncDone(true);
       setOfflineMeta(await OfflineManager.getMetadata());
+      await refreshDownloadStats();
       Alert.alert(label, detail);
     } catch (err: any) {
       Alert.alert(`${label} failed`, err?.message || 'Something went wrong');
@@ -808,10 +811,10 @@ export default function Profile() {
             label="Download topper images"
             sub={
               downloadStats
-                ? `${downloadStats.topperCopies.done.toLocaleString()} / ${downloadStats.topperCopies.total > 0 ? downloadStats.topperCopies.total.toLocaleString() : '?'} pages cached`
+                ? `${downloadStats.topperCopies.done.toLocaleString()} / ${downloadStats.topperCopies.total > 0 ? downloadStats.topperCopies.total.toLocaleString() : '?'} topper copies`
                 : offlineMeta?.topperImageCount
-                ? `${offlineMeta.topperImageCount.toLocaleString()} pages cached`
-                : 'Answer-sheet pages + diagram images'
+                ? `${offlineMeta.topperImageCount.toLocaleString()} topper copies`
+                : 'Topper answer sheets'
             }
             onPress={handleDownloadTopperImages}
           />

@@ -17,7 +17,7 @@ import { supabase } from '../lib/supabase';
 import { KVStore } from '../lib/kvStore';
 import { NetworkStatus } from '../lib/networkStatus';
 import { QuestionCache } from './QuestionCache';
-import { MediaCacheService, collectQuestionMediaUrls } from './MediaCacheService';
+import { MediaCacheService, collectQuestionMediaUrls, collectCardMediaUrls } from './MediaCacheService';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // ─── Storage Keys ────────────────────────────────────────────────
@@ -443,9 +443,10 @@ class OfflineManagerService {
     }
     report({ phase: 'cards', current: 1, total: 1, detail: `${totalCards} flashcards saved` });
 
-    // ──────── 7. MEDIA (images inside questions/explanations) ───
-    // R2/Cloudflare URLs — caching them is what makes answers readable in
-    // airplane mode. Runs LAST so a cancel here never costs question re-downloads.
+    // ──────── 7. MEDIA (images inside questions, explanations & cards) ───
+    // R2/Cloudflare URLs — caching them is what makes answers and flashcard
+    // photos readable in airplane mode. Runs LAST so a cancel here never costs
+    // question re-downloads.
     let totalMedia = 0;
     try {
       if (!this._cancelled) {
@@ -456,6 +457,12 @@ class OfflineManagerService {
           rows.push(...QuestionCache.getCachedQuestionsSync(test.id));
         }
         const urls = collectQuestionMediaUrls(rows);
+        // Flashcard front/back photos are stored on `cards`, which was fetched
+        // earlier in this same sync.
+        const cards = KVStore.getJson<any[]>(CARDS_PREFIX) ?? [];
+        for (const u of collectCardMediaUrls(cards)) {
+          if (!urls.includes(u)) urls.push(u);
+        }
         totalMedia = urls.length;
         report({ phase: 'media', current: 0, total: totalMedia, detail: 'Caching images...' });
 
@@ -814,6 +821,46 @@ class OfflineManagerService {
     // Pull user rows too so tags/notes/progress land in the same pass.
     await this.syncUserData(userId);
 
+    // ── New media only ────────────────────────────────────────────
+    // Author edits can introduce fresh images; cache just the URLs that are not
+    // already on disk. Already-cached ones are skipped, so a no-change refresh
+    // costs nothing here.
+    let totalMedia = meta.totalMedia ?? 0;
+    try {
+      if (!this._cancelled) {
+        await MediaCacheService.init();
+        const rows: any[] = [];
+        for (const test of courseTests) {
+          if (this._cancelled) break;
+          rows.push(...QuestionCache.getCachedQuestionsSync(test.id));
+        }
+        const urls = collectQuestionMediaUrls(rows);
+        const cards = KVStore.getJson<any[]>(CARDS_PREFIX) ?? [];
+        for (const u of collectCardMediaUrls(cards)) {
+          if (!urls.includes(u)) urls.push(u);
+        }
+        totalMedia = urls.length;
+
+        const result = await MediaCacheService.cacheUrls(
+          urls,
+          (done, t, skipped) => {
+            report({
+              phase: 'media',
+              current: done,
+              total: t,
+              detail: `Images ${done}/${t} (${skipped} already saved)`,
+            });
+          },
+          () => this._cancelled
+        );
+        if (result.done > 0) {
+          console.log(`[Offline] Refresh cached ${result.done} new image(s)`);
+        }
+      }
+    } catch (err) {
+      console.warn('[Offline] Refresh media phase failed', err);
+    }
+
     await this.setMetadata({
       lastCatalogScan: Date.now(),
       lastIncrementalSync: Date.now(),
@@ -821,6 +868,8 @@ class OfflineManagerService {
       totalQuestions: QuestionCache.getCachedTestIdsSync().length > 0
         ? this.getOfflineQuestionsAllSync().length
         : meta.totalQuestions,
+      totalMedia,
+      totalMediaCached: MediaCacheService.cachedCount(),
     });
     report({ phase: 'done', current: 1, total: 1, detail: 'Up to date!' });
 
@@ -853,6 +902,12 @@ class OfflineManagerService {
 
     const rows = this.getOfflineQuestionsAllSync();
     const urls = collectQuestionMediaUrls(rows);
+    // Include flashcard photos so "Download remaining images" also finishes
+    // any card images the cancelled run missed.
+    const cards = KVStore.getJson<any[]>(CARDS_PREFIX) ?? [];
+    for (const u of collectCardMediaUrls(cards)) {
+      if (!urls.includes(u)) urls.push(u);
+    }
     report({ phase: 'media', current: 0, total: urls.length, detail: 'Caching images...' });
 
     const result = await MediaCacheService.cacheUrls(

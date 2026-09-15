@@ -42,6 +42,7 @@ import { supabase } from '../../src/lib/supabase';
 import { useAuth } from '../../src/context/AuthContext';
 import { useCourse } from '../../src/context/CourseContext';
 import { GlobalSearchBar } from '../../src/components/GlobalSearchBar';
+import { DownloadCatalogBanner } from '../../src/components/DownloadCatalogBanner';
 import { useQuizStore } from '../../src/store/quizStore';
 import { mergeQuestions } from '../../src/utils/merger';
 import { OfflineManager } from '../../src/services/OfflineManager';
@@ -1315,6 +1316,14 @@ function UnifiedArenaSetup() {
             />
           }
         >
+          {/* Empty-bank call to action. Reuses the header button's handler so
+              there is only one download path on this screen. */}
+          <DownloadCatalogBanner
+            course={selectedCourse}
+            hidden={!needsDownload || !!syncProgress}
+            onPress={startOfflineDownload}
+            message="Download the question bank to browse topics and papers offline."
+          />
 
           {(loading || refreshingMetadata || syncProgress) && (
             <View style={[styles.metadataRefreshBanner, { backgroundColor: colors.surfaceStrong, borderColor: colors.border }]}>

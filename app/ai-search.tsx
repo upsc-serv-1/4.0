@@ -28,6 +28,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { cacheGetString, safeSetItem } from '../src/lib/safeAsyncStorage';
 import { aiExpandSearchQuery, aiExplainQuestion, aiImproveAnswer, type AIInferredFilters } from '../src/services/GeminiService';
 import { PageWrapper } from '../src/components/PageWrapper';
+import { DownloadCatalogBanner } from '../src/components/DownloadCatalogBanner';
 import Markdown from 'react-native-markdown-display';
 import { AIModelSwitcher } from '../src/components/ai/AIModelSwitcher';
 import { SharedQuestionCard } from '../src/components/unified/SharedQuestionCard';
@@ -2422,6 +2423,14 @@ export default function AISearchTab() {
           {QuickFilterBar}
           {SearchBar}
         </View>
+
+        {/* Empty-bank call to action. `requiresDownload` is set by every search
+            mode when the local catalogue has no rows for this course. */}
+        <DownloadCatalogBanner
+          course={selectedCourse}
+          hidden={!requiresDownload}
+          message="Search reads your downloaded bank. Grab it once to search offline."
+        />
 
         {IS_IPAD ? (
           <View style={styles.ipadBody}>

@@ -25,6 +25,7 @@ import { Platform } from 'react-native';
 import * as FileSystem from 'expo-file-system/legacy';
 import { Image as ExpoImage } from 'expo-image';
 import { KVStore } from '../lib/kvStore';
+import { parseImageUrls } from '../utils/imageHelpers';
 
 export interface MediaCacheRecord {
   remoteUrl: string;
@@ -136,8 +137,10 @@ class MediaCacheServiceClass {
 
   /**
    * Extract every remote image URL referenced by a question row.
-   * Covers question_text, options (all shapes), explanation_markdown and the
-   * flashcard front/back image columns.
+   * Covers question_text, options (all shapes) and explanation_markdown.
+   *
+   * Note: flashcard image columns are handled separately by `collectUrlsFromCard`
+   * because they use a different, non-Markdown encoding.
    */
   public static collectUrlsFromQuestion(q: any): string[] {
     const found = new Set<string>();
@@ -160,8 +163,47 @@ class MediaCacheServiceClass {
     scan(q?.question_text);
     scan(q?.explanation_markdown);
     scan(q?.options);
-    scan(q?.front_image_url);
-    scan(q?.back_image_url);
+    return Array.from(found);
+  }
+
+  /**
+   * Extract image URLs from a flashcard row.
+   *
+   * `front_image_url` / `back_image_url` are NOT plain URLs — they are written
+   * by `serializeImageUrls`, which emits a bare URL for a single image and a
+   * JSON array string for several (`'["a","b"]'`). They may also be
+   * `|||`-delimited legacy values. So they must go through `parseImageUrls`
+   * before being treated as URLs; feeding the raw string to a regex would
+   * produce a corrupt, un-downloadable "URL" spanning both entries.
+   */
+  public static collectUrlsFromCard(card: any): string[] {
+    const found = new Set<string>();
+
+    const addAll = (val?: string | null) => {
+      for (const url of parseImageUrls(val)) {
+        if (isRemoteImageUrl(url)) found.add(url);
+      }
+    };
+    addAll(card?.front_image_url);
+    addAll(card?.back_image_url);
+
+    // Card text can still embed Markdown/HTML images.
+    const scan = (value: any) => {
+      if (!value) return;
+      if (typeof value === 'string') {
+        let m: RegExpExecArray | null;
+        MD_IMAGE_RE.lastIndex = 0;
+        while ((m = MD_IMAGE_RE.exec(value))) if (isRemoteImageUrl(m[1])) found.add(m[1]);
+        HTML_IMG_RE.lastIndex = 0;
+        while ((m = HTML_IMG_RE.exec(value))) if (isRemoteImageUrl(m[1])) found.add(m[1]);
+        return;
+      }
+      if (Array.isArray(value)) { value.forEach(scan); return; }
+      if (typeof value === 'object') { Object.values(value).forEach(scan); }
+    };
+    scan(card?.front_text);
+    scan(card?.back_text);
+
     return Array.from(found);
   }
 
@@ -170,6 +212,9 @@ class MediaCacheServiceClass {
     const all = new Set<string>();
     for (const row of rows || []) {
       MediaCacheServiceClass.collectUrlsFromQuestion(row).forEach((u) => all.add(u));
+      // Cards are distinguished by having image columns; collecting from both
+      // is harmless because results are deduped by URL.
+      MediaCacheServiceClass.collectUrlsFromCard(row).forEach((u) => all.add(u));
     }
     return Array.from(all);
   }
@@ -305,4 +350,13 @@ export default MediaCacheService;
 /** Module-level helper so non-class callers can collect URLs without instantiating. */
 export function collectQuestionMediaUrls(rows: any[]): string[] {
   return MediaCacheServiceClass.collectUrls(rows);
+}
+
+/** Collect just the front/back image URLs from a batch of flashcard rows. */
+export function collectCardMediaUrls(rows: any[]): string[] {
+  const all = new Set<string>();
+  for (const row of rows || []) {
+    MediaCacheServiceClass.collectUrlsFromCard(row).forEach((u) => all.add(u));
+  }
+  return Array.from(all);
 }

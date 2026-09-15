@@ -92,6 +92,7 @@ import { cacheGetString, safeSetItem } from '../../src/lib/safeAsyncStorage';
 import { PinchGestureHandler, State as GHState } from 'react-native-gesture-handler';
 import { useTheme } from '../../src/context/ThemeContext';
 import { PageWrapper } from '../../src/components/PageWrapper';
+import { DownloadCatalogBanner } from '../../src/components/DownloadCatalogBanner';
 import { supabase } from '../../src/lib/supabase';
 import { useAuth } from '../../src/context/AuthContext';
 import { useCourse } from '../../src/context/CourseContext';
@@ -4200,6 +4201,11 @@ const isPyqUpscsearch = params.pyqFilter === 'PYQ Only' && params.year_start && 
 
             {showIndex ? renderQuestionIndex() : questions.length === 0 ? (
               <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 24, paddingTop: 80 }}>
+                {/* Empty-bank CTA. Without this an empty list is indistinguishable
+                    from "no matches for your filters". */}
+                <View style={{ width: '100%', marginBottom: 8 }}>
+                  <DownloadCatalogBanner course={selectedCourse} />
+                </View>
                 <Text style={{ color: colors.textTertiary, fontSize: 16, fontWeight: '600', textAlign: 'center', marginBottom: 12 }}>
                   No questions found
                 </Text>

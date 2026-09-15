@@ -45,6 +45,7 @@ import { supabase } from '../src/lib/supabase';
 import { PieChart, LineChart } from '../src/components/Charts';
 import { useTheme } from '../src/context/ThemeContext';
 import { useCourse } from '../src/context/CourseContext';
+import { DownloadCatalogBanner } from '../src/components/DownloadCatalogBanner';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { prelimsTaxonomy } from '../src/data/taxonomy';
 import { AnalysisExportSheet } from '../src/components/export/AnalysisExportSheet';
@@ -3690,6 +3691,8 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
         }
       >
         {/* Filter chips scroll away with content */}
+        <DownloadCatalogBanner course={selectedCourse} hidden={isEmbedded} />
+
         <View style={[
           styles.filterWrap, 
           { 

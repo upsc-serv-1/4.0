@@ -54,7 +54,6 @@ import { SharedQuestionCard } from '../src/components/unified/SharedQuestionCard
 import {
   mainsConsolidatedQuestions,
   ConsolidatedQuestion,
-  fetchMainsQuestionsFromSupabase,
   getInitialMainsQuestions,
   normalizePaper,
   resolvePaper,

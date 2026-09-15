@@ -52,6 +52,7 @@ import { useProfile } from '../../src/context/ProfileContext';
 import { HomescreenService, DailyTask, StudyStreak, DailyInsight } from '../../src/services/homescreenService';
 import { AVATARS } from '../../src/constants/avatars';
 import LocalQuery from '../../src/services/LocalQuery';
+import { DownloadCatalogBanner } from '../../src/components/DownloadCatalogBanner';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Markdown from 'react-native-markdown-display';
 import { getPYQCategorization } from '../../src/utils/questionUtils';
@@ -1547,6 +1548,11 @@ export default function HomeScreen() {
               ) : (
                 <View style={{ zIndex: 2, paddingVertical: 20, alignItems: 'center' }}>
                   <Text style={{ color: '#92400E', fontSize: 14, textAlign: 'center' }}>No questions found for the selected subjects.</Text>
+                  {/* Distinguish "bank not downloaded" from "filters too narrow":
+                      only offer the download CTA when there is truly no catalog. */}
+                  <View style={{ alignSelf: 'stretch', marginHorizontal: -4 }}>
+                    <DownloadCatalogBanner message="Download the question bank to get a daily challenge." />
+                  </View>
                   <TouchableOpacity onPress={() => { 
                     setTempPrefs({
                       subjects: challengePrefs.subjects.filter(s => availableFilters.subjects.includes(s)),

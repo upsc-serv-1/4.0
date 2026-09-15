@@ -103,6 +103,7 @@ type UnifiedSearchResult = {
   matchedInQuestion?: boolean;
   matchedInExplanation?: boolean;
   matchedInOptions?: boolean;
+  _searchTier?: number;
 };
 
 type UnifiedFilters = {
@@ -497,6 +498,84 @@ export const textMatchesKeyword = (text: string, kw: string): boolean => {
   }
   return hasWholeWord(text, kw) || text.toLowerCase().includes(kw.toLowerCase());
 };
+
+/**
+ * Evaluates whether a piece of text matches the query, userWords, and AI keywords.
+ * Enforces:
+ * 1. Exact mode: ONLY matches if the entire query phrase appears in the text.
+ * 2. Multi-word queries (e.g. "bhagat singh"):
+ *    - Matches if exact phrase is present (Tier 0).
+ *    - Matches if ALL user words are present in text (Tier 1).
+ *    - In AI modes, matches if an AI-expanded keyword is present (Tier 2).
+ *    - Crucially: An isolated word (like "singh" without "bhagat") NEVER matches!
+ * 3. Single-word queries (e.g. "ashoka"):
+ *    - Matches if the word or AI keywords appear.
+ */
+export function evaluateTextMatch(
+  text: string,
+  cleanQuery: string,
+  userWords: string[],
+  aiKeywords: string[],
+  mode: 'AI' | 'AI+Fuzzy' | 'Matching' | 'Exact'
+): { matched: boolean; score: number; tier: number } {
+  if (!text) return { matched: false, score: 0, tier: 99 };
+
+  // 1. Exact phrase match (Tier 0)
+  if (cleanQuery.length > 2 && textMatchesKeyword(text, cleanQuery)) {
+    return { matched: true, score: 10, tier: 0 };
+  }
+
+  // Exact mode requires exact phrase match!
+  if (mode === 'Exact') {
+    return { matched: false, score: 0, tier: 99 };
+  }
+
+  // 2. Multi-word query handling (e.g. "bhagat singh")
+  if (userWords.length > 1) {
+    const matchedUserWords = userWords.filter(w => textMatchesKeyword(text, w));
+
+    // Tier 1: ALL user words must appear in the text
+    if (matchedUserWords.length === userWords.length) {
+      return { matched: true, score: 6 + userWords.length, tier: 1 };
+    }
+
+    // Tier 2: For long queries (>= 4 words), majority (>= 70%) present
+    if (userWords.length >= 4) {
+      const matchRatio = matchedUserWords.length / userWords.length;
+      if (matchRatio >= 0.7) {
+        return { matched: true, score: 4 + matchedUserWords.length, tier: 2 };
+      }
+    }
+
+    // Tier 3: In AI modes, match if any AI expansion keyword appears
+    if (mode === 'AI' || mode === 'AI+Fuzzy') {
+      const matchedAi = aiKeywords.filter(k => k.length > 2 && textMatchesKeyword(text, k));
+      if (matchedAi.length > 0) {
+        return { matched: true, score: 2 + matchedAi.length * 0.5, tier: 3 };
+      }
+    }
+
+    // Isolated words (e.g. "singh" without "bhagat") MUST NEVER MATCH!
+    return { matched: false, score: 0, tier: 99 };
+  }
+
+  // 3. Single-word query handling (e.g. "ashoka")
+  if (userWords.length === 1) {
+    if (textMatchesKeyword(text, userWords[0])) {
+      return { matched: true, score: 6, tier: 1 };
+    }
+  }
+
+  // AI expansion match for single-word queries
+  if (mode === 'AI' || mode === 'AI+Fuzzy') {
+    const matchedAi = aiKeywords.filter(k => k.length > 2 && textMatchesKeyword(text, k));
+    if (matchedAi.length > 0) {
+      return { matched: true, score: 2 + matchedAi.length * 0.5, tier: 3 };
+    }
+  }
+
+  return { matched: false, score: 0, tier: 99 };
+}
 
 function highlightKeywords(text: string, allKeywords: string[]): React.ReactNode {
   const matchingKws = allKeywords.filter(k => k.length > 2 && textMatchesKeyword(text, k));
@@ -1450,8 +1529,7 @@ export default function IntegratedSearchScreen() {
       const userWords = cleanQuery
         .replace(/[^a-z0-9\s]/g, ' ')
         .split(/\s+/)
-        .filter(w => w.length > 2 && !STOP_WORDS.has(w));
-      let keywordsList: string[] = [...new Set([cleanQuery, ...userWords])];
+        .filter(w => w.length > 1 && !STOP_WORDS.has(w));
       let displayKeywords: string[] = [];
       
       if (mode === 'AI' || mode === 'AI+Fuzzy') {
@@ -1461,7 +1539,6 @@ export default function IntegratedSearchScreen() {
             displayKeywords = aiResult.keywords
               .map(k => k.toLowerCase().trim())
               .filter(k => Boolean(k) && !STOP_WORDS.has(k));
-            keywordsList = [...new Set([cleanQuery, ...userWords, ...displayKeywords])];
           }
         } catch (err) {
           console.warn('[UnifiedSearch] query expansion failed:', err);
@@ -1480,53 +1557,50 @@ export default function IntegratedSearchScreen() {
       const preQs = allPre.filter((q: any) => q.course === selectedCourse);
 
       preQs.forEach((q: any) => {
-        let score = 0;
         const qText = String(q.question_text || '').toLowerCase();
         const qExpl = String(q.explanation_markdown || q.explanation || '').toLowerCase();
         const optsObj = q.options || {};
         const optsText = `${q.option_a || ''} ${q.option_b || ''} ${q.option_c || ''} ${q.option_d || ''} ${Object.values(optsObj).join(' ')}`.toLowerCase();
 
-        let matchedInQ = false;
-        let matchedInExpl = false;
-        let matchedInOpts = false;
+        const matchQ = searchQuestion ? evaluateTextMatch(qText, cleanQuery, userWords, displayKeywords, mode) : { matched: false, score: 0, tier: 99 };
+        const matchExpl = searchExplanation ? evaluateTextMatch(qExpl, cleanQuery, userWords, displayKeywords, mode) : { matched: false, score: 0, tier: 99 };
+        const matchOpts = searchOptions ? evaluateTextMatch(optsText, cleanQuery, userWords, displayKeywords, mode) : { matched: false, score: 0, tier: 99 };
 
-        keywordsList.forEach((kw, index) => {
-          const weight = index === 0 ? 3 : 1;
-          const kwInQ = qText ? textMatchesKeyword(qText, kw) : false;
-          const kwInExpl = qExpl ? textMatchesKeyword(qExpl, kw) : false;
-          const kwInOpts = optsText ? textMatchesKeyword(optsText, kw) : false;
+        const combinedScopeText = [
+          searchQuestion ? qText : '',
+          searchExplanation ? qExpl : '',
+          searchOptions ? optsText : '',
+        ].filter(Boolean).join(' ');
+        const matchCombined = evaluateTextMatch(combinedScopeText, cleanQuery, userWords, displayKeywords, mode);
 
-          if (kwInQ) {
-            score += 2 * weight;
-            matchedInQ = true;
-          }
-          if (kwInExpl) {
-            score += 0.5 * weight;
-            matchedInExpl = true;
-          }
-          if (kwInOpts) {
-            score += 0.5 * weight;
-            matchedInOpts = true;
-          }
-        });
-
-        const hasScopeMatch = (searchQuestion && matchedInQ) || (searchExplanation && matchedInExpl) || (searchOptions && matchedInOpts);
-
-        if (hasScopeMatch && score > 0) {
-          matchedResults.push({
-            id: `prelims_${q.id}`,
-            type: 'prelims',
-            title: q.question_text,
-            subtitle: q.explanation_markdown || '',
-            subject: canonicalizeSubject(q.subject),
-            year: q.exam_year,
-            score,
-            rawItem: q,
-            matchedInQuestion: matchedInQ,
-            matchedInExplanation: matchedInExpl,
-            matchedInOptions: matchedInOpts,
-          });
+        if (!matchCombined.matched && !matchQ.matched && !matchExpl.matched && !matchOpts.matched) {
+          return;
         }
+
+        const matchedInQ = matchQ.matched || (searchQuestion && userWords.length > 0 && userWords.some(w => textMatchesKeyword(qText, w)));
+        const matchedInExpl = matchExpl.matched || (searchExplanation && userWords.length > 0 && userWords.some(w => textMatchesKeyword(qExpl, w)));
+        const matchedInOpts = matchOpts.matched || (searchOptions && userWords.length > 0 && userWords.some(w => textMatchesKeyword(optsText, w)));
+
+        const bestTier = Math.min(matchQ.tier, matchExpl.tier, matchOpts.tier, matchCombined.tier);
+        const score = (matchQ.matched ? matchQ.score * 2 : 0) +
+                      (matchExpl.matched ? matchExpl.score * 1 : 0) +
+                      (matchOpts.matched ? matchOpts.score * 0.5 : 0) +
+                      (matchCombined.score || 1);
+
+        matchedResults.push({
+          id: `prelims_${q.id}`,
+          type: 'prelims',
+          title: q.question_text,
+          subtitle: q.explanation_markdown || '',
+          subject: canonicalizeSubject(q.subject),
+          year: q.exam_year,
+          score,
+          _searchTier: bestTier,
+          rawItem: q,
+          matchedInQuestion: matchedInQ,
+          matchedInExplanation: matchedInExpl,
+          matchedInOptions: matchedInOpts,
+        });
       });
 
       // B. MAINS SEARCH (local cache only — the downloaded snapshot)
@@ -1534,7 +1608,6 @@ export default function IntegratedSearchScreen() {
       const sourceMains = mainsQuestions.length > 0 ? mainsQuestions : getInitialMainsQuestions();
 
       sourceMains.forEach((q: any) => {
-        let score = 0;
         const rawQBody = String(q.questionText || q.question_text || q.question || q.question_body || '').trim();
         const qText = (rawQBody || String(q.title || '')).toLowerCase();
 
@@ -1547,28 +1620,6 @@ export default function IntegratedSearchScreen() {
         const ansText = `${answersList.map((a: any) => `${a.answerText || a.answer_text || a.content || ''} ${a.synopsis || ''}`).join(' ')} ${directAns}`.toLowerCase();
         const metaText = `${q.subject || ''} ${q.sectionGroup || q.section_group || ''} ${q.microTopic || q.microtopic || ''} ${q.subTopic || q.subtopic || ''} ${q.macrotag || ''} ${q.microtag || ''}`.toLowerCase();
 
-        let matchedInQ = false;
-        let matchedInAns = false;
-
-        keywordsList.forEach((kw, index) => {
-          const weight = index === 0 ? 3 : 1;
-          const kwInQ = qText ? textMatchesKeyword(qText, kw) : false;
-          const kwInAns = ansText ? textMatchesKeyword(ansText, kw) : false;
-
-          if (kwInQ) {
-            score += 2 * weight;
-            matchedInQ = true;
-          }
-          if (kwInAns) {
-            score += 1.5 * weight;
-            matchedInAns = true;
-          }
-          // metaText ONLY adds bonus relevance if the active target scope actually matched!
-          if ((matchedInQ || matchedInAns) && metaText && textMatchesKeyword(metaText, kw)) {
-            score += 0.5 * weight;
-          }
-        });
-
         // ── Topper copies: first-class results (parity with MainsAISearchView, app/mains.tsx) ──
         if (isTopperQuestion(q)) {
           if (!searchQuestion) return; // respect the existing search-scope toggle
@@ -1577,47 +1628,81 @@ export default function IntegratedSearchScreen() {
           const tName = (getTopperName(topperAns, q) || '').toLowerCase();
           const rawAir = getAir(topperAns, q);
           const tAir = String(rawAir ?? q.air_rank ?? '').toLowerCase();
-          const searchLower = cleanQuery;
-          const nameMatch = !!(tName && tName !== 'topper' && tName.includes(searchLower));
-          const airMatch = !!(tAir && (tAir.includes(searchLower) || ('air ' + tAir).includes(searchLower)));
 
-          if (matchedInQ || nameMatch || airMatch) {
-            matchedResults.push({
-              id: `topper_${q.id}`,
-              type: 'topper',
-              title: q.questionText || q.question_text || q.title || 'Topper Copy',
-              subtitle: `${getTopperName(topperAns, q)}${rawAir ? ` (AIR ${rawAir})` : ''}`,
-              subject: canonicalizeSubject(q.subject),
-              paper: resolvePaper(q),
-              year: q.year || q.exam_year || q.topper_year,
-              score: Math.max(score, 1),
-              rawItem: q,
-              matchedInQuestion: matchedInQ || nameMatch || airMatch,
-              matchedInExplanation: false,
-              matchedInOptions: false,
-            });
+          const matchQ = evaluateTextMatch(qText, cleanQuery, userWords, displayKeywords, mode);
+          const matchName = tName && tName !== 'topper' ? evaluateTextMatch(tName, cleanQuery, userWords, displayKeywords, mode) : { matched: false, score: 0, tier: 99 };
+          const matchAir = tAir ? evaluateTextMatch(tAir, cleanQuery, userWords, displayKeywords, mode) : { matched: false, score: 0, tier: 99 };
+
+          const combinedTopperText = [qText, tName !== 'topper' ? tName : '', tAir ? `air ${tAir}` : ''].filter(Boolean).join(' ');
+          const matchCombined = evaluateTextMatch(combinedTopperText, cleanQuery, userWords, displayKeywords, mode);
+
+          if (!matchCombined.matched && !matchQ.matched && !matchName.matched && !matchAir.matched) {
+            return;
           }
+
+          const bestTier = Math.min(matchQ.tier, matchName.tier, matchAir.tier, matchCombined.tier);
+          const score = Math.max(matchQ.score, matchName.score, matchAir.score, matchCombined.score, 1);
+
+          matchedResults.push({
+            id: `topper_${q.id}`,
+            type: 'topper',
+            title: q.questionText || q.question_text || q.title || 'Topper Copy',
+            subtitle: `${getTopperName(topperAns, q)}${rawAir ? ` (AIR ${rawAir})` : ''}`,
+            subject: canonicalizeSubject(q.subject),
+            paper: resolvePaper(q),
+            year: q.year || q.exam_year || q.topper_year,
+            score,
+            _searchTier: bestTier,
+            rawItem: q,
+            matchedInQuestion: matchQ.matched || matchName.matched || matchAir.matched,
+            matchedInExplanation: false,
+            matchedInOptions: false,
+          });
           return; // never double-emit a topper row as a generic 'mains' card
         }
 
-        const hasScopeMatch = (searchQuestion && matchedInQ) || (searchExplanation && matchedInAns);
+        const matchQ = searchQuestion ? evaluateTextMatch(qText, cleanQuery, userWords, displayKeywords, mode) : { matched: false, score: 0, tier: 99 };
+        const matchAns = searchExplanation ? evaluateTextMatch(ansText, cleanQuery, userWords, displayKeywords, mode) : { matched: false, score: 0, tier: 99 };
 
-        if (hasScopeMatch && score > 0) {
-          matchedResults.push({
-            id: `mains_${q.id}`,
-            type: 'mains',
-            title: q.questionText || q.question_text || q.title || 'Mains Question',
-            subtitle: answersList.map((a: any) => a.answerText || a.answer_text || '').filter(Boolean).join(' ') || metaText,
-            subject: canonicalizeSubject(q.subject),
-            paper: resolvePaper(q),
-            year: q.year || q.exam_year,
-            score,
-            rawItem: q,
-            matchedInQuestion: matchedInQ,
-            matchedInExplanation: matchedInAns,
-            matchedInOptions: false,
-          });
+        const combinedScopeText = [
+          searchQuestion ? qText : '',
+          searchExplanation ? ansText : '',
+        ].filter(Boolean).join(' ');
+        const matchCombined = evaluateTextMatch(combinedScopeText, cleanQuery, userWords, displayKeywords, mode);
+
+        if (!matchCombined.matched && !matchQ.matched && !matchAns.matched) {
+          return;
         }
+
+        const matchedInQ = matchQ.matched || (searchQuestion && userWords.length > 0 && userWords.some(w => textMatchesKeyword(qText, w)));
+        const matchedInAns = matchAns.matched || (searchExplanation && userWords.length > 0 && userWords.some(w => textMatchesKeyword(ansText, w)));
+
+        let score = (matchQ.matched ? matchQ.score * 2 : 0) +
+                    (matchAns.matched ? matchAns.score * 1.5 : 0) +
+                    (matchCombined.score || 1);
+
+        // metaText ONLY adds bonus relevance if the active target scope actually matched!
+        if (metaText && userWords.some(w => textMatchesKeyword(metaText, w))) {
+          score += 1;
+        }
+
+        const bestTier = Math.min(matchQ.tier, matchAns.tier, matchCombined.tier);
+
+        matchedResults.push({
+          id: `mains_${q.id}`,
+          type: 'mains',
+          title: q.questionText || q.question_text || q.title || 'Mains Question',
+          subtitle: answersList.map((a: any) => a.answerText || a.answer_text || '').filter(Boolean).join(' ') || metaText,
+          subject: canonicalizeSubject(q.subject),
+          paper: resolvePaper(q),
+          year: q.year || q.exam_year,
+          score,
+          _searchTier: bestTier,
+          rawItem: q,
+          matchedInQuestion: matchedInQ,
+          matchedInExplanation: matchedInAns,
+          matchedInOptions: false,
+        });
       });
 
       // C. VALUE ADDITION SEARCH (Comprehensive field index search)
@@ -1636,46 +1721,44 @@ export default function IntegratedSearchScreen() {
 
       const uniqueVA = getUniqueValueAddItems(sourceVA);
       uniqueVA.forEach((va: any) => {
-        let score = 0;
         const titleLower = String(va.title || '').toLowerCase();
         const textContent = getValueAddItemTextContent(va).toLowerCase();
 
-        let matchedInTitle = false;
-        let matchedInContent = false;
+        const matchTitle = searchQuestion ? evaluateTextMatch(titleLower, cleanQuery, userWords, displayKeywords, mode) : { matched: false, score: 0, tier: 99 };
+        const matchContent = searchExplanation ? evaluateTextMatch(textContent, cleanQuery, userWords, displayKeywords, mode) : { matched: false, score: 0, tier: 99 };
 
-        keywordsList.forEach((kw, index) => {
-          const weight = index === 0 ? 3 : 1;
-          // In Value Add: 'Question' corresponds to the title/heading, 'Explanation' corresponds to content/notes
-          const kwInTitle = titleLower ? textMatchesKeyword(titleLower, kw) : false;
-          const kwInContent = textContent ? textMatchesKeyword(textContent, kw) : false;
+        const combinedVAText = [
+          searchQuestion ? titleLower : '',
+          searchExplanation ? textContent : '',
+        ].filter(Boolean).join(' ');
+        const matchCombined = evaluateTextMatch(combinedVAText, cleanQuery, userWords, displayKeywords, mode);
 
-          if (kwInTitle) {
-            score += 2 * weight;
-            matchedInTitle = true;
-          }
-          if (kwInContent) {
-            score += 1.5 * weight;
-            matchedInContent = true;
-          }
-        });
-
-        const hasScopeMatch = (searchQuestion && matchedInTitle) || (searchExplanation && matchedInContent);
-
-        if (hasScopeMatch && score > 0) {
-          matchedResults.push({
-            id: `valueadd_${va.id}`,
-            type: 'value_add',
-            title: va.title || 'Untitled Value Add',
-            subtitle: va.rawContent || va.content_markdown || va.context || va.description || '',
-            subject: canonicalizeSubject(va.subject),
-            paper: resolvePaper(va) || normalizePaper(va.paper) || 'GS1',
-            score,
-            rawItem: va,
-            matchedInQuestion: matchedInTitle,
-            matchedInExplanation: matchedInContent,
-            matchedInOptions: false,
-          });
+        if (!matchCombined.matched && !matchTitle.matched && !matchContent.matched) {
+          return;
         }
+
+        const matchedInTitle = matchTitle.matched || (searchQuestion && userWords.length > 0 && userWords.some(w => textMatchesKeyword(titleLower, w)));
+        const matchedInContent = matchContent.matched || (searchExplanation && userWords.length > 0 && userWords.some(w => textMatchesKeyword(textContent, w)));
+
+        const score = (matchTitle.matched ? matchTitle.score * 2 : 0) +
+                      (matchContent.matched ? matchContent.score * 1.5 : 0) +
+                      (matchCombined.score || 1);
+        const bestTier = Math.min(matchTitle.tier, matchContent.tier, matchCombined.tier);
+
+        matchedResults.push({
+          id: `valueadd_${va.id}`,
+          type: 'value_add',
+          title: va.title || 'Untitled Value Add',
+          subtitle: va.rawContent || va.content_markdown || va.context || va.description || '',
+          subject: canonicalizeSubject(va.subject),
+          paper: resolvePaper(va) || normalizePaper(va.paper) || 'GS1',
+          score,
+          _searchTier: bestTier,
+          rawItem: va,
+          matchedInQuestion: matchedInTitle,
+          matchedInExplanation: matchedInContent,
+          matchedInOptions: false,
+        });
       });
 
       setResults(matchedResults);
@@ -1980,7 +2063,10 @@ export default function IntegratedSearchScreen() {
         const subB = b.subject || '';
         if (subA !== subB) return subA.localeCompare(subB);
       } else {
-        // Relevance sorting
+        // Relevance sorting: Exact Match First (Tier 0 -> Tier 1 -> Tier 2 -> Tier 3)
+        const sTierA = a._searchTier ?? 1;
+        const sTierB = b._searchTier ?? 1;
+        if (sTierA !== sTierB) return sTierA - sTierB;
         if (a.score !== b.score) return b.score - a.score;
       }
 
@@ -3530,35 +3616,47 @@ export default function IntegratedSearchScreen() {
 
           {/* Keywords panel */}
           {keywords.length > 0 && (
-            <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 4, marginTop: 8 }}>
-              {keywords.map((kw, i) => {
-                const isExcluded = excludedKeywords.has(kw);
-                return (
-                  <TouchableOpacity
-                    key={i}
-                    onPress={() => toggleExcludedKeyword(kw)}
-                    style={[
-                      styles.pill,
-                      {
-                        backgroundColor: isExcluded ? colors.surfaceStrong : '#ede9fe',
-                        borderColor: isExcluded ? colors.border : '#c4b5fd',
-                        opacity: isExcluded ? 0.5 : 1,
-                      }
-                    ]}
-                  >
-                    <Text
-                      style={{
-                        fontSize: 10,
-                        fontWeight: '700',
-                        color: isExcluded ? colors.textTertiary : '#7c3aed',
-                        textDecorationLine: isExcluded ? 'line-through' : 'none',
-                      }}
-                    >
-                      {kw}
-                    </Text>
+            <View style={{ marginTop: 8 }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
+                <Text style={{ fontSize: 10, color: colors.textTertiary }}>
+                  {keywords.length - excludedKeywords.size}/{keywords.length} keywords active • Tap to exclude
+                </Text>
+                {excludedKeywords.size > 0 && (
+                  <TouchableOpacity onPress={() => setExcludedKeywords(new Set())} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+                    <Text style={{ fontSize: 10, fontWeight: '700', color: '#EF4444' }}>Reset Excluded</Text>
                   </TouchableOpacity>
-                );
-              })}
+                )}
+              </View>
+              <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 4 }}>
+                {keywords.map((kw, i) => {
+                  const isExcluded = excludedKeywords.has(kw);
+                  return (
+                    <TouchableOpacity
+                      key={i}
+                      onPress={() => toggleExcludedKeyword(kw)}
+                      style={[
+                        styles.pill,
+                        {
+                          backgroundColor: isExcluded ? colors.surfaceStrong : '#ede9fe',
+                          borderColor: isExcluded ? colors.border : '#c4b5fd',
+                          opacity: isExcluded ? 0.5 : 1,
+                        }
+                      ]}
+                    >
+                      <Text
+                        style={{
+                          fontSize: 10,
+                          fontWeight: '700',
+                          color: isExcluded ? colors.textTertiary : '#7c3aed',
+                          textDecorationLine: isExcluded ? 'line-through' : 'none',
+                        }}
+                      >
+                        {kw}
+                      </Text>
+                    </TouchableOpacity>
+                  );
+                })}
+              </View>
             </View>
           )}
         </View>

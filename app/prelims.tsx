@@ -133,7 +133,7 @@ function PrelimsScreen() {
       {/* Back Button Header */}
       <View style={[styles.header, { backgroundColor: 'transparent', paddingTop: insets.top, height: 64 + insets.top }]}>
         <TouchableOpacity
-          onPress={() => router.back()}
+          onPress={() => router.replace('/(tabs)')}
           style={[styles.backButton, { backgroundColor: colors.surface + '88', borderColor: colors.border }]}
         >
           <ChevronLeft size={20} color={colors.textPrimary} />

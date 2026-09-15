@@ -572,12 +572,29 @@ export function buildTopperAttachmentMap<T extends { answers?: any[]; [key: stri
 
     const genuineAnswers = (tq.answers || []).filter(
       a => isGenuineTopperAnswer(a) && getTopperPageUrls(a).length > 0
-    );
+    ).map((a, idx) => ({
+      ...a,
+      id: a.id || `${tq.id || 'topper'}-ans-${idx}`,
+      topper: a.topper || getTopperName(a, tq),
+      air: a.air !== undefined && a.air !== null && String(a.air).trim() !== '' ? a.air : getAir(a, tq),
+      topper_year: a.topper_year || tq.topper_year || tq.year,
+    }));
     if (genuineAnswers.length === 0) continue;
 
     const existing = map.get(key) || [];
-    const existingIds = new Set(existing.map(a => a.id).filter(Boolean));
-    const toAdd = genuineAnswers.filter(a => !a.id || !existingIds.has(a.id));
+    const toAdd = genuineAnswers.filter(ans => {
+      return !existing.some(ex => {
+        if (ex.id && ans.id && ex.id === ans.id) return true;
+        const exName = getTopperName(ex, tq).toLowerCase();
+        const ansName = getTopperName(ans, tq).toLowerCase();
+        const exAir = String(getAir(ex, tq) || '');
+        const ansAir = String(getAir(ans, tq) || '');
+        if (exName && ansName && exName !== 'topper' && exName === ansName && exAir === ansAir) {
+          return true;
+        }
+        return false;
+      });
+    });
     map.set(key, [...existing, ...toAdd]);
   }
 

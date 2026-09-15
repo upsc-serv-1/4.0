@@ -2403,6 +2403,14 @@ export default function AISearchTab() {
       >
         <View style={[styles.header, { backgroundColor: colors.bg, borderBottomColor: colors.border }]}>
           <View style={styles.headerLeft}>
+            <TouchableOpacity
+              onPress={() => router.back()}
+              style={{ padding: 8, marginLeft: -8 }}
+              hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+              testID="ai-search-back-button"
+            >
+              <ChevronLeft size={24} color={colors.textPrimary} />
+            </TouchableOpacity>
             <View style={styles.brainBadge}>
               <Brain size={16} color="#fff" />
             </View>

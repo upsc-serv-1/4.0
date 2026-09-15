@@ -6954,13 +6954,30 @@ function QuestionBankView({
       topperAnswer?: ConsolidatedAnswer;
     }> = [];
 
+    const isSameTopperAnswer = (a: ConsolidatedAnswer, b: ConsolidatedAnswer, qCtx: ConsolidatedQuestion) => {
+      if (a.id && b.id && a.id === b.id) return true;
+      const nameA = getTopperName(a, qCtx).toLowerCase();
+      const nameB = getTopperName(b, qCtx).toLowerCase();
+      const airA = String(getAir(a, qCtx) || '');
+      const airB = String(getAir(b, qCtx) || '');
+      if (nameA && nameB && nameA !== 'topper' && nameA === nameB && airA === airB) {
+        return true;
+      }
+      const pUrlsA = getTopperPageUrls(a);
+      const pUrlsB = getTopperPageUrls(b);
+      if (pUrlsA.length > 0 && pUrlsB.length > 0 && pUrlsA[0] === pUrlsB[0]) {
+        return true;
+      }
+      return false;
+    };
+
     const getAttachedForQuestion = (q: ConsolidatedQuestion): ConsolidatedAnswer[] => {
       const key = normalizeQuestionKey(q);
       const attached = topperAttachmentMap.get(key) || [];
       const inlineToppers = (q.answers || []).filter(isTopperAnswer);
       const combined = [...attached];
       inlineToppers.forEach(ia => {
-        if (!combined.some(a => (a.id && a.id === ia.id) || (a.institute && a.institute === ia.institute))) {
+        if (!combined.some(a => isSameTopperAnswer(a, ia, q))) {
           combined.push(ia);
         }
       });
@@ -7033,6 +7050,7 @@ function QuestionBankView({
             kind: 'topper',
             data: tq,
             topperAnswer: getTopperAnswer(tq),
+            attachedToppers: getAttachedForQuestion(tq),
             id: tq.id,
           });
         }
@@ -7868,11 +7886,30 @@ function QuestionBankView({
               if (kind === 'topper') {
                 const tq = rawItem as ConsolidatedQuestion;
                 const topperAns = (item as any).topperAnswer || (tq.answers || []).find((a: any) => isTopperAnswer(a)) || tq.answers?.[0];
+                const qKey = normalizeQuestionKey(tq);
+                const mapToppers = topperAttachmentMap.get(qKey) || [];
+                const itemAttached = (item as any).attachedToppers || [];
+                const inlineAnswers = (tq.answers || []).filter(isTopperAnswer);
+                const combinedToppers: ConsolidatedAnswer[] = [];
+                [...itemAttached, ...mapToppers, ...inlineAnswers, ...(topperAns ? [topperAns] : [])].forEach(ans => {
+                  if (
+                    !combinedToppers.some(
+                      c =>
+                        (c.id && ans.id && c.id === ans.id) ||
+                        (getTopperName(c, tq).toLowerCase() === getTopperName(ans, tq).toLowerCase() &&
+                          getTopperName(c, tq) !== 'Topper' &&
+                          String(getAir(c, tq) || '') === String(getAir(ans, tq) || ''))
+                    )
+                  ) {
+                    combinedToppers.push(ans);
+                  }
+                });
                 return (
                   <QuestionBankTopperCard
                     key={tq.id}
                     question={tq}
                     topperAnswer={topperAns}
+                    attachedToppers={combinedToppers}
                     colors={colors}
                     isDark={isDark}
                     zoomFontSize={zoomFontSize}
@@ -7893,7 +7930,15 @@ function QuestionBankView({
               const inlineToppers = (q.answers || []).filter(isTopperAnswer);
               const attachedToppers: ConsolidatedAnswer[] = [...rawAttached];
               [...mapToppers, ...inlineToppers].forEach(top => {
-                if (!attachedToppers.some(a => (a.id && a.id === top.id) || (a.institute && a.institute === top.institute))) {
+                if (
+                  !attachedToppers.some(
+                    a =>
+                      (a.id && top.id && a.id === top.id) ||
+                      (getTopperName(a, q).toLowerCase() === getTopperName(top, q).toLowerCase() &&
+                        getTopperName(a, q) !== 'Topper' &&
+                        String(getAir(a, q) || '') === String(getAir(top, q) || ''))
+                  )
+                ) {
                   attachedToppers.push(top);
                 }
               });

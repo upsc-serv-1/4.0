@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useState, useMemo } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { Image as ExpoImage } from 'expo-image';
-import { Bookmark, ExternalLink } from 'lucide-react-native';
+import { Bookmark, ExternalLink, Award } from 'lucide-react-native';
 import type { ConsolidatedQuestion, ConsolidatedAnswer } from '../../data/mainsConsolidatedLoader';
 import { getTopperName, getAir, getTopperPageUrls } from '../../utils/topperHelpers';
 import { TopperImageCacheService } from '../../services/TopperImageCacheService';
@@ -9,6 +9,7 @@ import { TopperImageCacheService } from '../../services/TopperImageCacheService'
 export interface QuestionBankTopperCardProps {
   question: ConsolidatedQuestion;
   topperAnswer?: ConsolidatedAnswer;
+  attachedToppers?: ConsolidatedAnswer[];
   colors: any;
   isDark: boolean;
   zoomFontSize: number;
@@ -60,6 +61,7 @@ export function highlightKeywords(text: string, query?: string): React.ReactNode
 export default function QuestionBankTopperCard({
   question,
   topperAnswer,
+  attachedToppers,
   colors,
   isDark,
   zoomFontSize,
@@ -69,11 +71,17 @@ export default function QuestionBankTopperCard({
   onOpenDetailed,
   searchQuery,
 }: QuestionBankTopperCardProps) {
-  // 1. Identify target topper answer
-  const answer =
-    topperAnswer ||
-    (question.answers || []).find(a => (a.page_urls && a.page_urls.length > 0) || a.is_topper) ||
-    question.answers?.[0];
+  // 1. Gather all topper answers available for this question
+  const allToppers = useMemo(() => {
+    if (attachedToppers && attachedToppers.length > 0) return attachedToppers;
+    if (topperAnswer) return [topperAnswer];
+    const inline = (question.answers || []).filter(a => (a.page_urls && a.page_urls.length > 0) || a.is_topper);
+    return inline.length > 0 ? inline : (question.answers?.[0] ? [question.answers[0]] : []);
+  }, [attachedToppers, topperAnswer, question]);
+
+  const [selectedTopperIdx, setSelectedTopperIdx] = useState(0);
+  const safeIdx = Math.min(selectedTopperIdx, Math.max(0, allToppers.length - 1));
+  const answer = allToppers[safeIdx] || topperAnswer || question.answers?.[0];
 
   const topperName = getTopperName(answer, question);
   const air = getAir(answer, question);
@@ -228,6 +236,78 @@ export default function QuestionBankTopperCard({
           {highlightKeywords(question.questionText, searchQuery)}
         </Text>
       </TouchableOpacity>
+
+      {/* Candidate Switcher Chips if multiple topper copies exist */}
+      {allToppers.length > 1 && (
+        <View style={styles.candidateChipsContainer}>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.candidateChipsScroll}
+          >
+            {allToppers.map((top, idx) => {
+              const isSelected = idx === safeIdx;
+              const name = getTopperName(top, question);
+              const rank = getAir(top, question);
+              const pUrls = getTopperPageUrls(top);
+              return (
+                <TouchableOpacity
+                  key={top.id || idx}
+                  activeOpacity={0.8}
+                  onPress={() => setSelectedTopperIdx(idx)}
+                  style={[
+                    styles.candidateChip,
+                    isSelected ? styles.candidateChipActive : styles.candidateChipInactive,
+                    {
+                      borderColor: isSelected
+                        ? '#ea580c'
+                        : isDark
+                        ? 'rgba(255, 255, 255, 0.12)'
+                        : 'rgba(0, 0, 0, 0.1)',
+                      backgroundColor: isSelected
+                        ? '#ea580c'
+                        : isDark
+                        ? 'rgba(234, 88, 12, 0.12)'
+                        : 'rgba(234, 88, 12, 0.06)',
+                    },
+                  ]}
+                >
+                  <Award size={11} color={isSelected ? '#ffffff' : '#ea580c'} />
+                  <Text
+                    style={[
+                      styles.candidateChipName,
+                      { color: isSelected ? '#ffffff' : (isDark ? '#fed7aa' : '#9a3412') },
+                    ]}
+                    numberOfLines={1}
+                  >
+                    {name}
+                  </Text>
+                  {!!rank && (
+                    <Text
+                      style={[
+                        styles.candidateChipMeta,
+                        { color: isSelected ? '#ffedd5' : (isDark ? '#fb923c' : '#c2410c') },
+                      ]}
+                    >
+                      • AIR {rank}
+                    </Text>
+                  )}
+                  {pUrls.length > 0 && (
+                    <Text
+                      style={[
+                        styles.candidateChipMeta,
+                        { color: isSelected ? '#fed7aa' : (isDark ? '#fdba74' : '#ea580c') },
+                      ]}
+                    >
+                      • {pUrls.length}p
+                    </Text>
+                  )}
+                </TouchableOpacity>
+              );
+            })}
+          </ScrollView>
+        </View>
+      )}
 
       {/* 3. Overlapping Thumbnail Row */}
       {previewUrls.length > 0 ? (
@@ -414,5 +494,39 @@ const styles = StyleSheet.create({
     padding: 8,
     borderRadius: 6,
     alignItems: 'center',
+  },
+  candidateChipsContainer: {
+    marginBottom: 8,
+  },
+  candidateChipsScroll: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingVertical: 2,
+  },
+  candidateChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    paddingHorizontal: 8,
+    paddingVertical: 3.5,
+    borderRadius: 14,
+    borderWidth: 1,
+  },
+  candidateChipActive: {
+    shadowColor: '#ea580c',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.25,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  candidateChipInactive: {},
+  candidateChipName: {
+    fontSize: 11,
+    fontWeight: '700',
+  },
+  candidateChipMeta: {
+    fontSize: 10,
+    fontWeight: '600',
   },
 });

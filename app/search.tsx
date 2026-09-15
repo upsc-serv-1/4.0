@@ -2462,6 +2462,14 @@ export default function IntegratedSearchScreen() {
         {!hasSearched && (
           <View style={[styles.header, { borderBottomColor: colors.border, paddingTop: insets.top, paddingHorizontal: 16, height: 60 }]}>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+              <TouchableOpacity
+                onPress={() => router.back()}
+                style={{ padding: 8, marginLeft: -8 }}
+                hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+                testID="search-back-button"
+              >
+                <ChevronLeft size={24} color={colors.textPrimary} />
+              </TouchableOpacity>
               <Image
                 source={require('../assets/icon.png')}
                 style={{ width: 28, height: 28, borderRadius: 6 }}
@@ -2502,6 +2510,16 @@ export default function IntegratedSearchScreen() {
           borderBottomColor: colors.border
         }}>
           <View style={{ flexDirection: 'row', gap: 8, position: 'relative', zIndex: 999, alignItems: 'center' }}>
+            {hasSearched && (
+              <TouchableOpacity
+                onPress={() => router.back()}
+                style={{ padding: 6, marginRight: -2 }}
+                hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+                testID="search-back-button-searched"
+              >
+                <ChevronLeft size={24} color={colors.textPrimary} />
+              </TouchableOpacity>
+            )}
             {/* Sidebar toggle chevron (Tablet/iPad only) */}
             {IS_IPAD && (
               <TouchableOpacity
@@ -2713,6 +2731,14 @@ export default function IntegratedSearchScreen() {
         {!hasSearched && (
           <View style={[styles.header, { borderBottomColor: colors.border, paddingTop: insets.top }]}>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+              <TouchableOpacity
+                onPress={() => router.back()}
+                style={{ padding: 8, marginLeft: -8 }}
+                hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+                testID="search-back-button-static"
+              >
+                <ChevronLeft size={24} color={colors.textPrimary} />
+              </TouchableOpacity>
               <Image
                 source={require('../assets/icon.png')}
                 style={{ width: 28, height: 28, borderRadius: 6 }}

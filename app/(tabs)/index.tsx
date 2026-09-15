@@ -12,6 +12,7 @@ import {
   Alert,
   KeyboardAvoidingView,
   Platform,
+  Keyboard,
 } from 'react-native';
 import { router, useFocusEffect } from 'expo-router';
 import * as Haptics from 'expo-haptics';
@@ -741,15 +742,23 @@ export default function HomeScreen() {
   };
 
   const handleSearchSubmit = () => {
-    if (searchQuery.trim()) {
-      router.push({ pathname: '/search', params: { q: searchQuery } });
-    } else {
+    const q = searchQuery.trim();
+    Keyboard.dismiss();
+    if (!q) {
       router.push('/search');
+      return;
     }
+    router.push({ pathname: '/search', params: { q } } as any);
   };
 
   const handleAISearch = () => {
-    router.push({ pathname: '/ai-search', params: { q: searchQuery } });
+    const q = searchQuery.trim();
+    Keyboard.dismiss();
+    if (!q) {
+      router.push('/search');
+      return;
+    }
+    router.push({ pathname: '/search', params: { q } } as any);
   };
 
   const handleTaskToggle = async (taskId: string) => {
@@ -1282,7 +1291,7 @@ export default function HomeScreen() {
                 </TouchableOpacity>
 
                 {/* 6. Prelims Ask AI (Tab icon: Search) */}
-                <TouchableOpacity style={[styles.quickTile, { backgroundColor: '#EEF2FF' }]} onPress={() => router.push('/ai-search')}>
+                <TouchableOpacity style={[styles.quickTile, { backgroundColor: '#EEF2FF' }]} onPress={() => router.push('/search')}>
                   <Search size={22} color="#6366F1" />
                   <Text style={[styles.quickTileTitle, { color: '#4338CA' }]}>Prelims Ask AI</Text>
                 </TouchableOpacity>

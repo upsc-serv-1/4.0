@@ -149,8 +149,6 @@ export function highlightKeywords(text: string, query?: string): React.ReactNode
         style={{
           fontWeight: '900',
           color: '#ea580c',
-          backgroundColor: 'rgba(234, 88, 12, 0.15)',
-          borderRadius: 3,
         }}
       >
         {part}
@@ -3105,7 +3103,7 @@ function HubView({
         {/* Large Figma Search Input */}
         <TouchableOpacity
           activeOpacity={0.8}
-          onPress={() => onSelect('search')}
+          onPress={() => router.push('/search')}
           style={[
             styles.largeSearchInput, 
             { 
@@ -7310,6 +7308,11 @@ function QuestionBankView({
                         placeholderTextColor="#94a3b8"
                         value={search}
                         onChangeText={setSearch}
+                        returnKeyType="search"
+                        onSubmitEditing={() => {
+                          const q = search.trim();
+                          if (q) router.push({ pathname: '/search', params: { q } } as any);
+                        }}
                         style={[styles.largeSearchText, { color: colors.textPrimary, fontSize: 15 }]}
                       />
                       {search.length > 0 && (

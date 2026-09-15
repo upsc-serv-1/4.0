@@ -179,7 +179,7 @@ function PrelimsScreen() {
           {/* Search Input */}
           <TouchableOpacity
             activeOpacity={0.8}
-            onPress={() => router.push('/ai-search')}
+            onPress={() => router.push('/search')}
             style={[
               styles.largeSearchInput,
               {

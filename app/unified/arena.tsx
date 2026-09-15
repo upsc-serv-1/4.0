@@ -1591,7 +1591,7 @@ function UnifiedArenaSetup() {
           {activeTab === 'search' && (
             <View style={{ padding: 20, alignItems: 'center' }}>
               <TouchableOpacity
-                onPress={() => router.push('/ai-search' as any)}
+                onPress={() => router.push('/search' as any)}
                 testID="arena-search-redirect-btn"
                 style={{
                   flexDirection: 'row', alignItems: 'center', gap: 12,
@@ -1607,7 +1607,7 @@ function UnifiedArenaSetup() {
                 <ChevronRight size={18} color="#7c3aed" />
               </TouchableOpacity>
               <Text style={{ marginTop: 12, fontSize: 11, color: colors.textTertiary, textAlign: 'center' }}>
-                Search from the AI Search tab for the full experience with hierarchical filters.
+                Search from Dr. UPSC AI Search for the full experience with hierarchical filters.
               </Text>
             </View>
           )}

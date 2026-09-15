@@ -79,6 +79,15 @@ import {
   buildTopperAttachmentMap,
 } from '../src/utils/topperHelpers';
 import { DetailedQuestionView, ValueAddCardBody, getMarkdownRules, parseIntroductoryBox } from './mains';
+import MainsQuestionCard from '../src/components/mains/MainsQuestionCard';
+import SidebarDisplayPreferences from '../src/components/mains/SidebarDisplayPreferences';
+import {
+  KeyBoxColor,
+  setGlobalTextColorMode,
+  setGlobalKeyBoxMode,
+  setGlobalKeyBoxColor,
+} from '../src/utils/mainsCardHelpers';
+import * as Haptics from 'expo-haptics';
 import { buildMarkdownStyles } from '../src/utils/markdownUtils';
 import { ThemeSwitcher } from '../src/components/ThemeSwitcher';
 import { getPYQCategorization } from '../src/utils/questionUtils';
@@ -668,118 +677,6 @@ const getCleanAvailableAnswers = (answers: any[]): any[] => {
   return (answers || []).filter(a => a && a.answerText && a.answerText.trim().length > 0);
 };
 
-const MainsResultAnswerPanel = ({
-  rawItem,
-  colors,
-  isDark,
-  mdStyles,
-  mdRules,
-  router,
-  activeTab,
-  onActiveTabChange,
-}: {
-  rawItem: any;
-  colors: any;
-  isDark: boolean;
-  mdStyles: any;
-  mdRules: any;
-  router: any;
-  activeTab: string;
-  onActiveTabChange: (tab: string) => void;
-}) => {
-  const cleanAnswers = getCleanAvailableAnswers(rawItem.answers || []);
-
-  if (cleanAnswers.length === 0) return null;
-
-  const activeAns = cleanAnswers.find(a => a.institute === activeTab) || cleanAnswers[0];
-  if (!activeAns) return null;
-
-  const parsedApproach = parseIntroductoryBox(activeAns.answerText);
-  const remainingText = parsedApproach 
-    ? (activeAns.answerText || '').replace(parsedApproach.rawMatch, '').trim()
-    : (activeAns.answerText || '');
-
-  return (
-    <View>
-      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12, flexWrap: 'wrap', gap: 6 }}>
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-          <BookOpen size={12} color={colors.textTertiary} />
-          <Text style={{ fontSize: 10, fontWeight: '800', color: colors.textTertiary, letterSpacing: 1 }}>MODEL ANSWER</Text>
-        </View>
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
-          {cleanAnswers.length > 1 && (
-            <View style={{ flexDirection: 'row', gap: 4, backgroundColor: colors.surfaceStrong, borderRadius: 8, padding: 2 }}>
-              {cleanAnswers.map(ans => {
-                const isTabActive = ans.institute === activeTab;
-                return (
-                  <TouchableOpacity
-                    key={ans.institute}
-                    onPress={() => onActiveTabChange(ans.institute)}
-                    style={{
-                      paddingHorizontal: 10,
-                      paddingVertical: 5,
-                      borderRadius: 6,
-                      borderWidth: 0.5,
-                      borderColor: isTabActive ? '#3b82f6' : colors.border,
-                      backgroundColor: isTabActive ? '#3b82f6' : colors.surfaceStrong,
-                    }}
-                  >
-                    <Text style={{ 
-                      fontSize: 11, 
-                      fontWeight: '700', 
-                      color: isTabActive ? '#ffffff' : colors.textTertiary 
-                    }}>
-                      {ans.institute}
-                    </Text>
-                  </TouchableOpacity>
-                );
-              })}
-            </View>
-          )}
-          <TouchableOpacity
-            onPress={() => {
-              router.push({
-                pathname: '/mains',
-                params: {
-                  initialScreen: 'questions',
-                  questionId: rawItem.id,
-                }
-              } as any);
-            }}
-            style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}
-          >
-            <ExternalLink size={12} color={colors.primary} />
-            <Text style={{ fontSize: 11, fontWeight: '700', color: colors.primary }}>Open in QB</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-
-      <View style={styles.inlineMainsAnswer}>
-        {parsedApproach && (
-          <View style={{
-            backgroundColor: isDark ? 'rgba(30, 41, 59, 0.45)' : '#f8fafc',
-            borderColor: colors.border,
-            borderWidth: 1,
-            borderRadius: 12,
-            padding: 16,
-            marginBottom: 16,
-          }}>
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 10 }}>
-              <Sparkles size={14} color="#3b82f6" />
-              <Text style={{ fontSize: 11, fontWeight: '800', color: '#3b82f6', letterSpacing: 1 }}>{parsedApproach.title}</Text>
-            </View>
-            <Markdown style={mdStyles} rules={mdRules}>
-              {cleanMainsMarkdownText(parsedApproach.body)}
-            </Markdown>
-          </View>
-        )}
-        <Markdown style={mdStyles} rules={mdRules}>
-          {cleanMainsMarkdownText(remainingText)}
-        </Markdown>
-      </View>
-    </View>
-  );
-};
 
 export default function IntegratedSearchScreen() {
   const params = useLocalSearchParams<{ q?: string }>();
@@ -1013,6 +910,110 @@ export default function IntegratedSearchScreen() {
     setTopperViewerQuestionText(qText || '');
     setTopperViewerVisible(true);
   }, []);
+
+  // Zoom level state for search results list (@dr_upsc_zoom_font_size)
+  const [zoomFontSize, setZoomFontSize] = useState<number>(16);
+  const baseResultsFontSizeRef = useRef<number>(16);
+  const [showResultsZoomIndicator, setShowResultsZoomIndicator] = useState(false);
+  const resultsZoomTimerRef = useRef<any>(null);
+
+  // Reading Preferences state (Muted Grey vs Deep Black, Boxed vs Plain Bold, Highlight Color)
+  const [textColorMode, setTextColorMode] = useState<'default' | 'black'>('default');
+  const [keyBoxMode, setKeyBoxMode] = useState<'boxed' | 'bold'>('boxed');
+  const [keyBoxColor, setKeyBoxColor] = useState<KeyBoxColor>('yellow');
+
+  // Mains card expand & institute selection state
+  const [expandedResultId, setExpandedResultId] = useState<string | null>(null);
+  const [selectedResultInstitutes, setSelectedResultInstitutes] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    AsyncStorage.getItem('@dr_upsc_zoom_font_size')
+      .then(val => {
+        if (val) {
+          const parsed = parseFloat(val);
+          if (!isNaN(parsed) && parsed >= 12 && parsed <= 32) {
+            setZoomFontSize(Math.round(parsed));
+            baseResultsFontSizeRef.current = Math.round(parsed);
+          }
+        }
+      })
+      .catch(() => {});
+
+    AsyncStorage.getItem('@mains_text_color_mode')
+      .then(val => {
+        if (val === 'default' || val === 'black') {
+          setTextColorMode(val);
+          setGlobalTextColorMode(val);
+        }
+      })
+      .catch(() => {});
+
+    AsyncStorage.getItem('@mains_key_box_mode')
+      .then(val => {
+        if (val === 'boxed' || val === 'bold') {
+          setKeyBoxMode(val);
+          setGlobalKeyBoxMode(val);
+        }
+      })
+      .catch(() => {});
+
+    AsyncStorage.getItem('@mains_key_box_color')
+      .then(val => {
+        if (val && ['yellow', 'green', 'blue', 'pink'].includes(val)) {
+          setKeyBoxColor(val as KeyBoxColor);
+          setGlobalKeyBoxColor(val as KeyBoxColor);
+        }
+      })
+      .catch(() => {});
+  }, []);
+
+  const handleUpdateTextColorMode = (mode: 'default' | 'black') => {
+    setTextColorMode(mode);
+    setGlobalTextColorMode(mode);
+    AsyncStorage.setItem('@mains_text_color_mode', mode).catch(() => {});
+  };
+
+  const handleUpdateKeyBoxMode = (mode: 'boxed' | 'bold') => {
+    setKeyBoxMode(mode);
+    setGlobalKeyBoxMode(mode);
+    AsyncStorage.setItem('@mains_key_box_mode', mode).catch(() => {});
+  };
+
+  const handleUpdateKeyBoxColor = (color: KeyBoxColor) => {
+    setKeyBoxColor(color);
+    setGlobalKeyBoxColor(color);
+    AsyncStorage.setItem('@mains_key_box_color', color).catch(() => {});
+  };
+
+  const handleCopyMainsQuestion = (q: any) => {
+    const text = q?.questionText || q?.question_text || '';
+    if (text) {
+      Clipboard.setStringAsync(text);
+      if (Platform.OS !== 'android') {
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
+      }
+    }
+  };
+
+  const onResultsPinchGestureEvent = (event: any) => {
+    const scale = event.nativeEvent.scale;
+    let next = baseResultsFontSizeRef.current * scale;
+    next = Math.max(12, Math.min(32, next));
+    setZoomFontSize(Math.round(next));
+    setShowResultsZoomIndicator(true);
+    if (resultsZoomTimerRef.current) clearTimeout(resultsZoomTimerRef.current);
+    resultsZoomTimerRef.current = setTimeout(() => setShowResultsZoomIndicator(false), 1500);
+  };
+
+  const onResultsPinchHandlerStateChange = (event: any) => {
+    if (event.nativeEvent.state === State.END || event.nativeEvent.state === State.CANCELLED) {
+      baseResultsFontSizeRef.current = zoomFontSize;
+      AsyncStorage.setItem('@dr_upsc_zoom_font_size', String(zoomFontSize)).catch(() => {});
+      if (Platform.OS !== 'android') {
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
+      }
+    }
+  };
 
   const baseFontSizeRef = useRef(16);
   const previewScrollRef = useRef<ScrollView>(null);
@@ -2178,7 +2179,7 @@ export default function IntegratedSearchScreen() {
           topperAnswer={topperAns}
           colors={colors}
           isDark={isDark}
-          zoomFontSize={Math.round(15 * (IS_IPAD ? 1.1 : 1))}
+          zoomFontSize={zoomFontSize}
           isBookmarked={savedQuestionIds.includes(tq.id)}
           onToggleBookmark={toggleBookmark}
           onOpenViewer={handleOpenTopperViewer}
@@ -2188,20 +2189,51 @@ export default function IntegratedSearchScreen() {
       );
     }
 
+    if (item.type === 'mains') {
+      const mq = item.rawItem;
+      return (
+        <MainsQuestionCard
+          key={item.id}
+          question={mq}
+          colors={colors}
+          isDark={isDark}
+          isTablet={IS_IPAD}
+          zoomFontSize={zoomFontSize}
+          textColorMode={textColorMode}
+          keyBoxMode={keyBoxMode}
+          keyBoxColor={keyBoxColor}
+          isExpanded={expandedResultId === mq.id}
+          onToggleExpand={() =>
+            setExpandedResultId(prev => (prev === mq.id ? null : mq.id))
+          }
+          selectedInstitute={selectedResultInstitutes[mq.id]}
+          onSelectInstitute={(inst) =>
+            setSelectedResultInstitutes(prev => ({ ...prev, [mq.id]: inst }))
+          }
+          isBookmarked={savedQuestionIds.includes(mq.id)}
+          onToggleBookmark={() => toggleBookmark(mq.id)}
+          onOpenDetailed={() => setPreviewMainsQuestion(mq)}
+          onCopyQuestion={() => handleCopyMainsQuestion(mq)}
+          onOpenTopperViewer={handleOpenTopperViewer}
+          attachedToppers={topperAttachmentMap.get(normalizeQuestionKey(mq.questionText || '')) || []}
+          searchQuery={query}
+          searchAcross={filters.searchAcross}
+        />
+      );
+    }
+
     const isFeatured = index === 0;
     const isExpanded = expandedIds.has(item.id);
     const subColor = getSubjectColor(item.subject || '');
     
     // Type badge details
-    const typeLabel = item.type === 'prelims' ? 'Prelims' : item.type === 'mains' ? 'Mains' : 'Value Add';
-    const typeBg = item.type === 'prelims' ? '#e0e7ff' : item.type === 'mains' ? '#fee2e2' : '#d1fae5';
-    const typeTxt = item.type === 'prelims' ? '#4338ca' : item.type === 'mains' ? '#b91c1c' : '#047857';
+    const typeLabel = item.type === 'prelims' ? 'Prelims' : 'Value Add';
+    const typeBg = item.type === 'prelims' ? '#e0e7ff' : '#d1fae5';
+    const typeTxt = item.type === 'prelims' ? '#4338ca' : '#047857';
 
     let displayTitle = item.type === 'prelims' 
       ? item.rawItem.question_text || item.title 
-      : item.type === 'mains' 
-        ? item.rawItem.questionText || item.title 
-        : item.title;
+      : item.title;
 
     if (item.type === 'value_add' && displayTitle.includes(' - ')) {
       const parts = displayTitle.split(' - ');
@@ -2216,9 +2248,6 @@ export default function IntegratedSearchScreen() {
       const expl = filters.searchAcross.includes('Explanation') ? (item.rawItem.explanation_markdown || item.rawItem.explanation) : null;
       const opts = filters.searchAcross.includes('Options') ? item.rawItem.options : null;
       snippetComponent = buildContextSnippet(item.rawItem.question_text, keywords, opts, expl, query);
-    } else if (item.type === 'mains') {
-      const expl = filters.searchAcross.includes('Explanation') ? item.subtitle : null;
-      snippetComponent = buildContextSnippet(item.rawItem.questionText || item.title, keywords, null, expl, query);
     } else {
       const expl = filters.searchAcross.includes('Explanation') ? item.subtitle : null;
       snippetComponent = buildContextSnippet(item.rawItem.title, keywords, null, expl, query);
@@ -2338,21 +2367,9 @@ export default function IntegratedSearchScreen() {
                 </View>
               ) : null}
 
-              {item.type === 'mains' && (item.rawItem.is_pyq || item.rawItem.isPyq) && (
-                <View style={[styles.chip, { backgroundColor: '#dcfce7' }]}>
-                  <Text style={[styles.chipText, { color: '#15803d' }]}>UPSC MAINS {item.year}</Text>
-                </View>
-              )}
-
-              {item.year && !(item.rawItem.is_pyq || item.rawItem.isPyq) && (
+              {item.year && (
                 <View style={[styles.chip, { backgroundColor: colors.surfaceStrong }]}>
                   <Text style={[styles.chipText, { color: colors.textTertiary }]}>{item.year}</Text>
-                </View>
-              )}
-
-              {item.type === 'mains' && item.paper && (
-                <View style={[styles.chip, { backgroundColor: colors.surfaceStrong }]}>
-                  <Text style={[styles.chipText, { color: colors.textSecondary }]}>{item.paper}</Text>
                 </View>
               )}
             </View>
@@ -2367,46 +2384,31 @@ export default function IntegratedSearchScreen() {
           )}
         </TouchableOpacity>
 
-        {/* Inline Expandable Panel (Mains & Value Addition) */}
-        {isExpanded && (
+        {/* Inline Expandable Panel (Value Addition) */}
+        {isExpanded && item.type === 'value_add' && (
           <View style={[styles.expandedPanel, { borderTopColor: colors.border }]}>
-            {item.type === 'value_add' ? (
-              <View>
-                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-                  <Text style={{ fontSize: 10, fontWeight: '800', color: colors.textTertiary, letterSpacing: 1 }}>VALUE ADDITION DETAILS</Text>
-                  <TouchableOpacity
-                    onPress={() => {
-                      router.push({
-                        pathname: '/mains',
-                        params: {
-                          initialScreen: 'value-add',
-                          category: item.rawItem.category,
-                          vaId: item.rawItem.id,
-                        }
-                      } as any);
-                    }}
-                    style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}
-                  >
-                    <ExternalLink size={12} color={colors.primary} />
-                    <Text style={{ fontSize: 11, fontWeight: '700', color: colors.primary }}>Open in Hub</Text>
-                  </TouchableOpacity>
-                </View>
-                <ValueAddCardBody item={item.rawItem} colors={colors} onImagePress={setZoomImageUri} />
+            <View>
+              <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+                <Text style={{ fontSize: 10, fontWeight: '800', color: colors.textTertiary, letterSpacing: 1 }}>VALUE ADDITION DETAILS</Text>
+                <TouchableOpacity
+                  onPress={() => {
+                    router.push({
+                      pathname: '/mains',
+                      params: {
+                        initialScreen: 'value-add',
+                        category: item.rawItem.category,
+                        vaId: item.rawItem.id,
+                      }
+                    } as any);
+                  }}
+                  style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}
+                >
+                  <ExternalLink size={12} color={colors.primary} />
+                  <Text style={{ fontSize: 11, fontWeight: '700', color: colors.primary }}>Open in Hub</Text>
+                </TouchableOpacity>
               </View>
-            ) : (
-              <MainsResultAnswerPanel
-                rawItem={item.rawItem}
-                colors={colors}
-                isDark={isDark}
-                mdStyles={mdStyles}
-                mdRules={mdRules}
-                router={router}
-                activeTab={activeMainsTabs[item.id] || getCleanAvailableAnswers(item.rawItem.answers || [])[0]?.institute || ''}
-                onActiveTabChange={(tab) => {
-                  setActiveMainsTabs(prev => ({ ...prev, [item.id]: tab }));
-                }}
-              />
-            )}
+              <ValueAddCardBody item={item.rawItem} colors={colors} onImagePress={setZoomImageUri} />
+            </View>
           </View>
         )}
         </View>
@@ -3414,6 +3416,18 @@ export default function IntegratedSearchScreen() {
           )}
         </View>
       )}
+
+      {/* READING & DISPLAY PREFERENCES */}
+      <SidebarDisplayPreferences
+        textColorMode={textColorMode}
+        onChangeTextColorMode={handleUpdateTextColorMode}
+        keyBoxMode={keyBoxMode}
+        onChangeKeyBoxMode={handleUpdateKeyBoxMode}
+        keyBoxColor={keyBoxColor}
+        onChangeKeyBoxColor={handleUpdateKeyBoxColor}
+        colors={colors}
+        isDark={isDark}
+      />
     </ScrollView>
   );
 
@@ -3973,16 +3987,49 @@ export default function IntegratedSearchScreen() {
 
           {/* Results column */}
           <View style={{ flex: 1 }}>
-            <FlatList
-              data={loading ? [] : activeResults}
-              keyExtractor={item => item.id}
-              renderItem={renderItem}
-              contentContainerStyle={{ paddingBottom: 60 }}
-              ListHeaderComponent={renderFlatListHeader()}
-              ListEmptyComponent={renderListEmptyOrLoading()}
-              keyboardShouldPersistTaps="handled"
-              extraData={{ activeMainsTabs, colors, isDark }}
-            />
+            <PinchGestureHandler
+              onGestureEvent={onResultsPinchGestureEvent}
+              onHandlerStateChange={onResultsPinchHandlerStateChange}
+            >
+              <View style={{ flex: 1 }}>
+                <FlatList
+                  data={loading ? [] : activeResults}
+                  keyExtractor={item => item.id}
+                  renderItem={renderItem}
+                  contentContainerStyle={{ paddingBottom: 60 }}
+                  ListHeaderComponent={renderFlatListHeader()}
+                  ListEmptyComponent={renderListEmptyOrLoading()}
+                  keyboardShouldPersistTaps="handled"
+                  extraData={{
+                    activeMainsTabs,
+                    colors,
+                    isDark,
+                    zoomFontSize,
+                    textColorMode,
+                    keyBoxMode,
+                    keyBoxColor,
+                    expandedResultId,
+                    selectedResultInstitutes,
+                  }}
+                />
+              </View>
+            </PinchGestureHandler>
+            {showResultsZoomIndicator && (
+              <View style={{
+                position: 'absolute',
+                top: 12,
+                alignSelf: 'center',
+                backgroundColor: 'rgba(0, 0, 0, 0.75)',
+                paddingHorizontal: 12,
+                paddingVertical: 6,
+                borderRadius: 20,
+                zIndex: 9999,
+              }}>
+                <Text style={{ color: '#fff', fontSize: 12, fontWeight: '700' }}>
+                  {Math.round(zoomFontSize)}pt
+                </Text>
+              </View>
+            )}
           </View>
         </View>
       )}
@@ -4280,6 +4327,9 @@ export default function IntegratedSearchScreen() {
             onOpenVitaminEditor={() => {}}
             detailedBestAnswer={detailedBestAnswer}
             onDeleteBestAnswer={() => {}}
+            textColorMode={textColorMode}
+            keyBoxMode={keyBoxMode}
+            keyBoxColor={keyBoxColor}
           />
         </Modal>
       )}

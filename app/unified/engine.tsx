@@ -88,6 +88,7 @@ import { PilotV2AIChat } from '../../src/components/pilot-v2/PilotV2AIChat';
 import { PilotV2Provider } from '../../src/context/PilotV2Context';
 import { LinearGradient } from 'expo-linear-gradient';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { cacheGetString, safeSetItem } from '../../src/lib/safeAsyncStorage';
 import { PinchGestureHandler, State as GHState } from 'react-native-gesture-handler';
 import { useTheme } from '../../src/context/ThemeContext';
 import { PageWrapper } from '../../src/components/PageWrapper';
@@ -1190,7 +1191,7 @@ export default function UnifiedQuizEngine() {
       // 1. Load from persisted custom tag catalog (shared with Tags tab)
       try {
         const catalogKey = `review_tag_catalog_${session.user.id}`;
-        const raw = await AsyncStorage.getItem(catalogKey);
+        const raw = await cacheGetString(catalogKey);
         if (raw) {
           const parsed = JSON.parse(raw);
           if (Array.isArray(parsed)) {
@@ -1205,9 +1206,11 @@ export default function UnifiedQuizEngine() {
         console.warn('Failed to load custom tags from AsyncStorage:', e);
       }
 
-      // 2. Also pull tags from question_states (legacy / cross-device data)
+      // 2. Also pull tags from question_states (legacy / cross-device data).
+      //    Local-first: the offline cache is refreshed by the user sync, so we
+      //    never need a live query here.
       try {
-        const { data } = await supabase
+        const { data } = await LocalQuery
           .from('question_states')
           .select('review_tags')
           .eq('user_id', session.user.id)
@@ -1671,7 +1674,8 @@ export default function UnifiedQuizEngine() {
           if (tagsRaw && tagsRaw !== 'All' && tagsRaw !== '' && tagsRaw !== '[]' && session?.user?.id) {
             const tagList = typeof tagsRaw === 'string' ? tagsRaw.split('|').filter(Boolean) : [];
             if (tagList.length > 0) {
-              // Build a Set of question IDs that have matching tags. Offline-aware.
+              // Build a Set of question IDs that have matching tags. Tags live in
+              // `question_states`, which the background user sync keeps fresh.
               let tagStates: any[] | null = null;
               try {
                 const { data } = await LocalQuery.from('question_states')
@@ -1680,14 +1684,6 @@ export default function UnifiedQuizEngine() {
                   .or(tagList.map(t => `review_tags.cs.["${t}"]`).join(','));
                 tagStates = data;
               } catch { tagStates = null; }
-              if ((!tagStates || tagStates.length === 0) && NetworkStatus.isOnline()) {
-                const res = await supabase
-                  .from('question_states')
-                  .select('question_id')
-                  .eq('user_id', session.user.id)
-                  .or(tagList.map(t => `review_tags.cs.["${t}"]`).join(','));
-                tagStates = res.data;
-              }
               const allowedIds = new Set((tagStates || []).map((t: any) => t.question_id));
               if (allowedIds.size > 0) {
                 filtered = filtered.filter((q: any) => allowedIds.has(q.id));
@@ -2093,8 +2089,7 @@ export default function UnifiedQuizEngine() {
               // Tag filtering requires separate fetch of IDs
               const tagList = typeof tagsRaw === 'string' ? tagsRaw.split('|').filter(Boolean) : [];
               const orQuery = tagList.map(t => `review_tags.cs.["${t}"]`).join(',');
-              // Prefer LocalQuery so it works offline. We fall back to Supabase
-              // only when we have no local rows AND we are online.
+              // Tags are user data cached locally by the background user sync.
               let tagIds: any[] | null = null;
               try {
                 const { data } = await LocalQuery.from('question_states')
@@ -2103,10 +2098,6 @@ export default function UnifiedQuizEngine() {
                   .or(orQuery);
                 tagIds = data;
               } catch { tagIds = null; }
-              if ((!tagIds || tagIds.length === 0) && NetworkStatus.isOnline()) {
-                const res = await supabase.from('question_states').select('question_id').eq('user_id', session.user.id).or(orQuery);
-                tagIds = res.data;
-              }
               if (tagIds && tagIds.length > 0) {
                  const slicedTagIds = tagIds.map((t: any) => t.question_id).slice(from, from + CHUNK);
                  if (slicedTagIds.length === 0) break;
@@ -2186,18 +2177,11 @@ export default function UnifiedQuizEngine() {
                  (params.pyqMaster || params.pyqFilter) === 'PYQ Only') {
                  
                  let tRows: any[] = [];
-                 let localRes = await LocalQuery.from('tests').select('*').eq('course', selectedCourse);
-                 let localTests = localRes.data || [];
-                 
-                 if ((!localTests || localTests.length === 0) && NetworkStatus.isOnline()) {
-                   const { data: remoteTests } = await supabase
-                     .from('tests')
-                     .select('id, title, series, institute, program_name, program_id, course')
-                     .eq('course', selectedCourse);
-                   tRows = remoteTests || [];
-                 } else {
-                   tRows = localTests || [];
-                 }
+                 // Catalog is local-only. When the bank isn't downloaded there is
+                 // nothing to filter against — the empty result surface prompts
+                 // the user to download instead of silently hitting Supabase.
+                 const localRes = await LocalQuery.from('tests').select('*').eq('course', selectedCourse);
+                 tRows = localRes.data || [];
                  
                  const pyqM = params.pyqMaster || params.pyqFilter;
                  if (pyqM === 'PYQ Only') {
@@ -2850,10 +2834,10 @@ const isPyqUpscsearch = params.pyqFilter === 'PYQ Only' && params.year_start && 
           if (error) console.warn('[tags] add_user_tag RPC failed', error.message);
         });
         const catalogKey = `review_tag_catalog_${session.user.id}`;
-        const existing = await AsyncStorage.getItem(catalogKey);
+        const existing = await cacheGetString(catalogKey);
         const parsed: string[] = existing ? JSON.parse(existing) : [];
         const newList = Array.from(new Set([...parsed, newTag]));
-        await AsyncStorage.setItem(catalogKey, JSON.stringify(newList));
+        await safeSetItem(catalogKey, JSON.stringify(newList));
       } catch {}
       // Notify Tags tab to refresh
       useTagStore.getState().bump({ type: 'add', tag: newTag, at: Date.now() });

@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { safeSetItem } from '../lib/safeAsyncStorage';
+import { safeSetItem, cacheGetString } from '../lib/safeAsyncStorage';
 import { supabase } from '../lib/supabase';
 
 export interface PilotNoteNode {
@@ -56,7 +56,7 @@ export function useNotesPilotVault(userId: string | undefined) {
     // 0. Load from Cache First
     try {
       if (rawNodes.length === 0) {
-        const cached = await AsyncStorage.getItem(cacheKey);
+        const cached = await cacheGetString(cacheKey);
         if (cached) {
           setRawNodes(JSON.parse(cached));
           // If we have cache, don't show the initial loading spinner

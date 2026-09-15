@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator
 import { router } from 'expo-router';
 import { ChevronLeft, ChevronRight, Search, Layers, Database, Check, X, ChevronDown, Book } from 'lucide-react-native';
 import { radius } from '../src/theme';
-import { supabase } from '../src/lib/supabase';
+import { LocalQuery } from '../src/services/LocalQuery';
 import { useTheme } from '../src/context/ThemeContext';
 import { useCourse } from '../src/context/CourseContext';
 import { PageWrapper } from '../src/components/PageWrapper';
@@ -82,22 +82,24 @@ export default function PapersScreen() {
   useEffect(() => { fetchPapers(); }, [examStage, selectedInstitutes, selectedPrograms, selectedSubject, selectedSection, selectedCourse]);
 
   const fetchDynamicFilters = async () => {
-    const { data: testMeta } = await supabase.from('tests')
+    // Local test catalogue only — repo browsing is a study path.
+    const { data: testMeta } = await LocalQuery.from('tests')
       .select('institute, program_name, subject, section_group')
       .eq('course', selectedCourse)
       .ilike('series', `%${examStage}%`);
     
     if (testMeta) {
-      setInstitutes(Array.from(new Set(testMeta.map(t => t.institute).filter(Boolean))).sort());
-      const filteredTests = selectedInstitutes.length > 0 ? testMeta.filter(t => selectedInstitutes.includes(t.institute)) : testMeta;
-      setPrograms(Array.from(new Set(filteredTests.map(t => t.program_name).filter(Boolean))).sort());
-      const foundSubjects = Array.from(new Set(filteredTests.map(t => t.subject))).filter(Boolean) as string[];
+      const rows = testMeta as any[];
+      setInstitutes(Array.from(new Set(rows.map((t: any) => t.institute).filter(Boolean))).sort() as string[]);
+      const filteredTests = selectedInstitutes.length > 0 ? rows.filter((t: any) => selectedInstitutes.includes(t.institute)) : rows;
+      setPrograms(Array.from(new Set(filteredTests.map((t: any) => t.program_name).filter(Boolean))).sort() as string[]);
+      const foundSubjects = Array.from(new Set(filteredTests.map((t: any) => t.subject))).filter(Boolean) as string[];
       setSubjects(["All Subjects", ...foundSubjects.sort()]);
 
       if (selectedSubject !== 'All Subjects') {
-        const subjectData = filteredTests.filter(t => t.subject === selectedSubject);
-        const foundSections = Array.from(new Set(subjectData.map(t => t.section_group))).sort() as (string | null)[];
-        setSections(["All Sections", ...foundSections.map(s => s === null ? "General" : s)]);
+        const subjectData = filteredTests.filter((t: any) => t.subject === selectedSubject);
+        const foundSections = Array.from(new Set(subjectData.map((t: any) => t.section_group))).sort() as (string | null)[];
+        setSections(["All Sections", ...foundSections.map((s: any) => s === null ? "General" : s)]);
       }
     }
   };
@@ -105,7 +107,7 @@ export default function PapersScreen() {
   const fetchPapers = async () => {
     setIsLoading(true);
     try {
-      let query = supabase.from('tests').select('*').eq('course', selectedCourse).ilike('series', `%${examStage}%`);
+      let query = LocalQuery.from('tests').select('*').eq('course', selectedCourse).ilike('series', `%${examStage}%`);
       if (selectedInstitutes.length > 0) query = query.in('institute', selectedInstitutes);
       if (selectedPrograms.length > 0) query = query.in('program_name', selectedPrograms);
       if (selectedSubject !== "All Subjects") query = query.eq('subject', selectedSubject);

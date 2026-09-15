@@ -46,6 +46,7 @@ import { useQuizStore } from '../../src/store/quizStore';
 import { mergeQuestions } from '../../src/utils/merger';
 import { OfflineManager } from '../../src/services/OfflineManager';
 import { LocalQuery } from '../../src/services/LocalQuery';
+import { isCatalogLocalReady } from '../../src/services/CatalogSource';
 import { buildArenaEngineSearchParams } from '../../src/utils/arenaSearchNavigation';
 import { isOffline } from '../../src/lib/networkStatus';
 
@@ -273,6 +274,8 @@ function UnifiedArenaSetup() {
   const [userTags, setUserTags] = useState<string[]>([]);
   const [questionCount, setQuestionCount] = useState<number | null>(null);
   const [calculatingCount, setCalculatingCount] = useState(false);
+  // True when no local bank exists — the UI surfaces a "Download questions" CTA.
+  const [needsDownload, setNeedsDownload] = useState(false);
   const countDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const fetchUserTags = useCallback(async () => {
@@ -482,8 +485,17 @@ function UnifiedArenaSetup() {
         }
       }
 
+      // Bank not downloaded → prompt, never silently pull from Supabase.
+      if (!isCatalogLocalReady(selectedCourse)) {
+        setSearchResults([]);
+        setQuestionCount(0);
+        setLoadingSearch(false);
+        setNeedsDownload(true);
+        return;
+      }
+
       while (allFreshData.length < MAX_TOTAL) {
-        let query = supabase.from('questions').select('id, question_number, question_text, options, correct_answer, explanation_markdown, subject, section_group, micro_topic, is_pyq, is_ncert, exam_group, exam_year, is_upsc_cse, is_upsc_cms, is_neetpg, is_inicet, is_allied, is_others, source, test_id, tests(*)').eq('course', selectedCourse);
+        let query = LocalQuery.from('questions').select('id, question_number, question_text, options, correct_answer, explanation_markdown, subject, section_group, micro_topic, is_pyq, is_ncert, exam_group, exam_year, is_upsc_cse, is_upsc_cms, is_neetpg, is_inicet, is_allied, is_others, source, test_id, tests(*)').eq('course', selectedCourse);
 
         if (term) {
           const words = term.split(/\s+/).filter(w => w.length > 1 || /\d/.test(w));
@@ -549,7 +561,7 @@ function UnifiedArenaSetup() {
         }
 
         if (sf.selectedInstitutes?.length > 0 || sf.selectedPrograms?.length > 0 || (sf.examStage && sf.examStage !== 'All')) {
-          let tQuery = supabase.from('tests').select('id').eq('course', selectedCourse);
+          let tQuery = LocalQuery.from('tests').select('id').eq('course', selectedCourse);
           if (sf.selectedInstitutes?.length > 0) tQuery = tQuery.in('institute', sf.selectedInstitutes);
           if (sf.selectedPrograms?.length > 0) tQuery = tQuery.in('program_name', sf.selectedPrograms);
           if (sf.examStage && sf.examStage !== 'All') tQuery = tQuery.ilike('series', `%${sf.examStage}%`);
@@ -573,7 +585,7 @@ function UnifiedArenaSetup() {
               if (fields.includes('Explanations')) fuzzyPatterns.push(`explanation_markdown.ilike.%${pattern}%`);
             }
 
-            let fuzzyQ = supabase.from('questions').select('id, question_number, question_text, options, correct_answer, explanation_markdown, subject, section_group, micro_topic, is_pyq, is_ncert, exam_group, exam_year, is_upsc_cse, is_upsc_cms, is_neetpg, is_inicet, is_allied, is_others, source, test_id, tests(*)').eq('course', selectedCourse).or(fuzzyPatterns.join(',')).limit(100);
+            let fuzzyQ = LocalQuery.from('questions').select('id, question_number, question_text, options, correct_answer, explanation_markdown, subject, section_group, micro_topic, is_pyq, is_ncert, exam_group, exam_year, is_upsc_cse, is_upsc_cms, is_neetpg, is_inicet, is_allied, is_others, source, test_id, tests(*)').eq('course', selectedCourse).or(fuzzyPatterns.join(',')).limit(100);
             if (sf.selectedSubjects?.length > 0) fuzzyQ = fuzzyQ.in('subject', sf.selectedSubjects);
             if (sf.selectedSections?.length > 0) {
               const fSections = sf.selectedSections.map((s: string) => s === 'General' ? null : s);
@@ -595,7 +607,7 @@ function UnifiedArenaSetup() {
             if (sf.ncertFilter === 'Non-NCERT') fuzzyQ = fuzzyQ.or('is_ncert.is.null,is_ncert.eq.false');
 
             if (sf.selectedInstitutes?.length > 0 || sf.selectedPrograms?.length > 0 || (sf.examStage && sf.examStage !== 'All')) {
-              let tfQuery = supabase.from('tests').select('id').eq('course', selectedCourse);
+              let tfQuery = LocalQuery.from('tests').select('id').eq('course', selectedCourse);
               if (sf.selectedInstitutes?.length > 0) tfQuery = tfQuery.in('institute', sf.selectedInstitutes);
               if (sf.selectedPrograms?.length > 0) tfQuery = tfQuery.in('program_name', sf.selectedPrograms);
               if (sf.examStage && sf.examStage !== 'All') tfQuery = tfQuery.ilike('series', `%${sf.examStage}%`);
@@ -707,94 +719,13 @@ function UnifiedArenaSetup() {
 
       let dataToShow = courseFiltered;
 
-      const shouldFetchOnline = !isOffline() && courseFiltered.length === 0;
-      if (shouldFetchOnline) {
-        console.log('[ARENA-LOAD] Fetching metadata from Supabase directly. Cause:', { cacheEmpty: courseFiltered.length === 0, online: !isOffline() });
-        
-        try {
-          let allSupabaseQuestions: any[] = [];
-          
-          const { count: totalCount, error: countErr } = await supabase
-            .from('questions')
-            .select('id', { count: 'exact', head: true })
-            .eq('course', selectedCourse)
-            .not('subject', 'is', null);
-            
-          const total = totalCount || 0;
-          
-          if (!countErr && total > 0) {
-            const chunkSize = 1000;
-            const chunksNeeded = Math.ceil(total / chunkSize);
-            const maxRequests = 40; // cap at 40k questions to prevent memory overflow
-            
-            const promises = [];
-            for (let i = 0; i < chunksNeeded && i < maxRequests; i++) {
-              promises.push(
-                supabase
-                  .from('questions')
-                  .select('course, subject, section_group, micro_topic, sub_topic, test_id, id, exam_category, exam_stage, is_inicet, is_neetpg, is_upsc_cms, tests(series, institute, program_name, title)')
-                  .eq('course', selectedCourse)
-                  .not('subject', 'is', null)
-                  .range(i * chunkSize, (i + 1) * chunkSize - 1)
-              );
-            }
-            
-            const results = await Promise.all(promises);
-            for (const res of results) {
-              if (res.data) allSupabaseQuestions.push(...res.data);
-            }
-          }
-
-          if (allSupabaseQuestions.length > 0) {
-            dataToShow = allSupabaseQuestions.map((q: any) => {
-              const testObj = Array.isArray(q.tests) ? q.tests[0] : q.tests;
-              const cat = String(q.exam_category || '').toLowerCase();
-              let inst = testObj?.institute || null;
-              const prog = testObj?.program_name || null;
-              
-              const qCourse = q.course || selectedCourse;
-              
-              return {
-                course: qCourse,
-                subject: q.subject || null,
-                section_group: q.section_group || null,
-                micro_topic: q.micro_topic || null,
-                test_id: q.test_id || null,
-                id: q.id,
-                exam_category: q.exam_category || null,
-                exam_stage: q.exam_stage || null,
-                series: testObj?.series || null,
-                institute: inst,
-                program_name: prog,
-                title: testObj?.title || null,
-                is_inicet: q.is_inicet,
-                is_neetpg: q.is_neetpg,
-                is_upsc_cms: q.is_upsc_cms,
-              };
-            });
-            console.log('[ARENA-LOAD] ✅ Metadata from Supabase:', { items: allSupabaseQuestions.length, course: selectedCourse });
-          } else {
-            console.log('[ARENA-LOAD] No data from Supabase for:', selectedCourse, countErr || '');
-          }
-        } catch (fetchErr) {
-          console.warn('[ARENA-LOAD] Supabase direct fetch failed:', fetchErr);
-        }
-
-        // Start background sync (non-blocking — don't await)
-        if (session?.user?.id) {
-          setSyncProgress({ phase: 'tests', current: 0, total: 1, detail: 'Starting download...' });
-          OfflineManager.syncAllContent(session.user.id, (progress) => {
-            setSyncProgress(progress);
-          }, selectedCourse).then(() => {
-            console.log('[ARENA-LOAD] ✅ Background sync completed');
-            setSyncProgress(null);
-          }).catch((syncErr: any) => {
-            console.warn('[ARENA-LOAD] Background sync failed:', syncErr);
-            setSyncProgress(null);
-          });
-        }
+      // Bank not downloaded → show the download prompt instead of pulling the
+      // whole questions table over the wire.
+      if (courseFiltered.length === 0 && !isCatalogLocalReady(selectedCourse)) {
+        console.log('[ARENA-LOAD] Catalog not downloaded locally — prompting user.');
+        setNeedsDownload(true);
       } else {
-        console.log('[ARENA-LOAD] ✅ Using offline cache immediately (no blocking online fetch)');
+        setNeedsDownload(false);
       }
 
       arenaMetadataCache = dataToShow;
@@ -803,85 +734,6 @@ function UnifiedArenaSetup() {
 
       if (session?.user?.id) {
         await fetchUserTags();
-      }
-
-      // Background sync: Only if offline cache had data, try to get more from Supabase (non-blocking)
-      if (courseFiltered.length > 0) {
-        setTimeout(async () => {
-          try {
-            console.log('[ARENA-SYNC] Starting background sync for course:', selectedCourse);
-            const supabaseQuestions: any[] = [];
-              const { count: totalCount, error: countErr } = await supabase
-                .from('questions')
-                .select('id', { count: 'exact', head: true })
-                .eq('course', selectedCourse)
-                .not('subject', 'is', null);
-
-              const total = totalCount || 0;
-              if (!countErr && total > 0) {
-                const chunkSize = 1000;
-                const chunksNeeded = Math.ceil(total / chunkSize);
-                const maxRequests = 40;
-
-                const promises = [];
-                for (let i = 0; i < chunksNeeded && i < maxRequests; i++) {
-                  promises.push(
-                    supabase
-                      .from('questions')
-                      .select('course, subject, section_group, micro_topic, sub_topic, test_id, id, exam_category, exam_stage, is_inicet, is_neetpg, is_upsc_cms, tests(series, institute, program_name, title)')
-                      .eq('course', selectedCourse)
-                      .not('subject', 'is', null)
-                      .range(i * chunkSize, (i + 1) * chunkSize - 1)
-                  );
-                }
-
-                const results = await Promise.all(promises);
-                for (const res of results) {
-                  if (res.data) supabaseQuestions.push(...res.data);
-                }
-              }
-
-            if (supabaseQuestions?.length) {
-              const flatSynced = supabaseQuestions.map((q: any) => {
-                const testObj = Array.isArray(q.tests) ? q.tests[0] : q.tests;
-                const inst = testObj?.institute || null;
-                const prog = testObj?.program_name || null;
-                
-                const qCourse = q.course || selectedCourse;
-
-                return {
-                  course: qCourse,
-                  subject: q.subject || null,
-                  section_group: q.section_group || null,
-                  micro_topic: q.micro_topic || null,
-                  test_id: q.test_id || null,
-                  id: q.id,
-                  exam_category: q.exam_category || null,
-                  exam_stage: q.exam_stage || null,
-                  series: testObj?.series || null,
-                  institute: inst,
-                  program_name: prog,
-                  title: testObj?.title || null,
-                  is_inicet: q.is_inicet,
-                  is_neetpg: q.is_neetpg,
-                  is_upsc_cms: q.is_upsc_cms,
-                };
-              });
-
-              console.log('[ARENA-SYNC] ✅ Synced from Supabase:', { items: flatSynced.length, course: selectedCourse });
-              
-              // Always update UI from background sync to ensure mappings are fresh
-              if (flatSynced.length > 0) {
-                arenaMetadataCache = flatSynced;
-                arenaMetadataCachedAt = Date.now();
-                setMetadata(flatSynced);
-                console.log('[ARENA-SYNC] Updated UI with synced flat data');
-              }
-            }
-          } catch (syncErr) {
-            console.log('[ARENA-SYNC] Background sync failed (non-blocking):', syncErr);
-          }
-        }, 500);
       }
     } catch (err) {
       console.error('[ARENA-LOAD] ❌ Metadata fetch error:', { error: err, timestamp: new Date().toISOString() });
@@ -900,7 +752,15 @@ function UnifiedArenaSetup() {
         return;
       }
 
-      const useOffline = OfflineManager.getOfflineQuestionsForCourseSync(selectedCourse).length > 0 || isOffline();
+      // Counts always come from the local bank. If it isn't downloaded there is
+      // nothing to count — the UI shows a download prompt instead.
+      if (!isCatalogLocalReady(selectedCourse)) {
+        setQuestionCount(0);
+        setNeedsDownload(true);
+        setCalculatingCount(false);
+        return;
+      }
+      const qSource = LocalQuery;
 
       const isDefaultAllQuestions =
         activeTab === 'topic' &&
@@ -916,7 +776,6 @@ function UnifiedArenaSetup() {
 
       if (isDefaultAllQuestions) {
         // Count questions for the selected course only (not all courses)
-        const qSource = useOffline ? LocalQuery : supabase;
         const { count, error } = await qSource.from('questions')
           .select('id', { count: 'exact', head: true })
           .eq('course', selectedCourse);
@@ -928,7 +787,7 @@ function UnifiedArenaSetup() {
       }
 
       if (activeTab === 'paper') {
-        let tQuery = (useOffline ? LocalQuery : supabase).from('tests').select('id').eq('course', selectedCourse);
+        let tQuery = qSource.from('tests').select('id').eq('course', selectedCourse);
 
         if (selectedTestId) {
           tQuery = tQuery.eq('id', selectedTestId);
@@ -941,7 +800,7 @@ function UnifiedArenaSetup() {
         }
 
         const { data: testRows, error: tErr } = await tQuery;
-        const testIds = (testRows || []).map(t => t.id);
+        const testIds = (testRows || []).map((t: any) => t.id);
 
         if (testIds.length === 0 || tErr) {
           setQuestionCount(0);
@@ -949,7 +808,7 @@ function UnifiedArenaSetup() {
           return;
         }
 
-        let query = (useOffline ? LocalQuery : supabase)
+        let query = qSource
           .from('questions')
           .select('id', { count: 'exact', head: true })
           .in('test_id', testIds);
@@ -966,7 +825,7 @@ function UnifiedArenaSetup() {
         return;
       }
 
-      let query = (useOffline ? LocalQuery : supabase).from('questions').select('id', { count: 'exact', head: true }).eq('course', selectedCourse);
+      let query = qSource.from('questions').select('id', { count: 'exact', head: true }).eq('course', selectedCourse);
 
       if (activeTab === 'topic') {
         if (selectedSubjects.length > 0) query = query.in('subject', selectedSubjects);
@@ -1016,7 +875,7 @@ function UnifiedArenaSetup() {
             setQuestionCount(0); setCalculatingCount(false); return;
           }
           const orQuery = selectedTags.map(t => `review_tags.cs.["${t}"]`).join(',');
-          const { data: tagIds, error: tagErr } = await (useOffline ? LocalQuery : supabase).from('question_states')
+          const { data: tagIds, error: tagErr } = await LocalQuery.from('question_states')
             .select('question_id')
             .eq('user_id', session.user.id)
             .or(orQuery);
@@ -1031,7 +890,7 @@ function UnifiedArenaSetup() {
         }
 
         if (deferredSelectedInstitutes.length > 0 || selectedPrograms.length > 0) {
-          let tQuery = (useOffline ? LocalQuery : supabase).from('tests').select('id').eq('course', selectedCourse);
+          let tQuery = LocalQuery.from('tests').select('id').eq('course', selectedCourse);
           if (deferredSelectedInstitutes.length > 0) {
             tQuery = tQuery.in('institute', deferredSelectedInstitutes);
           }

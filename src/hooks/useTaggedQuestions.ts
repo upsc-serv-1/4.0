@@ -1,7 +1,8 @@
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { safeSetItem } from '../lib/safeAsyncStorage';
+import { safeSetItem, cacheGetString } from '../lib/safeAsyncStorage';
 import { supabase } from '../lib/supabase';
+import { LocalQuery } from '../services/LocalQuery';
 import { formatTagLabel, normalizeTag } from '../utils/tagUtils';
 import { useTagStore } from '../store/tagStore';
 import { autoCleanupQuestionState, batchCleanupEmptyStates } from '../utils/questionStateUtils';
@@ -116,7 +117,7 @@ export function useTaggedVault(userId: string | undefined) {
 
   const loadTagCatalog = useCallback(async () => {
     try {
-      const raw = await AsyncStorage.getItem(tagCatalogKey);
+      const raw = await cacheGetString(tagCatalogKey);
       const cached = raw ? JSON.parse(raw) : [];
       let serverTags: string[] = [];
       if (userId) {
@@ -148,7 +149,7 @@ export function useTaggedVault(userId: string | undefined) {
     // FAST PATH: Load from cache first so UI appears immediately
     let hasCacheData = false;
     try {
-      const cached = await AsyncStorage.getItem(cacheKey);
+      const cached = await cacheGetString(cacheKey);
       if (cached) {
         const parsed = JSON.parse(cached);
         if (Array.isArray(parsed) && parsed.length > 0) {
@@ -180,7 +181,8 @@ export function useTaggedVault(userId: string | undefined) {
       }
 
       // Fetch only the tagged questions that belong to the current course.
-      const { data: questions, error: questionsError } = await supabase
+      // Local catalog only — the Tags tab must work in airplane mode.
+      const { data: questions, error: questionsError } = await LocalQuery
         .from('questions')
         .select('id, test_id, subject, section_group, micro_topic, question_text, explanation_markdown, correct_answer, options, is_pyq, is_upsc_cse, exam_year, exam_group, tests(institute,program_name,series)')
         .eq('course', selectedCourse)
@@ -188,7 +190,7 @@ export function useTaggedVault(userId: string | undefined) {
 
       if (questionsError) throw questionsError;
 
-      const courseQuestionIds = new Set((questions || []).map(q => q.id));
+      const courseQuestionIds = new Set((questions || []).map((q: any) => q.id));
 
       // Filter states to only those belonging to the selected course
       const filteredStates = (states || [])
@@ -216,7 +218,7 @@ export function useTaggedVault(userId: string | undefined) {
       }
       let allQuestions = [...rawQuestions];
       if (upscPyqYears.size > 0) {
-        const { data: siblings } = await supabase
+        const { data: siblings } = await LocalQuery
           .from('questions')
           .select('id, test_id, subject, section_group, micro_topic, question_text, explanation_markdown, correct_answer, options, is_pyq, is_upsc_cse, is_upsc_cms, is_neetpg, is_inicet, exam_year, exam_group, tests(institute,program_name,series)')
           .eq('course', selectedCourse)
@@ -225,7 +227,7 @@ export function useTaggedVault(userId: string | undefined) {
           .eq('is_upsc_cse', true)
           .limit(2000);
         if (siblings && siblings.length > 0) {
-          const existingIds = new Set(rawQuestions.map(q => q.id));
+          const existingIds = new Set(rawQuestions.map((q: any) => q.id));
           const newSiblings = siblings.filter((s: any) => !existingIds.has(s.id));
           allQuestions = [...rawQuestions, ...newSiblings];
         }
@@ -297,7 +299,7 @@ export function useTaggedVault(userId: string | undefined) {
       // Network failed — we already restored cache above, so only update error state
       if (!hasCacheData) {
         try {
-          const cached = await AsyncStorage.getItem(cacheKey);
+          const cached = await cacheGetString(cacheKey);
           if (cached) {
             const parsed = JSON.parse(cached);
             if (Array.isArray(parsed)) {

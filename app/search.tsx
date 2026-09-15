@@ -778,24 +778,8 @@ export default function IntegratedSearchScreen() {
         if (va && va.length > 0) setMainsValueAdd(va);
       }
 
-      try {
-        const liveQ = await fetchMainsQuestionsFromSupabase();
-        if (isMounted && liveQ && liveQ.length > 0) {
-          setMainsQuestions(liveQ);
-          console.log('[SearchScreen] Loaded live questions from Supabase:', liveQ.length);
-        }
-      } catch (e) {
-        console.log('[SearchScreen] Questions Supabase sync skipped/failed:', e);
-      }
-      try {
-        const liveVA = await fetchValueAdditionFromSupabase();
-        if (isMounted && liveVA && liveVA.length > 0) {
-          setMainsValueAdd(liveVA);
-          console.log('[SearchScreen] Loaded live value additions from Supabase:', liveVA.length);
-        }
-      } catch (e) {
-        console.log('[SearchScreen] Value additions Supabase sync skipped/failed:', e);
-      }
+      // Mains catalog is local-only after Download. Refresh is the sole path
+      // that re-reads the server, so we never pay catalog egress on screen open.
     };
     syncData();
     return () => { isMounted = false; };
@@ -1286,20 +1270,9 @@ export default function IntegratedSearchScreen() {
         }
       });
 
-      // B. MAINS SEARCH (Cached + Live synced)
+      // B. MAINS SEARCH (local cache only — the downloaded snapshot)
       await KVStore.ready();
-      let sourceMains = mainsQuestions.length > 0 ? mainsQuestions : getInitialMainsQuestions();
-      if ((!sourceMains || sourceMains.length === 0) && activeFilters.showMains) {
-        try {
-          const liveQ = await fetchMainsQuestionsFromSupabase();
-          if (liveQ && liveQ.length > 0) {
-            sourceMains = liveQ;
-            setMainsQuestions(liveQ);
-          }
-        } catch (e) {
-          console.log('[UnifiedSearch] on-demand mains questions fetch failed:', e);
-        }
-      }
+      const sourceMains = mainsQuestions.length > 0 ? mainsQuestions : getInitialMainsQuestions();
 
       sourceMains.forEach((q: any) => {
         let score = 0;

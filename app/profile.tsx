@@ -40,6 +40,7 @@ import {
   Brain,
   Users,
   ShieldCheck,
+  Image as ImageIcon,
 } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -233,11 +234,14 @@ export default function Profile() {
     try {
       await OfflineManager.syncAllContent(session.user.id, (p) => {
         setSyncProgress(p);
-        // Animate progress bar
-        const phaseFraction: Record<string, number> = { tests: 0.05, questions: 0.7, states: 0.8, notes: 0.85, attempts: 0.9, cards: 0.95, done: 1 };
+        // Animate progress bar — questions then the media (images) phase.
+        const phaseFraction: Record<string, number> = { tests: 0.05, questions: 0.6, states: 0.7, notes: 0.75, attempts: 0.78, cards: 0.82, media: 0.9, done: 1 };
         let target = phaseFraction[p.phase] || 0;
         if (p.phase === 'questions' && p.total > 0) {
-          target = 0.05 + (p.current / p.total) * 0.65;
+          target = 0.05 + (p.current / p.total) * 0.55;
+        }
+        if (p.phase === 'media' && p.total > 0) {
+          target = 0.82 + (p.current / p.total) * 0.17;
         }
         RNAnimated.timing(progressAnim, { toValue: target, duration: 300, useNativeDriver: false }).start();
       }, selectedCourse);
@@ -251,16 +255,56 @@ export default function Profile() {
     }
   };
 
+  const [isMediaSyncing, setIsMediaSyncing] = useState(false);
+
+  /**
+   * "Check for updates" — cheap catalog delta (tests index only) plus the
+   * user-data sync. It never re-downloads tests that are already complete, and
+   * it never selects the whole questions table.
+   */
   const handleRefreshSync = async () => {
     if (!session?.user?.id) return;
-    Alert.alert('Refreshing...', 'Fetching new content in the background.');
+    setIsSyncing(true);
+    setSyncModalVisible(true);
+    setSyncDone(false);
+    progressAnim.setValue(0);
     try {
-      await OfflineManager.incrementalSync(session.user.id);
+      const result = await OfflineManager.refreshCatalogDelta(
+        session.user.id,
+        (p) => setSyncProgress(p),
+        selectedCourse
+      );
       const meta = await OfflineManager.getMetadata();
       setOfflineMeta(meta);
-      Alert.alert('Done', 'Offline data is up to date!');
-    } catch {
-      Alert.alert('Error', 'Refresh failed. Try again later.');
+      setSyncDone(true);
+      if (result.newTests === 0 && result.updatedTests === 0) {
+        Alert.alert('Already up to date', `No new or changed tests. ${result.unchangedTests} tests checked.`);
+      } else {
+        Alert.alert(
+          'Updated',
+          `${result.newTests} new test(s), ${result.updatedTests} changed. ${result.unchangedTests} unchanged.`
+        );
+      }
+    } catch (err: any) {
+      Alert.alert('Error', err?.message || 'Refresh failed. Try again later.');
+    } finally {
+      setIsSyncing(false);
+    }
+  };
+
+  /** Resume only the image phase — reuses cached questions, no catalog egress. */
+  const handleDownloadRemainingImages = async () => {
+    if (!session?.user?.id) return;
+    setIsMediaSyncing(true);
+    try {
+      const result = await OfflineManager.downloadRemainingMedia((p) => setSyncProgress(p));
+      const meta = await OfflineManager.getMetadata();
+      setOfflineMeta(meta);
+      Alert.alert('Done', `${result.done} new images cached, ${result.skipped} already present.`);
+    } catch (err: any) {
+      Alert.alert('Error', err?.message || 'Image download failed.');
+    } finally {
+      setIsMediaSyncing(false);
     }
   };
 
@@ -519,21 +563,30 @@ export default function Profile() {
           <Row 
             testID="profile-download"
             icon={<Download color={colors.primary} size={20} />}
-            label="Download All Data"
-            sub={offlineMeta?.lastFullSync ? `Last synced: ${OfflineManager.formatSyncAge(offlineMeta.lastFullSync)}` : 'Make app work offline'}
+            label="Download for offline"
+            sub={offlineMeta?.lastFullSync ? `Last downloaded: ${OfflineManager.formatSyncAge(offlineMeta.lastFullSync)}` : 'Questions + all answer images'}
             onPress={startFullDownload}
           />
           <Row 
             testID="profile-refresh"
             icon={<RefreshCw color={colors.primary} size={20} />}
-            label="Refresh Data"
-            sub={offlineMeta?.lastIncrementalSync ? `Updated: ${OfflineManager.formatSyncAge(offlineMeta.lastIncrementalSync)}` : 'Fetch latest changes'}
+            label="Check for updates"
+            sub={offlineMeta?.lastCatalogScan ? `Checked: ${OfflineManager.formatSyncAge(offlineMeta.lastCatalogScan)}` : 'New tests, images & your data'}
             onPress={handleRefreshSync}
           />
+          {offlineMeta?.mediaPhaseCancelled ? (
+            <Row 
+              testID="profile-download-images"
+              icon={<ImageIcon color={colors.primary} size={20} />}
+              label="Download remaining images"
+              sub={isMediaSyncing ? 'Caching images...' : 'Previous image download was cancelled'}
+              onPress={handleDownloadRemainingImages}
+            />
+          ) : null}
           <Row 
             testID="profile-clear-cache"
             icon={<Trash2 color="#ef4444" size={20} />}
-            label="Clear Offline Data"
+            label="Clear offline data"
             sub={offlineMeta?.totalQuestions ? `${offlineMeta.totalQuestions.toLocaleString()} questions cached` : 'No data cached'}
             onPress={handleClearOffline}
           />

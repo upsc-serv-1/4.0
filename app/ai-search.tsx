@@ -25,6 +25,7 @@ import { useTheme } from '../src/context/ThemeContext';
 import { useAuth } from '../src/context/AuthContext';
 import { useCourse } from '../src/context/CourseContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { cacheGetString, safeSetItem } from '../src/lib/safeAsyncStorage';
 import { aiExpandSearchQuery, aiExplainQuestion, aiImproveAnswer, type AIInferredFilters } from '../src/services/GeminiService';
 import { PageWrapper } from '../src/components/PageWrapper';
 import Markdown from 'react-native-markdown-display';
@@ -42,6 +43,7 @@ import { PilotV2SaveSheet } from '../src/components/pilot-v2/PilotV2SaveSheet';
 import { AddToFlashcardSheet } from '../src/components/flashcards/AddToFlashcardSheet';
 import { fetchBestAnswer, type BestAnswer } from '../src/services/BestAnswerService';
 import { LocalQuery } from '../src/services/LocalQuery';
+import { isCatalogLocalReady } from '../src/services/CatalogSource';
 import { buildMarkdownStyles, buildMarkdownRules } from '../src/utils/markdownUtils';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
@@ -323,6 +325,9 @@ export default function AISearchTab() {
   // Issue #11: Store master results for client-side filtering
   const [masterResults, setMasterResults] = useState<SearchResult[]>([]);
   const [loading, setLoading]   = useState(false);
+  // True when the local bank is missing — drives the "Download questions" CTA
+  // instead of silently searching the live table.
+  const [requiresDownload, setRequiresDownload] = useState(false);
   const [showModelSwitcher, setShowModelSwitcher] = useState(false);
   const [hasSearched, setHasSearched]   = useState(false);
   const [filters, setFilters]           = useState<Filters>(DEFAULT_FILTERS);
@@ -465,7 +470,7 @@ export default function AISearchTab() {
       // 1. Read persisted custom tag catalog (shared with Full Engine and Tags tab)
       try {
         const catalogKey = `review_tag_catalog_${userId}`;
-        const raw = await AsyncStorage.getItem(catalogKey);
+        const raw = await cacheGetString(catalogKey);
         if (raw) {
           const parsed = JSON.parse(raw);
           if (Array.isArray(parsed)) parsed.forEach((t: string) => t && allTags.add(t));
@@ -669,10 +674,10 @@ export default function AISearchTab() {
           if (error) console.warn('[tags] add_user_tag RPC failed', error.message);
         });
         const catalogKey = `review_tag_catalog_${session.user.id}`;
-        const existing = await AsyncStorage.getItem(catalogKey);
+        const existing = await cacheGetString(catalogKey);
         const parsed: string[] = existing ? JSON.parse(existing) : [];
         const newList = Array.from(new Set([...parsed, createdTag]));
-        await AsyncStorage.setItem(catalogKey, JSON.stringify(newList));
+        await safeSetItem(catalogKey, JSON.stringify(newList));
       } catch {}
       useTagStore.getState().bump({ type: 'add', tag: createdTag, at: Date.now() });
     }
@@ -767,19 +772,20 @@ export default function AISearchTab() {
   // ── Fetch filter option lists ─────────────────────────────────────────────
   useEffect(() => {
     (async () => {
-      const { data: subData } = await supabase
+      // Facets come from the downloaded catalogue — no network needed.
+      const { data: subData } = await LocalQuery
         .from('questions').select('subject').eq('course', selectedCourse).not('subject', 'is', null).limit(1000);
       if (subData) {
         const unique = [...new Set(subData.map((r: any) => r.subject).filter(Boolean))].sort() as string[];
         setSubjectOptions(unique);
       }
-      const { data: instData } = await supabase
+      const { data: instData } = await LocalQuery
         .from('tests').select('institute').eq('course', selectedCourse).not('institute', 'is', null).limit(300);
       if (instData) {
         const unique = [...new Set(instData.map((r: any) => r.institute).filter(Boolean))].sort() as string[];
         setInstituteOptions(unique);
       }
-      const { data: progData } = await supabase
+      const { data: progData } = await LocalQuery
         .from('tests').select('program_name').eq('course', selectedCourse).not('program_name', 'is', null).limit(300);
       if (progData) {
         const unique = [...new Set(progData.map((r: any) => r.program_name).filter(Boolean))].sort() as string[];
@@ -788,8 +794,8 @@ export default function AISearchTab() {
       const raw = await AsyncStorage.getItem('ai_search_history');
       if (raw) setSearchHistory(JSON.parse(raw));
 
-      // PYQ hot topics — fetch last 6 years of PYQs and run predictive analysis
-      const { data: pyqData } = await supabase
+      // PYQ hot topics — computed from the local bank's last 6 years of PYQs
+      const { data: pyqData } = await LocalQuery
         .from('questions')
         .select('subject, section_group, micro_topic, exam_year, is_pyq')
         .eq('course', selectedCourse)
@@ -809,7 +815,7 @@ export default function AISearchTab() {
   useEffect(() => {
     const subs = pendingFilters.subjects !== 'All' ? pendingFilters.subjects.split(',').filter(Boolean) : [];
     if (subs.length === 0) { setSectionOptions([]); setMicrotopicOptions([]); return; }
-    supabase.from('questions').select('section_group, micro_topic').eq('course', selectedCourse).in('subject', subs).limit(2000).then(({ data }) => {
+    LocalQuery.from('questions').select('section_group, micro_topic').eq('course', selectedCourse).in('subject', subs).limit(2000).then(({ data }) => {
       if (!data) return;
       const secs = [...new Set(data.map((r: any) => r.section_group).filter(Boolean))].sort() as string[];
       setSectionOptions(secs);
@@ -821,7 +827,7 @@ export default function AISearchTab() {
     const subs = pendingFilters.subjects !== 'All' ? pendingFilters.subjects.split(',').filter(Boolean) : [];
     const secs = pendingFilters.sections !== 'All' ? pendingFilters.sections.split(',').filter(Boolean) : [];
     if (subs.length === 0 || secs.length === 0) { setMicrotopicOptions([]); return; }
-    supabase.from('questions').select('micro_topic').eq('course', selectedCourse).in('subject', subs).in('section_group', secs).not('micro_topic', 'is', null).limit(2000).then(({ data }) => {
+    LocalQuery.from('questions').select('micro_topic').eq('course', selectedCourse).in('subject', subs).in('section_group', secs).not('micro_topic', 'is', null).limit(2000).then(({ data }) => {
       if (!data) return;
       const mts = [...new Set(data.map((r: any) => r.micro_topic).filter(Boolean))].sort() as string[];
       setMicrotopicOptions(mts);
@@ -975,7 +981,7 @@ export default function AISearchTab() {
           const tags = af.revisionTags.split(',').filter(Boolean);
           if (tags.length > 0) {
             const orQuery = tags.map(tag => `review_tags.cs.["${tag.replace(/"/g, '\\"')}"]`).join(',');
-            const { data: taggedRows } = await supabase
+            const { data: taggedRows } = await LocalQuery
               .from('question_states')
               .select('question_id')
               .eq('user_id', session.user.id)
@@ -995,7 +1001,7 @@ export default function AISearchTab() {
         const instList = af.institutes !== 'All' ? af.institutes.split(',').filter(Boolean) : [];
         const progList = af.programs !== 'All' ? af.programs.split(',').filter(Boolean) : [];
         if (stageActive || instList.length > 0 || progList.length > 0) {
-          let testsQ = supabase.from('tests').select('id').eq('course', selectedCourse);
+          let testsQ = LocalQuery.from('tests').select('id').eq('course', selectedCourse);
           if (stageActive) {
             const stageList = af.stage.split(',').filter(Boolean);
             if (stageList.length === 1) testsQ = testsQ.ilike('series', `%${af.stage}%`);
@@ -1016,64 +1022,40 @@ export default function AISearchTab() {
         test_id,tests(institute,series,program_name)`;
 
       // ─────────────────────────────────────────────────────────────────────
-      // EXACT MODE: offline-first + Supabase supplement
+      // EXACT MODE: strictly local full-bank search
       // ─────────────────────────────────────────────────────────────────────
       if (mode === 'Exact') {
         const term = q.trim();
         setKeywords([term]);
         const fields = getSearchFields(activeFilters.searchAcross);
 
-        // STEP 1: Search 20k MMKV questions synchronously (instant, no limit)
+        // The local bank IS the server snapshot — no "local then remote" merge.
         const localResults = searchOfflineSync([term], activeFilters, fields);
+        setRequiresDownload(!isCatalogLocalReady(selectedCourse));
         setMasterResults(localResults as SearchResult[]);
 
-        // STEP 2: Set immediate results (no network wait)
         const { mergedQs: localMerged } = mergeQuestions(localResults as any);
         if (!sidebarSubjectFilter) {
           const uniqueSubjects = [...new Set(localMerged.map((r: any) => r.subject).filter(Boolean))];
           setAllSearchSubjects(uniqueSubjects as string[]);
         }
         setResults(localMerged as SearchResult[]);
-
-        // STEP 3: Fire Supabase in background for any NEW questions (unlimited)
-        (async () => {
-          try {
-            // Search in ALL selected fields
-            let orConditions: string[] = [];
-            for (const f of fields) orConditions.push(`${f}.ilike.%${term}%`);
-            let dbQ = supabase.from('questions').select(BASE_SELECT)
-              .or(orConditions.join(',')).limit(500);
-            dbQ = await applyFilters(dbQ, activeFilters);
-            const { data } = await dbQ;
-            if (!data || data.length === 0) return;
-            const localIds = new Set(localResults.map((r: any) => r.id));
-            const fresh = (data as any[]).filter((r: any) => !localIds.has(r.id));
-            if (fresh.length === 0) return;
-            const all = [...localResults, ...fresh];
-            const { mergedQs } = mergeQuestions(all as any);
-            setMasterResults(all as SearchResult[]);
-            if (!sidebarSubjectFilter) {
-              const uniqueSubjects = [...new Set(mergedQs.map((r: any) => r.subject).filter(Boolean))];
-              setAllSearchSubjects(uniqueSubjects as string[]);
-            }
-            setResults(mergedQs as SearchResult[]);
-          } catch (e) { /* background supplement failure is non-critical */ }
-        })();
         return;
       }
 
       // ─────────────────────────────────────────────────────────────────────
-      // MATCHING MODE: offline-first + Supabase supplement
+      // MATCHING MODE: strictly local full-bank search
       // ─────────────────────────────────────────────────────────────────────
       if (mode === 'Matching') {
         setKeywords([q.trim()]);
         const term = q.trim();
         const fields = getSearchFields(activeFilters.searchAcross);
 
-        // STEP 1: Search 20k MMKV questions synchronously (instant, no limit)
+        // Search the whole downloaded course synchronously (question_text +
+        // explanation_markdown), then fall back to the per-test cache for
+        // partial downloads.
         const localResults = searchOfflineSync([term], activeFilters, fields);
-
-        // Also do original QuestionCache.searchLocal for cache users without full offline download
+        setRequiresDownload(!isCatalogLocalReady(selectedCourse) && localResults.length === 0);
         let cachedResults = localResults;
         try {
           const cacheMode = 'Matching';
@@ -1084,12 +1066,12 @@ export default function AISearchTab() {
           for (const r of cachedResults) { if (!mmkvIds.has(r.id)) localResults.push(r); }
         } catch {}
 
-        // Apply revision tag filter (needs Supabase question_states query)
+        // Apply revision tag filter from the local question_states cache
         let finalLocal = [...localResults];
         const revTagList = activeFilters.revisionTags !== 'All' ? activeFilters.revisionTags.split(',').filter(Boolean) : [];
         if (revTagList.length && session?.user?.id) {
           const orQuery = revTagList.map(tag => `review_tags.cs.["${tag.replace(/"/g, '\\"')}"]`).join(',');
-          const { data: taggedRows } = await supabase
+          const { data: taggedRows } = await LocalQuery
             .from('question_states')
             .select('question_id')
             .eq('user_id', session.user.id)
@@ -1105,48 +1087,6 @@ export default function AISearchTab() {
           setAllSearchSubjects(uniqueSubjects as string[]);
         }
         setResults(localMerged as SearchResult[]);
-
-        // STEP 2: Fire Supabase in background for supplement (fuzzy patterns)
-        (async () => {
-          try {
-            let conditions: string[] = [];
-            const searchAcrossFields = getSearchFields(activeFilters.searchAcross);
-            // For each selected field, build ilike conditions
-            for (const f of searchAcrossFields) {
-              conditions.push(`${f}.ilike.%${term}%`);
-              if (term.length > 3 && term.length < 20) {
-                for (let i = 0; i < term.length; i++) {
-                  const pattern = term.slice(0, i) + term.slice(i + 1);
-                  conditions.push(`${f}.ilike.% ${pattern} %`);
-                  conditions.push(`${f}.ilike.${pattern},%`);
-                  conditions.push(`${f}.ilike.% ${pattern},%`);
-                }
-                for (let i = 0; i < term.length; i++) {
-                  const vowelSwaps = ['a', 'e', 'i', 'o', 'u'];
-                  for (const swap of vowelSwaps) {
-                    if (swap !== term[i]) {
-                      const pattern = term.slice(0, i) + swap + term.slice(i + 1);
-                      conditions.push(`${f}.ilike.% ${pattern} %`);
-                    }
-                  }
-                }
-              }
-            }
-            let dbQ = supabase.from('questions').select(BASE_SELECT)
-              .or(conditions.slice(0, 10).join(','))
-              .limit(500);
-            dbQ = await applyFilters(dbQ, activeFilters);
-            const { data: remote } = await dbQ;
-            if (!remote || remote.length === 0) return;
-            const localIds = new Set(finalLocal.map((r: any) => r.id));
-            const fresh = remote.filter((r: any) => !localIds.has(r.id));
-            if (fresh.length === 0) return;
-            const all = [...finalLocal, ...fresh];
-            const { mergedQs } = mergeQuestions(all as any);
-            setMasterResults(all as SearchResult[]);
-            setResults(mergedQs as SearchResult[]);
-          } catch (e) { /* background supplement non-critical */ }
-        })();
         return;
       }
 
@@ -1180,8 +1120,9 @@ export default function AISearchTab() {
         for (const kw of displayKeywords) allSearchTerms.push(kw);
         const uniqueTerms = [...new Set(allSearchTerms)];
 
-        // STEP 2: Search 20k MMKV questions synchronously with ALL terms (instant, no limit)
+        // STEP 2: Search the full downloaded bank synchronously with ALL terms
         const localResults = searchOfflineSync(uniqueTerms, mergedFilters, fields);
+        setRequiresDownload(!isCatalogLocalReady(selectedCourse));
         setMasterResults(localResults as SearchResult[]);
 
         const { mergedQs: localMerged } = mergeQuestions(localResults as any);
@@ -1190,47 +1131,6 @@ export default function AISearchTab() {
           setAllSearchSubjects(uniqueSubjects as string[]);
         }
         setResults(localMerged as SearchResult[]);
-        if (displayKeywords.length === 0) return;
-
-        // STEP 3: Fire Supabase supplement in background (new questions only)
-        (async () => {
-          try {
-            const seenIds = new Set<string>();
-            const priorityResults: SearchResult[] = [];
-            const addBatch = (rows: SearchResult[]) => {
-              for (const r of rows) { if (!seenIds.has(r.id)) { seenIds.add(r.id); priorityResults.push(r); } }
-            };
-            // First add all local results
-            for (const r of localResults) addBatch(r as any);
-
-            // Tier 0: exact phrase from Supabase (search in ALL selected fields)
-            let orConditions: string[] = [];
-            for (const f of fields) orConditions.push(`${f}.ilike.%${rawTerm}%`);
-            let dbQ = supabase.from('questions').select(BASE_SELECT)
-              .or(orConditions.join(',')).limit(500);
-            dbQ = await applyFilters(dbQ, mergedFilters, aiResult.filters.specificYear || null);
-            const { data: tier0 } = await dbQ;
-            if (tier0) addBatch(tier0 as unknown as SearchResult[]);
-
-            // Tier 1: ALL terms as big OR chunks
-            const searchSqlTerms: string[] = [];
-            for (const f of fields) {
-              for (const w of userWords) searchSqlTerms.push(`${f}.ilike.%${w}%`);
-              for (const kw of displayKeywords) searchSqlTerms.push(`${f}.ilike.%${kw}%`);
-            }
-            const sqlUniq = [...new Set(searchSqlTerms)];
-            for (let i = 0; i < sqlUniq.length; i += 10) {
-              const chunk = sqlUniq.slice(i, i + 10);
-              let qB = supabase.from('questions').select(BASE_SELECT).or(chunk.join(',')).limit(500);
-              qB = await applyFilters(qB, mergedFilters, aiResult.filters.specificYear || null);
-              const { data } = await qB;
-              if (data) addBatch(data as unknown as SearchResult[]);
-            }
-            const { mergedQs } = mergeQuestions(priorityResults as any);
-            setMasterResults(priorityResults as SearchResult[]);
-            setResults(mergedQs as SearchResult[]);
-          } catch (e) { /* supplement non-critical */ }
-        })();
         return;
       }
 
@@ -1259,8 +1159,9 @@ export default function AISearchTab() {
       for (const kw of displayKeywords) allSearchTerms.push(kw);
       const uniqueTerms = [...new Set(allSearchTerms)];
 
-      // STEP 1: Search 20k MMKV questions synchronously with ALL terms (instant, no limit)
+      // STEP 1: Search the full downloaded bank synchronously (instant, no limit)
       const localResults = searchOfflineSync(uniqueTerms, mergedFilters, fields);
+      setRequiresDownload(!isCatalogLocalReady(selectedCourse));
       setMasterResults(localResults as SearchResult[]);
 
       // Compute tiers for sorting
@@ -1283,47 +1184,6 @@ export default function AISearchTab() {
         setAllSearchSubjects(uniqueSubjects as string[]);
       }
       setResults(localMerged as SearchResult[]);
-
-      // STEP 2: Fire Supabase supplement in background (new questions only)
-      (async () => {
-        try {
-          const seenIds = new Set<string>();
-          const priorityResults: SearchResult[] = [];
-          const addBatch = (rows: SearchResult[]) => {
-            for (const r of rows) { if (!seenIds.has(r.id)) { seenIds.add(r.id); priorityResults.push(r); } }
-          };
-          // Add all local results first
-          for (const r of localResults) addBatch(r as any);
-
-          // Tier 0: exact phrase from Supabase (search in ALL selected fields)
-          let orConditions: string[] = [];
-          for (const f of fields) orConditions.push(`${f}.ilike.%${rawTerm}%`);
-          let dbQ = supabase.from('questions').select(BASE_SELECT)
-            .or(orConditions.join(',')).limit(500);
-          dbQ = await applyFilters(dbQ, mergedFilters, aiYear);
-          const { data: tier0 } = await dbQ;
-          if (tier0) addBatch(tier0 as unknown as SearchResult[]);
-
-          // Tier 1: ALL terms as big OR chunks
-          const searchSqlTerms: string[] = [];
-          for (const f of fields) {
-            for (const w of userWords) searchSqlTerms.push(`${f}.ilike.%${w}%`);
-            for (const kw of displayKeywords) searchSqlTerms.push(`${f}.ilike.%${kw}%`);
-          }
-          const sqlUniq = [...new Set(searchSqlTerms)];
-          for (let i = 0; i < sqlUniq.length; i += 10) {
-            const chunk = sqlUniq.slice(i, i + 10);
-            let qB = supabase.from('questions').select(BASE_SELECT).or(chunk.join(',')).limit(500);
-            qB = await applyFilters(qB, mergedFilters, aiYear);
-            const { data } = await qB;
-            if (data) addBatch(data as unknown as SearchResult[]);
-          }
-          const { mergedQs } = mergeQuestions(priorityResults as any);
-          const stamped2 = mergedQs.map((r: any) => ({ ...r, _searchTier: getSearchTier(r) }));
-          setMasterResults(priorityResults as SearchResult[]);
-          setResults(stamped2 as SearchResult[]);
-        } catch (e) { /* supplement non-critical */ }
-      })();
     } catch (e: any) {
       const msg: string = e?.message || 'Unknown error';
       if (msg.includes('No Gemini API key found') || msg.includes('No Groq API key found') || msg.includes('No DeepSeek API key found')) {

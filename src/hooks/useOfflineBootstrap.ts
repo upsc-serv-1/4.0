@@ -4,15 +4,19 @@
  * Responsibilities (invoked once from app/_layout.tsx at root):
  *   1. Ensure KVStore is ready (matters only when running the AsyncStorage
  *      fallback on web / Expo Go — native MMKV is always ready).
- *   2. When a user signs in:
- *        - If no full sync has ever happened, kick off OfflineManager.syncAllContent
- *          in the background (non-blocking — the UI is free to render from
- *          whatever cache exists).
- *        - Otherwise, run an incrementalSync in the background.
+ *   2. When a user signs in, run a *user-data only* incremental sync:
+ *        notes, tags, question_states, attempts, cards metadata, progress.
+ *      These are small JSON rows and are what cross-device sync depends on.
  *   3. Start the SyncQueue worker so any offline mutations drain when online.
- *   4. On sign-out, stop workers and wipe the offline KVStore for that user.
+ *   4. On sign-out, stop workers and let the profile handler wipe the KVStore.
  *
- * This component renders nothing. It's mounted near the top of the tree.
+ * IMPORTANT — what this hook deliberately does NOT do:
+ *   It never calls `OfflineManager.syncAllContent`. That path downloads the
+ *   entire `questions` catalogue and used to fire automatically whenever the
+ *   local cache merely *looked* empty (e.g. after "Clear Offline Data"). That
+ *   single call was the largest source of Supabase egress. Downloading the
+ *   bank is now strictly an explicit user action from Profile → "Download for
+ *   offline"; catalog top-ups happen only via Profile → "Check for updates".
  */
 
 import { useEffect, useRef } from 'react';
@@ -21,12 +25,12 @@ import { KVStore } from '../lib/kvStore';
 import { OfflineManager } from '../services/OfflineManager';
 import { startSyncQueueWorker, stopSyncQueueWorker, SyncQueue } from '../services/SyncQueue';
 import { useCourse } from '../context/CourseContext';
+import { isCatalogLocalReady } from '../services/CatalogSource';
 
 export function useOfflineBootstrap() {
   const { session } = useAuth();
   const { selectedCourse } = useCourse();
   const lastUserIdRef = useRef<string | null>(null);
-  const fullSyncInFlight = useRef(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -53,30 +57,21 @@ export function useOfflineBootstrap() {
       // Start background queue worker (idempotent)
       startSyncQueueWorker(30_000);
 
-      // Check if questions are actually cached (not just metadata).
-      // This handles the case where the user cleared the download cache: even if
-      // metadata.lastFullSync is set, the actual question data is gone, so we must
-      // re-run a full sync to repopulate MMKV.
+      // User-scoped sync only. No catalog fetch — ever.
       try {
         const meta = await OfflineManager.getMetadata();
-        const cachedQuestions = OfflineManager.getOfflineQuestionsForCourseSync(selectedCourse);
-        const hasQuestions = cachedQuestions.length > 0;
 
-        if ((!meta.lastFullSync || !hasQuestions) && !fullSyncInFlight.current) {
-          fullSyncInFlight.current = true;
-          console.log('[OfflineBootstrap] Starting full sync', { 
-            reason: !meta.lastFullSync ? 'no lastFullSync' : 'no cached questions',
-            cachedCount: cachedQuestions.length 
-          });
-          // fire-and-forget — progress is surfaced by any screen that cares
-          OfflineManager.syncAllContent(userId, undefined, selectedCourse)
-            .catch((e) => console.warn('[OfflineBootstrap] initial full sync failed', e))
-            .finally(() => {
-              fullSyncInFlight.current = false;
-            });
+        if (!meta.lastFullSync) {
+          // No download has ever completed. Do NOT auto-download the bank:
+          // the welcome / Profile UI prompts the user to tap Download.
+          console.log(
+            '[OfflineBootstrap] No completed download yet — skipping auto sync.',
+            'Catalog ready:', isCatalogLocalReady(selectedCourse)
+          );
         } else {
-          // Incremental pull to catch up on anything that changed while offline.
-          OfflineManager.incrementalSync(userId).catch(() => {});
+          OfflineManager.syncUserData(userId).catch((e) =>
+            console.warn('[OfflineBootstrap] user sync failed', e)
+          );
         }
       } catch (e) {
         console.warn('[OfflineBootstrap] metadata check failed', e);

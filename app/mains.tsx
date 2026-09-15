@@ -470,6 +470,7 @@ import {
   ConsolidatedQuestion,
   fetchMainsQuestionsFromSupabase,
   getInitialMainsQuestions,
+  MAINS_QUESTIONS_CACHE_KEY,
   normalizeSubject
 } from '../src/data/mainsConsolidatedLoader';
 import {
@@ -491,6 +492,7 @@ import {
   MainsNoteItem
 } from '../src/data/mainsNotesLoader';
 import { buildNotesPdfHtml } from '../src/utils/notesPdfEngine';
+import { cacheGetString, safeSetItem } from '../src/lib/safeAsyncStorage';
 
 
 const getQuestionSection = (q: any): string => q.sectionGroup || q.section_group || q.sectiongroup || '';
@@ -1295,10 +1297,10 @@ export function MainsScreenInner() {
         if (error) console.warn('[tags] add_user_tag RPC failed', error.message);
       });
       const catalogKey = `review_tag_catalog_${session.user.id}`;
-      const existing = await AsyncStorage.getItem(catalogKey);
+      const existing = await cacheGetString(catalogKey);
       const parsed: string[] = existing ? JSON.parse(existing) : [];
       const newList = Array.from(new Set([...parsed, cleanTag]));
-      await AsyncStorage.setItem(catalogKey, JSON.stringify(newList));
+      await safeSetItem(catalogKey, JSON.stringify(newList));
     } catch {}
 
     useTagStore.getState().bump({ type: 'add', tag: cleanTag, at: Date.now() });
@@ -1425,7 +1427,7 @@ export function MainsScreenInner() {
       const allTags = new Set<string>(DEFAULT_TAGS);
       try {
         const catalogKey = `review_tag_catalog_${userId}`;
-        const raw = await AsyncStorage.getItem(catalogKey);
+        const raw = await cacheGetString(catalogKey);
         if (raw) {
           const parsed = JSON.parse(raw);
           if (Array.isArray(parsed)) parsed.forEach((t: string) => t && allTags.add(t));
@@ -1870,54 +1872,24 @@ export function MainsScreenInner() {
         console.error('Failed to load saved states:', err);
       }
     };
-    
-    const syncSupabaseData = async () => {
-      try {
-        const liveQuestions = await fetchMainsQuestionsFromSupabase();
-        if (liveQuestions && liveQuestions.length > 0) {
-          setQuestions(liveQuestions);
-          console.log('[MainsScreen] Loaded live questions from Supabase:', liveQuestions.length);
-        }
-      } catch (err) {
-        console.log('[MainsScreen] Failed to load live questions, using offline fallback:', err);
-      }
 
-      try {
-        const liveValueAdd = await fetchValueAdditionFromSupabase();
-        if (liveValueAdd && liveValueAdd.length > 0) {
-          const merged = liveValueAdd.map(item => {
-            if (item.category === 'ethics') {
-              const cleanText = (str: string) => (str || '').toLowerCase().replace(/[^a-z0-9]/g, '').trim();
-              const targetTitle = cleanText(item.title);
-              const localMatch = mainsConsolidatedValueAdd.find(
-                l => l.category === 'ethics' && cleanText(l.title) === targetTitle
-              );
-              if (localMatch) {
-                const nextItem = { ...item };
-                if (localMatch.diagramImagePath) {
-                  nextItem.diagramImagePath = localMatch.diagramImagePath;
-                }
-                if (localMatch.ethicsData?.diagramsList) {
-                  nextItem.ethicsData = {
-                    ...nextItem.ethicsData,
-                    diagramsList: localMatch.ethicsData.diagramsList
-                  };
-                }
-                return nextItem;
-              }
-            }
-            return item;
-          });
-          setValueAddItems(merged);
-          console.log('[MainsScreen] Loaded live value additions from Supabase (with offline diagram falls):', liveValueAdd.length);
-        }
-      } catch (err) {
-        console.log('[MainsScreen] Failed to load live value additions, using offline fallback:', err);
+    // Mains catalog is served from the downloaded KVStore snapshot only.
+    // "Refresh" (handleForceSync) is the single action that re-reads the server,
+    // so opening this screen costs zero catalog egress.
+    const loadLocalCatalog = async () => {
+      await KVStore.ready();
+      const cachedQuestions = KVStore.getJson<any[]>(MAINS_QUESTIONS_CACHE_KEY);
+      if (cachedQuestions && cachedQuestions.length > 0) {
+        console.log('[MainsScreen] Loaded questions from KVStore cache:', cachedQuestions.length);
+      }
+      const cachedValueAdd = KVStore.getJson<any[]>('@mains_cached_value_add_v2');
+      if (cachedValueAdd && cachedValueAdd.length > 0) {
+        console.log('[MainsScreen] Loaded value additions from KVStore cache:', cachedValueAdd.length);
       }
     };
 
     loadState();
-    syncSupabaseData();
+    loadLocalCatalog();
   }, []);
 
   const [syncingMains, setSyncingMains] = useState(false);
@@ -1926,7 +1898,7 @@ export function MainsScreenInner() {
     if (syncingMains) return;
     setSyncingMains(true);
     try {
-      KVStore.delete('@mains_cached_questions_v2');
+      KVStore.delete(MAINS_QUESTIONS_CACHE_KEY);
       KVStore.delete('@mains_cached_value_add_v2');
       const liveQuestions = await fetchMainsQuestionsFromSupabase();
       const liveValueAdd = await fetchValueAdditionFromSupabase();

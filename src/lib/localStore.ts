@@ -9,20 +9,18 @@
  *      `last_server_sync` and apply server-newer rows locally (last-writer-wins
  *      using `client_updated_at` — already present on `user_cards`).
  *
- * Gracefully degrades: if MMKV isn't installed (Expo Go / web), we fall back to
- * AsyncStorage + in-memory map. Same interface, slightly slower.
- *
- * This is intentionally dependency-light so it works even if the user hasn't
- * added `react-native-mmkv` yet. Install it for full offline:
- *     yarn add react-native-mmkv
- * …and rebuild the native app (`npx expo prebuild`).
+ * Backed by the shared KVStore (`upsc-offline-v1`). It previously used its own
+ * `ankipro-study-cache` MMKV instance, which meant "Clear offline data" could
+ * leave the dirty queue behind and leak storage. Sharing one instance keeps all
+ * offline state in a single, wipable namespace.
  */
 
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Platform } from 'react-native';
 import { supabase } from './supabase';
+import { KVStore } from './kvStore';
 
-// --- MMKV (optional) ------------------------------------------------------
+// --- Backend -------------------------------------------------------------
+// All reads/writes go through KVStore so this module shares the offline
+// namespace (and its clear-all behaviour) with the rest of the app.
 type KVBackend = {
   getString: (k: string) => string | null | undefined;
   set: (k: string, v: string) => void;
@@ -30,45 +28,14 @@ type KVBackend = {
   getAllKeys: () => string[];
 };
 
-let backend: KVBackend | null = null;
-
-try {
-  if (Platform.OS !== 'web') {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const { MMKV } = require('react-native-mmkv');
-    const mmkv = new MMKV({ id: 'ankipro-study-cache' });
-    backend = {
-      getString: (k) => mmkv.getString(k) ?? null,
-      set: (k, v) => mmkv.set(k, v),
-      delete: (k) => mmkv.delete(k),
-      getAllKeys: () => mmkv.getAllKeys(),
-    };
-  }
-} catch {
-  backend = null;
-}
-
-// --- Fallback backend (AsyncStorage + in-memory mirror) -------------------
-const memCache = new Map<string, string>();
-const asyncBackend: KVBackend = {
-  getString: (k) => (memCache.has(k) ? memCache.get(k)! : null),
-  set: (k, v) => { memCache.set(k, v); AsyncStorage.setItem(k, v).catch(() => {}); },
-  delete: (k) => { memCache.delete(k); AsyncStorage.removeItem(k).catch(() => {}); },
-  getAllKeys: () => Array.from(memCache.keys()),
+const backend: KVBackend = {
+  getString: (k) => KVStore.getString(k),
+  set: (k, v) => KVStore.setString(k, v),
+  delete: (k) => KVStore.delete(k),
+  getAllKeys: () => KVStore.getAllKeys(),
 };
 
-// Preload AsyncStorage keys on module init (only used in fallback path)
-if (!backend) {
-  AsyncStorage.getAllKeys().then(keys => {
-    const relevant = (keys as string[]).filter(k => k.startsWith(PREFIX));
-    if (relevant.length === 0) return;
-    return AsyncStorage.multiGet(relevant).then(pairs => {
-      pairs.forEach(([k, v]) => { if (v !== null) memCache.set(k, v); });
-    });
-  }).catch(() => {});
-}
-
-const kv: KVBackend = backend ?? asyncBackend;
+const kv: KVBackend = backend;
 
 // --- Keys -----------------------------------------------------------------
 const PREFIX = 'ap:';
@@ -114,7 +81,8 @@ function saveDirtySet(userId: string, set: Set<string>) {
 
 // --- Public API -----------------------------------------------------------
 export class LocalStore {
-  static isMMKV() { return backend !== null; }
+  /** True when the shared KVStore is backed by real MMKV (not the fallback). */
+  static isMMKV() { return KVStore.isMMKV(); }
 
   /** Read the local snapshot of a user_card (returns null if not cached). */
   static get(userId: string, cardId: string): LocalUserCard | null {

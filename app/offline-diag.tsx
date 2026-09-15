@@ -23,6 +23,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '../src/context/ThemeContext';
 import { OfflineManager, OfflineMetadata } from '../src/services/OfflineManager';
 import { KVStore } from '../src/lib/kvStore';
+import { MediaCacheService } from '../src/services/MediaCacheService';
 import { NetworkStatus } from '../src/lib/networkStatus';
 import { supabase } from '../src/lib/supabase';
 import {
@@ -195,6 +196,7 @@ export default function OfflineDiagScreen() {
       setCacheStats({
         'Tests': tests.length,
         'Questions': questions.length,
+        'Answer Images (cached)': MediaCacheService.cachedCount(),
         'Institutes': facets.institutes.length,
         'Programs': facets.program_names.length,
         'Subjects': subjects.length,
@@ -291,13 +293,10 @@ export default function OfflineDiagScreen() {
       global.__offlineDiagActive = false;
       NetworkStatus.setSimulatedOffline(false);
       setSimulating(false);
-      // Run an incremental sync to flush queued mutations & pull any
-      // updates that happened during the simulation window.
-      try {
-        const userId = (KVStore.getJson<any>('@offline_meta') as any) ? null : null;
-        // No need to look up userId — incrementalSync will no-op without it.
-        // The SyncQueue worker (already running) will drain pending writes.
-      } catch {}
+      // The SyncQueue worker (already running) drains any pending writes now
+      // that the simulated offline flag is cleared. We deliberately do NOT run
+      // a catalog sync here — that would re-pay question egress from a
+      // diagnostic screen.
     } catch (e: any) {
       Alert.alert('Error', 'Could not stop simulation: ' + e.message);
     }

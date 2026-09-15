@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { safeSetItem } from '../lib/safeAsyncStorage';
+import { safeSetItem, cacheGetString } from '../lib/safeAsyncStorage';
 import { useAuth } from '../context/AuthContext';
 import { useCourse } from '../context/CourseContext';
 import { supabase } from '../lib/supabase';
@@ -13,6 +13,7 @@ import {
   HierarchicalPerformance,
 } from '../lib/hierarchical-analytics';
 import { OfflineManager } from '../services/OfflineManager';
+import { LocalQuery } from '../services/LocalQuery';
 
 type AttemptPayloadQuestion = {
   question_id?: string;
@@ -107,7 +108,7 @@ const fetchQuestionsMeta = async (questionIds: string[], selectedCourse: string)
   
   for (let i = 0; i < questionIds.length; i += CHUNK_SIZE) {
     const chunk = questionIds.slice(i, i + CHUNK_SIZE);
-    const { data, error } = await supabase
+    const { data, error } = await LocalQuery
       .from('questions')
       .select('id, subject, section_group, micro_topic, correct_answer, question_text, options, explanation_markdown, is_pyq, exam_year, exam_group, is_upsc_cse, is_upsc_cms, is_neetpg, is_inicet, is_allied, is_others, source')
       .eq('course', selectedCourse)
@@ -115,7 +116,7 @@ const fetchQuestionsMeta = async (questionIds: string[], selectedCourse: string)
 
     if (error) throw error;
     
-    (data || []).forEach(row => {
+    (data || []).forEach((row: any) => {
       meta[String(row.id)] = row;
     });
   }
@@ -255,7 +256,7 @@ export function useAggregateTestAnalytics(userId: string | null) {
       // 0. Load from Cache First for instant UI
       const cacheKey = `analytics_cache_${userId}`;
       try {
-        const cached = await AsyncStorage.getItem(cacheKey);
+        const cached = await cacheGetString(cacheKey);
         if (cached) {
           const parsed = JSON.parse(cached);
           setTrends(parsed.trends);
@@ -299,7 +300,7 @@ export function useAggregateTestAnalytics(userId: string | null) {
 
         // Check if data actually changed before doing heavy recomputation
         const lastAttemptId = attempts[attempts.length - 1]?.id;
-        const cached = await AsyncStorage.getItem(cacheKey);
+        const cached = await cacheGetString(cacheKey);
         if (cached) {
           const parsed = JSON.parse(cached);
           const hasRawQuestions =

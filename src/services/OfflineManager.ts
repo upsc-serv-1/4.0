@@ -17,6 +17,7 @@ import { supabase } from '../lib/supabase';
 import { KVStore } from '../lib/kvStore';
 import { NetworkStatus } from '../lib/networkStatus';
 import { QuestionCache } from './QuestionCache';
+import { MediaCacheService, collectQuestionMediaUrls } from './MediaCacheService';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // ─── Storage Keys ────────────────────────────────────────────────
@@ -74,6 +75,8 @@ export const TABLES = {
 export interface OfflineMetadata {
   lastFullSync: number | null;
   lastIncrementalSync: number | null;
+  /** Last time the lightweight tests index was checked (Refresh button only). */
+  lastCatalogScan?: number | null;
   syncVersion?: number;
   totalQuestions: number;
   totalTests: number;
@@ -81,6 +84,10 @@ export interface OfflineMetadata {
   totalNotes: number;
   totalAttempts: number;
   totalCards: number;
+  /** Media (image) phase bookkeeping. */
+  totalMedia?: number;
+  totalMediaCached?: number;
+  mediaPhaseCancelled?: boolean;
 }
 
 export interface SyncProgress {
@@ -436,10 +443,64 @@ class OfflineManagerService {
     }
     report({ phase: 'cards', current: 1, total: 1, detail: `${totalCards} flashcards saved` });
 
+    // ──────── 7. MEDIA (images inside questions/explanations) ───
+    // R2/Cloudflare URLs — caching them is what makes answers readable in
+    // airplane mode. Runs LAST so a cancel here never costs question re-downloads.
+    let totalMedia = 0;
+    try {
+      if (!this._cancelled) {
+        await MediaCacheService.init();
+        const rows: any[] = [];
+        for (const test of testsToSync) {
+          if (this._cancelled) break;
+          rows.push(...QuestionCache.getCachedQuestionsSync(test.id));
+        }
+        const urls = collectQuestionMediaUrls(rows);
+        totalMedia = urls.length;
+        report({ phase: 'media', current: 0, total: totalMedia, detail: 'Caching images...' });
+
+        const result = await MediaCacheService.cacheUrls(
+          urls,
+          (done, total, skipped) => {
+            report({
+              phase: 'media',
+              current: done,
+              total,
+              detail: skipped > 0
+                ? `Images ${done}/${total} (${skipped} already saved)`
+                : `Images ${done}/${total}`,
+            });
+          },
+          () => this._cancelled
+        );
+        report({
+          phase: 'media',
+          current: totalMedia,
+          total: totalMedia,
+          detail: this._cancelled
+            ? `Image download stopped — ${result.skipped} cached`
+            : `${result.done} new images cached (${result.skipped} already present)`,
+        });
+      }
+    } catch (err) {
+      console.warn('[Offline] Media cache phase failed', err);
+    }
+    if (this._cancelled) {
+      // Media is resumable and cheap to re-run; record that so Profile can
+      // offer "Download remaining images" without re-fetching questions.
+      await this.setMetadata({
+        mediaPhaseCancelled: true,
+        totalMedia,
+        totalMediaCached: MediaCacheService.cachedCount(),
+      });
+      return;
+    }
+
     // ──────── FINALIZE ──────────────────────────────────────────
     await this.setMetadata({
       lastFullSync: Date.now(),
       lastIncrementalSync: Date.now(),
+      lastCatalogScan: Date.now(),
       syncVersion: OFFLINE_SYNC_VERSION,
       totalQuestions,
       totalTests: allTests.length,
@@ -447,6 +508,9 @@ class OfflineManagerService {
       totalNotes,
       totalAttempts,
       totalCards,
+      totalMedia,
+      totalMediaCached: MediaCacheService.cachedCount(),
+      mediaPhaseCancelled: false,
     });
     report({ phase: 'done', current: 1, total: 1, detail: 'All data downloaded!' });
   }
@@ -512,8 +576,21 @@ class OfflineManagerService {
     }
   }
 
-  // ── INCREMENTAL SYNC ──────────────────────────────────────────
+  // ── INCREMENTAL SYNC (USER DATA ONLY) ─────────────────────────
+  /**
+   * Pulls *only* per-user rows (states, notes, attempts, cards, tags,
+   * progress). It NEVER touches `questions` or `tests` — those are catalog
+   * tables and are refreshed exclusively by the explicit "Check for updates"
+   * action (`refreshCatalogDelta`).
+   *
+   * This is the safe-to-run-on-every-login / every-foreground path: a few KB
+   * of JSON, no hundreds-of-MB egress.
+   */
   async incrementalSync(userId: string) {
+    return this.syncUserData(userId);
+  }
+
+  async syncUserData(userId: string) {
     const meta = await this.getMetadata();
     if (!meta.lastFullSync) return;
 
@@ -610,6 +687,194 @@ class OfflineManagerService {
     } catch (err) {
       console.warn('[Offline] Incremental sync failed (will retry later)', err);
     }
+  }
+
+  // ── CATALOG DELTA (Refresh button only) ───────────────────────
+  /**
+   * Cheap catalog refresh. Fetches ONLY the lightweight test index
+   * (id, course, question_count, updated_at) — never `select('*')` on
+   * `questions`, never the whole table.
+   *
+   * A test's questions are re-downloaded only when:
+   *   • the local cache has no rows for it, or
+   *   • the cached row count differs from the server's `question_count`, or
+   *   • the server `updated_at` is newer than the last catalog scan.
+   *
+   * Everything else is skipped, so "Refresh with no author changes" costs a
+   * single small tests-index query plus the user sync.
+   */
+  async refreshCatalogDelta(
+    userId: string,
+    onProgress?: (p: SyncProgress) => void,
+    selectedCourse?: string
+  ): Promise<{ newTests: number; updatedTests: number; unchangedTests: number }> {
+    const report = (p: SyncProgress) => {
+      this.currentSyncProgress = p;
+      this._notifyListeners(p);
+      if (onProgress) { try { onProgress(p); } catch {} }
+    };
+
+    this._cancelled = false;
+    const meta = await this.getMetadata();
+    const sinceScan = meta.lastCatalogScan ?? null;
+
+    let course = selectedCourse;
+    if (!course) {
+      try {
+        const stored = await AsyncStorage.getItem('selectedCourse');
+        if (stored) course = stored;
+      } catch {}
+    }
+    if (!course) course = 'Civil Services';
+
+    report({ phase: 'tests', current: 0, total: 1, detail: 'Checking for new tests...' });
+
+    // Lightweight index — 4 small columns, no question payload.
+    const { data: testIndex, error: idxErr } = await supabase
+      .from('tests')
+      .select('id, course, question_count, updated_at');
+    if (idxErr) throw idxErr;
+
+    const allTests = testIndex ?? [];
+    const courseTests = allTests.filter((t: any) => t.course === course);
+
+    // Merge the index into the locally cached test catalogue so titles etc.
+    // (already fetched during Download) are preserved for tests we skip.
+    const cachedTests = this.getOfflineTestsSync();
+    const cachedById = new Map(cachedTests.map((t: any) => [t.id, t]));
+    const mergedTests = cachedTests.map((t: any) => {
+      const fresh = courseTests.find((c: any) => c.id === t.id);
+      return fresh ? { ...t, question_count: fresh.question_count, updated_at: fresh.updated_at } : t;
+    });
+    for (const fresh of courseTests) {
+      if (!cachedById.has(fresh.id)) mergedTests.push(fresh);
+    }
+    KVStore.setJson(OFFLINE_TESTS_KEY, mergedTests);
+
+    let newTests = 0;
+    let updatedTests = 0;
+    let unchangedTests = 0;
+    let downloadedQuestions = 0;
+
+    const total = courseTests.length;
+    for (let i = 0; i < total; i++) {
+      if (this._cancelled) return { newTests, updatedTests, unchangedTests };
+      const test = courseTests[i];
+      report({
+        phase: 'questions',
+        current: i,
+        total,
+        detail: `Checking ${test.id}  (${i + 1}/${total})`,
+      });
+
+      const cachedQs = QuestionCache.getCachedQuestionsSync(test.id);
+      const expectedCount = test.question_count || 0;
+      const isKnown = cachedById.has(test.id);
+      const cachedUpdatedAt = cachedById.get(test.id)?.updated_at ?? null;
+
+      const countChanged = cachedQs.length > 0 && expectedCount > 0 && cachedQs.length !== expectedCount;
+      const contentChanged =
+        isKnown && cachedQs.length > 0 && cachedUpdatedAt && test.updated_at && test.updated_at !== cachedUpdatedAt;
+      const neverCached = cachedQs.length === 0;
+
+      if (!neverCached && !countChanged && !contentChanged) {
+        unchangedTests += 1;
+        continue;
+      }
+
+      if (neverCached) newTests += 1;
+      else updatedTests += 1;
+
+      try {
+        const questions = await this.fetchAllRows(
+          'questions',
+          (query) =>
+            query
+              .eq('test_id', test.id)
+              .order('question_number', { ascending: true })
+              .order('id', { ascending: true })
+        );
+        if (questions && questions.length > 0) {
+          await QuestionCache.cacheQuestions(test.id, questions);
+          downloadedQuestions += questions.length;
+        }
+      } catch (err) {
+        console.warn(`[Offline] Catalog delta failed for test ${test.id}`, err);
+      }
+    }
+
+    report({
+      phase: 'questions',
+      current: total,
+      total,
+      detail: `${downloadedQuestions} questions fetched (${unchangedTests} tests unchanged)`,
+    });
+    if (this._cancelled) return { newTests, updatedTests, unchangedTests };
+
+    // Pull user rows too so tags/notes/progress land in the same pass.
+    await this.syncUserData(userId);
+
+    await this.setMetadata({
+      lastCatalogScan: Date.now(),
+      lastIncrementalSync: Date.now(),
+      totalTests: mergedTests.length,
+      totalQuestions: QuestionCache.getCachedTestIdsSync().length > 0
+        ? this.getOfflineQuestionsAllSync().length
+        : meta.totalQuestions,
+    });
+    report({ phase: 'done', current: 1, total: 1, detail: 'Up to date!' });
+
+    return { newTests, updatedTests, unchangedTests };
+  }
+
+  /** True when a previously-completed download exists for this course. */
+  hasCompletedDownload(course?: string): boolean {
+    const meta = KVStore.getJson<OfflineMetadata>(OFFLINE_META_KEY);
+    if (!meta?.lastFullSync) return false;
+    if (course) return this.getOfflineQuestionsForCourseSync(course).length > 0;
+    return this.getOfflineQuestionsAllSync().length > 0;
+  }
+
+  /**
+   * Resume the image phase only. Reuses the already-cached questions — it
+   * never re-fetches rows from Supabase, so the cost is purely R2 bandwidth.
+   */
+  async downloadRemainingMedia(
+    onProgress?: (p: SyncProgress) => void
+  ): Promise<{ done: number; skipped: number; failed: number }> {
+    const report = (p: SyncProgress) => {
+      this.currentSyncProgress = p;
+      this._notifyListeners(p);
+      if (onProgress) { try { onProgress(p); } catch {} }
+    };
+
+    this._cancelled = false;
+    await MediaCacheService.init();
+
+    const rows = this.getOfflineQuestionsAllSync();
+    const urls = collectQuestionMediaUrls(rows);
+    report({ phase: 'media', current: 0, total: urls.length, detail: 'Caching images...' });
+
+    const result = await MediaCacheService.cacheUrls(
+      urls,
+      (done, total, skipped) => {
+        report({
+          phase: 'media',
+          current: done,
+          total,
+          detail: `Images ${done}/${total} (${skipped} already saved)`,
+        });
+      },
+      () => this._cancelled
+    );
+
+    await this.setMetadata({
+      totalMedia: urls.length,
+      totalMediaCached: MediaCacheService.cachedCount(),
+      mediaPhaseCancelled: false,
+    });
+    report({ phase: 'done', current: 1, total: 1, detail: 'Images downloaded!' });
+    return result;
   }
 
   // ── READERS (all synchronous via KVStore) ─────────────────────
@@ -874,6 +1139,7 @@ class OfflineManagerService {
   // ── CLEAR ─────────────────────────────────────────────────────
   async clearAllOfflineData() {
     await QuestionCache.clearCache();
+    try { await MediaCacheService.clearCache(); } catch { /* best-effort */ }
     KVStore.delete(OFFLINE_META_KEY);
     KVStore.delete(OFFLINE_TESTS_KEY);
     KVStore.delete(OFFLINE_METADATA_CONSOLIDATED_KEY);

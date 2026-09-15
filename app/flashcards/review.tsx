@@ -29,6 +29,7 @@ import { parseImageUrls } from '../../src/utils/imageHelpers';
 import { BranchSvc, BranchNode } from '../../src/services/BranchService';
 import { PremiumMoveModal } from '../../src/components/flashcards/PremiumMoveModal';
 import { OfflineManager } from '../../src/services/OfflineManager';
+import { LocalQuery } from '../../src/services/LocalQuery';
 import { NetworkStatus } from '../../src/lib/networkStatus';
 import { buildCanonicalExplanations } from '../unified/engine';
 import { fetchBestAnswer, saveBestAnswer, BestAnswer } from '../../src/services/BestAnswerService';
@@ -233,7 +234,9 @@ export default function ReviewScreen() {
     let cancelled = false;
     (async () => {
       try {
-        const { data } = await supabase
+        // Local-first: question rows come from the downloaded bank, never a
+        // live query — flashcard review must work in airplane mode.
+        const { data } = await LocalQuery
           .from('questions')
           .select('id, explanation_markdown, source, exam_year, exam_group, correct_answer, tests(*)')
           .eq('id', qId)

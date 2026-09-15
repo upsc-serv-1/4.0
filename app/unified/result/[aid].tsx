@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useMemo, useCallback } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { cacheGetString } from '../../../src/lib/safeAsyncStorage';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator, Share, Platform, Alert, Dimensions, Animated, Switch } from 'react-native';
 import { useLocalSearchParams, router, Stack } from 'expo-router';
 import { useTheme } from '../../../src/context/ThemeContext';
@@ -478,7 +479,7 @@ export default function ResultScreen() {
 
       try {
         const catalogKey = `review_tag_catalog_${session.user.id}`;
-        const raw = await AsyncStorage.getItem(catalogKey);
+        const raw = await cacheGetString(catalogKey);
         if (raw) {
           const parsed = JSON.parse(raw);
           if (Array.isArray(parsed)) parsed.forEach(t => t && tags.add(t));

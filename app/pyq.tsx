@@ -21,6 +21,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { KVStore } from '../src/lib/kvStore';
 import { OfflineManager } from '../src/services/OfflineManager';
 import { QuestionCache } from '../src/services/QuestionCache';
+import { MAINS_QUESTIONS_CACHE_KEY, getInitialMainsQuestions } from '../src/data/mainsConsolidatedLoader';
 import { router, useLocalSearchParams, useFocusEffect } from 'expo-router';
 import * as Haptics from 'expo-haptics';
 import * as Print from 'expo-print';
@@ -898,48 +899,19 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
   };
 
   const fetchQuestionsForTests = async (testIds: string[], bypassCache = false) => {
-    // OFFLINE-FIRST: use cached questions when available unless bypassing cache.
-    if (!bypassCache) {
-      const cachedQuestions = OfflineManager.getOfflineQuestionsForCourseSync(selectedCourse) || [];
-      if (cachedQuestions.length > 0) {
-        const cachedRows = cachedQuestions.filter((q: any) => testIds.includes(q.test_id));
-        if (cachedRows.length > 0) {
-          return cachedRows;
-        }
-      }
-    }
+    // STRICTLY LOCAL: PYQ is a study screen, so it reads the downloaded bank
+    // only. No hybrid "local first, then live Supabase" path — that was the
+    // main source of egress and made offline results inconsistent.
+    const cachedQuestions = OfflineManager.getOfflineQuestionsForCourseSync(selectedCourse) || [];
+    const cachedRows = cachedQuestions.filter((q: any) => testIds.includes(q.test_id));
+    if (cachedRows.length > 0) return cachedRows;
 
+    // Fall back to the per-test cache (covers tests not in the course index).
     const rows: any[] = [];
-    let from = 0;
-    while (true) {
-      const { data, error } = await supabase
-        .from('questions')
-        .select('*, tests(institute)')
-        .in('test_id', testIds)
-        .eq('course', selectedCourse)
-        .order('test_id', { ascending: true })
-        .order('question_number', { ascending: true })
-        .range(from, from + PYQ_PAGE_SIZE - 1);
-      if (error) throw error;
-      if (!data?.length) break;
-      rows.push(...data);
-      if (data.length < PYQ_PAGE_SIZE) break;
-      from += PYQ_PAGE_SIZE;
+    for (const tId of testIds) {
+      const cached = QuestionCache.getCachedQuestionsSync(tId);
+      if (cached.length > 0) rows.push(...cached);
     }
-
-    if (bypassCache && rows.length > 0) {
-      const grouped: Record<string, any[]> = {};
-      rows.forEach(q => {
-        if (q.test_id) {
-          if (!grouped[q.test_id]) grouped[q.test_id] = [];
-          grouped[q.test_id].push(q);
-        }
-      });
-      for (const tId of Object.keys(grouped)) {
-        await QuestionCache.cacheQuestions(tId, grouped[tId]);
-      }
-    }
-
     return rows;
   };
 
@@ -982,33 +954,22 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
           else if (targetPaperGroup === 'GS Paper 4') mappedPaper = 'GS4';
           else if (targetPaperGroup === 'Optional') mappedPaper = 'Optional';
           
-          console.log(`[MainsFetch] Querying mains_questions for paper: ${mappedPaper}, stage: ${examStage}`);
-          
-           // Query Supabase mains_questions with paper filter and is_pyq=true at DB level (paginated)
-          const mainsQs: any[] = [];
-          let from = 0;
-          while (true) {
-            let query = supabase
-              .from('mains_questions')
-              .select('id, question_number, question_text, marks, exam_year, subject, section_group, microtopic, subtopic, nanotopic, macrotag, microtag, hierarchy_path, paper, is_pyq, source_attribution_label, exam_info, stage, exam, exam_group, is_upsc_cse, is_allied, is_others, exam_category, answers:mains_answers(id, institute)')
-              .eq('is_pyq', true);
-
+          // STRICTLY LOCAL: mains PYQ rows come from the downloaded KVStore
+          // snapshot (@mains_cached_questions_v2). Refresh is the only path
+          // that re-reads the server.
+          const cachedMains = (
+            KVStore.getJson<any[]>(MAINS_QUESTIONS_CACHE_KEY)
+            ?? (typeof getInitialMainsQuestions === 'function' ? (getInitialMainsQuestions() as any[]) : [])
+            ?? []
+          );
+          const mainsQs: any[] = cachedMains.filter((q: any) => {
+            if (!q?.is_pyq) return false;
             if (mappedPaper === 'Optional') {
-              query = query.not('paper', 'in', '("GS1","GS2","GS3","GS4","Essay")');
-            } else {
-              query = query.eq('paper', mappedPaper);
+              return !['GS1', 'GS2', 'GS3', 'GS4', 'Essay'].includes(String(q.paper));
             }
-
-            const { data, error: mainsErr } = await query
-              .range(from, from + PYQ_PAGE_SIZE - 1);
-            
-            if (mainsErr) throw mainsErr;
-            if (!data || data.length === 0) break;
-            mainsQs.push(...data);
-            if (data.length < PYQ_PAGE_SIZE) break;
-            from += PYQ_PAGE_SIZE;
-          }
-          console.log('[MainsFetch] Fetched from Supabase (paginated):', mainsQs.length, 'questions for paper:', mappedPaper);
+            return q.paper === mappedPaper;
+          });
+          console.log('[MainsFetch] Using local cache:', mainsQs.length, 'questions for paper:', mappedPaper);
           
           if (mainsQs.length === 0) {
             console.warn(`[MainsFetch] No questions found for paper=${mappedPaper} in mains_questions table`);

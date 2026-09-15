@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { safeSetItem } from '../lib/safeAsyncStorage';
+import { safeSetItem, cacheGetString } from '../lib/safeAsyncStorage';
 import { supabase } from '../lib/supabase';
 import { formatTagLabel, normalizeTag } from '../utils/tagUtils';
 import { useTagStore } from '../store/tagStore';
@@ -103,7 +103,7 @@ export function useMainsTaggedVault(userId: string | undefined, localQuestionsLi
   // Load custom-tag catalog from AsyncStorage
   const loadCustomReviewTags = useCallback(async () => {
     try {
-      const cached = await AsyncStorage.getItem(tagCatalogKey).then((v) => (v ? JSON.parse(v) : []));
+      const cached = await cacheGetString(tagCatalogKey).then((v) => (v ? JSON.parse(v) : []));
       
       // Proactively fetch all active review tags from mains_question_states
       const { data: states } = await supabase
@@ -246,7 +246,7 @@ export function useMainsTaggedVault(userId: string | undefined, localQuestionsLi
       
       // Fallback cache load
       try {
-        const cached = await AsyncStorage.getItem(cacheKey);
+        const cached = await cacheGetString(cacheKey);
         if (cached) {
           setRawQuestions(JSON.parse(cached));
         }
@@ -261,7 +261,7 @@ export function useMainsTaggedVault(userId: string | undefined, localQuestionsLi
     let isMounted = true;
     const init = async () => {
       try {
-        const cached = await AsyncStorage.getItem(cacheKey);
+        const cached = await cacheGetString(cacheKey);
         if (cached && isMounted) {
           setRawQuestions(JSON.parse(cached));
         }
@@ -379,7 +379,7 @@ export function useMainsTaggedVault(userId: string | undefined, localQuestionsLi
   const persistCatalog = useCallback(async (tagList: string[]) => {
     const sorted = dedupeTags(tagList).sort((a, b) => a.localeCompare(b));
     setCustomReviewTags(sorted);
-    await AsyncStorage.setItem(tagCatalogKey, JSON.stringify(sorted));
+    await safeSetItem(tagCatalogKey, JSON.stringify(sorted));
   }, [tagCatalogKey]);
 
   const addTagToReview = useCallback(async (tagName: string) => {

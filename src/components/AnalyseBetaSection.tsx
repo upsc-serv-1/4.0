@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, ScrollView, ActivityIndicator, TouchableOpacity
 import { useTheme } from '../context/ThemeContext';
 import { spacing } from '../theme';
 import { supabase } from '../lib/supabase';
+import { LocalQuery } from '../services/LocalQuery';
 import { LineChart, BarChart, HorizontalBarChart } from './Charts';
 import { TrendingUp, Target, Clock, Calendar, ChevronRight, BarChart2 } from 'lucide-react-native';
 import { SkeletonAnalytics } from './common/SkeletonLoader';
@@ -44,17 +45,17 @@ export const AnalyseBetaSection = ({ userId }: AnalyseBetaProps) => {
 
       if (!statesError && states && states.length > 0) {
         const qIds = Array.from(new Set(states.map(s => s.question_id)));
-        const { data: qMeta } = await supabase
+        const { data: qMeta } = await LocalQuery
           .from('questions')
           .select('id, subject, correct_answer')
           .in('id', qIds);
 
         if (qMeta) {
-          const qMap = new Map(qMeta.map(q => [String(q.id), q]));
+          const qMap = new Map(qMeta.map((q: any) => [String(q.id), q]));
           const subjects = new Map<string, { total: number, correct: number }>();
 
           states.forEach(s => {
-            const meta = qMap.get(String(s.question_id));
+            const meta: any = qMap.get(String(s.question_id));
             if (meta) {
               const sub = meta.subject || 'General';
               const isCorrect = s.selected_answer === meta.correct_answer;

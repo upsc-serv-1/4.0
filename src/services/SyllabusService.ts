@@ -1,7 +1,8 @@
 import { supabase } from '../lib/supabase';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { NetworkStatus } from '../lib/networkStatus';
+import { KVStore } from '../lib/kvStore';
 import { SyncQueue } from './SyncQueue';
+import { OfflineManager } from './OfflineManager';
 
 export interface SyllabusProgress {
   ncert: boolean;
@@ -12,15 +13,28 @@ export interface SyllabusProgress {
   ansWriting?: boolean;
 }
 
+/**
+ * Local progress lives in the OfflineManager MMKV collection
+ * (`@user_syllabus_progress_<uid>`), which is populated by the user-data sync
+ * and wiped by "Clear offline data". This service previously kept a *second*
+ * copy in AsyncStorage under `upsc_syllabus_progress_*`; that duplicate could
+ * drift from the MMKV copy and survived a cache clear. It is now single-source.
+ */
 export class SyllabusService {
-  private static STORAGE_KEY = 'upsc_syllabus_progress';
+  private static toMap(rows: any[]): Record<string, SyllabusProgress> {
+    const progress: Record<string, SyllabusProgress> = {};
+    (rows || []).forEach((row: any) => {
+      if (row?.path) progress[row.path] = row.status;
+    });
+    return progress;
+  }
 
   static async getProgress(userId: string) {
     if (!userId) return {};
-    const cacheKey = `${this.STORAGE_KEY}_${userId}`;
-    // Offline-first: read cache immediately.
-    const local = await AsyncStorage.getItem(cacheKey);
-    const cached = local ? JSON.parse(local) : {};
+
+    // Offline-first: the MMKV copy is synchronous and authoritative on device.
+    const localRows = OfflineManager.getCollectionSync('user_syllabus_progress', userId);
+    const cached = this.toMap(localRows);
 
     if (!NetworkStatus.isOnline()) {
       return cached;
@@ -34,12 +48,11 @@ export class SyllabusService {
 
       if (error) throw error;
 
-      const progress: Record<string, SyllabusProgress> = {};
-      data.forEach((row: any) => {
-        progress[row.path] = row.status;
-      });
-
-      await AsyncStorage.setItem(cacheKey, JSON.stringify(progress));
+      const progress = this.toMap(data || []);
+      // Keep the shared MMKV collection in step with the server response.
+      if (data) {
+        KVStore.setJson(`@user_syllabus_progress_${userId}`, data);
+      }
       return progress;
     } catch {
       return cached;
@@ -48,18 +61,25 @@ export class SyllabusService {
 
   static async getCachedProgress(userId: string) {
     if (!userId) return {};
-    const cacheKey = `${this.STORAGE_KEY}_${userId}`;
-    const local = await AsyncStorage.getItem(cacheKey);
-    return local ? JSON.parse(local) : {};
+    return this.toMap(OfflineManager.getCollectionSync('user_syllabus_progress', userId));
   }
 
   static async updateProgress(userId: string, path: string, status: SyllabusProgress) {
-    const cacheKey = `${this.STORAGE_KEY}_${userId}`;
-    // 1. Always update local cache first so UI reflects the change instantly.
-    const local = await AsyncStorage.getItem(cacheKey);
-    const data = local ? JSON.parse(local) : {};
-    data[path] = status;
-    await AsyncStorage.setItem(cacheKey, JSON.stringify(data));
+    // 1. Update the shared MMKV collection first so UI reflects the change
+    //    instantly and "Clear offline data" cannot miss it.
+    const rows = OfflineManager.getCollectionSync('user_syllabus_progress', userId) as any[];
+    const next = [...rows];
+    const idx = next.findIndex((r: any) => r?.path === path);
+    const record = {
+      id: idx >= 0 ? next[idx].id : undefined,
+      user_id: userId,
+      path,
+      status,
+      updated_at: new Date().toISOString(),
+    };
+    if (idx >= 0) next[idx] = { ...next[idx], ...record };
+    else next.push(record);
+    KVStore.setJson(`@user_syllabus_progress_${userId}`, next);
 
     const payload = {
       user_id: userId,

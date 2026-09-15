@@ -84,39 +84,17 @@ const getAnalyticsSubject = (q: any, maps: ReturnType<typeof buildTaxonomyMaps>)
 };
 
 const fetchQuestionsForTests = async (testIds: string[]) => {
+  // Strictly local: a missing bank yields no rows rather than a live query.
   const offlineQuestions = OfflineManager.getOfflineQuestionsAllSync() || [];
-  const offlineRows = offlineQuestions.filter((q: any) => testIds.includes(q.test_id));
-  if (offlineRows.length > 0) return offlineRows;
-
-  const rows: any[] = [];
-  let from = 0;
-  while (true) {
-    const { data, error } = await supabase
-      .from('questions')
-      .select('*')
-      .in('test_id', testIds)
-      .order('test_id', { ascending: true })
-      .order('question_number', { ascending: true })
-      .range(from, from + PAGE_SIZE - 1);
-    if (error) throw error;
-    if (!data?.length) break;
-    rows.push(...data);
-    if (data.length < PAGE_SIZE) break;
-    from += PAGE_SIZE;
-  }
-  return rows;
+  return offlineQuestions.filter((q: any) => testIds.includes(q.test_id));
 };
 
 export async function buildWeightedSyllabusData(filter: WeightedYearFilter): Promise<WeightedSyllabusResult> {
   const maps = buildTaxonomyMaps();
-  let tests: any[] = OfflineManager.getOfflineTestsSync() || [];
-  if (!tests.length) {
-    const { data, error } = await supabase
-      .from('tests')
-      .select('id, title, subject, level, paper_type, section_group, exam_year, launch_year, institute, program_id, program_name, series');
-    if (error) throw error;
-    tests = data || [];
-  }
+  // Strictly local: weighted progress is computed from the downloaded test
+  // catalogue. When nothing is downloaded the result is simply empty — the
+  // screen prompts for a Download rather than querying the server.
+  const tests: any[] = OfflineManager.getOfflineTestsSync() || [];
 
   const relevantTests = tests.filter((test: any) => {
     const institute = normalizeKey(test.institute);

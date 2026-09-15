@@ -1,5 +1,6 @@
 import React from 'react';
-import { View, ScrollView, Platform } from 'react-native';
+import { View, ScrollView, Platform, Image as RNImage } from 'react-native';
+import { MediaCacheService } from '../services/MediaCacheService';
 
 /**
  * Build theme-aware Markdown inline styles.
@@ -46,9 +47,40 @@ export function buildMarkdownStyles(
 
 /**
  * Build custom render rules that produce properly scrollable tables.
+ *
+ * Also installs the `image` rule, which is what makes answer images work in
+ * airplane mode:
+ *   • If the URL was cached during the Download's media phase, it renders from
+ *     the local `file://` path — zero network.
+ *   • Otherwise it renders the remote URL (online case, unchanged) and asks
+ *     MediaCacheService to cache it in the background for next time. That lazy
+ *     path is the safety net for URLs added after the last Download.
+ *
+ * Media lives on Cloudflare/R2, so even the remote render does not touch
+ * Supabase egress.
  */
 export function buildMarkdownRules(borderColor: string, primaryColor: string, textColor: string, fontSize: number) {
   return {
+    image: (node: any) => {
+      const src = String(node?.attributes?.src || '');
+      if (!src) return null;
+
+      // Cached URLs resolve to a local file; unknown ones stay remote and get
+      // queued for lazy caching.
+      const resolved = MediaCacheService.resolveUri(src);
+      if (resolved === src && /^https?:\/\//i.test(src)) {
+        MediaCacheService.ensureCached([src]);
+      }
+
+      return (
+        <RNImage
+          key={node.key}
+          source={{ uri: resolved }}
+          style={{ width: '100%', height: 220, resizeMode: 'contain', marginVertical: 8, borderRadius: 6 }}
+          resizeMode="contain"
+        />
+      );
+    },
     table: (node: any, children: any) => (
       <ScrollView key={node.key} horizontal showsHorizontalScrollIndicator contentContainerStyle={{ minWidth: '100%' }} style={{ marginVertical: 8 }}>
         <View style={{ borderWidth: 1, borderColor, borderRadius: 8, overflow: 'hidden', minWidth: 280 }}>

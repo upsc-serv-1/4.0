@@ -1008,11 +1008,15 @@ export default function IntegratedSearchScreen() {
         }
 
         if (filters.pyqFilter === 'PYQ Only') {
-          const isPyq = r.type === 'prelims' ? r.rawItem?.is_pyq : (r.rawItem?.is_pyq || r.rawItem?.isPyq);
-          if (!isPyq) return;
+          if (r.type !== 'topper') {
+            const isPyq = r.type === 'prelims' ? r.rawItem?.is_pyq : (r.rawItem?.is_pyq || r.rawItem?.isPyq);
+            if (!isPyq) return;
+          }
         } else if (filters.pyqFilter === 'Non-PYQ') {
-          const isPyq = r.type === 'prelims' ? r.rawItem?.is_pyq : (r.rawItem?.is_pyq || r.rawItem?.isPyq);
-          if (isPyq) return;
+          if (r.type !== 'topper') {
+            const isPyq = r.type === 'prelims' ? r.rawItem?.is_pyq : (r.rawItem?.is_pyq || r.rawItem?.isPyq);
+            if (isPyq) return;
+          }
         }
 
         const canon = canonicalizeSubject(r.subject);
@@ -1223,10 +1227,11 @@ export default function IntegratedSearchScreen() {
     results.forEach(r => {
       if (r.type === 'prelims' && !filters.showPrelims) return;
       if (r.type === 'mains' && !filters.showMains) return;
+      if (r.type === 'topper' && !filters.showToppers) return;
       if (r.type === 'value_add' && !filters.showValueAdd) return;
 
       if (filters.mainsPapers.length > 0) {
-        if (r.type === 'mains' || r.type === 'value_add') {
+        if (r.type === 'mains' || r.type === 'topper' || r.type === 'value_add') {
           const normP = normalizePaper(r.paper);
           if (!normP || !filters.mainsPapers.some(p => normalizePaper(p) === normP || p === r.paper)) return;
         } else {
@@ -1238,7 +1243,7 @@ export default function IntegratedSearchScreen() {
       if (canon) subs.add(canon);
     });
     return Array.from(subs).sort();
-  }, [results, filters.showPrelims, filters.showMains, filters.showValueAdd, filters.mainsPapers]);
+  }, [results, filters.showPrelims, filters.showMains, filters.showToppers, filters.showValueAdd, filters.mainsPapers]);
 
   // Real-time match counts for subjects, papers, institutes, and stages from search results
   // All counts are fully REACTIVE and INTERCONNECTED with all active filters!
@@ -1363,11 +1368,12 @@ export default function IntegratedSearchScreen() {
       if (!canon) return;
       if (r.type === 'prelims' && !filters.showPrelims) return;
       if (r.type === 'mains' && !filters.showMains) return;
+      if (r.type === 'topper' && !filters.showToppers) return;
       if (r.type === 'value_add' && !filters.showValueAdd) return;
       if (!matchesScope(r)) return;
 
       if (filters.mainsPapers.length > 0) {
-        if (r.type === 'mains' || r.type === 'value_add') {
+        if (r.type === 'mains' || r.type === 'topper' || r.type === 'value_add') {
           const normP = normalizePaper(r.paper);
           if (!normP || !filters.mainsPapers.some(p => normalizePaper(p) === normP || p === r.paper)) return;
         } else {
@@ -1764,19 +1770,15 @@ export default function IntegratedSearchScreen() {
     // Filter by NCERT (prelims)
     if (filters.ncertFilter === 'NCERT Only') {
       list = list.filter(item => {
-        if (item.type === 'prelims') {
-          const v = item.rawItem.is_ncert;
-          return v === true || v === 1 || ['true', '1', 'yes'].includes(String(v).trim().toLowerCase());
-        }
-        return false;
+        if (item.type !== 'prelims') return true;
+        const v = item.rawItem.is_ncert;
+        return v === true || v === 1 || ['true', '1', 'yes'].includes(String(v).trim().toLowerCase());
       });
     } else if (filters.ncertFilter === 'Non-NCERT') {
       list = list.filter(item => {
-        if (item.type === 'prelims') {
-          const v = item.rawItem.is_ncert;
-          return !(v === true || v === 1 || ['true', '1', 'yes'].includes(String(v).trim().toLowerCase()));
-        }
-        return true;
+        if (item.type !== 'prelims') return true;
+        const v = item.rawItem.is_ncert;
+        return !(v === true || v === 1 || ['true', '1', 'yes'].includes(String(v).trim().toLowerCase()));
       });
     }
 
@@ -1793,11 +1795,11 @@ export default function IntegratedSearchScreen() {
 
     // Filter by Exam Category (prelims)
     if (filters.examCategory === 'UPSC') {
-      list = list.filter(item => item.type === 'prelims' && item.rawItem.is_upsc_cse);
+      list = list.filter(item => item.type !== 'prelims' || !!item.rawItem.is_upsc_cse);
     } else if (filters.examCategory === 'Allied') {
-      list = list.filter(item => item.type === 'prelims' && item.rawItem.is_allied);
+      list = list.filter(item => item.type !== 'prelims' || !!item.rawItem.is_allied);
     } else if (filters.examCategory === 'Others') {
-      list = list.filter(item => item.type === 'prelims' && item.rawItem.is_others);
+      list = list.filter(item => item.type !== 'prelims' || !!item.rawItem.is_others);
     }
 
     // Filter by institute
@@ -1836,22 +1838,18 @@ export default function IntegratedSearchScreen() {
     // Filter by Sections (prelims)
     if (filters.sections.length > 0) {
       list = list.filter(item => {
-        if (item.type === 'prelims') {
-          const sec = item.rawItem.section_group || item.rawItem.sectionGroup;
-          return sec && filters.sections.includes(sec);
-        }
-        return false;
+        if (item.type !== 'prelims') return true;
+        const sec = item.rawItem.section_group || item.rawItem.sectionGroup;
+        return sec && filters.sections.includes(sec);
       });
     }
 
     // Filter by Microtopics (prelims)
     if (filters.microtopics.length > 0) {
       list = list.filter(item => {
-        if (item.type === 'prelims') {
-          const mt = item.rawItem.micro_topic || item.rawItem.microTopic;
-          return mt && filters.microtopics.includes(mt);
-        }
-        return false;
+        if (item.type !== 'prelims') return true;
+        const mt = item.rawItem.micro_topic || item.rawItem.microTopic;
+        return mt && filters.microtopics.includes(mt);
       });
     }
 
@@ -1859,20 +1857,18 @@ export default function IntegratedSearchScreen() {
     if (filters.yearRange) {
       const yr = filters.yearRange.trim();
       list = list.filter(item => {
-        if (item.type === 'prelims') {
-          const y = item.rawItem.exam_year || item.year;
-          if (!y) return false;
-          if (yr.includes('-')) {
-            const [minY, maxY] = yr.split('-').map(x => parseInt(x.trim(), 10));
-            return y >= minY && y <= maxY;
-          }
-          if (yr.includes(',')) {
-            const years = yr.split(',').map(x => parseInt(x.trim(), 10));
-            return years.includes(y);
-          }
-          return y === parseInt(yr, 10);
+        if (item.type !== 'prelims') return true;
+        const y = item.rawItem.exam_year || item.year;
+        if (!y) return false;
+        if (yr.includes('-')) {
+          const [minY, maxY] = yr.split('-').map(x => parseInt(x.trim(), 10));
+          return y >= minY && y <= maxY;
         }
-        return false;
+        if (yr.includes(',')) {
+          const years = yr.split(',').map(x => parseInt(x.trim(), 10));
+          return years.includes(y);
+        }
+        return y === parseInt(yr, 10);
       });
     }
 
@@ -2075,23 +2071,21 @@ export default function IntegratedSearchScreen() {
   // Rendering individual card - replica of Prelims search design
   const renderItem = ({ item, index }: { item: UnifiedSearchResult; index: number }) => {
     if (item.type === 'topper') {
+      const tq = item.rawItem;
       const topperAns =
-        (item.rawItem.answers || []).find((a: any) => isTopperAnswer(a)) || item.rawItem.answers?.[0];
-      const qKey = normalizeQuestionKey(item.rawItem);
-      const attached = topperAttachmentMap.get(qKey) || [];
+        (tq.answers || []).find((a: any) => isTopperAnswer(a)) || tq.answers?.[0];
       return (
         <QuestionBankTopperCard
           key={item.id}
-          question={item.rawItem}
+          question={tq}
           topperAnswer={topperAns}
-          attachedToppers={attached.length > 0 ? attached : undefined}
           colors={colors}
           isDark={isDark}
-          zoomFontSize={15}
-          isBookmarked={savedQuestionIds.includes(item.rawItem.id)}
+          zoomFontSize={Math.round(15 * (IS_IPAD ? 1.1 : 1))}
+          isBookmarked={savedQuestionIds.includes(tq.id)}
           onToggleBookmark={toggleBookmark}
           onOpenViewer={handleOpenTopperViewer}
-          onOpenDetailed={() => setPreviewMainsQuestion(item.rawItem)}
+          onOpenDetailed={() => setPreviewMainsQuestion(tq)}
           searchQuery={query}
         />
       );

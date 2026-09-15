@@ -2143,42 +2143,7 @@ export function MainsScreenInner() {
               onToggleVaFavorite={handleToggleVaFavorite}
             />
           )}
-          {currentScreen === 'search' && (
-            <MainsAISearchView
-              colors={colors}
-              isTablet={isTablet}
-              insets={insets}
-              onToggleBookmark={toggleBookmark}
-              savedQuestionIds={savedQuestionIds}
-              onCopy={handleCopy}
-              copiedId={copiedId}
-              questions={questions}
-              valueAddItems={valueAddItems}
-              userTags={userTags}
-              setUserTags={setUserTags}
-              userQuestionStates={userQuestionStates}
-              onOpenDetailed={(q) => {
-                setPreviousScreen('search');
-                setDetailedQuestion(q);
-                setCurrentScreen('detailed-question');
-              }}
-              onActiveQuestionChange={handleActiveQuestionChange}
-              onAddFlashcardClick={handleValueAddFlashcard}
-              valueAddTags={valueAddTags}
-              onToggleValueAddTag={handleToggleValueAddTag}
-              onCreateTag={handleCreateDetailedTag}
-              vaFavorites={vaFavorites}
-              onToggleVaFavorite={handleToggleVaFavorite}
-              textColorMode={textColorMode}
-              onChangeTextColorMode={handleUpdateTextColorMode}
-              keyBoxMode={keyBoxMode}
-              onChangeKeyBoxMode={handleUpdateKeyBoxMode}
-              keyBoxColor={keyBoxColor}
-              onChangeKeyBoxColor={handleUpdateKeyBoxColor}
-              onForceSync={handleForceSync}
-              syncing={syncingMains}
-            />
-          )}
+          {/* Phase 7: In-Mains AI Search retired in favor of unified /search screen */}
           {currentScreen === 'detailed-question' && detailedQuestion && (
             <DetailedQuestionView
               question={detailedQuestion}

@@ -1818,7 +1818,7 @@ export default function UnifiedQuizEngine() {
       const MAX_TOTAL = 10000; // Safety cap to prevent memory issues
       
       while (from < MAX_TOTAL) {
-        let query = supabase.from('questions').select(SELECT_COLS).eq('course', selectedCourse);
+        let query = LocalQuery.from('questions').select(SELECT_COLS).eq('course', selectedCourse);
         const resIds = getResultIds();
         
         if (resIds && resIds.length > 0) {
@@ -1830,7 +1830,7 @@ export default function UnifiedQuizEngine() {
           if (from > 0) break; // Only one question (cluster head)
           // PARITY FIX: fetch sibling rows so the merger can rebuild the full
           // multi-institute explanation cluster, exactly like the index path.
-          const { data: tgt } = await supabase
+          const { data: tgt } = await LocalQuery
             .from('questions')
             .select(SELECT_COLS)
             .eq('course', selectedCourse)
@@ -1843,7 +1843,7 @@ export default function UnifiedQuizEngine() {
           const isMedical = selectedCourse === 'Medical Science';
           const examYear = String(target.exam_year || '').trim();
           if (target.is_pyq && (isUpsc || isMedical) && examYear) {
-            let sibsQuery = supabase
+            let sibsQuery = LocalQuery
               .from('questions')
               .select(SELECT_COLS)
               .eq('course', selectedCourse)
@@ -1910,15 +1910,7 @@ export default function UnifiedQuizEngine() {
               let localRes = await LocalQuery.from('tests').select('*').eq('course', selectedCourse);
               let localTests = localRes.data || [];
               
-              if ((!localTests || localTests.length === 0) && NetworkStatus.isOnline()) {
-                const { data: remoteTests } = await supabase
-                  .from('tests')
-                  .select('id, title, series, institute, program_name, program_id, course')
-                  .eq('course', selectedCourse);
-                testRows = remoteTests || [];
-              } else {
-                testRows = localTests || [];
-              }
+              testRows = localTests || [];
               
               const pyqM = params.pyqMaster || params.pyqFilter;
               if (pyqM === 'PYQ Only') {
@@ -2363,7 +2355,7 @@ const isPyqUpscsearch = params.pyqFilter === 'PYQ Only' && params.year_start && 
               .filter(Boolean)
           ));
           if (years.length > 0) {
-            const { data: siblings } = await supabase
+            const { data: siblings } = await LocalQuery
               .from('questions')
               .select(SELECT_COLS)
               .eq('course', selectedCourse)

@@ -129,6 +129,63 @@ const naturalCompare = (() => {
   return (a: string, b: string) => collator.compare(a, b);
 })();
 
+export function highlightKeywords(text: string, query?: string): React.ReactNode {
+  if (!text) return null;
+  if (!query || !query.trim()) return text;
+
+  const trimmed = query.trim();
+  const words = trimmed.split(/\s+/).filter(w => w.length >= 2);
+  if (words.length === 0) return text;
+
+  const escaped = words.map(w => w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|');
+  const pattern = new RegExp(`(${escaped})`, 'gi');
+  const parts = text.split(pattern);
+  if (parts.length <= 1) return text;
+
+  return parts.map((part, i) =>
+    pattern.test(part) ? (
+      <Text
+        key={i}
+        style={{
+          fontWeight: '900',
+          color: '#ea580c',
+          backgroundColor: 'rgba(234, 88, 12, 0.15)',
+          borderRadius: 3,
+        }}
+      >
+        {part}
+      </Text>
+    ) : (
+      part
+    )
+  );
+}
+
+export function buildAnswerSnippet(answers: any[], query?: string): React.ReactNode | null {
+  if (!query || !query.trim() || !answers || answers.length === 0) return null;
+  const words = query.trim().toLowerCase().split(/\s+/).filter(w => w.length >= 2);
+  if (words.length === 0) return null;
+
+  for (const a of answers) {
+    const rawText = a.answerText || '';
+    if (!rawText) continue;
+    const cleanText = rawText.replace(/!\[.*?\]\(.*?\)/g, '').replace(/[#*`_]/g, ' ').replace(/\s+/g, ' ');
+    const lower = cleanText.toLowerCase();
+    for (const w of words) {
+      const idx = lower.indexOf(w);
+      if (idx >= 0) {
+        const start = Math.max(0, idx - 40);
+        const end = Math.min(cleanText.length, idx + w.length + 60);
+        const prefix = start > 0 ? '...' : '';
+        const suffix = end < cleanText.length ? '...' : '';
+        const snippet = `${prefix}${cleanText.slice(start, end).trim()}${suffix}`;
+        return highlightKeywords(snippet, query);
+      }
+    }
+  }
+  return null;
+}
+
 const replaceBrInChildren = (children: any): any => {
   if (!children) return children;
   
@@ -452,6 +509,97 @@ const getValueAddMicro = (va: any): string => va.microtopic || va.microTopic || 
 const getValueAddSub = (va: any): string => va.subtopic || va.subTopic || va.sub_topic || '';
 const getValueAddNano = (va: any): string => va.nanotopic || va.nanoTopic || va.nano_topic || '';
 
+// High-frequency syllabus concepts across Optional (Anthro/Socio) and GS for smart clustering
+const KNOWN_SYLLABUS_CONCEPTS: Array<{ name: string; patterns: RegExp[] }> = [
+  // Anthropology / Sociology Paper 2 concepts
+  { name: 'Jajmani System', patterns: [/\bjajmani\b/i] },
+  { name: 'Dominant Caste', patterns: [/\bdominant\s*caste\b/i] },
+  { name: 'Sanskritization', patterns: [/\bsanskritiz/i, /\bsanskritik/i] },
+  { name: 'Purity and Pollution', patterns: [/\bpurity\s*(and|&)?\s*pollution\b/i] },
+  { name: 'Caste Mobility', patterns: [/\bcaste\s*mobility\b/i, /\bsocial\s*mobility\b/i] },
+  { name: 'Untouchability & Dalit Assertion', patterns: [/\buntouchab/i, /\bdalit\b/i] },
+  { name: 'Sacred Complex', patterns: [/\bsacred\s*complex\b/i] },
+  { name: 'Nature-Man-Spirit Complex', patterns: [/\bnature[-\s]*man[-\s]*spirit\b/i] },
+  { name: 'Tribe-Caste Continuum', patterns: [/\btribe[-\s]*caste\b/i] },
+  { name: 'Universalization & Parochialization', patterns: [/\buniversaliz/i, /\bparochializ/i] },
+  { name: 'Great and Little Traditions', patterns: [/\bgreat\s*(and|&)?\s*little\s*tradition/i] },
+  { name: 'Westernization & Modernization', patterns: [/\bwesterniz/i, /\bmoderniz/i] },
+  { name: 'Agrarian Social Structure', patterns: [/\bagrarian\s*(social)?\s*structure\b/i, /\bland\s*tenure\b/i, /\bland\s*reforms\b/i] },
+  { name: 'Kinship, Lineage & Clan', patterns: [/\bkinship\b/i, /\blineage\b/i, /\bdescent\b/i, /\bphratry\b/i, /\bmoiety\b/i] },
+  { name: 'Village Studies in India', patterns: [/\bvillage\s*stud/i, /\bindian\s*village\b/i] },
+  { name: 'Tribal Economy & Shifting Cultivation', patterns: [/\bshifting\s*cultivation\b/i, /\bjhum\b/i, /\btribal\s*economy\b/i] },
+  { name: 'Tribal Integration & Assimilation', patterns: [/\btribal\s*integration\b/i, /\bisolation\s*vs\s*assimilation\b/i, /\bpanchsheel\b/i] },
+  { name: 'Particularly Vulnerable Tribal Groups (PVTGs)', patterns: [/\bpvtg/i, /\bprimitive\s*tribe/i] },
+  { name: 'Scheduled Castes & OBC Movements', patterns: [/\bscheduled\s*caste\b/i, /\bobc\b/i, /\bbackward\s*class/i] },
+  { name: 'Youth Dormitory (Ghotul)', patterns: [/\byouth\s*dormitor/i, /\bghotul\b/i] },
+  { name: 'Totemism & Animism', patterns: [/\btotem/i, /\banimis/i] },
+  { name: 'Kula Ring & Potlatch', patterns: [/\bkula\b/i, /\bpotlatch\b/i] },
+  // Common GS concepts
+  { name: 'Judicial Review & Basic Structure', patterns: [/\bbasic\s*structure\b/i, /\bjudicial\s*review\b/i] },
+  { name: 'Federalism & Centre-State Relations', patterns: [/\bfederalism\b/i, /\bcentre[-\s]*state\b/i] },
+  { name: 'Elections & Representation of People', patterns: [/\belectoral\s*reform/i, /\brepresentation\s*of\s*the\s*people\b/i, /\brpa\b/i] },
+  { name: 'Governor & Ordinance Power', patterns: [/\bgovernor\b/i, /\bordinance\b/i] },
+  { name: 'Inclusive Growth & Poverty', patterns: [/\binclusive\s*growth\b/i, /\bpoverty\s*alleviation\b/i] },
+  { name: 'Monetary Policy & Inflation', patterns: [/\bmonetary\s*policy\b/i, /\binflation\s*targeting\b/i] },
+  { name: 'Climate Change & COP', patterns: [/\bclimate\s*change\b/i, /\bparis\s*agreement\b/i, /\bipcc\b/i] },
+  { name: 'Artificial Intelligence & Emerging Tech', patterns: [/\bartificial\s*intelligence\b/i, /\bquantum\s*computing\b/i, /\bgenai\b/i] },
+  { name: 'Public Service Values & Integrity', patterns: [/\bprobity\b/i, /\bcode\s*of\s*ethics\b/i, /\bcitizen\s*charter\b/i] },
+];
+
+export const resolveItemConcept = (item: any): string => {
+  if (!item) return 'General / Conceptual Questions';
+
+  // 1. Direct nanoTopic / microtag if available
+  const nano = getQuestionNano(item) || getValueAddNano(item);
+  if (nano && nano.trim() && nano.trim().toLowerCase() !== 'all' && nano.trim().toLowerCase() !== 'general') {
+    return nano.trim();
+  }
+
+  // 2. Microtag / macrotag
+  const tag = item.microtag || item.macrotag;
+  if (tag && typeof tag === 'string' && tag.trim()) {
+    const firstTag = tag.split(',')[0].trim();
+    if (firstTag && firstTag.toLowerCase() !== 'general' && firstTag.toLowerCase() !== 'all') {
+      return firstTag;
+    }
+  }
+
+  // 3. Smart concept keyword detection from question text / statement / title / content
+  const text = (
+    item.questionText ||
+    item.statement ||
+    item.question_text ||
+    item.title ||
+    item.content ||
+    ''
+  ).toLowerCase();
+
+  if (text) {
+    for (const kc of KNOWN_SYLLABUS_CONCEPTS) {
+      if (kc.patterns.some(p => p.test(text))) {
+        return kc.name;
+      }
+    }
+  }
+
+  // 4. Check hierarchy path (often index 5 or 4 has the micro/nanotopic)
+  if (Array.isArray(item.hierarchy_path) && item.hierarchy_path.length >= 5) {
+    const lastItem = item.hierarchy_path[item.hierarchy_path.length - 1];
+    if (lastItem && typeof lastItem === 'string' && lastItem.trim() && lastItem.trim().toLowerCase() !== 'general') {
+      return lastItem.trim();
+    }
+  }
+
+  // 5. If microTopic exists and is distinct from subTopic, use it
+  const micro = getQuestionMicro(item) || getValueAddMicro(item);
+  const sub = getQuestionSub(item) || getValueAddSub(item);
+  if (micro && micro !== sub && micro.toLowerCase() !== 'general' && micro.toLowerCase() !== 'all') {
+    return micro;
+  }
+
+  return 'General / Conceptual Questions';
+};
+
 interface MainsFilters {
   searchAcross: ('Questions' | 'Answers' | 'Value Additions' | 'Topper Copies')[];
   pyqFilter: 'All' | 'PYQ Only' | 'Non-PYQ';
@@ -582,7 +730,16 @@ export function MainsScreenInner() {
       if (val && !overrideWithParamsRef.current) {
         try {
           const parsed = JSON.parse(val);
-          if (parsed && typeof parsed === 'object') setSessionFilters(parsed);
+          if (parsed && typeof parsed === 'object') {
+            if (Array.isArray(parsed.searchAcross)) {
+              if (!parsed.searchAcross.includes('Topper Copies') && !parsed._userCustomizedSearchAcross) {
+                parsed.searchAcross = [...parsed.searchAcross, 'Topper Copies'];
+              }
+            } else {
+              parsed.searchAcross = DEFAULT_MAINS_FILTERS.searchAcross;
+            }
+            setSessionFilters(parsed);
+          }
         } catch {}
       }
     }).catch(() => {}).finally(() => { 
@@ -4452,7 +4609,7 @@ function SidebarFilterRow({
 
 /** PYQ filter with collapse/expand — separate because it's single-select, not chip-based multi */
 function SidebarPYQFilter({ filters, onUpdateFilters, colors }: { filters: MainsFilters; onUpdateFilters: (f: MainsFilters) => void; colors: any }) {
-  const [expanded, setExpanded] = useState(true);
+  const [expanded, setExpanded] = useState(false);
   const activeLabel = filters.pyqFilter !== 'All' ? filters.pyqFilter : null;
 
   return (
@@ -4505,6 +4662,344 @@ function SidebarPYQFilter({ filters, onUpdateFilters, colors }: { filters: Mains
   );
 }
 
+/** Group By filter with collapse/expand — placed right below PYQ filter */
+function SidebarGroupByFilter({
+  groupBy = 'source',
+  onChangeGroupBy,
+  colors,
+}: {
+  groupBy?: 'source' | 'concept';
+  onChangeGroupBy?: (mode: 'source' | 'concept') => void;
+  colors: any;
+}) {
+  const [expanded, setExpanded] = useState(false);
+
+  return (
+    <View style={{ marginVertical: 2 }}>
+      <TouchableOpacity
+        onPress={() => setExpanded(!expanded)}
+        activeOpacity={0.7}
+        style={[
+          styles.sidebarSectionHeader,
+          (expanded || groupBy === 'concept') && styles.sidebarSectionHeaderActive,
+        ]}
+      >
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+          <Text style={[styles.panelLabel, { color: colors.textTertiary, fontSize: 10, marginBottom: 0, letterSpacing: 1 }]}>
+            GROUP BY
+          </Text>
+          <View style={{ backgroundColor: groupBy === 'concept' ? '#ea580c' : colors.border + '60', borderRadius: 8, paddingHorizontal: 6, paddingVertical: 2 }}>
+            <Text style={{ fontSize: 8, fontWeight: '800', color: groupBy === 'concept' ? '#ffffff' : colors.textTertiary }}>
+              {groupBy === 'concept' ? 'Concept' : 'Source'}
+            </Text>
+          </View>
+        </View>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+          <View style={{ width: 18, height: 18, borderRadius: 9, backgroundColor: expanded ? colors.primary + '15' : 'transparent', alignItems: 'center', justifyContent: 'center' }}>
+            {expanded
+              ? <ChevronUp size={13} color={colors.textSecondary} />
+              : <ChevronDown size={13} color={colors.textTertiary} />
+            }
+          </View>
+        </View>
+      </TouchableOpacity>
+      {expanded && (
+        <View style={{ flexDirection: 'row', gap: 6, paddingTop: 6, paddingBottom: 4, paddingHorizontal: 2 }}>
+          {[
+            { id: 'source' as const, label: 'Source' },
+            { id: 'concept' as const, label: 'Concept' },
+          ].map(opt => {
+            const isSelected = groupBy === opt.id;
+            return (
+              <TouchableOpacity
+                key={opt.id}
+                onPress={() => onChangeGroupBy && onChangeGroupBy(opt.id)}
+                activeOpacity={0.8}
+                style={[
+                  styles.sidebarFchip,
+                  {
+                    flex: 1,
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    paddingHorizontal: 8,
+                    paddingVertical: 6,
+                  },
+                  isSelected && [
+                    styles.sidebarFchipSel,
+                    {
+                      backgroundColor: opt.id === 'concept' ? '#ea580c' : colors.primary,
+                      borderColor: opt.id === 'concept' ? '#ea580c' : colors.primary,
+                    }
+                  ]
+                ]}
+              >
+                <Text style={[styles.sidebarFchipText, { color: isSelected ? '#fff' : colors.textSecondary, fontWeight: isSelected ? '800' : '600', textAlign: 'center' }]}>
+                  {opt.label}
+                </Text>
+              </TouchableOpacity>
+            );
+          })}
+        </View>
+      )}
+    </View>
+  );
+}
+
+/** Search In filter with collapse/expand */
+function SidebarSearchInFilter({
+  filters,
+  onUpdateFilters,
+  colors,
+}: {
+  filters: MainsFilters;
+  onUpdateFilters: (f: MainsFilters) => void;
+  colors: any;
+}) {
+  const [expanded, setExpanded] = useState(false);
+  const searchAcrossList = (filters.searchAcross && filters.searchAcross.length > 0)
+    ? filters.searchAcross
+    : DEFAULT_MAINS_FILTERS.searchAcross;
+  const isCustom = searchAcrossList.length !== DEFAULT_MAINS_FILTERS.searchAcross.length ||
+    !DEFAULT_MAINS_FILTERS.searchAcross.every(x => searchAcrossList.includes(x));
+
+  return (
+    <View style={{ marginVertical: 2 }}>
+      <TouchableOpacity
+        onPress={() => setExpanded(!expanded)}
+        activeOpacity={0.7}
+        style={[
+          styles.sidebarSectionHeader,
+          (expanded || isCustom) && styles.sidebarSectionHeaderActive,
+        ]}
+      >
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+          <Text style={[styles.panelLabel, { color: colors.textTertiary, fontSize: 10, marginBottom: 0, letterSpacing: 1 }]}>
+            SEARCH IN
+          </Text>
+          <View style={{ backgroundColor: isCustom ? colors.primary : colors.border + '60', borderRadius: 8, paddingHorizontal: 6, paddingVertical: 2 }}>
+            <Text style={{ fontSize: 8, fontWeight: '800', color: isCustom ? '#ffffff' : colors.textTertiary }}>
+              {searchAcrossList.length}/4
+            </Text>
+          </View>
+        </View>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+          <View style={{ width: 18, height: 18, borderRadius: 9, backgroundColor: expanded ? colors.primary + '15' : 'transparent', alignItems: 'center', justifyContent: 'center' }}>
+            {expanded
+              ? <ChevronUp size={13} color={colors.textSecondary} />
+              : <ChevronDown size={13} color={colors.textTertiary} />
+            }
+          </View>
+        </View>
+      </TouchableOpacity>
+      {expanded && (
+        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 5, paddingTop: 8, paddingBottom: 6, paddingHorizontal: 2 }}>
+          {(['Questions', 'Answers', 'Value Additions', 'Topper Copies'] as const).map(opt => {
+            const isSelected = searchAcrossList.includes(opt);
+            return (
+              <TouchableOpacity
+                key={opt}
+                onPress={() => {
+                  const list = [...searchAcrossList];
+                  const idx = list.indexOf(opt);
+                  let next: typeof list;
+                  if (idx >= 0) {
+                    next = list.filter(x => x !== opt);
+                    // always keep at least Questions
+                    if (next.length === 0) next = ['Questions'];
+                  } else {
+                    next = [...list, opt];
+                  }
+                  onUpdateFilters({ ...filters, searchAcross: next as any });
+                }}
+                activeOpacity={0.8}
+                style={[styles.sidebarFchip, isSelected && [styles.sidebarFchipSel, { backgroundColor: colors.primary, borderColor: colors.primary }]]}
+              >
+                <Text style={[styles.sidebarFchipText, { color: isSelected ? '#fff' : colors.textSecondary }]}>
+                  {opt === 'Questions' ? 'Question Text' : opt === 'Answers' ? 'Answer Text' : opt === 'Value Additions' ? 'Value Adds' : 'Topper Copies'}
+                </Text>
+              </TouchableOpacity>
+            );
+          })}
+        </View>
+      )}
+    </View>
+  );
+}
+
+/** Reading & Display preferences accordion (collapsed by default) */
+function SidebarDisplayPreferences({
+  textColorMode = 'default',
+  onChangeTextColorMode,
+  keyBoxMode = 'boxed',
+  onChangeKeyBoxMode,
+  keyBoxColor = 'blue',
+  onChangeKeyBoxColor,
+  colors,
+}: {
+  textColorMode?: 'default' | 'black';
+  onChangeTextColorMode?: (mode: 'default' | 'black') => void;
+  keyBoxMode?: 'boxed' | 'bold';
+  onChangeKeyBoxMode?: (mode: 'boxed' | 'bold') => void;
+  keyBoxColor?: KeyBoxColor;
+  onChangeKeyBoxColor?: (color: KeyBoxColor) => void;
+  colors: any;
+}) {
+  const { isDark } = useTheme();
+  const [expanded, setExpanded] = useState(false);
+
+  return (
+    <View style={{ marginVertical: 2, marginTop: 12, borderTopWidth: 1, borderTopColor: colors.border + '60', paddingTop: 8 }}>
+      <TouchableOpacity
+        onPress={() => setExpanded(!expanded)}
+        activeOpacity={0.7}
+        style={[
+          styles.sidebarSectionHeader,
+          expanded && styles.sidebarSectionHeaderActive,
+        ]}
+      >
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+          <Text style={[styles.panelLabel, { color: colors.textTertiary, fontSize: 10, marginBottom: 0, letterSpacing: 1 }]}>
+            READING & DISPLAY
+          </Text>
+          <View style={{ backgroundColor: colors.border + '60', borderRadius: 8, paddingHorizontal: 6, paddingVertical: 2 }}>
+            <Text style={{ fontSize: 8, fontWeight: '800', color: colors.textTertiary }}>
+              3
+            </Text>
+          </View>
+        </View>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+          <View style={{ width: 18, height: 18, borderRadius: 9, backgroundColor: expanded ? colors.primary + '15' : 'transparent', alignItems: 'center', justifyContent: 'center' }}>
+            {expanded
+              ? <ChevronUp size={13} color={colors.textSecondary} />
+              : <ChevronDown size={13} color={colors.textTertiary} />
+            }
+          </View>
+        </View>
+      </TouchableOpacity>
+
+      {expanded && (
+        <View style={{ paddingTop: 8, paddingBottom: 6, paddingHorizontal: 2 }}>
+          {/* TEXT READABILITY */}
+          <Text style={{ fontSize: 9, fontWeight: '900', color: colors.textTertiary + '99', letterSpacing: 1.5, marginBottom: 6 }}>
+            TEXT READABILITY
+          </Text>
+          <View style={{ flexDirection: 'row', backgroundColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)', borderRadius: 8, padding: 3, gap: 4 }}>
+            <TouchableOpacity
+              onPress={() => onChangeTextColorMode?.('default')}
+              style={{
+                flex: 1,
+                paddingVertical: 7,
+                alignItems: 'center',
+                borderRadius: 6,
+                backgroundColor: textColorMode === 'default' ? (isDark ? '#334155' : '#ffffff') : 'transparent',
+                ...Platform.select({
+                  ios: textColorMode === 'default' ? { shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.1, shadowRadius: 2 } : {},
+                  android: textColorMode === 'default' ? { elevation: 1 } : {},
+                }),
+              }}
+            >
+              <Text style={{ fontSize: 11, fontWeight: '700', color: textColorMode === 'default' ? colors.primary : colors.textSecondary }}>
+                Muted Grey
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => onChangeTextColorMode?.('black')}
+              style={{
+                flex: 1,
+                paddingVertical: 7,
+                alignItems: 'center',
+                borderRadius: 6,
+                backgroundColor: textColorMode === 'black' ? (isDark ? '#334155' : '#ffffff') : 'transparent',
+                ...Platform.select({
+                  ios: textColorMode === 'black' ? { shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.1, shadowRadius: 2 } : {},
+                  android: textColorMode === 'black' ? { elevation: 1 } : {},
+                }),
+              }}
+            >
+              <Text style={{ fontSize: 11, fontWeight: '700', color: textColorMode === 'black' ? (isDark ? '#ffffff' : '#000000') : colors.textSecondary }}>
+                Deep Black
+              </Text>
+            </TouchableOpacity>
+          </View>
+
+          {/* KEYWORD BOXES */}
+          <Text style={{ fontSize: 9, fontWeight: '900', color: colors.textTertiary + '99', letterSpacing: 1.5, marginTop: 12, marginBottom: 6 }}>
+            KEYWORD BOXES
+          </Text>
+          <View style={{ flexDirection: 'row', backgroundColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)', borderRadius: 8, padding: 3, gap: 4 }}>
+            <TouchableOpacity
+              onPress={() => onChangeKeyBoxMode?.('boxed')}
+              style={{
+                flex: 1,
+                paddingVertical: 7,
+                alignItems: 'center',
+                borderRadius: 6,
+                backgroundColor: keyBoxMode === 'boxed' ? (isDark ? '#334155' : '#ffffff') : 'transparent',
+                ...Platform.select({
+                  ios: keyBoxMode === 'boxed' ? { shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.1, shadowRadius: 2 } : {},
+                  android: keyBoxMode === 'boxed' ? { elevation: 1 } : {},
+                }),
+              }}
+            >
+              <Text style={{ fontSize: 11, fontWeight: '700', color: keyBoxMode === 'boxed' ? colors.primary : colors.textSecondary }}>
+                Boxed
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => onChangeKeyBoxMode?.('bold')}
+              style={{
+                flex: 1,
+                paddingVertical: 7,
+                alignItems: 'center',
+                borderRadius: 6,
+                backgroundColor: keyBoxMode === 'bold' ? (isDark ? '#334155' : '#ffffff') : 'transparent',
+                ...Platform.select({
+                  ios: keyBoxMode === 'bold' ? { shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.1, shadowRadius: 2 } : {},
+                  android: keyBoxMode === 'bold' ? { elevation: 1 } : {},
+                }),
+              }}
+            >
+              <Text style={{ fontSize: 11, fontWeight: '700', color: keyBoxMode === 'bold' ? (isDark ? '#ffffff' : '#000000') : colors.textSecondary }}>
+                Plain Bold
+              </Text>
+            </TouchableOpacity>
+          </View>
+
+          {/* HIGHLIGHT COLOR */}
+          <Text style={{ fontSize: 9, fontWeight: '900', color: colors.textTertiary + '99', letterSpacing: 1.5, marginTop: 12, marginBottom: 6 }}>
+            HIGHLIGHT COLOR
+          </Text>
+          <View style={{ flexDirection: 'row', gap: 10, alignItems: 'center' }}>
+            {(['yellow', 'green', 'blue', 'pink'] as KeyBoxColor[]).map((c) => (
+              <TouchableOpacity
+                key={c}
+                onPress={() => onChangeKeyBoxColor?.(c)}
+                style={{
+                  width: 28,
+                  height: 28,
+                  borderRadius: 14,
+                  backgroundColor: 
+                    c === 'yellow' ? (isDark ? '#ca8a04' : '#fef08a') :
+                    c === 'green' ? (isDark ? '#16a34a' : '#bbf7d0') :
+                    c === 'blue' ? (isDark ? '#2563eb' : '#bfdbfe') :
+                    (isDark ? '#db2777' : '#fbcfe8'),
+                  borderWidth: keyBoxColor === c ? 2 : 1,
+                  borderColor: keyBoxColor === c ? (isDark ? '#ffffff' : '#000000') : (isDark ? '#334155' : '#e2e8f0'),
+                  shadowColor: '#000',
+                  shadowOffset: { width: 0, height: 1 },
+                  shadowOpacity: keyBoxColor === c ? 0.3 : 0,
+                  shadowRadius: 2,
+                  elevation: keyBoxColor === c ? 2 : 0,
+                }}
+              />
+            ))}
+          </View>
+        </View>
+      )}
+    </View>
+  );
+}
+
 interface MainsLeftPanelProps {
   colors: any;
   insets: any;
@@ -4544,6 +5039,8 @@ interface MainsLeftPanelProps {
   onChangeKeyBoxColor?: (color: KeyBoxColor) => void;
   onForceSync?: () => void;
   syncing?: boolean;
+  groupBy?: 'source' | 'concept';
+  onChangeGroupBy?: (mode: 'source' | 'concept') => void;
 }
 
 function MainsLeftPanel({
@@ -4585,6 +5082,8 @@ function MainsLeftPanel({
   onChangeKeyBoxColor,
   onForceSync,
   syncing = false,
+  groupBy = 'source',
+  onChangeGroupBy,
 }: MainsLeftPanelProps) {
   const { isDark } = useTheme();
   const isOptional = filters.paper !== 'All' && !filters.paper.split('|').some(p => ['GS1', 'GS2', 'GS3', 'GS4', 'Essay'].includes(p));
@@ -4635,11 +5134,12 @@ function MainsLeftPanel({
                 const isExcluded = excludedKeywords.has(kw);
                 return (
                   <TouchableOpacity
-                    key={i}
+                    key={`${kw}-${i}`}
                     onPress={() => toggleExcludedKeyword(kw)}
-                    style={[styles.pill, {
-                      backgroundColor: isExcluded ? '#f1f5f9' : '#ede9fe',
-                      borderColor: isExcluded ? colors.border : '#c4b5fd',
+                    activeOpacity={0.7}
+                    style={[styles.keywordPill, {
+                      backgroundColor: isExcluded ? colors.border + '30' : '#f5f3ff',
+                      borderColor: isExcluded ? colors.border : '#ddd6fe',
                       opacity: isExcluded ? 0.5 : 1,
                     }]}
                   >
@@ -4674,46 +5174,23 @@ function MainsLeftPanel({
           SOURCE
         </Text>
         <SidebarPYQFilter filters={filters} onUpdateFilters={onUpdateFilters} colors={colors} />
+        {onChangeGroupBy && (
+          <SidebarGroupByFilter
+            groupBy={groupBy}
+            onChangeGroupBy={onChangeGroupBy}
+            colors={colors}
+          />
+        )}
       </View>
 
       {/* ── GROUP: SEARCH IN ── */}
       {!isSearchView && (
-        <View style={{ marginBottom: 4, marginTop: 8 }}>
-          <Text style={{ fontSize: 8, fontWeight: '900', color: colors.textTertiary + '80', letterSpacing: 1.5, paddingHorizontal: 4, marginBottom: 6 }}>
-            SEARCH IN
-          </Text>
-          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 5, paddingHorizontal: 2 }}>
-            {(['Questions', 'Answers', 'Value Additions', 'Topper Copies'] as const).map(opt => {
-              const searchAcrossList = (filters.searchAcross && filters.searchAcross.length > 0)
-                ? filters.searchAcross
-                : DEFAULT_MAINS_FILTERS.searchAcross;
-              const isSelected = searchAcrossList.includes(opt);
-              return (
-                <TouchableOpacity
-                  key={opt}
-                  onPress={() => {
-                    const list = [...searchAcrossList];
-                    const idx = list.indexOf(opt);
-                    let next: typeof list;
-                    if (idx >= 0) {
-                      next = list.filter(x => x !== opt);
-                      // always keep at least Questions
-                      if (next.length === 0) next = ['Questions'];
-                    } else {
-                      next = [...list, opt];
-                    }
-                    onUpdateFilters({ ...filters, searchAcross: next as any });
-                  }}
-                  activeOpacity={0.8}
-                  style={[styles.sidebarFchip, isSelected && [styles.sidebarFchipSel, { backgroundColor: colors.primary, borderColor: colors.primary }]]}
-                >
-                  <Text style={[styles.sidebarFchipText, { color: isSelected ? '#fff' : colors.textSecondary }]}>
-                    {opt === 'Questions' ? 'Question Text' : opt === 'Answers' ? 'Answer Text' : opt === 'Value Additions' ? 'Value Adds' : 'Topper Copies'}
-                  </Text>
-                </TouchableOpacity>
-              );
-            })}
-          </View>
+        <View style={{ marginBottom: 4, marginTop: 4 }}>
+          <SidebarSearchInFilter
+            filters={filters}
+            onUpdateFilters={onUpdateFilters}
+            colors={colors}
+          />
         </View>
       )}
 
@@ -4927,134 +5404,16 @@ function MainsLeftPanel({
         </View>
       )}
 
-      {/* ── TEXT COLOR MODE CONTROL ── */}
-      <View style={{ marginTop: 24, borderTopWidth: 1, borderTopColor: colors.border, paddingTop: 16, paddingHorizontal: 4, marginBottom: 20 }}>
-        <Text style={{ fontSize: 9, fontWeight: '900', color: colors.textTertiary + '99', letterSpacing: 1.5, marginBottom: 8 }}>
-          TEXT READABILITY
-        </Text>
-        <View style={{ flexDirection: 'row', backgroundColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)', borderRadius: 8, padding: 3, gap: 4 }}>
-          <TouchableOpacity
-            onPress={() => onChangeTextColorMode?.('default')}
-            style={{
-              flex: 1,
-              paddingVertical: 8,
-              alignItems: 'center',
-              borderRadius: 6,
-              backgroundColor: textColorMode === 'default' ? (isDark ? '#334155' : '#ffffff') : 'transparent',
-              ...Platform.select({
-                ios: textColorMode === 'default' ? {
-                  shadowColor: '#000',
-                  shadowOffset: { width: 0, height: 1 },
-                  shadowOpacity: 0.1,
-                  shadowRadius: 2,
-                } : {},
-                android: textColorMode === 'default' ? {
-                  elevation: 1,
-                } : {},
-              }),
-            }}
-          >
-            <Text style={{ fontSize: 11, fontWeight: '700', color: textColorMode === 'default' ? colors.primary : colors.textSecondary }}>
-              Muted Grey
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => onChangeTextColorMode?.('black')}
-            style={{
-              flex: 1,
-              paddingVertical: 8,
-              alignItems: 'center',
-              borderRadius: 6,
-              backgroundColor: textColorMode === 'black' ? (isDark ? '#334155' : '#ffffff') : 'transparent',
-              ...Platform.select({
-                ios: textColorMode === 'black' ? {
-                  shadowColor: '#000',
-                  shadowOffset: { width: 0, height: 1 },
-                  shadowOpacity: 0.1,
-                  shadowRadius: 2,
-                } : {},
-                android: textColorMode === 'black' ? {
-                  elevation: 1,
-                } : {},
-              }),
-            }}
-          >
-            <Text style={{ fontSize: 11, fontWeight: '700', color: textColorMode === 'black' ? (isDark ? '#ffffff' : '#000000') : colors.textSecondary }}>
-              Deep Black
-            </Text>
-          </TouchableOpacity>
-        </View>
-        <Text style={{ fontSize: 10, fontFamily: 'PlusJakartaSans-Bold', fontWeight: '900', color: colors.textTertiary + '99', letterSpacing: 1.5, marginTop: 14, marginBottom: 8 }}>
-          KEYWORD BOXES
-        </Text>
-        <View style={{ flexDirection: 'row', backgroundColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)', borderRadius: 8, padding: 3, gap: 4 }}>
-          <TouchableOpacity
-            onPress={() => onChangeKeyBoxMode?.('boxed')}
-            style={{
-              flex: 1,
-              paddingVertical: 8,
-              alignItems: 'center',
-              borderRadius: 6,
-              backgroundColor: keyBoxMode === 'boxed' ? (isDark ? '#334155' : '#ffffff') : 'transparent',
-              ...Platform.select({
-                ios: keyBoxMode === 'boxed' ? { shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.1, shadowRadius: 2 } : {},
-                android: keyBoxMode === 'boxed' ? { elevation: 1 } : {},
-              }),
-            }}
-          >
-            <Text style={{ fontSize: 11, fontWeight: '700', color: keyBoxMode === 'boxed' ? colors.primary : colors.textSecondary }}>
-              Boxed
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => onChangeKeyBoxMode?.('bold')}
-            style={{
-              flex: 1,
-              paddingVertical: 8,
-              alignItems: 'center',
-              borderRadius: 6,
-              backgroundColor: keyBoxMode === 'bold' ? (isDark ? '#334155' : '#ffffff') : 'transparent',
-              ...Platform.select({
-                ios: keyBoxMode === 'bold' ? { shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.1, shadowRadius: 2 } : {},
-                android: keyBoxMode === 'bold' ? { elevation: 1 } : {},
-              }),
-            }}
-          >
-            <Text style={{ fontSize: 11, fontWeight: '700', color: keyBoxMode === 'bold' ? (isDark ? '#ffffff' : '#000000') : colors.textSecondary }}>
-              Plain Bold
-            </Text>
-          </TouchableOpacity>
-        </View>
-
-        <Text style={{ fontSize: 10, fontFamily: 'PlusJakartaSans-Bold', fontWeight: '900', color: colors.textTertiary + '99', letterSpacing: 1.5, marginTop: 14, marginBottom: 8 }}>
-          HIGHLIGHT COLOR
-        </Text>
-        <View style={{ flexDirection: 'row', gap: 10, alignItems: 'center' }}>
-          {(['yellow', 'green', 'blue', 'pink'] as KeyBoxColor[]).map((c) => (
-            <TouchableOpacity
-              key={c}
-              onPress={() => onChangeKeyBoxColor?.(c)}
-              style={{
-                width: 28,
-                height: 28,
-                borderRadius: 14,
-                backgroundColor: 
-                  c === 'yellow' ? (isDark ? '#ca8a04' : '#fef08a') :
-                  c === 'green' ? (isDark ? '#16a34a' : '#bbf7d0') :
-                  c === 'blue' ? (isDark ? '#2563eb' : '#bfdbfe') :
-                  (isDark ? '#db2777' : '#fbcfe8'),
-                borderWidth: keyBoxColor === c ? 2 : 1,
-                borderColor: keyBoxColor === c ? (isDark ? '#ffffff' : '#000000') : (isDark ? '#334155' : '#e2e8f0'),
-                shadowColor: '#000',
-                shadowOffset: { width: 0, height: 1 },
-                shadowOpacity: keyBoxColor === c ? 0.3 : 0,
-                shadowRadius: 2,
-                elevation: keyBoxColor === c ? 2 : 0,
-              }}
-            />
-          ))}
-        </View>
-      </View>
+      {/* ── READING & DISPLAY PREFERENCES ACCORDION ── */}
+      <SidebarDisplayPreferences
+        textColorMode={textColorMode}
+        onChangeTextColorMode={onChangeTextColorMode}
+        keyBoxMode={keyBoxMode}
+        onChangeKeyBoxMode={onChangeKeyBoxMode}
+        keyBoxColor={keyBoxColor}
+        onChangeKeyBoxColor={onChangeKeyBoxColor}
+        colors={colors}
+      />
       {onForceSync && (
         <View style={{ marginTop: 24, paddingHorizontal: 4, marginBottom: 20 }}>
           <TouchableOpacity
@@ -5120,7 +5479,7 @@ interface HierarchyModalProps {
 }
 
 const fuzzyMatchPaper = (paperFilter: string[], targetPaper: string) => {
-  if (paperFilter.length === 0) return targetPaper !== 'Optional';
+  if (paperFilter.length === 0) return true;
   return paperFilter.some(pf => {
     const pNorm = pf.trim().toLowerCase().replace(/\s+/g, '');
     const qNorm = (targetPaper || '').trim().toLowerCase().replace(/\s+/g, '');
@@ -5941,6 +6300,10 @@ function QuestionBankView({
   // View mode selector state: 'all' | 'questions' | 'valueAdd' | 'toppers'
   const [viewMode, setViewMode] = useState<'all' | 'questions' | 'valueAdd' | 'toppers'>('all');
 
+  // Group by: 'source' (current: PYQ -> Non-PYQ -> Toppers) vs 'concept' (smart clustering by micro-theme/concept)
+  const [groupBy, setGroupBy] = useState<'source' | 'concept'>('source');
+  const [collapsedConcepts, setCollapsedConcepts] = useState<Record<string, boolean>>({});
+
   // Full-screen Image Viewer Lightbox for Topper Copies
   const [topperViewerVisible, setTopperViewerVisible] = useState(false);
   const [topperViewerImages, setTopperViewerImages] = useState<string[]>([]);
@@ -6019,7 +6382,7 @@ function QuestionBankView({
         const next = typeof updater === 'function' ? (updater as Function)(prev) : updater;
         return {
           ...next,
-          searchAcross: next.searchAcross && next.searchAcross.length > 0 ? next.searchAcross : ['Questions'],
+          searchAcross: next.searchAcross && next.searchAcross.length > 0 ? next.searchAcross : DEFAULT_MAINS_FILTERS.searchAcross,
         };
       });
     }, 16);
@@ -6048,7 +6411,7 @@ function QuestionBankView({
 
   const [hierarchyModalVisible, setHierarchyModalVisible] = useState(false);
 
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
 
   const allInstitutes = useMemo(() => {
     const instSet = new Set<string>();
@@ -6345,79 +6708,57 @@ function QuestionBankView({
 
         const subtopicVal = getQuestionSub(q);
 
-        // Search text matching
+        // Search text matching: strict matching per user selection (no unwanted syllabus/hierarchy fallback)
         if (searchLower) {
           const isTopper = isTopperQuestion(q);
-          const qText = (searchInQuestions || (searchInToppers && isTopper))
-            ? (q.questionText?.toLowerCase() || '')
-            : '';
-          const aText = searchInAnswers
-            ? (q.answers || []).map((a: any) => a.answerText || '').join(' ').toLowerCase()
-            : '';
+          const qTextMatch = (searchInQuestions || (searchInToppers && isTopper)) &&
+            Boolean(q.questionText && q.questionText.toLowerCase().includes(searchLower));
 
-          // Syllabus topics matching
-          const qSubject = (q.subject || '').toLowerCase();
-          const qSec = (getQuestionSection(q) || '').toLowerCase();
-          const qMicro = (getQuestionMicro(q) || '').toLowerCase();
-          const qSub = (subtopicVal || '').toLowerCase();
-          const qNano = (getQuestionNano(q) || '').toLowerCase();
-          const qMacro = (q.macrotag || '').toLowerCase();
-          const qMicrotag = (q.microtag || '').toLowerCase();
-          const hPathMatch = Array.isArray(q.hierarchy_path) &&
-            q.hierarchy_path.some((h: any) => String(h).toLowerCase().includes(searchLower));
-          const syllabusMatch =
-            qSubject.includes(searchLower) ||
-            qSec.includes(searchLower) ||
-            qMicro.includes(searchLower) ||
-            qSub.includes(searchLower) ||
-            qNano.includes(searchLower) ||
-            qMacro.includes(searchLower) ||
-            qMicrotag.includes(searchLower) ||
-            hPathMatch;
+          const aTextMatch = searchInAnswers &&
+            (q.answers || []).some((a: any) => (a.answerText || '').toLowerCase().includes(searchLower));
 
           // Topper metadata match (candidate name, institute, AIR rank)
           let topperMatch = false;
-          if (searchInToppers) {
-            const key = normalizeQuestionKey(q);
-            const attached = topperAttachmentMap.get(key) || [];
-            const candidateAnswers = (q.answers || []).concat(attached);
+          if (searchInToppers && isTopper) {
             const qTopperName = (q.topper_name || '').toLowerCase();
             const qAir = String(q.air_rank || '').toLowerCase();
-            const directTopperMatch =
+            topperMatch =
+              qTextMatch ||
               (qTopperName && qTopperName.includes(searchLower)) ||
               (qAir && (qAir.includes(searchLower) || ('air ' + qAir).includes(searchLower) || ('air' + qAir).includes(searchLower)));
 
-            topperMatch = directTopperMatch || candidateAnswers.some(a => {
-              if (!isTopperAnswer(a)) return false;
-              const tName = getTopperName(a, q).toLowerCase();
-              const rawAir = getAir(a, q);
-              const tAir = String(rawAir || '').toLowerCase();
-              const inst = (a.institute || '').toLowerCase();
-              return (
-                tName.includes(searchLower) ||
-                tAir.includes(searchLower) ||
-                ('air ' + tAir).includes(searchLower) ||
-                ('air' + tAir).includes(searchLower) ||
-                inst.includes(searchLower)
-              );
-            });
+            if (!topperMatch) {
+              const key = normalizeQuestionKey(q);
+              const attached = topperAttachmentMap.get(key) || [];
+              const candidateAnswers = (q.answers || []).concat(attached);
+              topperMatch = candidateAnswers.some(a => {
+                if (!isTopperAnswer(a)) return false;
+                const tName = getTopperName(a, q).toLowerCase();
+                const rawAir = getAir(a, q);
+                const tAir = String(rawAir || '').toLowerCase();
+                const inst = (a.institute || '').toLowerCase();
+                return (
+                  tName.includes(searchLower) ||
+                  tAir.includes(searchLower) ||
+                  ('air ' + tAir).includes(searchLower) ||
+                  ('air' + tAir).includes(searchLower) ||
+                  inst.includes(searchLower)
+                );
+              });
+            }
           }
 
           const matchSearch =
-            (searchInQuestions && qText.includes(searchLower)) ||
-            (searchInAnswers && aText.includes(searchLower)) ||
-            syllabusMatch ||
-            topperMatch;
+            (searchInQuestions && qTextMatch) ||
+            (searchInAnswers && aTextMatch) ||
+            (searchInToppers && isTopper && topperMatch);
 
           if (!matchSearch) return false;
         }
 
-        // Paper matching:
-        // By default, paper = All hides Optional questions.
-        // When active search query has length >= 2, search across the full corpus including Optional!
-        // If user explicitly picked specific paper(s), respect that filter.
+        // Paper matching: When paperFilter is 'All' (length === 0), include all papers (GS + Optional)
         const matchPaper = paperFilter.length === 0
-          ? (searchLower.length >= 2 ? true : q.paper !== 'Optional')
+          ? true
           : paperFilter.some(pf => {
               const pNorm = pf.trim().toLowerCase().replace(/\s+/g, '');
               const qNorm = (q.paper || '').trim().toLowerCase().replace(/\s+/g, '');
@@ -6521,15 +6862,13 @@ function QuestionBankView({
         if (filters.pyqFilter === 'PYQ Only') return false;
 
         // Search across fields
-        const vaText = `${va.title || ''} ${va.description || ''} ${va.tags || ''}`.toLowerCase();
+        const vaText = `${va.title || ''} ${va.description || ''} ${va.content || ''} ${va.quote || ''} ${va.author || ''} ${va.tags || ''} ${JSON.stringify(va.data_points || '')} ${JSON.stringify(va.examples || '')}`.toLowerCase();
         if (searchLower && !vaText.includes(searchLower)) return false;
 
         // Paper filter
         if (paperFilter.length > 0) {
           const matchPaper = paperFilter.includes(va.paper || '');
           if (!matchPaper) return false;
-        } else {
-          if (searchLower.length < 2 && va.paper === 'Optional') return false;
         }
 
         // Subject filter
@@ -6745,8 +7084,82 @@ function QuestionBankView({
       return 0;
     });
 
+    if (groupBy === 'concept') {
+      const conceptMap: Record<string, typeof sorted> = {};
+      sorted.forEach(item => {
+        const rawItem = item.kind === 'valueAdd' ? item.data : (item.data || item);
+        const concept = resolveItemConcept(rawItem);
+        if (!conceptMap[concept]) {
+          conceptMap[concept] = [];
+        }
+        conceptMap[concept].push(item);
+      });
+
+      // Sort items within each concept: PYQ first (year desc) -> Non-PYQ (year desc) -> Value Adds -> Topper copies
+      const getPriority = (it: any): number => {
+        if (it.kind === 'question') {
+          return it.data?.is_pyq ? 0 : 1;
+        }
+        if (it.kind === 'valueAdd') return 2;
+        if (it.kind === 'topper') return 3;
+        return 4;
+      };
+
+      Object.keys(conceptMap).forEach(conceptKey => {
+        conceptMap[conceptKey].sort((a, b) => {
+          const pA = getPriority(a);
+          const pB = getPriority(b);
+          if (pA !== pB) return pA - pB;
+
+          const yearA = a.data?.year || a.data?.topper_year || 0;
+          const yearB = b.data?.year || b.data?.topper_year || 0;
+          if (yearA !== yearB) return yearB - yearA;
+
+          return 0;
+        });
+      });
+
+      const sortedConcepts = Object.keys(conceptMap).sort((a, b) => {
+        const aIsGen = a.startsWith('General');
+        const bIsGen = b.startsWith('General');
+        if (aIsGen && !bIsGen) return 1;
+        if (!aIsGen && bIsGen) return -1;
+        return a.localeCompare(b);
+      });
+
+      const groupedList: Array<any> = [];
+      sortedConcepts.forEach(concept => {
+        const itemsInConcept = conceptMap[concept];
+        // Section Header item
+        groupedList.push({
+          kind: 'conceptHeader',
+          id: `concept-hdr-${concept}`,
+          concept: concept,
+          count: itemsInConcept.length,
+          data: { concept, count: itemsInConcept.length },
+        });
+
+        if (!collapsedConcepts[concept]) {
+          groupedList.push(...itemsInConcept);
+        }
+      });
+
+      return groupedList;
+    }
+
     return sorted;
-  }, [viewMode, filteredQuestions, filteredValueAdds, filteredToppers, topperAttachmentMap, vaFavorites]);
+  }, [viewMode, filteredQuestions, filteredValueAdds, filteredToppers, topperAttachmentMap, vaFavorites, groupBy, collapsedConcepts]);
+
+  const conceptCounts = useMemo(() => {
+    if (groupBy !== 'concept') return {};
+    const counts: Record<string, number> = {};
+    activeContent.forEach((it: any) => {
+      if (it.kind === 'conceptHeader') {
+        counts[it.concept] = it.count || 0;
+      }
+    });
+    return counts;
+  }, [groupBy, activeContent]);
 
   return (
     <View style={styles.subContainer}>
@@ -6782,6 +7195,8 @@ function QuestionBankView({
               onChangeKeyBoxColor={onChangeKeyBoxColor}
               onForceSync={onForceSync}
               syncing={syncing}
+              groupBy={groupBy}
+              onChangeGroupBy={setGroupBy}
             />
           </View>
         )}
@@ -6824,7 +7239,7 @@ function QuestionBankView({
               <FlatList
                 ref={flatListRef}
           data={activeContent}
-            extraData={[keyBoxMode, keyBoxColor, textColorMode, zoomFontSize, expandedId]}
+            extraData={[keyBoxMode, keyBoxColor, textColorMode, zoomFontSize, expandedId, groupBy, collapsedConcepts]}
             keyExtractor={item => item.id}
             contentContainerStyle={styles.listScroll}
             showsVerticalScrollIndicator={false}
@@ -7343,6 +7758,81 @@ function QuestionBankView({
                 : ((item as any).category !== undefined && !(item as any).questionText ? 'valueAdd' : 'question');
               const rawItem = isTaggedUnion ? (item as any).data : item;
 
+              // ── CONCEPT SECTION HEADER ──
+              if (kind === 'conceptHeader') {
+                const conceptTitle = item.concept || 'General Questions';
+                const count = item.count || 0;
+                const isCollapsed = Boolean(collapsedConcepts[conceptTitle]);
+                return (
+                  <TouchableOpacity
+                    key={item.id}
+                    activeOpacity={0.8}
+                    onPress={() => {
+                      setCollapsedConcepts(prev => ({
+                        ...prev,
+                        [conceptTitle]: !prev[conceptTitle],
+                      }));
+                    }}
+                    style={{
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      backgroundColor: isDark ? 'rgba(30, 41, 59, 0.85)' : '#ffffff',
+                      borderRadius: 12,
+                      paddingHorizontal: 14,
+                      paddingVertical: 11,
+                      marginTop: 14,
+                      marginBottom: 8,
+                      borderWidth: 1,
+                      borderColor: isDark ? 'rgba(255,255,255,0.12)' : '#e2e8f0',
+                      borderLeftWidth: 4,
+                      borderLeftColor: '#ea580c',
+                      shadowColor: '#000',
+                      shadowOffset: { width: 0, height: 1 },
+                      shadowOpacity: isDark ? 0.2 : 0.05,
+                      shadowRadius: 2,
+                      elevation: 1,
+                    }}
+                  >
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, flex: 1, marginRight: 8 }}>
+                      <Text style={{ fontSize: 13 }}>🎯</Text>
+                      <Text
+                        style={{
+                          fontSize: 13,
+                          fontWeight: '800',
+                          color: colors.text,
+                          flexShrink: 1,
+                          letterSpacing: 0.2,
+                        }}
+                        numberOfLines={1}
+                      >
+                        {conceptTitle}
+                      </Text>
+                      <View style={{
+                        backgroundColor: isDark ? 'rgba(234, 88, 12, 0.2)' : '#ffedd5',
+                        borderRadius: 10,
+                        paddingHorizontal: 7,
+                        paddingVertical: 2,
+                      }}>
+                        <Text style={{ fontSize: 10, fontWeight: '800', color: '#ea580c' }}>
+                          {count} {count === 1 ? 'item' : 'items'}
+                        </Text>
+                      </View>
+                    </View>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                      <Text style={{ fontSize: 10, fontWeight: '600', color: colors.textSecondary }}>
+                        {isCollapsed ? 'Show' : 'Hide'}
+                      </Text>
+                      <ChevronDown
+                        size={16}
+                        color={colors.textSecondary}
+                        style={{ transform: [{ rotate: isCollapsed ? '-90deg' : '0deg' }] }}
+                      />
+                    </View>
+                  </TouchableOpacity>
+                );
+              }
+
               // ── VALUE ADDITION CARD ──
               if (kind === 'valueAdd' || ((rawItem as any).category !== undefined && !(rawItem as any).questionText)) {
                 const va = rawItem as ValueAdditionItem;
@@ -7393,6 +7883,7 @@ function QuestionBankView({
                     onToggleBookmark={onToggleSaved}
                     onOpenViewer={handleOpenTopperViewer}
                     onOpenDetailed={onOpenDetailed}
+                    searchQuery={search}
                   />
                 );
               }
@@ -7412,6 +7903,34 @@ function QuestionBankView({
               const isExpanded = expandedId === q.id;
               const isBookmarked = savedIds.includes(q.id);
 
+              const isOptionalQ =
+                !q.paper ||
+                q.paper.trim().toLowerCase() === 'optional' ||
+                q.paper.trim().toLowerCase().includes('anthro') ||
+                q.paper.trim().toLowerCase().includes('socio');
+
+              let displayPaperOrSubject = '';
+              if (isOptionalQ) {
+                const rawSub =
+                  (q.subject && q.subject.trim().toLowerCase() !== 'optional' ? q.subject.trim() : null) ||
+                  (q.hierarchy_path?.[0] && q.hierarchy_path[0].trim().toLowerCase() !== 'optional' ? q.hierarchy_path[0].trim() : null) ||
+                  'Optional';
+                displayPaperOrSubject =
+                  rawSub.length > 3 && rawSub === rawSub.toUpperCase()
+                    ? rawSub.charAt(0) + rawSub.slice(1).toLowerCase()
+                    : rawSub;
+              } else {
+                displayPaperOrSubject = q.paper;
+              }
+
+              const authorOrSource =
+                q.topper_name ||
+                q.source_attribution_label ||
+                q.institute ||
+                (q.answers || []).find(a => a.institute && a.institute.trim() && a.institute.toLowerCase() !== 'model answer')?.institute ||
+                (q.answers || []).find(a => a.topper && a.topper.trim())?.topper ||
+                '';
+
               return (
                 <View
                   key={q.id}
@@ -7421,9 +7940,11 @@ function QuestionBankView({
                   style={[
                     styles.figmaQuestionCard,
                     {
-                      backgroundColor: 'rgba(255, 255, 255, 0.45)',
-                      borderColor: q.is_pyq ? 'rgba(34, 197, 94, 0.6)' : 'rgba(255, 255, 255, 0.65)',
-                      borderWidth: q.is_pyq ? 1.8 : 1.2,
+                      backgroundColor: isDark ? 'rgba(30, 41, 59, 0.65)' : 'rgba(255, 255, 255, 0.75)',
+                      borderColor: q.is_pyq ? 'rgba(34, 197, 94, 0.6)' : 'rgba(59, 130, 246, 0.55)',
+                      borderWidth: 1.2,
+                      borderLeftWidth: 3.5,
+                      borderLeftColor: q.is_pyq ? '#16a34a' : '#2563eb',
                       marginBottom: 12
                     },
                   ]}
@@ -7448,7 +7969,7 @@ function QuestionBankView({
                   >
                     <View style={{ flex: 1 }}>
                       <View style={styles.badgeRow}>
-                        {!!q.is_pyq && (
+                        {!!q.is_pyq ? (
                           <View style={{
                             backgroundColor: 'rgba(34, 197, 94, 0.12)',
                             borderColor: 'rgba(34, 197, 94, 0.3)',
@@ -7456,13 +7977,29 @@ function QuestionBankView({
                             borderRadius: 6,
                             paddingHorizontal: 6,
                             paddingVertical: 1,
-                            marginRight: 8,
+                            marginRight: 6,
                           }}>
                             <Text style={{
                               color: '#16a34a',
                               fontSize: Math.round(zoomFontSize * 0.65),
                               fontWeight: '900',
                             }}>PYQ</Text>
+                          </View>
+                        ) : (
+                          <View style={{
+                            backgroundColor: 'rgba(59, 130, 246, 0.12)',
+                            borderColor: 'rgba(59, 130, 246, 0.3)',
+                            borderWidth: 1,
+                            borderRadius: 6,
+                            paddingHorizontal: 6,
+                            paddingVertical: 1,
+                            marginRight: 6,
+                          }}>
+                            <Text style={{
+                              color: '#2563eb',
+                              fontSize: Math.round(zoomFontSize * 0.65),
+                              fontWeight: '900',
+                            }}>PRACTICE</Text>
                           </View>
                         )}
                         {attachedToppers.length > 0 && (
@@ -7473,7 +8010,7 @@ function QuestionBankView({
                             borderRadius: 6,
                             paddingHorizontal: 6,
                             paddingVertical: 1,
-                            marginRight: 8,
+                            marginRight: 6,
                             flexDirection: 'row',
                             alignItems: 'center',
                             gap: 3,
@@ -7488,19 +8025,66 @@ function QuestionBankView({
                             </Text>
                           </View>
                         )}
-                        <Text style={[styles.paperBadgeText, { color: '#3b82f6', fontSize: Math.round(zoomFontSize * 0.65) }]}>{q.paper}</Text>
-                        {!!q.year && (
+                        <Text style={[styles.paperBadgeText, { color: '#3b82f6', fontSize: Math.round(zoomFontSize * 0.7), fontWeight: '700' }]}>
+                          {displayPaperOrSubject}
+                        </Text>
+                        {!!authorOrSource && (
+                          <>
+                            <Text style={[styles.metaTextDot, { color: colors.textTertiary, fontSize: Math.round(zoomFontSize * 0.7) }]}>•</Text>
+                            <Text style={[styles.metaText, { color: q.is_pyq ? '#15803d' : '#2563eb', fontWeight: '800', fontSize: Math.round(zoomFontSize * 0.7) }]}>
+                              {authorOrSource}
+                            </Text>
+                          </>
+                        )}
+                        {!!q.year && (!authorOrSource || !String(authorOrSource).includes(String(q.year))) && (
                           <>
                             <Text style={[styles.metaTextDot, { color: colors.textTertiary, fontSize: Math.round(zoomFontSize * 0.7) }]}>•</Text>
                             <Text style={[styles.metaText, { color: colors.textTertiary, fontSize: Math.round(zoomFontSize * 0.7) }]}>{q.year}</Text>
                           </>
                         )}
-                        <Text style={[styles.metaTextDot, { color: colors.textTertiary, fontSize: Math.round(zoomFontSize * 0.7) }]}>•</Text>
-                        <Text style={[styles.metaText, { color: colors.textTertiary, fontSize: Math.round(zoomFontSize * 0.7) }]}>{q.marks} Marks</Text>
+                        {!!q.marks && (
+                          <>
+                            <Text style={[styles.metaTextDot, { color: colors.textTertiary, fontSize: Math.round(zoomFontSize * 0.7) }]}>•</Text>
+                            <Text style={[styles.metaText, { color: colors.textTertiary, fontSize: Math.round(zoomFontSize * 0.7) }]}>{q.marks} Marks</Text>
+                          </>
+                        )}
                       </View>
                       <Text style={[styles.questionTitleText, { color: colors.textPrimary, fontSize: zoomFontSize, lineHeight: Math.round(zoomFontSize * 1.35) }]}>
-                        {q.questionText}
+                        {highlightKeywords(q.questionText, search)}
                       </Text>
+                      {/* Answer match snippet if matched in answers */}
+                      {(() => {
+                        const searchInAnswers = filters.searchAcross?.includes('Answers');
+                        if (!search.trim() || !searchInAnswers) return null;
+                        const snippet = buildAnswerSnippet(q.answers || [], search);
+                        if (!snippet) return null;
+                        return (
+                          <View style={{
+                            marginTop: 6,
+                            padding: 8,
+                            borderRadius: 8,
+                            backgroundColor: isDark ? 'rgba(234, 88, 12, 0.08)' : '#fff7ed',
+                            borderColor: isDark ? 'rgba(234, 88, 12, 0.25)' : '#ffedd5',
+                            borderWidth: 1,
+                            flexDirection: 'row',
+                            alignItems: 'flex-start',
+                            gap: 6
+                          }}>
+                            <View style={{
+                              backgroundColor: '#ea580c',
+                              paddingHorizontal: 5,
+                              paddingVertical: 1,
+                              borderRadius: 4,
+                              marginTop: 1
+                            }}>
+                              <Text style={{ color: '#ffffff', fontSize: 8.5, fontWeight: '900' }}>ANSWER</Text>
+                            </View>
+                            <Text style={{ color: isDark ? '#cbd5e1' : '#475569', fontSize: 11, lineHeight: 16, flex: 1 }} numberOfLines={2}>
+                              {snippet}
+                            </Text>
+                          </View>
+                        );
+                      })()}
                     </View>
                     <View style={styles.cardActionsRow}>
                       <TouchableOpacity onPress={() => onOpenDetailed(q)} style={styles.actionIconButton}>
@@ -11756,6 +12340,7 @@ function MainsAISearchView({
                       onToggleBookmark={onToggleBookmark}
                       onOpenViewer={handleOpenTopperViewer}
                       onOpenDetailed={onOpenDetailed}
+                      searchQuery={query}
                     />
                   );
                 }
@@ -11763,6 +12348,34 @@ function MainsAISearchView({
                 if (item.type === 'question') {
                   const isExpanded = expandedId === item.id;
                   const isBookmarked = savedQuestionIds.includes(item.id);
+
+                  const isOptionalItem =
+                    !item.paper ||
+                    item.paper.trim().toLowerCase() === 'optional' ||
+                    item.paper.trim().toLowerCase().includes('anthro') ||
+                    item.paper.trim().toLowerCase().includes('socio');
+
+                  let displayPaperOrSubject = '';
+                  if (isOptionalItem) {
+                    const rawSub =
+                      (item.subject && item.subject.trim().toLowerCase() !== 'optional' ? item.subject.trim() : null) ||
+                      (item.hierarchy_path?.[0] && item.hierarchy_path[0].trim().toLowerCase() !== 'optional' ? item.hierarchy_path[0].trim() : null) ||
+                      'Optional';
+                    displayPaperOrSubject =
+                      rawSub.length > 3 && rawSub === rawSub.toUpperCase()
+                        ? rawSub.charAt(0) + rawSub.slice(1).toLowerCase()
+                        : rawSub;
+                  } else {
+                    displayPaperOrSubject = item.paper;
+                  }
+
+                  const authorOrSource =
+                    item.topper_name ||
+                    item.source_attribution_label ||
+                    item.institute ||
+                    (item.answers || []).find(a => a.institute && a.institute.trim() && a.institute.toLowerCase() !== 'model answer')?.institute ||
+                    (item.answers || []).find(a => a.topper && a.topper.trim())?.topper ||
+                    '';
 
                   return (
                     <View
@@ -11772,7 +12385,14 @@ function MainsAISearchView({
                       }}
                       style={[
                         styles.figmaQuestionCard,
-                        { backgroundColor: 'rgba(255, 255, 255, 0.45)', borderColor: 'rgba(255, 255, 255, 0.65)', marginBottom: 12 },
+                        {
+                          backgroundColor: isDark ? 'rgba(30, 41, 59, 0.65)' : 'rgba(255, 255, 255, 0.75)',
+                          borderColor: item.is_pyq ? 'rgba(34, 197, 94, 0.6)' : 'rgba(59, 130, 246, 0.55)',
+                          borderWidth: 1.2,
+                          borderLeftWidth: 3.5,
+                          borderLeftColor: item.is_pyq ? '#16a34a' : '#2563eb',
+                          marginBottom: 12
+                        },
                       ]}
                     >
                       <TouchableOpacity
@@ -11794,18 +12414,70 @@ function MainsAISearchView({
                       >
                         <View style={{ flex: 1 }}>
                           <View style={styles.badgeRow}>
-                            <View style={{ backgroundColor: '#eff6ff', paddingHorizontal: 8, paddingVertical: 2, borderRadius: 6 }}>
-                              <Text style={{ fontSize: 9, fontWeight: '900', color: '#2563eb' }}>MAINS QUESTION</Text>
-                            </View>
-                            <Text style={[styles.paperBadgeText, { color: '#3b82f6', marginLeft: 6 }]}>{item.paper}</Text>
-                            <Text style={[styles.metaTextDot, { color: colors.textTertiary }]}>•</Text>
-                            <Text style={[styles.metaText, { color: colors.textTertiary }]}>{item.year}</Text>
-                            <Text style={[styles.metaTextDot, { color: colors.textTertiary }]}>•</Text>
-                            <Text style={[styles.metaText, { color: colors.textTertiary }]}>{item.marks} Marks</Text>
+                            {!!item.is_pyq ? (
+                              <View style={{ backgroundColor: 'rgba(34, 197, 94, 0.12)', borderColor: 'rgba(34, 197, 94, 0.3)', borderWidth: 1, borderRadius: 6, paddingHorizontal: 6, paddingVertical: 1, marginRight: 6 }}>
+                                <Text style={{ fontSize: 9, fontWeight: '900', color: '#16a34a' }}>PYQ</Text>
+                              </View>
+                            ) : (
+                              <View style={{ backgroundColor: 'rgba(59, 130, 246, 0.12)', borderColor: 'rgba(59, 130, 246, 0.3)', borderWidth: 1, borderRadius: 6, paddingHorizontal: 6, paddingVertical: 1, marginRight: 6 }}>
+                                <Text style={{ fontSize: 9, fontWeight: '900', color: '#2563eb' }}>PRACTICE</Text>
+                              </View>
+                            )}
+                            <Text style={[styles.paperBadgeText, { color: '#3b82f6', fontSize: 11, fontWeight: '700' }]}>{displayPaperOrSubject}</Text>
+                            {!!authorOrSource && (
+                              <>
+                                <Text style={[styles.metaTextDot, { color: colors.textTertiary }]}>•</Text>
+                                <Text style={[styles.metaText, { color: item.is_pyq ? '#15803d' : '#2563eb', fontWeight: '800' }]}>{authorOrSource}</Text>
+                              </>
+                            )}
+                            {!!item.year && (!authorOrSource || !String(authorOrSource).includes(String(item.year))) && (
+                              <>
+                                <Text style={[styles.metaTextDot, { color: colors.textTertiary }]}>•</Text>
+                                <Text style={[styles.metaText, { color: colors.textTertiary }]}>{item.year}</Text>
+                              </>
+                            )}
+                            {!!item.marks && (
+                              <>
+                                <Text style={[styles.metaTextDot, { color: colors.textTertiary }]}>•</Text>
+                                <Text style={[styles.metaText, { color: colors.textTertiary }]}>{item.marks} Marks</Text>
+                              </>
+                            )}
                           </View>
                           <Text style={[styles.questionTitleText, { color: colors.textPrimary }]}>
-                            {item.questionText}
+                            {highlightKeywords(item.questionText, query)}
                           </Text>
+                          {/* Answer match snippet if matched in answers */}
+                          {(() => {
+                            if (!query?.trim() || !activeFilters.searchAcross.includes('Answers')) return null;
+                            const snippet = buildAnswerSnippet(item.answers || [], query);
+                            if (!snippet) return null;
+                            return (
+                              <View style={{
+                                marginTop: 6,
+                                padding: 8,
+                                borderRadius: 8,
+                                backgroundColor: isDark ? 'rgba(234, 88, 12, 0.08)' : '#fff7ed',
+                                borderColor: isDark ? 'rgba(234, 88, 12, 0.25)' : '#ffedd5',
+                                borderWidth: 1,
+                                flexDirection: 'row',
+                                alignItems: 'flex-start',
+                                gap: 6
+                              }}>
+                                <View style={{
+                                  backgroundColor: '#ea580c',
+                                  paddingHorizontal: 5,
+                                  paddingVertical: 1,
+                                  borderRadius: 4,
+                                  marginTop: 1
+                                }}>
+                                  <Text style={{ color: '#ffffff', fontSize: 8.5, fontWeight: '900' }}>ANSWER</Text>
+                                </View>
+                                <Text style={{ color: isDark ? '#cbd5e1' : '#475569', fontSize: 11, lineHeight: 16, flex: 1 }} numberOfLines={2}>
+                                  {snippet}
+                                </Text>
+                              </View>
+                            );
+                          })()}
                         </View>
                         <View style={styles.cardActionsRow}>
                           <TouchableOpacity onPress={() => onOpenDetailed(item)} style={styles.actionIconButton}>

@@ -19,7 +19,7 @@ import { Search, Sliders, X, Clock, Zap, Book, Layers, ChevronRight, Check, Tras
 import { useRouter, usePathname } from 'expo-router';
 import { QuestionCache } from '../services/QuestionCache';
 import { useTheme } from '../context/ThemeContext';
-import { supabase } from '../lib/supabase';
+import { catalogFrom } from '../services/CatalogSource';
 import * as Haptics from 'expo-haptics';
 import { buildArenaEngineSearchParams } from '../utils/arenaSearchNavigation';
 import { getPYQCategorization } from '../utils/questionUtils';
@@ -104,107 +104,6 @@ export const GlobalSearchBar: React.FC<GlobalSearchBarProps> = ({
           }
 
           let results = [...localResults];
-
-          // 2. Remote Fallback if local is sparse
-          if (results.length < 5) {
-            const term = query.trim();
-            const activeFields = searchFields.length > 0 ? searchFields : ['Questions', 'Notes'];
-            const orConditions = [];
-            if (activeFields.includes('Questions')) orConditions.push(`question_text.ilike.%${term}%`);
-            if (activeFields.includes('Explanations')) orConditions.push(`explanation_markdown.ilike.%${term}%`);
-
-            if (orConditions.length > 0) {
-              let remoteQuery = supabase
-                .from('questions')
-                .select('*, is_ncert, tests(institute, series, title)')
-                .or(orConditions.join(','))
-                .limit(10);
-
-              // Apply filters to remote query (hard filters)
-              if (selectedSubjects.length > 0) remoteQuery = remoteQuery.in('subject', selectedSubjects);
-              if (selectedSections.length > 0) {
-                const rSections = selectedSections.map((s: string) => s === 'General' ? null : s);
-                if (rSections.includes(null)) {
-                  const nonNulls = rSections.filter((s: any) => s !== null);
-                  if (nonNulls.length > 0) remoteQuery = remoteQuery.or(`section_group.in.(${nonNulls.join(',')}),section_group.is.null`);
-                  else remoteQuery = remoteQuery.is('section_group', null);
-                } else {
-                  remoteQuery = remoteQuery.in('section_group', rSections);
-                }
-              }
-              if (selectedMicrotopics.length > 0) remoteQuery = remoteQuery.in('micro_topic', selectedMicrotopics);
-              if (pyqFilter === 'PYQ Only') remoteQuery = remoteQuery.eq('is_pyq', true);
-              if (pyqFilter === 'Non-PYQ') remoteQuery = remoteQuery.eq('is_pyq', false);
-              if (ncertFilter === 'NCERT Only') {
-                remoteQuery = remoteQuery.eq('is_ncert', true);
-              } else if (ncertFilter === 'Non-NCERT') {
-                remoteQuery = remoteQuery.or('is_ncert.is.null,is_ncert.eq.false');
-              }
-
-              if (selectedInstitutes.length > 0 || selectedPrograms.length > 0 || examStage !== 'All') {
-                let rtQuery = supabase.from('tests').select('id');
-                if (selectedInstitutes.length > 0) rtQuery = rtQuery.in('institute', selectedInstitutes);
-                if (selectedPrograms.length > 0) rtQuery = rtQuery.in('program_name', selectedPrograms);
-                if (examStage !== 'All') rtQuery = rtQuery.ilike('series', `%${examStage}%`);
-                const { data: rtRows } = await rtQuery;
-                const rtIds = (rtRows || []).map((t: any) => t.id);
-                if (rtIds.length > 0) remoteQuery = remoteQuery.in('test_id', rtIds);
-                else remoteQuery = remoteQuery.in('test_id', ['__NO_MATCH__']);
-              }
-
-              let { data: remote } = await remoteQuery;
-
-              // FUZZY FALLBACK: If still sparse and term is long, try 1-character tolerance
-              if (searchMode !== 'Exact' && term.length > 3) {
-                const fuzzyPatterns = [];
-                for (let i = 0; i < term.length; i++) {
-                  const pattern = term.substring(0, i) + '%' + term.substring(i + 1);
-                  if (activeFields.includes('Questions')) fuzzyPatterns.push(`question_text.ilike.%${pattern}%`);
-                }
-                if (fuzzyPatterns.length > 0) {
-                  let fuzzyQ = supabase.from('questions').select('*, is_ncert, tests(institute, series, title)').or(fuzzyPatterns.join(',')).limit(5);
-                  if (selectedSubjects.length > 0) fuzzyQ = fuzzyQ.in('subject', selectedSubjects);
-                  if (selectedSections.length > 0) {
-                    const fSections = selectedSections.map((s: string) => s === 'General' ? null : s);
-                    if (fSections.includes(null)) {
-                      const nonNulls = fSections.filter((s: any) => s !== null);
-                      if (nonNulls.length > 0) fuzzyQ = fuzzyQ.or(`section_group.in.(${nonNulls.join(',')}),section_group.is.null`);
-                      else fuzzyQ = fuzzyQ.is('section_group', null);
-                    } else {
-                      fuzzyQ = fuzzyQ.in('section_group', fSections);
-                    }
-                  }
-                  if (selectedMicrotopics.length > 0) fuzzyQ = fuzzyQ.in('micro_topic', selectedMicrotopics);
-                  if (pyqFilter === 'PYQ Only') fuzzyQ = fuzzyQ.eq('is_pyq', true);
-                  if (pyqFilter === 'Non-PYQ') fuzzyQ = fuzzyQ.eq('is_pyq', false);
-                  if (ncertFilter === 'NCERT Only') {
-                    fuzzyQ = fuzzyQ.eq('is_ncert', true);
-                  } else if (ncertFilter === 'Non-NCERT') {
-                    fuzzyQ = fuzzyQ.or('is_ncert.is.null,is_ncert.eq.false');
-                  }
-                  if (selectedInstitutes.length > 0 || selectedPrograms.length > 0 || examStage !== 'All') {
-                    let ftQuery = supabase.from('tests').select('id');
-                    if (selectedInstitutes.length > 0) ftQuery = ftQuery.in('institute', selectedInstitutes);
-                    if (selectedPrograms.length > 0) ftQuery = ftQuery.in('program_name', selectedPrograms);
-                    if (examStage !== 'All') ftQuery = ftQuery.ilike('series', `%${examStage}%`);
-                    const { data: ftRows } = await ftQuery;
-                    const ftIds = (ftRows || []).map((t: any) => t.id);
-                    if (ftIds.length > 0) fuzzyQ = fuzzyQ.in('test_id', ftIds);
-                    else fuzzyQ = fuzzyQ.in('test_id', ['__NO_MATCH__']);
-                  }
-                  const { data: fData } = await fuzzyQ;
-                  if (fData) remote = [...(remote || []), ...fData];
-                }
-              }
-
-              if (remote) {
-                // Deduplicate and merge
-                const localIds = new Set(results.map(r => r.id));
-                const newItems = remote.filter(r => !localIds.has(r.id));
-                results = [...results, ...newItems];
-              }
-            }
-          }
 
           // 3. SORT: Relevance → UPSC Priority → Newest Year.
           const prioritized = results.sort((a, b) => {
@@ -303,7 +202,7 @@ export const GlobalSearchBar: React.FC<GlobalSearchBarProps> = ({
 
   const fetchFilters = async () => {
     try {
-      let instQ = supabase.from('tests').select('institute');
+      let instQ = catalogFrom('tests').select('institute');
       if (examStage && examStage !== 'All') instQ = instQ.ilike('series', `%${examStage}%`);
       const { data: instData } = await instQ;
       if (instData) {
@@ -311,7 +210,7 @@ export const GlobalSearchBar: React.FC<GlobalSearchBarProps> = ({
       }
 
       if (selectedInstitutes.length > 0) {
-        let progQ = supabase.from('tests').select('program_name').in('institute', selectedInstitutes);
+        let progQ = catalogFrom('tests').select('program_name').in('institute', selectedInstitutes);
         if (examStage && examStage !== 'All') progQ = progQ.ilike('series', `%${examStage}%`);
         const { data: progData } = await progQ;
         if (progData) {
@@ -325,9 +224,9 @@ export const GlobalSearchBar: React.FC<GlobalSearchBarProps> = ({
 
   const fetchDynamicFilters = async () => {
     try {
-      let query = supabase.from('questions').select('subject, section_group, micro_topic');
+      let query = catalogFrom('questions').select('subject, section_group, micro_topic');
       if (selectedInstitutes.length > 0) {
-        const { data: tests } = await supabase.from('tests').select('id').in('institute', selectedInstitutes);
+        const { data: tests } = await catalogFrom('tests').select('id').in('institute', selectedInstitutes);
         if (tests) query = query.in('test_id', tests.map(t => t.id));
       }
       const { data } = await query.limit(2000);

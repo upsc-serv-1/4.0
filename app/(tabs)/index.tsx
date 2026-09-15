@@ -64,6 +64,26 @@ const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const IS_TABLET = SCREEN_WIDTH >= 768;
 const AVATAR_MAP = Object.fromEntries(AVATARS.map(a => [a.id, a.uri]));
 
+const formatMainsSubjectName = (key: string): string => {
+  const map: Record<string, string> = {
+    'GEOGRAPHY': 'Geography',
+    'HISTORY': 'History',
+    'SOCIETY': 'Society',
+    'POLITY': 'Polity',
+    'GOVERNANCE': 'Governance',
+    'SOCIAL JUSTICE': 'Social Justice',
+    'INTERNATIONAL RELATIONS': 'International Relations',
+    'INDIAN ECONOMY': 'Economy',
+    'AGRICULTURE': 'Agriculture',
+    'SCIENCE & TECHNOLOGY': 'Science & Technology',
+    'ENVIRONMENT': 'Environment',
+    'DISASTER MANAGEMENT': 'Disaster Management',
+    'INTERNAL SECURITY': 'Internal Security',
+    'ETHICS, INTEGRITY & APTITUDE': 'Ethics & Integrity',
+  };
+  return map[key] || key.charAt(0).toUpperCase() + key.slice(1).toLowerCase();
+};
+
 const calculateTabSubjects = (progress: Record<string, SyllabusProgress>, trackingMethod: 'single' | 'multi' = 'multi', optionalChoice: string = 'Anthropology') => {
   const getLeafNodes = (node: any, path: string): Array<{ path: string; topic: string }> => {
     if (Array.isArray(node)) {
@@ -114,9 +134,91 @@ const calculateTabSubjects = (progress: Record<string, SyllabusProgress>, tracki
   const prelimsColors = ['#F97316', '#3B82F6', '#10B981', '#6366F1', '#EC4899', '#3B82F6', '#EAB308', '#3B82F6'];
   const prelims = calc(MICRO_SYLLABUS, prelimsKeys, prelimsColors);
 
-  const mainsKeys = ['GS1', 'GS2', 'GS3', 'GS4', 'Essay'];
-  const mainsColors = ['#F97316', '#3B82F6', '#10B981', '#6366F1', '#EC4899'];
-  const mains = calc(MAINS_SYLLABUS, mainsKeys, mainsColors);
+  // Helper to calculate one level deeper subjects for Mains GS Papers
+  const calcMainsSubjects = (paperKey: string, baseColor: string) => {
+    const paperNode = (MAINS_SYLLABUS as any)?.[paperKey];
+    if (!paperNode || typeof paperNode !== 'object') return [];
+    return Object.keys(paperNode).map((subjectKey) => {
+      let total = 0;
+      let completed = 0;
+      const subjData = paperNode[subjectKey];
+      if (subjData) {
+        const leaves = getLeafNodes(subjData, `${paperKey}.${subjectKey}`);
+        leaves.forEach(leaf => {
+          const item = progress[leaf.path] || {};
+          if (trackingMethod === 'single') {
+            total += 1;
+            if (item.mastered) completed++;
+          } else {
+            total += 4;
+            if (item.mastered) completed++;
+            if (item.ncert) completed++;
+            if (item.pyqs) completed++;
+            if (item.books) completed++;
+          }
+        });
+      }
+
+      return {
+        id: `${paperKey}.${subjectKey}`,
+        paperKey,
+        rawKey: subjectKey,
+        name: formatMainsSubjectName(subjectKey),
+        percent: total > 0 ? Math.round((completed / total) * 100) : 0,
+        color: baseColor
+      };
+    });
+  };
+
+  const gsPaperKeys = ['GS1', 'GS2', 'GS3', 'GS4'];
+  const gsColors = ['#EA580C', '#2563EB', '#059669', '#4F46E5'];
+  const gsPapers = calc(MAINS_SYLLABUS, gsPaperKeys, gsColors);
+
+  const gs1Subjects = calcMainsSubjects('GS1', '#EA580C');
+  const gs2Subjects = calcMainsSubjects('GS2', '#2563EB');
+  const gs3Subjects = calcMainsSubjects('GS3', '#059669');
+  const gs4Subjects = calcMainsSubjects('GS4', '#4F46E5');
+
+  const mains = [...gs1Subjects, ...gs2Subjects, ...gs3Subjects, ...gs4Subjects];
+
+  const mainsDetailed = {
+    gs1: {
+      key: 'GS1',
+      name: 'GS 1',
+      badgeBg: '#FFF7ED',
+      borderColor: '#FFEDD5',
+      headerColor: '#EA580C',
+      percent: gsPapers.find(g => g.id === 'GS1')?.percent || 0,
+      subjects: gs1Subjects
+    },
+    gs2: {
+      key: 'GS2',
+      name: 'GS 2',
+      badgeBg: '#EFF6FF',
+      borderColor: '#DBEAFE',
+      headerColor: '#2563EB',
+      percent: gsPapers.find(g => g.id === 'GS2')?.percent || 0,
+      subjects: gs2Subjects
+    },
+    gs3: {
+      key: 'GS3',
+      name: 'GS 3',
+      badgeBg: '#ECFDF5',
+      borderColor: '#D1FAE5',
+      headerColor: '#059669',
+      percent: gsPapers.find(g => g.id === 'GS3')?.percent || 0,
+      subjects: gs3Subjects
+    },
+    gs4: {
+      key: 'GS4',
+      name: 'GS 4',
+      badgeBg: '#EEF2FF',
+      borderColor: '#E0E7FF',
+      headerColor: '#4F46E5',
+      percent: gsPapers.find(g => g.id === 'GS4')?.percent || 0,
+      subjects: gs4Subjects
+    }
+  };
   
   const sourceSyllabus = optionalChoice === 'Anthropology' ? ANTHROPOLOGY_SYLLABUS : optionalChoice === 'Medical Science' ? MEDICAL_SCIENCE_SYLLABUS : OPTIONAL_SYLLABUS;
   const paper1Key = `${optionalChoice} Paper 1`;
@@ -191,11 +293,9 @@ const calculateTabSubjects = (progress: Record<string, SyllabusProgress>, tracki
   };
 
   // Create an Overall list combining all unique subjects
-  const overallKeys = Array.from(new Set([...prelimsKeys, ...mainsKeys, ...optionalKeys]));
-  const overallColors = [...prelimsColors, ...mainsColors, ...optionalColors];
-  const overall = calc({ ...MICRO_SYLLABUS, ...MAINS_SYLLABUS, ...activeOptionalSyllabus }, overallKeys, overallColors, optionalNameMap);
+  const overall = [...prelims, ...mains, ...optional];
 
-  return { Prelims: prelims, Mains: mains, Optional: optional, Overall: overall, optionalDetailed };
+  return { Prelims: prelims, Mains: mains, Optional: optional, Overall: overall, optionalDetailed, mainsDetailed };
 };
 
 const DEFAULT_TAB_SUBJECTS = {
@@ -210,12 +310,77 @@ const DEFAULT_TAB_SUBJECTS = {
     { id: 'Economy', name: 'Economy', percent: 0, color: '#3B82F6' },
   ],
   Mains: [
-    { id: 'GS1', name: 'GS1', percent: 0, color: '#F97316' },
-    { id: 'GS2', name: 'GS2', percent: 0, color: '#3B82F6' },
-    { id: 'GS3', name: 'GS3', percent: 0, color: '#10B981' },
-    { id: 'GS4', name: 'GS4', percent: 0, color: '#6366F1' },
-    { id: 'Essay', name: 'Essay', percent: 0, color: '#EC4899' },
+    { id: 'GS1.GEOGRAPHY', paperKey: 'GS1', rawKey: 'GEOGRAPHY', name: 'Geography', percent: 0, color: '#EA580C' },
+    { id: 'GS1.HISTORY', paperKey: 'GS1', rawKey: 'HISTORY', name: 'History', percent: 0, color: '#EA580C' },
+    { id: 'GS1.SOCIETY', paperKey: 'GS1', rawKey: 'SOCIETY', name: 'Society', percent: 0, color: '#EA580C' },
+    { id: 'GS2.POLITY', paperKey: 'GS2', rawKey: 'POLITY', name: 'Polity', percent: 0, color: '#2563EB' },
+    { id: 'GS2.GOVERNANCE', paperKey: 'GS2', rawKey: 'GOVERNANCE', name: 'Governance', percent: 0, color: '#2563EB' },
+    { id: 'GS2.SOCIAL JUSTICE', paperKey: 'GS2', rawKey: 'SOCIAL JUSTICE', name: 'Social Justice', percent: 0, color: '#2563EB' },
+    { id: 'GS2.INTERNATIONAL RELATIONS', paperKey: 'GS2', rawKey: 'INTERNATIONAL RELATIONS', name: 'International Relations', percent: 0, color: '#2563EB' },
+    { id: 'GS3.INDIAN ECONOMY', paperKey: 'GS3', rawKey: 'INDIAN ECONOMY', name: 'Economy', percent: 0, color: '#059669' },
+    { id: 'GS3.AGRICULTURE', paperKey: 'GS3', rawKey: 'AGRICULTURE', name: 'Agriculture', percent: 0, color: '#059669' },
+    { id: 'GS3.SCIENCE & TECHNOLOGY', paperKey: 'GS3', rawKey: 'SCIENCE & TECHNOLOGY', name: 'Science & Technology', percent: 0, color: '#059669' },
+    { id: 'GS3.ENVIRONMENT', paperKey: 'GS3', rawKey: 'ENVIRONMENT', name: 'Environment', percent: 0, color: '#059669' },
+    { id: 'GS3.DISASTER MANAGEMENT', paperKey: 'GS3', rawKey: 'DISASTER MANAGEMENT', name: 'Disaster Management', percent: 0, color: '#059669' },
+    { id: 'GS3.INTERNAL SECURITY', paperKey: 'GS3', rawKey: 'INTERNAL SECURITY', name: 'Internal Security', percent: 0, color: '#059669' },
+    { id: 'GS4.ETHICS, INTEGRITY & APTITUDE', paperKey: 'GS4', rawKey: 'ETHICS, INTEGRITY & APTITUDE', name: 'Ethics & Integrity', percent: 0, color: '#4F46E5' },
   ],
+  mainsDetailed: {
+    gs1: {
+      key: 'GS1',
+      name: 'GS 1',
+      badgeBg: '#FFF7ED',
+      borderColor: '#FFEDD5',
+      headerColor: '#EA580C',
+      percent: 0,
+      subjects: [
+        { id: 'GS1.GEOGRAPHY', paperKey: 'GS1', rawKey: 'GEOGRAPHY', name: 'Geography', percent: 0, color: '#EA580C' },
+        { id: 'GS1.HISTORY', paperKey: 'GS1', rawKey: 'HISTORY', name: 'History', percent: 0, color: '#EA580C' },
+        { id: 'GS1.SOCIETY', paperKey: 'GS1', rawKey: 'SOCIETY', name: 'Society', percent: 0, color: '#EA580C' },
+      ]
+    },
+    gs2: {
+      key: 'GS2',
+      name: 'GS 2',
+      badgeBg: '#EFF6FF',
+      borderColor: '#DBEAFE',
+      headerColor: '#2563EB',
+      percent: 0,
+      subjects: [
+        { id: 'GS2.POLITY', paperKey: 'GS2', rawKey: 'POLITY', name: 'Polity', percent: 0, color: '#2563EB' },
+        { id: 'GS2.GOVERNANCE', paperKey: 'GS2', rawKey: 'GOVERNANCE', name: 'Governance', percent: 0, color: '#2563EB' },
+        { id: 'GS2.SOCIAL JUSTICE', paperKey: 'GS2', rawKey: 'SOCIAL JUSTICE', name: 'Social Justice', percent: 0, color: '#2563EB' },
+        { id: 'GS2.INTERNATIONAL RELATIONS', paperKey: 'GS2', rawKey: 'INTERNATIONAL RELATIONS', name: 'International Relations', percent: 0, color: '#2563EB' },
+      ]
+    },
+    gs3: {
+      key: 'GS3',
+      name: 'GS 3',
+      badgeBg: '#ECFDF5',
+      borderColor: '#D1FAE5',
+      headerColor: '#059669',
+      percent: 0,
+      subjects: [
+        { id: 'GS3.INDIAN ECONOMY', paperKey: 'GS3', rawKey: 'INDIAN ECONOMY', name: 'Economy', percent: 0, color: '#059669' },
+        { id: 'GS3.AGRICULTURE', paperKey: 'GS3', rawKey: 'AGRICULTURE', name: 'Agriculture', percent: 0, color: '#059669' },
+        { id: 'GS3.SCIENCE & TECHNOLOGY', paperKey: 'GS3', rawKey: 'SCIENCE & TECHNOLOGY', name: 'Science & Technology', percent: 0, color: '#059669' },
+        { id: 'GS3.ENVIRONMENT', paperKey: 'GS3', rawKey: 'ENVIRONMENT', name: 'Environment', percent: 0, color: '#059669' },
+        { id: 'GS3.DISASTER MANAGEMENT', paperKey: 'GS3', rawKey: 'DISASTER MANAGEMENT', name: 'Disaster Management', percent: 0, color: '#059669' },
+        { id: 'GS3.INTERNAL SECURITY', paperKey: 'GS3', rawKey: 'INTERNAL SECURITY', name: 'Internal Security', percent: 0, color: '#059669' },
+      ]
+    },
+    gs4: {
+      key: 'GS4',
+      name: 'GS 4',
+      badgeBg: '#EEF2FF',
+      borderColor: '#E0E7FF',
+      headerColor: '#4F46E5',
+      percent: 0,
+      subjects: [
+        { id: 'GS4.ETHICS, INTEGRITY & APTITUDE', paperKey: 'GS4', rawKey: 'ETHICS, INTEGRITY & APTITUDE', name: 'Ethics & Integrity', percent: 0, color: '#4F46E5' },
+      ]
+    }
+  },
   Optional: [
     { id: 'Anthropology Paper 1', name: 'Paper 1', percent: 0, color: '#7C3AED' },
     { id: 'Anthropology Paper 2', name: 'Paper 2', percent: 0, color: '#EC4899' },
@@ -259,6 +424,7 @@ export default function HomeScreen() {
   const [tabSubjects, setTabSubjects] = useState(DEFAULT_TAB_SUBJECTS);
   const [searchQuery, setSearchQuery] = useState('');
   const [prepTab, setPrepTab] = useState<'Prelims' | 'Mains' | 'Optional' | 'Overall'>('Prelims');
+  const [mainsFilter, setMainsFilter] = useState<'all' | 'gs1' | 'gs2' | 'gs3' | 'gs4'>('all');
   const [tasks, setTasks] = useState<DailyTask[]>([]);
   const [streak, setStreak] = useState<StudyStreak>({
     current_streak: 0,
@@ -824,13 +990,200 @@ export default function HomeScreen() {
                       </ScrollView>
                     </View>
                   </View>
+                ) : prepTab === 'Mains' && tabSubjects.mainsDetailed ? (
+                  <View style={{ width: '100%' }}>
+                    {/* Paper Filter Chips for Mains */}
+                    <View style={{ flexDirection: 'row', gap: 6, marginBottom: 10, alignItems: 'center' }}>
+                      {[
+                        { id: 'all', label: 'All Papers' },
+                        { id: 'gs1', label: 'GS 1' },
+                        { id: 'gs2', label: 'GS 2' },
+                        { id: 'gs3', label: 'GS 3' },
+                        { id: 'gs4', label: 'GS 4' },
+                      ].map((p) => {
+                        const isActive = mainsFilter === p.id;
+                        return (
+                          <TouchableOpacity
+                            key={p.id}
+                            onPress={() => {
+                              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                              setMainsFilter(p.id as any);
+                            }}
+                            style={{
+                              paddingHorizontal: 10,
+                              paddingVertical: 4,
+                              borderRadius: 12,
+                              backgroundColor: isActive ? '#1E293B' : '#F1F5F9',
+                            }}
+                          >
+                            <Text style={{
+                              fontSize: 11,
+                              fontWeight: isActive ? '700' : '500',
+                              color: isActive ? '#FFFFFF' : '#64748B'
+                            }}>
+                              {p.label}
+                            </Text>
+                          </TouchableOpacity>
+                        );
+                      })}
+                    </View>
+
+                    {/* Mains Detailed Subject Columns */}
+                    {mainsFilter === 'all' ? (
+                      IS_TABLET ? (
+                        <View style={{ flexDirection: 'row', gap: 10, width: '100%' }}>
+                          {(['gs1', 'gs2', 'gs3', 'gs4'] as const).map((paperKey) => {
+                            const paper = tabSubjects.mainsDetailed[paperKey];
+                            if (!paper) return null;
+                            return (
+                              <View
+                                key={paper.key}
+                                style={{
+                                  flex: 1,
+                                  backgroundColor: paper.badgeBg,
+                                  borderRadius: 12,
+                                  padding: 10,
+                                  borderWidth: 1,
+                                  borderColor: paper.borderColor
+                                }}
+                              >
+                                <TouchableOpacity
+                                  style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8, paddingBottom: 4, borderBottomWidth: 1, borderBottomColor: paper.borderColor }}
+                                  onPress={() => router.push({ pathname: '/tracker', params: { subject: paper.key, defaultMode: 'mains' } })}
+                                >
+                                  <Text style={{ fontSize: 12, fontWeight: '800', color: paper.headerColor }}>{paper.name}</Text>
+                                  <Text style={{ fontSize: 11, fontWeight: '800', color: paper.headerColor }}>{paper.percent}%</Text>
+                                </TouchableOpacity>
+                                <ScrollView style={{ maxHeight: 180 }} showsVerticalScrollIndicator={false} nestedScrollEnabled={true}>
+                                  {paper.subjects.map((sub: any, sIdx: number) => (
+                                    <TouchableOpacity
+                                      key={sub.id || sIdx}
+                                      style={{ marginBottom: 8 }}
+                                      onPress={() => router.push({ pathname: '/tracker', params: { subject: paper.key, group: sub.rawKey, defaultMode: 'mains' } })}
+                                    >
+                                      <View style={styles.subjectLabelRow}>
+                                        <Text style={[styles.subjectName, { fontSize: 11, flex: 1, marginRight: 8 }]} numberOfLines={1}>{sub.name}</Text>
+                                        <Text style={[styles.subjectPercent, { fontSize: 11 }]}>{sub.percent}%</Text>
+                                      </View>
+                                      <View style={styles.progressTrack}>
+                                        <View style={[styles.progressFill, { width: `${sub.percent}%`, backgroundColor: paper.headerColor }]} />
+                                      </View>
+                                    </TouchableOpacity>
+                                  ))}
+                                </ScrollView>
+                              </View>
+                            );
+                          })}
+                        </View>
+                      ) : (
+                        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 10, paddingRight: 8 }}>
+                          {(['gs1', 'gs2', 'gs3', 'gs4'] as const).map((paperKey) => {
+                            const paper = tabSubjects.mainsDetailed[paperKey];
+                            if (!paper) return null;
+                            const cardWidth = Math.max(160, (SCREEN_WIDTH - 64) / 2);
+                            return (
+                              <View
+                                key={paper.key}
+                                style={{
+                                  width: cardWidth,
+                                  backgroundColor: paper.badgeBg,
+                                  borderRadius: 12,
+                                  padding: 10,
+                                  borderWidth: 1,
+                                  borderColor: paper.borderColor
+                                }}
+                              >
+                                <TouchableOpacity
+                                  style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8, paddingBottom: 4, borderBottomWidth: 1, borderBottomColor: paper.borderColor }}
+                                  onPress={() => router.push({ pathname: '/tracker', params: { subject: paper.key, defaultMode: 'mains' } })}
+                                >
+                                  <Text style={{ fontSize: 12, fontWeight: '800', color: paper.headerColor }}>{paper.name}</Text>
+                                  <Text style={{ fontSize: 11, fontWeight: '800', color: paper.headerColor }}>{paper.percent}%</Text>
+                                </TouchableOpacity>
+                                <ScrollView style={{ maxHeight: 180 }} showsVerticalScrollIndicator={false} nestedScrollEnabled={true}>
+                                  {paper.subjects.map((sub: any, sIdx: number) => (
+                                    <TouchableOpacity
+                                      key={sub.id || sIdx}
+                                      style={{ marginBottom: 8 }}
+                                      onPress={() => router.push({ pathname: '/tracker', params: { subject: paper.key, group: sub.rawKey, defaultMode: 'mains' } })}
+                                    >
+                                      <View style={styles.subjectLabelRow}>
+                                        <Text style={[styles.subjectName, { fontSize: 11, flex: 1, marginRight: 8 }]} numberOfLines={1}>{sub.name}</Text>
+                                        <Text style={[styles.subjectPercent, { fontSize: 11 }]}>{sub.percent}%</Text>
+                                      </View>
+                                      <View style={styles.progressTrack}>
+                                        <View style={[styles.progressFill, { width: `${sub.percent}%`, backgroundColor: paper.headerColor }]} />
+                                      </View>
+                                    </TouchableOpacity>
+                                  ))}
+                                </ScrollView>
+                              </View>
+                            );
+                          })}
+                        </ScrollView>
+                      )
+                    ) : (
+                      // Single Paper selected view
+                      (() => {
+                        const paper = tabSubjects.mainsDetailed[mainsFilter as 'gs1' | 'gs2' | 'gs3' | 'gs4'];
+                        if (!paper) return null;
+                        return (
+                          <View
+                            style={{
+                              width: '100%',
+                              backgroundColor: paper.badgeBg,
+                              borderRadius: 12,
+                              padding: 12,
+                              borderWidth: 1,
+                              borderColor: paper.borderColor
+                            }}
+                          >
+                            <TouchableOpacity
+                              style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12, paddingBottom: 6, borderBottomWidth: 1, borderBottomColor: paper.borderColor }}
+                              onPress={() => router.push({ pathname: '/tracker', params: { subject: paper.key, defaultMode: 'mains' } })}
+                            >
+                              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                                <Text style={{ fontSize: 14, fontWeight: '800', color: paper.headerColor }}>{paper.name}</Text>
+                                <Text style={{ fontSize: 12, color: '#64748B' }}>({paper.subjects.length} subjects)</Text>
+                              </View>
+                              <Text style={{ fontSize: 12, fontWeight: '800', color: paper.headerColor }}>{paper.percent}% Completed ›</Text>
+                            </TouchableOpacity>
+                            <View style={styles.subjectGrid}>
+                              {paper.subjects.map((sub: any, sIdx: number) => (
+                                <TouchableOpacity
+                                  key={sub.id || sIdx}
+                                  style={styles.subjectItem}
+                                  onPress={() => router.push({ pathname: '/tracker', params: { subject: paper.key, group: sub.rawKey, defaultMode: 'mains' } })}
+                                >
+                                  <View style={styles.subjectLabelRow}>
+                                    <Text style={[styles.subjectName, { flex: 1, marginRight: 8 }]} numberOfLines={1}>{sub.name}</Text>
+                                    <Text style={styles.subjectPercent}>{sub.percent}%</Text>
+                                  </View>
+                                  <View style={styles.progressTrack}>
+                                    <View style={[styles.progressFill, { width: `${sub.percent}%`, backgroundColor: paper.headerColor }]} />
+                                  </View>
+                                </TouchableOpacity>
+                              ))}
+                            </View>
+                          </View>
+                        );
+                      })()
+                    )}
+                  </View>
                 ) : (
                   <View style={styles.subjectGrid}>
                     {currentSubjects.map((sub, idx) => (
                       <TouchableOpacity
                         key={sub.id || sub.name || idx}
                         style={styles.subjectItem}
-                        onPress={() => router.push({ pathname: '/tracker', params: { subject: sub.id || sub.name, defaultMode: prepTab.toLowerCase() } })}
+                        onPress={() => {
+                          if (sub.id && sub.id.includes('.')) {
+                            const [pSub, pGroup] = sub.id.split('.');
+                            router.push({ pathname: '/tracker', params: { subject: pSub, group: pGroup, defaultMode: 'mains' } });
+                          } else {
+                            router.push({ pathname: '/tracker', params: { subject: sub.id || sub.name, defaultMode: prepTab.toLowerCase() } });
+                          }
+                        }}
                       >
                         <View style={styles.subjectLabelRow}>
                           <Text style={[styles.subjectName, { flex: 1, marginRight: 8 }]} numberOfLines={1}>{sub.name}</Text>

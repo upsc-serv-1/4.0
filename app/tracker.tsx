@@ -405,7 +405,7 @@ function SyllabusTracker() {
   const isTablet = width >= 768;
   const { session } = useAuth();
   const { selectedCourse } = useCourse();
-  const params = useLocalSearchParams<{ defaultMode?: Mode, subject?: string }>();
+  const params = useLocalSearchParams<{ defaultMode?: Mode, subject?: string, group?: string }>();
   const [mode, setMode] = useState<Mode>(
     params.defaultMode === 'mains' 
       ? 'mains' 
@@ -431,8 +431,16 @@ function SyllabusTracker() {
   const [expandedPaths, setExpandedPaths] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
-    if (params.subject) setSelectedSubject(params.subject);
-  }, [params.subject]);
+    if (params.subject) {
+      setSelectedSubject(params.subject);
+      if (params.group) {
+        setExpandedPaths(prev => ({
+          ...prev,
+          [`${params.subject}.${params.group}`]: true
+        }));
+      }
+    }
+  }, [params.subject, params.group]);
 
   const togglePathExpanded = (path: string) => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
@@ -441,10 +449,6 @@ function SyllabusTracker() {
       [path]: !prev[path]
     }));
   };
-
-  useEffect(() => {
-    setExpandedPaths({});
-  }, [selectedSubject]);
 
   const [expandedGroup, setExpandedGroup] = useState<string | null>(null);
   const [trackingMethod, setTrackingMethod] = useState<'single' | 'multi'>('multi');

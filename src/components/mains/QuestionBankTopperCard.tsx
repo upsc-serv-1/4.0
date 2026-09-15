@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Image as ExpoImage } from 'expo-image';
-import { Award, Bookmark, ExternalLink } from 'lucide-react-native';
+import { Bookmark, ExternalLink } from 'lucide-react-native';
 import type { ConsolidatedQuestion, ConsolidatedAnswer } from '../../data/mainsConsolidatedLoader';
 import { getTopperName, getAir, getTopperPageUrls } from '../../utils/topperHelpers';
 import { TopperImageCacheService } from '../../services/TopperImageCacheService';
@@ -22,6 +22,39 @@ export interface QuestionBankTopperCardProps {
     questionText?: string
   ) => void;
   onOpenDetailed?: (q: ConsolidatedQuestion) => void;
+  searchQuery?: string;
+}
+
+export function highlightKeywords(text: string, query?: string): React.ReactNode {
+  if (!text) return null;
+  if (!query || !query.trim()) return text;
+
+  const trimmed = query.trim();
+  const words = trimmed.split(/\s+/).filter(w => w.length >= 2);
+  if (words.length === 0) return text;
+
+  const escaped = words.map(w => w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|');
+  const pattern = new RegExp(`(${escaped})`, 'gi');
+  const parts = text.split(pattern);
+  if (parts.length <= 1) return text;
+
+  return parts.map((part, i) =>
+    pattern.test(part) ? (
+      <Text
+        key={i}
+        style={{
+          fontWeight: '900',
+          color: '#ea580c',
+          backgroundColor: 'rgba(234, 88, 12, 0.15)',
+          borderRadius: 3,
+        }}
+      >
+        {part}
+      </Text>
+    ) : (
+      part
+    )
+  );
 }
 
 export default function QuestionBankTopperCard({
@@ -34,6 +67,7 @@ export default function QuestionBankTopperCard({
   onToggleBookmark,
   onOpenViewer,
   onOpenDetailed,
+  searchQuery,
 }: QuestionBankTopperCardProps) {
   // 1. Identify target topper answer
   const answer =
@@ -44,10 +78,56 @@ export default function QuestionBankTopperCard({
   const topperName = getTopperName(answer, question);
   const air = getAir(answer, question);
   const pageUrls = getTopperPageUrls(answer);
-  const institute = answer?.institute || question.institute;
   const displayYear = question.year || (question as any).topper_year;
 
-  // 2. Overlapping Thumbnail strip calculations (R2: first 3, 72x96, radius 8, overlapping, +N if more)
+  // Instead of generic "Optional", display the actual optional subject name (e.g. Anthropology)
+  const isOptional =
+    !question.paper ||
+    question.paper.trim().toLowerCase() === 'optional' ||
+    question.paper.trim().toLowerCase().includes('anthro') ||
+    question.paper.trim().toLowerCase().includes('socio');
+
+  let displaySubject = '';
+  if (isOptional) {
+    const rawSub =
+      (question.subject && question.subject.trim().toLowerCase() !== 'optional'
+        ? question.subject.trim()
+        : null) ||
+      (question.hierarchy_path?.[0] && question.hierarchy_path[0].trim().toLowerCase() !== 'optional'
+        ? question.hierarchy_path[0].trim()
+        : null) ||
+      'Optional';
+
+    // Format all-caps (e.g. "ANTHROPOLOGY" -> "Anthropology")
+    displaySubject =
+      rawSub.length > 3 && rawSub === rawSub.toUpperCase()
+        ? rawSub.charAt(0) + rawSub.slice(1).toLowerCase()
+        : rawSub;
+  } else {
+    const paper = question.paper.trim();
+    const rawSub = (question.subject || '').trim();
+    if (rawSub && rawSub.toLowerCase() !== paper.toLowerCase()) {
+      const cleanSub =
+        rawSub.length > 3 && rawSub === rawSub.toUpperCase()
+          ? rawSub.charAt(0) + rawSub.slice(1).toLowerCase()
+          : rawSub;
+      displaySubject = `${paper} · ${cleanSub}`;
+    } else {
+      displaySubject = paper;
+    }
+  }
+
+  // Formatted candidate rank & year string: e.g. "AIR 36 - 2025" or "AIR 120 - 2025"
+  const rankYearParts = [];
+  if (air !== undefined && air !== null && String(air).trim() !== '') {
+    rankYearParts.push(`AIR ${air}`);
+  }
+  if (displayYear) {
+    rankYearParts.push(`${displayYear}`);
+  }
+  const rankYearStr = rankYearParts.join(' - ');
+
+  // 2. Overlapping Thumbnail strip calculations (first 3, 68x90, radius 7, overlapping, +N if more)
   const previewUrls = pageUrls.slice(0, 3);
   const remainingCount = pageUrls.length - 3;
 
@@ -67,47 +147,39 @@ export default function QuestionBankTopperCard({
           backgroundColor: isDark ? 'rgba(30, 41, 59, 0.7)' : 'rgba(255, 255, 255, 0.85)',
           borderColor: 'rgba(249, 115, 22, 0.35)',
           borderLeftColor: '#f97316',
-          borderLeftWidth: 3, // R2: 3px left orange accent
+          borderLeftWidth: 3, // 3px left orange accent
         },
       ]}
     >
-      {/* 1. Header Badge Row (R2: Award icon + TOPPER COPY label 11px, 700, #ea580c) */}
+      {/* 1. Header: Candidate Name (AIR - Year) · Subject · Marks */}
       <View style={styles.headerRow}>
-        <View style={styles.badgeLeftGroup}>
-          <View
-            style={[
-              styles.topperBadge,
-              {
-                backgroundColor: isDark ? 'rgba(234, 88, 12, 0.18)' : '#fff7ed',
-                borderColor: 'rgba(234, 88, 12, 0.35)',
-              },
-            ]}
-          >
-            <Award size={12} color="#ea580c" />
-            <Text style={styles.topperBadgeText}>TOPPER COPY</Text>
-          </View>
+        <View style={styles.metaLeftGroup}>
+          {/* Candidate Name & Rank/Year */}
+          <Text style={[styles.candidateName, { color: colors.textSecondary }]}>
+            {topperName}
+            {!!rankYearStr && (
+              <Text style={{ fontWeight: '600', color: colors.textSecondary }}>
+                {' '}({rankYearStr})
+              </Text>
+            )}
+          </Text>
 
-          <Text style={[styles.metaPill, { color: '#ea580c' }]}>{question.paper || 'Optional'}</Text>
-
-          {!!displayYear && (
+          {/* Subject (e.g. Anthropology instead of Optional) */}
+          {!!displaySubject && (
             <>
               <Text style={[styles.metaDot, { color: colors.textTertiary }]}>•</Text>
-              <Text style={[styles.metaText, { color: colors.textTertiary }]}>{displayYear}</Text>
+              <Text style={[styles.subjectText, { color: colors.textSecondary }]}>
+                {displaySubject}
+              </Text>
             </>
           )}
 
+          {/* Marks */}
           {!!question.marks && (
             <>
               <Text style={[styles.metaDot, { color: colors.textTertiary }]}>•</Text>
-              <Text style={[styles.metaText, { color: colors.textTertiary }]}>{question.marks} Marks</Text>
-            </>
-          )}
-
-          {!!question.subject && (
-            <>
-              <Text style={[styles.metaDot, { color: colors.textTertiary }]}>•</Text>
-              <Text style={[styles.metaText, { color: colors.textTertiary }]} numberOfLines={1}>
-                {question.subject}
+              <Text style={[styles.marksText, { color: colors.textTertiary }]}>
+                {question.marks} Marks
               </Text>
             </>
           )}
@@ -120,8 +192,9 @@ export default function QuestionBankTopperCard({
               onPress={() => onOpenDetailed(question)}
               style={styles.iconBtn}
               activeOpacity={0.7}
+              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
             >
-              <ExternalLink size={16} color={colors.textTertiary} />
+              <ExternalLink size={15} color={colors.textTertiary} />
             </TouchableOpacity>
           )}
           {onToggleBookmark && (
@@ -129,9 +202,10 @@ export default function QuestionBankTopperCard({
               onPress={() => onToggleBookmark(question.id)}
               style={styles.iconBtn}
               activeOpacity={0.7}
+              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
             >
               <Bookmark
-                size={16}
+                size={15}
                 color={isBookmarked ? '#f97316' : colors.textTertiary}
                 fill={isBookmarked ? '#f97316' : 'none'}
               />
@@ -140,7 +214,7 @@ export default function QuestionBankTopperCard({
         </View>
       </View>
 
-      {/* 2. Question Title (R2: same typography as question cards) */}
+      {/* 2. Question Title */}
       <TouchableOpacity activeOpacity={0.85} onPress={() => handleOpenAt(0)}>
         <Text
           style={[
@@ -148,33 +222,15 @@ export default function QuestionBankTopperCard({
             {
               color: colors.textPrimary,
               fontSize: zoomFontSize,
-              lineHeight: Math.round(zoomFontSize * 1.35),
+              lineHeight: Math.round(zoomFontSize * 1.3),
             },
           ]}
         >
-          {question.questionText}
+          {highlightKeywords(question.questionText, searchQuery)}
         </Text>
       </TouchableOpacity>
 
-      {/* 3. Person Row (R2: name, AIR n, institute, page count) */}
-      <View style={styles.personRow}>
-        <Text style={[styles.candidateName, { color: '#ea580c' }]}>{topperName}</Text>
-        {air !== undefined && (
-          <View style={styles.airChip}>
-            <Text style={styles.airChipText}>AIR {air}</Text>
-          </View>
-        )}
-        {!!institute && (
-          <Text style={[styles.instituteText, { color: colors.textTertiary }]}>
-            • {institute}
-          </Text>
-        )}
-        <Text style={[styles.pageCountText, { color: colors.textTertiary }]}>
-          • {pageUrls.length} {pageUrls.length === 1 ? 'page' : 'pages'}
-        </Text>
-      </View>
-
-      {/* 4. Overlapping Thumbnail Row (R2: 72x96, radius 8, overlapping, +N if more) */}
+      {/* 3. Overlapping Thumbnail Row */}
       {previewUrls.length > 0 ? (
         <View style={styles.thumbnailRow}>
           {previewUrls.map((url, idx) => {
@@ -189,7 +245,7 @@ export default function QuestionBankTopperCard({
                 onPress={() => handleOpenAt(idx)}
                 style={[
                   styles.thumbnailWrapper,
-                  idx > 0 && { marginLeft: -14 },
+                  idx > 0 && { marginLeft: -12 },
                   {
                     zIndex: idx + 1,
                     borderColor: isDark ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.12)',
@@ -224,7 +280,7 @@ export default function QuestionBankTopperCard({
             { backgroundColor: isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.02)' },
           ]}
         >
-          <Text style={{ fontSize: 12, color: colors.textTertiary, fontStyle: 'italic' }}>
+          <Text style={{ fontSize: 11, color: colors.textTertiary, fontStyle: 'italic' }}>
             Tap to view topper copy
           </Text>
         </TouchableOpacity>
@@ -235,115 +291,91 @@ export default function QuestionBankTopperCard({
 
 const styles = StyleSheet.create({
   card: {
-    borderRadius: 14,
+    borderRadius: 12,
     borderWidth: 1.2,
-    padding: 14,
-    marginBottom: 12,
+    padding: 10,
+    marginBottom: 8,
     shadowColor: '#64748b',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-    elevation: 2,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.04,
+    shadowRadius: 3,
+    elevation: 1.5,
     overflow: 'hidden',
   },
   headerRow: {
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     justifyContent: 'space-between',
-    marginBottom: 8,
+    marginBottom: 6,
+    gap: 6,
   },
-  badgeLeftGroup: {
+  metaLeftGroup: {
     flexDirection: 'row',
     alignItems: 'center',
     flexWrap: 'wrap',
-    gap: 6,
     flex: 1,
+    gap: 5,
   },
   topperBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    borderRadius: 6,
+    borderRadius: 4,
     borderWidth: 1,
-    paddingHorizontal: 7,
-    paddingVertical: 2,
+    paddingHorizontal: 5,
+    paddingVertical: 1.5,
   },
   topperBadgeText: {
-    fontSize: 11,
-    fontWeight: '700',
+    fontSize: 9,
+    fontWeight: '900',
     color: '#ea580c',
     letterSpacing: 0.5,
-  },
-  metaPill: {
-    fontSize: 11,
-    fontWeight: '800',
-  },
-  metaDot: {
-    fontSize: 11,
-  },
-  metaText: {
-    fontSize: 11,
-    fontWeight: '600',
   },
   actionsRight: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
+    flexShrink: 0,
+    marginTop: -2,
   },
   iconBtn: {
-    padding: 6,
+    padding: 3,
+  },
+  candidateName: {
+    fontSize: 11.5,
+    fontWeight: '700',
+  },
+  subjectText: {
+    fontSize: 11,
+    fontWeight: '700',
+  },
+  marksText: {
+    fontSize: 10.5,
+    fontWeight: '600',
+  },
+  metaDot: {
+    fontSize: 9,
+  },
+  pageCountText: {
+    fontSize: 10.5,
+    fontWeight: '500',
   },
   questionTitle: {
     fontWeight: '800',
-    marginBottom: 8,
-  },
-  personRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    flexWrap: 'wrap',
-    gap: 6,
-    marginBottom: 10,
-  },
-  candidateName: {
-    fontSize: 12.5,
-    fontWeight: '800',
-  },
-  airChip: {
-    backgroundColor: 'rgba(234, 88, 12, 0.12)',
-    borderColor: 'rgba(234, 88, 12, 0.3)',
-    borderWidth: 0.8,
-    borderRadius: 5,
-    paddingHorizontal: 5,
-    paddingVertical: 1,
-  },
-  airChipText: {
-    fontSize: 9.5,
-    fontWeight: '900',
-    color: '#ea580c',
-  },
-  instituteText: {
-    fontSize: 11.5,
-    fontWeight: '600',
-  },
-  pageCountText: {
-    fontSize: 11.5,
-    fontWeight: '500',
+    marginBottom: 6,
   },
   thumbnailRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 4,
+    paddingVertical: 2,
   },
   thumbnailWrapper: {
-    width: 72,
-    height: 96,
-    borderRadius: 8,
+    width: 68,
+    height: 90,
+    borderRadius: 7,
     borderWidth: 1,
     overflow: 'hidden',
     position: 'relative',
     shadowColor: '#000',
     shadowOffset: { width: 1, height: 2 },
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.08,
     shadowRadius: 2,
     elevation: 2,
   },
@@ -377,13 +409,13 @@ const styles = StyleSheet.create({
   },
   moreOverlayText: {
     color: '#ffffff',
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: '900',
     letterSpacing: 0.5,
   },
   emptyPagesNotice: {
-    padding: 10,
-    borderRadius: 8,
+    padding: 8,
+    borderRadius: 6,
     alignItems: 'center',
   },
 });

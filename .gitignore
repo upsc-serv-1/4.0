@@ -48,3 +48,4 @@ p*.jpg
 
 # Internal agent logs
 .agents/
+.cursor/

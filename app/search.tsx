@@ -890,6 +890,7 @@ export default function IntegratedSearchScreen() {
   const [filterOpen, setFilterOpen] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [sidebarSubjectFilter, setSidebarSubjectFilter] = useState<string | null>(null);
+  const [keywordsExpanded, setKeywordsExpanded] = useState(true);
   const [filters, setFilters] = useState<UnifiedFilters>(DEFAULT_FILTERS);
 
   // Live Sync / Offline Loader States - synchronously hydrate from KVStore cache on boot
@@ -1300,29 +1301,25 @@ export default function IntegratedSearchScreen() {
     return ['All', ...Array.from(s).sort((a, b) => Number(b) - Number(a))];
   }, [mainsQuestions]);
 
-  // Real-time subjects in results for quick drill-down (respects active stages & papers)
+  // Master subject counts and list derived from master/unfiltered results (ai-search parity)
+  const masterSubjectCounts = useMemo(() => {
+    const counts: Record<string, number> = {};
+    results.forEach(r => {
+      const canon = canonicalizeSubject(r.subject);
+      if (canon) counts[canon] = (counts[canon] || 0) + 1;
+    });
+    return counts;
+  }, [results]);
+
+  // Real-time subjects in master results for quick drill-down (ensures options don't disappear)
   const allResultSubjects = useMemo(() => {
     const subs = new Set<string>();
     results.forEach(r => {
-      if (r.type === 'prelims' && !filters.showPrelims) return;
-      if (r.type === 'mains' && !filters.showMains) return;
-      if (r.type === 'topper' && !filters.showToppers) return;
-      if (r.type === 'value_add' && !filters.showValueAdd) return;
-
-      if (filters.mainsPapers.length > 0) {
-        if (r.type === 'mains' || r.type === 'topper' || r.type === 'value_add') {
-          const normP = normalizePaper(r.paper);
-          if (!normP || !filters.mainsPapers.some(p => normalizePaper(p) === normP || p === r.paper)) return;
-        } else {
-          return;
-        }
-      }
-
       const canon = canonicalizeSubject(r.subject);
       if (canon) subs.add(canon);
     });
     return Array.from(subs).sort();
-  }, [results, filters.showPrelims, filters.showMains, filters.showToppers, filters.showValueAdd, filters.mainsPapers]);
+  }, [results]);
 
   // Real-time match counts for subjects, papers, institutes, and stages from search results
   // All counts are fully REACTIVE and INTERCONNECTED with all active filters!
@@ -2052,51 +2049,65 @@ export default function IntegratedSearchScreen() {
     // Sort logic from Mains Question Bank (Primary & Secondary fallbacks)
     const paperOrder: Record<string, number> = { GS1: 0, GS2: 1, GS3: 2, GS4: 3, Essay: 4, Optional: 5 };
 
-    list.sort((a, b) => {
-      // Primary sort criteria based on user selection
-      if (sortMode === 'Year') {
-        const yearA = a.year || 0;
-        const yearB = b.year || 0;
-        if (yearA !== yearB) return yearB - yearA;
-      } else if (sortMode === 'Subject') {
-        const subA = a.subject || '';
-        const subB = b.subject || '';
-        if (subA !== subB) return subA.localeCompare(subB);
-      } else {
-        // Relevance sorting: Exact Match First (Tier 0 -> Tier 1 -> Tier 2 -> Tier 3)
-        const sTierA = a._searchTier ?? 1;
-        const sTierB = b._searchTier ?? 1;
-        if (sTierA !== sTierB) return sTierA - sTierB;
-        if (a.score !== b.score) return b.score - a.score;
-      }
+    const term = query.toLowerCase().trim();
+    const isExactMatch = (r: UnifiedSearchResult) =>
+      !!term && `${r.title || ''} ${r.subtitle || ''}`.toLowerCase().includes(term);
 
-      // ── Secondary / Fallback sorting order ──
-      
-      // 1. PYQ tier (UPSC PYQ -> UPSC Allied PYQ -> Other PYQ -> Non-PYQ)
+    // Keep the existing tier/score sorter as the "within-group" sorter
+    const withinGroupSorter = (a: UnifiedSearchResult, b: UnifiedSearchResult) => {
+      const sTierA = a._searchTier ?? 1;
+      const sTierB = b._searchTier ?? 1;
+      if (sTierA !== sTierB) return sTierA - sTierB;
+      if (a.score !== b.score) return (b.score || 0) - (a.score || 0);
+
+      // PYQ tier (UPSC PYQ -> UPSC Allied PYQ -> Other PYQ -> Non-PYQ)
       const tierA = getQuestionSortTier(a);
       const tierB = getQuestionSortTier(b);
-      if (tierA !== tierB) return tierA - tierB;
+      const tierDiff = tierA - tierB;
+      if (tierDiff !== 0) return tierDiff;
 
-      // 2. Latest year on top (if not already sorted by Year)
+      // Latest year on top
       const yA = a.year || 0;
       const yB = b.year || 0;
       if (yA !== yB) return yB - yA;
 
-      // 3. GS paper order
+      // GS paper order
       const orderA = paperOrder[a.paper || ''] ?? 99;
       const orderB = paperOrder[b.paper || ''] ?? 99;
       if (orderA !== orderB) return orderA - orderB;
 
-      // 4. Same subject together (if not already sorted by Subject)
+      // Same subject together
       const sA = a.subject || '';
       const sB = b.subject || '';
       if (sA !== sB) return sA.localeCompare(sB);
 
       return 0;
-    });
+    };
 
-    return list;
-  }, [results, filters, excludedKeywords, sortMode, sidebarSubjectFilter, userQuestionStates, prelimsTaggedMap]);
+    if (sortMode === 'Year') {
+      return list.sort((a, b) => {
+        const yearA = a.year || 0;
+        const yearB = b.year || 0;
+        if (yearA !== yearB) return yearB - yearA;
+        return withinGroupSorter(a, b);
+      });
+    }
+
+    if (sortMode === 'Subject') {
+      return list.sort((a, b) => {
+        const subA = a.subject || '';
+        const subB = b.subject || '';
+        if (subA !== subB) return subA.localeCompare(subB);
+        return withinGroupSorter(a, b);
+      });
+    }
+
+    // Exact matches always come first, followed by semantic/fuzzy matches
+    const exactMatches = list.filter(isExactMatch).sort(withinGroupSorter);
+    const semanticMatches = list.filter(r => !isExactMatch(r)).sort(withinGroupSorter);
+
+    return [...exactMatches, ...semanticMatches];
+  }, [results, filters, excludedKeywords, sortMode, sidebarSubjectFilter, userQuestionStates, prelimsTaggedMap, query]);
 
   const activeResults = sortedAndFilteredResults;
   const activeFilterCount = useMemo(() => countActiveFilters(filters), [filters]);
@@ -2545,52 +2556,63 @@ export default function IntegratedSearchScreen() {
       {/* 0.1 Interactive Keywords Exclusion Section (matching ai-search and mains) */}
       {keywords.length > 0 && (
         <View style={{ marginBottom: 14, paddingBottom: 12, borderBottomWidth: 0.5, borderBottomColor: colors.border }}>
-          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+          <TouchableOpacity
+            onPress={() => setKeywordsExpanded(prev => !prev)}
+            style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 4 }}
+          >
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, flex: 1 }}>
               <Sparkles size={12} color="#7C3AED" />
               <Text style={{ fontSize: 10, fontWeight: '800', color: '#7C3AED', letterSpacing: 1 }}>
-                {keywords.length - excludedKeywords.size}/{keywords.length} KEYWORDS
+                {keywords.length - excludedKeywords.size}/{keywords.length} AI KEYWORDS USED
               </Text>
             </View>
-            {excludedKeywords.size > 0 && (
-              <TouchableOpacity onPress={() => setExcludedKeywords(new Set())}>
-                <Text style={{ fontSize: 10, fontWeight: '700', color: '#EF4444' }}>Reset</Text>
-              </TouchableOpacity>
-            )}
-          </View>
-          <Text style={{ fontSize: 10, color: colors.textTertiary, marginBottom: 8 }}>
-            💡 Tap to exclude keywords from search
-          </Text>
-          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 5 }}>
-            {keywords.map((kw, i) => {
-              const isExcluded = excludedKeywords.has(kw);
-              return (
-                <TouchableOpacity
-                  key={i}
-                  onPress={() => toggleExcludedKeyword(kw)}
-                  style={[
-                    styles.pill,
-                    {
-                      backgroundColor: isExcluded ? (isDark ? '#334155' : '#F1F5F9') : '#EDE9FE',
-                      borderColor: isExcluded ? colors.border : '#C4B5FD',
-                      opacity: isExcluded ? 0.5 : 1,
-                      paddingVertical: 4,
-                      paddingHorizontal: 8,
-                    }
-                  ]}
-                >
-                  <Text style={{
-                    fontSize: 11,
-                    fontWeight: '600',
-                    color: isExcluded ? colors.textTertiary : '#7C3AED',
-                    textDecorationLine: isExcluded ? 'line-through' : 'none',
-                  }}>
-                    {kw}
-                  </Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+              {excludedKeywords.size > 0 && (
+                <TouchableOpacity onPress={() => setExcludedKeywords(new Set())} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+                  <Text style={{ fontSize: 10, fontWeight: '700', color: '#EF4444' }}>Clear All</Text>
                 </TouchableOpacity>
-              );
-            })}
-          </View>
+              )}
+              {keywordsExpanded ? <ChevronUp size={14} color="#7C3AED" /> : <ChevronDown size={14} color={colors.textTertiary} />}
+            </View>
+          </TouchableOpacity>
+
+          {keywordsExpanded && (
+            <>
+              <Text style={{ fontSize: 10, color: colors.textTertiary, marginTop: 4, marginBottom: 8 }}>
+                💡 Tap to exclude keywords from search
+              </Text>
+              <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 5 }}>
+                {keywords.map((kw, i) => {
+                  const isExcluded = excludedKeywords.has(kw);
+                  return (
+                    <TouchableOpacity
+                      key={i}
+                      onPress={() => toggleExcludedKeyword(kw)}
+                      style={[
+                        styles.pill,
+                        {
+                          backgroundColor: isExcluded ? '#f1f5f9' : '#ede9fe',
+                          borderColor: isExcluded ? colors.border : '#c4b5fd',
+                          opacity: isExcluded ? 0.5 : 1,
+                          paddingVertical: 4,
+                          paddingHorizontal: 8,
+                        }
+                      ]}
+                    >
+                      <Text style={{
+                        fontSize: 11,
+                        fontWeight: '600',
+                        color: isExcluded ? colors.textTertiary : '#7C3AED',
+                        textDecorationLine: isExcluded ? 'line-through' : 'none',
+                      }}>
+                        {kw}
+                      </Text>
+                    </TouchableOpacity>
+                  );
+                })}
+              </View>
+            </>
+          )}
         </View>
       )}
 
@@ -2612,7 +2634,7 @@ export default function IntegratedSearchScreen() {
           <View style={{ gap: 6 }}>
             {allResultSubjects.map(sub => {
               const canonSub = canonicalizeSubject(sub);
-              const count = resultCounts.subjectCounts[canonSub] ?? 0;
+              const count = masterSubjectCounts[canonSub] ?? 0;
               const isSelected = sidebarSubjectFilter ? canonicalizeSubject(sidebarSubjectFilter) === canonSub : false;
               const color = getSubjectColor(canonSub);
               return (
@@ -3617,46 +3639,58 @@ export default function IntegratedSearchScreen() {
           {/* Keywords panel */}
           {keywords.length > 0 && (
             <View style={{ marginTop: 8 }}>
-              <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
-                <Text style={{ fontSize: 10, color: colors.textTertiary }}>
-                  {keywords.length - excludedKeywords.size}/{keywords.length} keywords active • Tap to exclude
-                </Text>
-                {excludedKeywords.size > 0 && (
-                  <TouchableOpacity onPress={() => setExcludedKeywords(new Set())} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
-                    <Text style={{ fontSize: 10, fontWeight: '700', color: '#EF4444' }}>Reset Excluded</Text>
-                  </TouchableOpacity>
-                )}
-              </View>
-              <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 4 }}>
-                {keywords.map((kw, i) => {
-                  const isExcluded = excludedKeywords.has(kw);
-                  return (
-                    <TouchableOpacity
-                      key={i}
-                      onPress={() => toggleExcludedKeyword(kw)}
-                      style={[
-                        styles.pill,
-                        {
-                          backgroundColor: isExcluded ? colors.surfaceStrong : '#ede9fe',
-                          borderColor: isExcluded ? colors.border : '#c4b5fd',
-                          opacity: isExcluded ? 0.5 : 1,
-                        }
-                      ]}
-                    >
-                      <Text
-                        style={{
-                          fontSize: 10,
-                          fontWeight: '700',
-                          color: isExcluded ? colors.textTertiary : '#7c3aed',
-                          textDecorationLine: isExcluded ? 'line-through' : 'none',
-                        }}
-                      >
-                        {kw}
-                      </Text>
+              <TouchableOpacity
+                onPress={() => setKeywordsExpanded(prev => !prev)}
+                style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 4 }}
+              >
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, flex: 1 }}>
+                  <Sparkles size={11} color="#7c3aed" />
+                  <Text style={{ fontSize: 10, fontWeight: '800', color: '#7c3aed', letterSpacing: 0.5 }}>
+                    {keywords.length - excludedKeywords.size}/{keywords.length} AI KEYWORDS USED
+                  </Text>
+                </View>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                  {excludedKeywords.size > 0 && (
+                    <TouchableOpacity onPress={() => setExcludedKeywords(new Set())} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+                      <Text style={{ fontSize: 10, fontWeight: '700', color: '#EF4444' }}>Clear All</Text>
                     </TouchableOpacity>
-                  );
-                })}
-              </View>
+                  )}
+                  {keywordsExpanded ? <ChevronUp size={13} color="#7c3aed" /> : <ChevronDown size={13} color={colors.textTertiary} />}
+                </View>
+              </TouchableOpacity>
+
+              {keywordsExpanded && (
+                <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 4, marginTop: 4 }}>
+                  {keywords.map((kw, i) => {
+                    const isExcluded = excludedKeywords.has(kw);
+                    return (
+                      <TouchableOpacity
+                        key={i}
+                        onPress={() => toggleExcludedKeyword(kw)}
+                        style={[
+                          styles.pill,
+                          {
+                            backgroundColor: isExcluded ? '#f1f5f9' : '#ede9fe',
+                            borderColor: isExcluded ? colors.border : '#c4b5fd',
+                            opacity: isExcluded ? 0.5 : 1,
+                          }
+                        ]}
+                      >
+                        <Text
+                          style={{
+                            fontSize: 10,
+                            fontWeight: '700',
+                            color: isExcluded ? colors.textTertiary : '#7c3aed',
+                            textDecorationLine: isExcluded ? 'line-through' : 'none',
+                          }}
+                        >
+                          {kw}
+                        </Text>
+                      </TouchableOpacity>
+                    );
+                  })}
+                </View>
+              )}
             </View>
           )}
         </View>

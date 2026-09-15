@@ -17,7 +17,7 @@ import {
   Image,
   Keyboard,
 } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
   Search,
@@ -43,6 +43,7 @@ import {
 } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { loadSearchHistory, saveSearch, removeSearchItem, clearSearchHistory } from '../src/utils/searchHistory';
 import { PinchGestureHandler, State } from 'react-native-gesture-handler';
 import Markdown from 'react-native-markdown-display';
 import { useTheme } from '../src/context/ThemeContext';
@@ -64,6 +65,18 @@ import {
   fetchValueAdditionFromSupabase,
   getInitialValueAdditions,
 } from '../src/data/mainsValueAdditionLoader';
+import QuestionBankTopperCard from '../src/components/mains/QuestionBankTopperCard';
+import TopperImageViewerModal from '../src/components/mains/TopperImageViewerModal';
+import {
+  isTopperQuestion,
+  isGenuineTopperAnswer,
+  isTopperAnswer,
+  getTopperName,
+  getAir,
+  getTopperPageUrls,
+  normalizeQuestionKey,
+  buildTopperAttachmentMap,
+} from '../src/utils/topperHelpers';
 import { DetailedQuestionView, ValueAddCardBody, getMarkdownRules, parseIntroductoryBox } from './mains';
 import { buildMarkdownStyles } from '../src/utils/markdownUtils';
 import { ThemeSwitcher } from '../src/components/ThemeSwitcher';
@@ -78,7 +91,7 @@ const IS_IPAD = SCREEN_WIDTH >= 768;
 
 type UnifiedSearchResult = {
   id: string;
-  type: 'prelims' | 'mains' | 'value_add';
+  type: 'prelims' | 'mains' | 'value_add' | 'topper';
   title: string;
   subtitle?: string;
   subject?: string;
@@ -94,6 +107,7 @@ type UnifiedSearchResult = {
 type UnifiedFilters = {
   showPrelims: boolean;
   showMains: boolean;
+  showToppers: boolean;
   showValueAdd: boolean;
   pyqFilter: 'All' | 'PYQ Only' | 'Non-PYQ';
   examCategory: 'All' | 'UPSC' | 'Allied' | 'Others';
@@ -121,6 +135,7 @@ export function matchesSearchScope(item: UnifiedSearchResult, searchAcross: ('Qu
 const DEFAULT_FILTERS: UnifiedFilters = {
   showPrelims: true,
   showMains: true,
+  showToppers: true,
   showValueAdd: true,
   pyqFilter: 'All',
   examCategory: 'All',
@@ -254,9 +269,10 @@ function getSubjectColor(sub: string): string {
   return '#94a3b8';
 }
 
-function getStageIndicatorColor(type: 'prelims' | 'mains' | 'value_add'): string {
+function getStageIndicatorColor(type: 'prelims' | 'mains' | 'value_add' | 'topper'): string {
   if (type === 'prelims') return '#3b82f6'; // Blue
   if (type === 'mains') return '#f97316';   // Amber/Orange (not pink!)
+  if (type === 'topper') return '#ea580c';  // Vibrant Orange/Topper
   return '#22c55e';                         // Green
 }
 
@@ -437,7 +453,7 @@ function highlightKeywords(text: string, allKeywords: string[]): React.ReactNode
   const parts = text.split(pattern);
   return parts.map((part, i) =>
     pattern.test(part)
-      ? <Text key={i} style={{ fontWeight: '800', color: '#f59e0b', backgroundColor: '#fef3c720' }}>{part}</Text>
+      ? <Text key={i} style={{ fontWeight: '800', color: '#f59e0b' }}>{part}</Text>
       : <Text key={i}>{part}</Text>
   );
 }
@@ -634,6 +650,7 @@ const MainsResultAnswerPanel = ({
 };
 
 export default function IntegratedSearchScreen() {
+  const params = useLocalSearchParams<{ q?: string }>();
   const { colors, isDark } = useTheme();
   const { session } = useAuth();
   const { selectedCourse } = useCourse();
@@ -734,11 +751,11 @@ export default function IntegratedSearchScreen() {
   const [mainsQuestions, setMainsQuestions] = useState<ConsolidatedQuestion[]>(() => getInitialMainsQuestions());
   const [mainsValueAdd, setMainsValueAdd] = useState<ValueAdditionItem[]>(() => getInitialValueAdditions());
 
-  // Load search history from local storage
+  // Load search history from local storage (unified)
   useEffect(() => {
-    AsyncStorage.getItem('integrated_search_history')
-      .then(raw => {
-        if (raw) setSearchHistory(JSON.parse(raw));
+    loadSearchHistory()
+      .then(history => {
+        if (history) setSearchHistory(history);
       })
       .catch(() => {});
   }, []);
@@ -757,6 +774,57 @@ export default function IntegratedSearchScreen() {
   const [detailedBestAnswer, setDetailedBestAnswer] = useState<BestAnswer | null>(null);
   
   const [previewValueAddItem, setPreviewValueAddItem] = useState<ValueAdditionItem | null>(null);
+
+  // Lookup map for fast topper attachment: questionKey -> genuine topper answers
+  const topperAttachmentMap = useMemo(() => {
+    return buildTopperAttachmentMap(mainsQuestions);
+  }, [mainsQuestions]);
+
+  // Saved / Bookmarked Mains Questions (parity with app/mains.tsx)
+  const [savedQuestionIds, setSavedQuestionIds] = useState<string[]>([]);
+  useEffect(() => {
+    AsyncStorage.getItem('mains_saved_questions')
+      .then(stored => {
+        if (stored) setSavedQuestionIds(JSON.parse(stored));
+      })
+      .catch(e => console.error('Failed to load mains saved questions:', e));
+  }, []);
+
+  const toggleBookmark = async (id: string) => {
+    try {
+      const next = savedQuestionIds.includes(id)
+        ? savedQuestionIds.filter(qId => qId !== id)
+        : [...savedQuestionIds, id];
+      setSavedQuestionIds(next);
+      await AsyncStorage.setItem('mains_saved_questions', JSON.stringify(next));
+    } catch (err) {
+      console.error('Failed to save bookmark:', err);
+    }
+  };
+
+  // Full-screen Image Viewer Lightbox for Topper Copies (parity with app/mains.tsx)
+  const [topperViewerVisible, setTopperViewerVisible] = useState(false);
+  const [topperViewerImages, setTopperViewerImages] = useState<string[]>([]);
+  const [topperViewerIndex, setTopperViewerIndex] = useState(0);
+  const [topperViewerName, setTopperViewerName] = useState('Topper');
+  const [topperViewerAir, setTopperViewerAir] = useState<string | number | undefined>(undefined);
+  const [topperViewerQuestionText, setTopperViewerQuestionText] = useState('');
+
+  const handleOpenTopperViewer = useCallback((
+    images: string[],
+    index: number = 0,
+    name?: string,
+    air?: string | number,
+    qText?: string
+  ) => {
+    if (!images || images.length === 0) return;
+    setTopperViewerImages(images);
+    setTopperViewerIndex(index);
+    setTopperViewerName(name || 'Topper');
+    setTopperViewerAir(air);
+    setTopperViewerQuestionText(qText || '');
+    setTopperViewerVisible(true);
+  }, []);
 
   const baseFontSizeRef = useRef(16);
   const previewScrollRef = useRef<ScrollView>(null);
@@ -819,10 +887,11 @@ export default function IntegratedSearchScreen() {
       results.forEach(r => {
         if (r.type === 'prelims' && !filters.showPrelims) return;
         if (r.type === 'mains' && !filters.showMains) return;
+        if (r.type === 'topper' && !filters.showToppers) return;
         if (r.type === 'value_add' && !filters.showValueAdd) return;
 
         if (filters.mainsPapers.length > 0) {
-          if (r.type === 'mains' || r.type === 'value_add') {
+          if (r.type === 'mains' || r.type === 'value_add' || r.type === 'topper') {
             const normP = normalizePaper(r.paper);
             if (!normP || !filters.mainsPapers.some(p => normalizePaper(p) === normP || p === r.paper)) return;
           } else {
@@ -856,7 +925,7 @@ export default function IntegratedSearchScreen() {
         });
       }
 
-      if (filters.showMains) {
+      if (filters.showMains || filters.showToppers) {
         mainsQuestions.forEach(q => {
           const normP = normalizePaper(q.paper);
           if (filters.mainsPapers.length > 0 && (!normP || !filters.mainsPapers.some(p => normalizePaper(p) === normP || p === q.paper))) return;
@@ -876,7 +945,7 @@ export default function IntegratedSearchScreen() {
     }
 
     return ['All', ...Array.from(subjects).sort()];
-  }, [mainsQuestions, mainsValueAdd, coursePrelims, filters.showPrelims, filters.showMains, filters.showValueAdd, filters.mainsPapers, filters.pyqFilter, filters.subjects, hasSearched, results]);
+  }, [mainsQuestions, mainsValueAdd, coursePrelims, filters.showPrelims, filters.showMains, filters.showToppers, filters.showValueAdd, filters.mainsPapers, filters.pyqFilter, filters.subjects, hasSearched, results]);
 
   // Aggregate unique institutes dynamically - INTERCONNECTED with active stages & search results
   const instituteOptions = useMemo(() => {
@@ -997,10 +1066,10 @@ export default function IntegratedSearchScreen() {
     const subjectCounts: Record<string, number> = {};
     const paperCounts: Record<string, number> = {};
     const instituteCounts: Record<string, number> = {};
-    const stageCounts = { prelims: 0, mains: 0, value_add: 0 };
+    const stageCounts = { prelims: 0, mains: 0, topper: 0, value_add: 0 };
 
     const matchesPyq = (item: UnifiedSearchResult) => {
-      if (filters.pyqFilter === 'All') return true;
+      if (filters.pyqFilter === 'All' || item.type === 'topper') return true;
       const isPyq = item.type === 'prelims' ? item.rawItem?.is_pyq : (item.rawItem?.is_pyq || item.rawItem?.isPyq);
       if (filters.pyqFilter === 'PYQ Only') return !!isPyq;
       if (filters.pyqFilter === 'Non-PYQ') return !isPyq;
@@ -1018,7 +1087,7 @@ export default function IntegratedSearchScreen() {
     };
 
     const matchesInstitute = (item: UnifiedSearchResult) => {
-      if (filters.institutes.length === 0) return true;
+      if (filters.institutes.length === 0 || item.type === 'topper') return true;
       if (item.type === 'prelims') {
         const tests = Array.isArray(item.rawItem?.tests) ? item.rawItem.tests[0] : item.rawItem?.tests;
         const inst = tests?.institute || item.rawItem?.provider || item.rawItem?.source?.institute || '';
@@ -1031,7 +1100,7 @@ export default function IntegratedSearchScreen() {
     };
 
     const matchesProgramme = (item: UnifiedSearchResult) => {
-      if (filters.programmes.length === 0) return true;
+      if (filters.programmes.length === 0 || item.type === 'topper') return true;
       if (item.type === 'prelims') {
         const tests = Array.isArray(item.rawItem?.tests) ? item.rawItem.tests[0] : item.rawItem?.tests;
         const prog = tests?.program_name || item.rawItem?.program_name || '';
@@ -1069,6 +1138,10 @@ export default function IntegratedSearchScreen() {
         if (filters.mainsPapers.length === 0 && matchesInstitute(r) && matchesProgramme(r)) {
           stageCounts.prelims++;
         }
+      } else if (r.type === 'topper') {
+        const normP = normalizePaper(r.paper);
+        if (filters.mainsPapers.length > 0 && (!normP || !filters.mainsPapers.some(p => normalizePaper(p) === normP || p === r.paper))) return;
+        stageCounts.topper++;
       } else if (r.type === 'mains') {
         const normP = normalizePaper(r.paper);
         if (filters.mainsPapers.length > 0 && (!normP || !filters.mainsPapers.some(p => normalizePaper(p) === normP || p === r.paper))) return;
@@ -1083,11 +1156,12 @@ export default function IntegratedSearchScreen() {
     });
 
     // 2. Calculate Paper Counts (for GS1, GS2, GS3, GS4, Essay, Optional)
-    // CRITICAL: Respects filters.showMains and filters.showValueAdd!
+    // CRITICAL: Respects filters.showMains, filters.showToppers, and filters.showValueAdd!
     // If user deselects Value Addition, Value Additions are NOT counted in paperCounts.
     results.forEach(r => {
       if (!r.paper) return;
       if (r.type === 'mains' && !filters.showMains) return;
+      if (r.type === 'topper' && !filters.showToppers) return;
       if (r.type === 'value_add' && !filters.showValueAdd) return;
       if (r.type === 'prelims') return; // prelims has no paper
 
@@ -1309,6 +1383,37 @@ export default function IntegratedSearchScreen() {
           }
         });
 
+        // ── Topper copies: first-class results (parity with MainsAISearchView, app/mains.tsx) ──
+        if (isTopperQuestion(q)) {
+          if (!searchQuestion) return; // respect the existing search-scope toggle
+          const topperAns =
+            (q.answers || []).find((a: any) => isGenuineTopperAnswer(a)) || (q.answers || [])[0];
+          const tName = (getTopperName(topperAns, q) || '').toLowerCase();
+          const rawAir = getAir(topperAns, q);
+          const tAir = String(rawAir ?? q.air_rank ?? '').toLowerCase();
+          const searchLower = cleanQuery;
+          const nameMatch = !!(tName && tName !== 'topper' && tName.includes(searchLower));
+          const airMatch = !!(tAir && (tAir.includes(searchLower) || ('air ' + tAir).includes(searchLower)));
+
+          if (matchedInQ || nameMatch || airMatch) {
+            matchedResults.push({
+              id: `topper_${q.id}`,
+              type: 'topper',
+              title: q.questionText || q.question_text || q.title || 'Topper Copy',
+              subtitle: `${getTopperName(topperAns, q)}${rawAir ? ` (AIR ${rawAir})` : ''}`,
+              subject: canonicalizeSubject(q.subject),
+              paper: resolvePaper(q),
+              year: q.year || q.exam_year || q.topper_year,
+              score: Math.max(score, 1),
+              rawItem: q,
+              matchedInQuestion: matchedInQ || nameMatch || airMatch,
+              matchedInExplanation: false,
+              matchedInOptions: false,
+            });
+          }
+          return; // never double-emit a topper row as a generic 'mains' card
+        }
+
         const hasScopeMatch = (searchQuestion && matchedInQ) || (searchExplanation && matchedInAns);
 
         if (hasScopeMatch && score > 0) {
@@ -1389,15 +1494,11 @@ export default function IntegratedSearchScreen() {
 
       setResults(matchedResults);
 
-      // Save query to history
+      // Save query to unified history
       if (currentQuery) {
-        setSearchHistory(prev => {
-          const next = [currentQuery, ...prev.filter(h => h.toLowerCase() !== currentQuery.toLowerCase())].slice(0, 10);
-          try {
-            KVStore.setJson('@unified_search_history', next);
-          } catch {}
-          return next;
-        });
+        saveSearch(currentQuery)
+          .then(next => setSearchHistory(next))
+          .catch(() => {});
       }
       setShowHistory(false);
     } catch (err) {
@@ -1407,6 +1508,17 @@ export default function IntegratedSearchScreen() {
       setLoading(false);
     }
   };
+
+  // ── Auto-run search when opened with a query param ──
+  const autoRanRef = useRef(false);
+  useEffect(() => {
+    const incoming = typeof params.q === 'string' ? params.q.trim() : '';
+    if (incoming && !autoRanRef.current) {
+      autoRanRef.current = true;
+      setQuery(incoming);
+      runIntegratedSearch(incoming, filters);
+    }
+  }, [params.q]);
 
   // Open active list in Quiz Engine Lite (Learn or Exam Mode)
   const openBatchQuiz = (openInQuizMode?: 'learning' | 'exam') => {
@@ -1438,6 +1550,7 @@ export default function IntegratedSearchScreen() {
     list = list.filter(item => {
       if (item.type === 'prelims' && !filters.showPrelims) return false;
       if (item.type === 'mains' && !filters.showMains) return false;
+      if (item.type === 'topper' && !filters.showToppers) return false;
       if (item.type === 'value_add' && !filters.showValueAdd) return false;
       return true;
     });
@@ -1454,12 +1567,14 @@ export default function IntegratedSearchScreen() {
     // Filter by PYQ status
     if (filters.pyqFilter === 'PYQ Only') {
       list = list.filter(item => {
+        if (item.type === 'topper') return true;
         if (item.type === 'prelims') return item.rawItem.is_pyq;
         if (item.type === 'mains') return item.rawItem.is_pyq || item.rawItem.isPyq;
         return false;
       });
     } else if (filters.pyqFilter === 'Non-PYQ') {
       list = list.filter(item => {
+        if (item.type === 'topper') return true;
         if (item.type === 'prelims') return !item.rawItem.is_pyq;
         if (item.type === 'mains') return !(item.rawItem.is_pyq || item.rawItem.isPyq);
         return true;
@@ -1488,7 +1603,7 @@ export default function IntegratedSearchScreen() {
     // Filter by Mains Paper
     if (filters.mainsPapers.length > 0) {
       list = list.filter(item => {
-        if (item.type === 'mains' || item.type === 'value_add') {
+        if (item.type === 'mains' || item.type === 'value_add' || item.type === 'topper') {
           const normP = normalizePaper(item.paper);
           return filters.mainsPapers.some(p => normalizePaper(p) === normP || p === item.paper);
         }
@@ -1508,6 +1623,7 @@ export default function IntegratedSearchScreen() {
     // Filter by institute
     if (filters.institutes.length > 0) {
       list = list.filter(item => {
+        if (item.type === 'topper') return true;
         if (item.type === 'prelims') {
           const tests = Array.isArray(item.rawItem.tests) ? item.rawItem.tests[0] : item.rawItem.tests;
           const inst = tests?.institute || item.rawItem.provider || item.rawItem.source?.institute || '';
@@ -1523,6 +1639,7 @@ export default function IntegratedSearchScreen() {
     // Filter by programme
     if (filters.programmes.length > 0) {
       list = list.filter(item => {
+        if (item.type === 'topper') return true;
         if (item.type === 'prelims') {
           const tests = Array.isArray(item.rawItem.tests) ? item.rawItem.tests[0] : item.rawItem.tests;
           const prog = tests?.program_name || item.rawItem.program_name || '';
@@ -1638,7 +1755,7 @@ export default function IntegratedSearchScreen() {
 
   // Mains bookmark handler
   const handleToggleMainsSaved = async (id: string) => {
-    Alert.alert('Bookmarked', 'Bookmarked state updated successfully.');
+    await toggleBookmark(id);
   };
 
   const onPinchGestureEvent = (event: any) => {
@@ -1655,6 +1772,29 @@ export default function IntegratedSearchScreen() {
 
   // Rendering individual card - replica of Prelims search design
   const renderItem = ({ item, index }: { item: UnifiedSearchResult; index: number }) => {
+    if (item.type === 'topper') {
+      const topperAns =
+        (item.rawItem.answers || []).find((a: any) => isTopperAnswer(a)) || item.rawItem.answers?.[0];
+      const qKey = normalizeQuestionKey(item.rawItem);
+      const attached = topperAttachmentMap.get(qKey) || [];
+      return (
+        <QuestionBankTopperCard
+          key={item.id}
+          question={item.rawItem}
+          topperAnswer={topperAns}
+          attachedToppers={attached.length > 0 ? attached : undefined}
+          colors={colors}
+          isDark={isDark}
+          zoomFontSize={15}
+          isBookmarked={savedQuestionIds.includes(item.rawItem.id)}
+          onToggleBookmark={toggleBookmark}
+          onOpenViewer={handleOpenTopperViewer}
+          onOpenDetailed={() => setPreviewMainsQuestion(item.rawItem)}
+          searchQuery={query}
+        />
+      );
+    }
+
     const isFeatured = index === 0;
     const isExpanded = expandedIds.has(item.id);
     const subColor = getSubjectColor(item.subject || '');
@@ -1902,7 +2042,7 @@ export default function IntegratedSearchScreen() {
     });
   };
 
-  const toggleStage = (key: 'showPrelims' | 'showMains' | 'showValueAdd') => {
+  const toggleStage = (key: 'showPrelims' | 'showMains' | 'showToppers' | 'showValueAdd') => {
     setFilters(p => {
       const nextVal = !p[key];
       const next = { ...p, [key]: nextVal };
@@ -1911,8 +2051,8 @@ export default function IntegratedSearchScreen() {
         next.ncertFilter = 'All';
         next.examCategory = 'All';
       }
-      // If both Mains and ValueAdd turned off, reset mainsPapers
-      if (!next.showMains && !next.showValueAdd) {
+      // If Mains, Toppers, and ValueAdd all turned off, reset mainsPapers
+      if (!next.showMains && !next.showToppers && !next.showValueAdd) {
         next.mainsPapers = [];
       }
       return next;
@@ -1984,6 +2124,10 @@ export default function IntegratedSearchScreen() {
             <View style={{ flex: 1, padding: 8, borderRadius: 10, backgroundColor: '#FFEDD5', alignItems: 'center' }}>
               <Text style={{ fontSize: 16, fontWeight: '800', color: '#C2410C' }}>{activeResults.filter(r => r.type === 'mains').length}</Text>
               <Text style={{ fontSize: 9, fontWeight: '600', color: '#9A3412' }}>Mains</Text>
+            </View>
+            <View style={{ flex: 1, padding: 8, borderRadius: 10, backgroundColor: '#FFF7ED', alignItems: 'center', borderWidth: 0.5, borderColor: '#FED7AA' }}>
+              <Text style={{ fontSize: 16, fontWeight: '800', color: '#EA580C' }}>{activeResults.filter(r => r.type === 'topper').length}</Text>
+              <Text style={{ fontSize: 9, fontWeight: '600', color: '#C2410C' }}>Toppers</Text>
             </View>
             <View style={{ flex: 1, padding: 8, borderRadius: 10, backgroundColor: '#F3E8FF', alignItems: 'center' }}>
               <Text style={{ fontSize: 16, fontWeight: '800', color: '#7E22CE' }}>{activeResults.filter(r => r.type === 'value_add').length}</Text>
@@ -2105,8 +2249,8 @@ export default function IntegratedSearchScreen() {
         {renderFilterGroupHeader(
           'searchStages', 
           'SEARCH STAGES', 
-          `${(filters.showPrelims ? 1 : 0) + (filters.showMains ? 1 : 0) + (filters.showValueAdd ? 1 : 0)}/3`,
-          !filters.showPrelims || !filters.showMains || !filters.showValueAdd
+          `${(filters.showPrelims ? 1 : 0) + (filters.showMains ? 1 : 0) + (filters.showToppers ? 1 : 0) + (filters.showValueAdd ? 1 : 0)}/4`,
+          !filters.showPrelims || !filters.showMains || !filters.showToppers || !filters.showValueAdd
         )}
         {!collapsedFilters.searchStages && (
           <View>
@@ -2135,6 +2279,20 @@ export default function IntegratedSearchScreen() {
               {hasSearched && (
                 <Text style={{ fontSize: 11, fontWeight: '700', color: colors.textTertiary }}>
                   {resultCounts.stageCounts.mains}
+                </Text>
+              )}
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => toggleStage('showToppers')}
+              style={styles.checkboxRow}
+            >
+              <View style={[styles.checkbox, filters.showToppers && { backgroundColor: '#ea580c', borderColor: '#ea580c' }]}>
+                {filters.showToppers && <Check size={12} color="#fff" />}
+              </View>
+              <Text style={{ fontSize: 13, fontWeight: '600', color: colors.textSecondary, flex: 1 }}>Topper Copies</Text>
+              {hasSearched && (
+                <Text style={{ fontSize: 11, fontWeight: '700', color: colors.textTertiary }}>
+                  {resultCounts.stageCounts.topper}
                 </Text>
               )}
             </TouchableOpacity>
@@ -2240,7 +2398,7 @@ export default function IntegratedSearchScreen() {
       </View>
 
       {/* 4. Paper (Mains) filter with Live Facet Counts */}
-      {(filters.showMains || filters.showValueAdd) && (
+      {(filters.showMains || filters.showToppers || filters.showValueAdd) && (
         <View style={styles.filterGroup}>
           {renderFilterGroupHeader(
             'mainsPaper', 
@@ -2424,7 +2582,7 @@ export default function IntegratedSearchScreen() {
           <Text style={{ fontSize: 10, fontWeight: '800', color: colors.textTertiary, letterSpacing: 0.5 }}>RECENT SEARCHES</Text>
           <TouchableOpacity onPressIn={() => {
             setSearchHistory([]);
-            AsyncStorage.removeItem('integrated_search_history');
+            clearSearchHistory().catch(() => {});
             setShowHistory(false);
           }}>
             <Text style={{ fontSize: 10, fontWeight: '700', color: colors.textTertiary }}>Clear</Text>
@@ -2441,9 +2599,9 @@ export default function IntegratedSearchScreen() {
             </View>
             <TouchableOpacity
               onPressIn={() => {
-                const next = searchHistory.filter((_, j) => j !== i);
-                setSearchHistory(next);
-                AsyncStorage.setItem('integrated_search_history', JSON.stringify(next));
+                removeSearchItem(h)
+                  .then(next => setSearchHistory(next))
+                  .catch(() => {});
               }}
               style={{ padding: 4 }}
             >
@@ -2551,7 +2709,14 @@ export default function IntegratedSearchScreen() {
                 value={query}
                 onChangeText={setQuery}
                 returnKeyType="search"
-                onFocus={() => { if (searchHistory.length > 0) setShowHistory(true); }}
+                onFocus={() => {
+                  loadSearchHistory().then(h => {
+                    setSearchHistory(h);
+                    if (h.length > 0) setShowHistory(true);
+                  }).catch(() => {
+                    if (searchHistory.length > 0) setShowHistory(true);
+                  });
+                }}
                 onBlur={() => setTimeout(() => setShowHistory(false), 200)}
                 onSubmitEditing={() => runIntegratedSearch(query, filters)}
                 style={[styles.input, { color: colors.textPrimary }]}
@@ -2813,12 +2978,22 @@ export default function IntegratedSearchScreen() {
                     onChangeText={setQuery}
                     returnKeyType="search"
                     onFocus={() => {
-                      if (searchHistory.length > 0) {
-                        setShowHistory(true);
-                        setTimeout(() => {
-                          landingScrollRef.current?.scrollToEnd({ animated: true });
-                        }, 50);
-                      }
+                      loadSearchHistory().then(h => {
+                        setSearchHistory(h);
+                        if (h.length > 0) {
+                          setShowHistory(true);
+                          setTimeout(() => {
+                            landingScrollRef.current?.scrollToEnd({ animated: true });
+                          }, 50);
+                        }
+                      }).catch(() => {
+                        if (searchHistory.length > 0) {
+                          setShowHistory(true);
+                          setTimeout(() => {
+                            landingScrollRef.current?.scrollToEnd({ animated: true });
+                          }, 50);
+                        }
+                      });
                     }}
                     onBlur={() => setTimeout(() => setShowHistory(false), 200)}
                     onSubmitEditing={() => runIntegratedSearch(query, filters)}
@@ -3188,7 +3363,7 @@ export default function IntegratedSearchScreen() {
             isDark={isDark}
             isTablet={IS_IPAD}
             insets={insets}
-            savedIds={[]}
+            savedIds={savedQuestionIds}
             onToggleSaved={handleToggleMainsSaved}
             userTags={[]}
             onToggleTag={() => {}}
@@ -3276,6 +3451,17 @@ export default function IntegratedSearchScreen() {
           </Pressable>
         </Modal>
       )}
+
+      {/* Fullscreen Topper Copy Lightbox (parity with app/mains.tsx) */}
+      <TopperImageViewerModal
+        visible={topperViewerVisible}
+        images={topperViewerImages}
+        initialIndex={topperViewerIndex}
+        topperName={topperViewerName}
+        air={topperViewerAir}
+        questionText={topperViewerQuestionText}
+        onClose={() => setTopperViewerVisible(false)}
+      />
     </View>
     </KeyboardAvoidingView>
   );

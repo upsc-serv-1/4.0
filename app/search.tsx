@@ -395,6 +395,51 @@ const getQuestionSortTier = (item: UnifiedSearchResult): number => {
   }
 };
 
+const PAPER_ORDER: Record<string, number> = { GS1: 0, GS2: 1, GS3: 2, GS4: 3, Essay: 4, Optional: 5 };
+
+export const getResultConceptKey = (r: UnifiedSearchResult): string => {
+  if (r.type === 'prelims') {
+    const micro = r.rawItem?.micro_topic || r.rawItem?.microTopic;
+    if (micro && typeof micro === 'string' && micro.trim()) return micro.trim();
+    const sec = r.rawItem?.section_group || r.rawItem?.sectionGroup;
+    if (sec && typeof sec === 'string' && sec.trim()) return sec.trim();
+    const sub = r.subject || r.rawItem?.subject;
+    if (sub && typeof sub === 'string' && sub.trim()) return sub.trim();
+    return 'General Prelims Questions';
+  }
+  return resolveItemConcept(r.rawItem || r);
+};
+
+const withinGroupSorter = (a: UnifiedSearchResult, b: UnifiedSearchResult) => {
+  const sTierA = a._searchTier ?? 1;
+  const sTierB = b._searchTier ?? 1;
+  if (sTierA !== sTierB) return sTierA - sTierB;
+  if (a.score !== b.score) return (b.score || 0) - (a.score || 0);
+
+  // PYQ tier (UPSC PYQ -> UPSC Allied PYQ -> Other PYQ -> Non-PYQ)
+  const tierA = getQuestionSortTier(a);
+  const tierB = getQuestionSortTier(b);
+  const tierDiff = tierA - tierB;
+  if (tierDiff !== 0) return tierDiff;
+
+  // Latest year on top
+  const yA = a.year || 0;
+  const yB = b.year || 0;
+  if (yA !== yB) return yB - yA;
+
+  // GS paper order
+  const orderA = PAPER_ORDER[a.paper || ''] ?? 99;
+  const orderB = PAPER_ORDER[b.paper || ''] ?? 99;
+  if (orderA !== orderB) return orderA - orderB;
+
+  // Same subject together
+  const sA = a.subject || '';
+  const sB = b.subject || '';
+  if (sA !== sB) return sA.localeCompare(sB);
+
+  return 0;
+};
+
 const cleanMainsMarkdownText = (text: string | undefined | null): string => {
   if (!text) return '';
   
@@ -727,8 +772,10 @@ export default function IntegratedSearchScreen() {
   const [keywords, setKeywords] = useState<string[]>([]);
   const [excludedKeywords, setExcludedKeywords] = useState<Set<string>>(new Set());
 
-  // Sorting
+  // Sorting & Grouping
   const [sortMode, setSortMode] = useState<'Relevance' | 'Year' | 'Subject' | 'Concept'>('Relevance');
+  const [groupBy, setGroupBy] = useState<'relevance' | 'concept'>('relevance');
+  const [collapsedConcepts, setCollapsedConcepts] = useState<Record<string, boolean>>({});
 
   // Engine mode picker bottom sheet
   const [modePickerOpen, setModePickerOpen] = useState(false);
@@ -2030,6 +2077,11 @@ export default function IntegratedSearchScreen() {
     } as any);
   };
 
+  const term = query.toLowerCase().trim();
+  const isExactMatch = useCallback((r: UnifiedSearchResult) =>
+    !!term && `${r.title || ''} ${r.subtitle || ''}`.toLowerCase().includes(term),
+  [term]);
+
   // Dynamically apply filters instantly on the client side!
   const sortedAndFilteredResults = useMemo(() => {
     let list = [...results];
@@ -2301,44 +2353,6 @@ export default function IntegratedSearchScreen() {
       list = list.filter(r => r.subject && canonicalizeSubject(r.subject) === normSide);
     }
 
-    // Sort logic from Mains Question Bank (Primary & Secondary fallbacks)
-    const paperOrder: Record<string, number> = { GS1: 0, GS2: 1, GS3: 2, GS4: 3, Essay: 4, Optional: 5 };
-
-    const term = query.toLowerCase().trim();
-    const isExactMatch = (r: UnifiedSearchResult) =>
-      !!term && `${r.title || ''} ${r.subtitle || ''}`.toLowerCase().includes(term);
-
-    // Keep the existing tier/score sorter as the "within-group" sorter
-    const withinGroupSorter = (a: UnifiedSearchResult, b: UnifiedSearchResult) => {
-      const sTierA = a._searchTier ?? 1;
-      const sTierB = b._searchTier ?? 1;
-      if (sTierA !== sTierB) return sTierA - sTierB;
-      if (a.score !== b.score) return (b.score || 0) - (a.score || 0);
-
-      // PYQ tier (UPSC PYQ -> UPSC Allied PYQ -> Other PYQ -> Non-PYQ)
-      const tierA = getQuestionSortTier(a);
-      const tierB = getQuestionSortTier(b);
-      const tierDiff = tierA - tierB;
-      if (tierDiff !== 0) return tierDiff;
-
-      // Latest year on top
-      const yA = a.year || 0;
-      const yB = b.year || 0;
-      if (yA !== yB) return yB - yA;
-
-      // GS paper order
-      const orderA = paperOrder[a.paper || ''] ?? 99;
-      const orderB = paperOrder[b.paper || ''] ?? 99;
-      if (orderA !== orderB) return orderA - orderB;
-
-      // Same subject together
-      const sA = a.subject || '';
-      const sB = b.subject || '';
-      if (sA !== sB) return sA.localeCompare(sB);
-
-      return 0;
-    };
-
     if (sortMode === 'Year') {
       return list.sort((a, b) => {
         const yearA = a.year || 0;
@@ -2359,12 +2373,8 @@ export default function IntegratedSearchScreen() {
 
     if (sortMode === 'Concept') {
       return list.sort((a, b) => {
-        const cA = a.type === 'prelims'
-          ? (a.rawItem?.micro_topic || a.rawItem?.section_group || a.subject || 'General')
-          : resolveItemConcept(a.rawItem || a);
-        const cB = b.type === 'prelims'
-          ? (b.rawItem?.micro_topic || b.rawItem?.section_group || b.subject || 'General')
-          : resolveItemConcept(b.rawItem || b);
+        const cA = getResultConceptKey(a);
+        const cB = getResultConceptKey(b);
         if (cA !== cB) return cA.localeCompare(cB);
         return withinGroupSorter(a, b);
       });
@@ -2375,9 +2385,61 @@ export default function IntegratedSearchScreen() {
     const semanticMatches = list.filter(r => !isExactMatch(r)).sort(withinGroupSorter);
 
     return [...exactMatches, ...semanticMatches];
-  }, [results, filters, excludedKeywords, sortMode, sidebarSubjectFilter, userQuestionStates, prelimsTaggedMap, query]);
+  }, [results, filters, excludedKeywords, sortMode, sidebarSubjectFilter, userQuestionStates, prelimsTaggedMap, isExactMatch]);
 
   const activeResults = sortedAndFilteredResults;
+  const isGroupedByConcept = groupBy === 'concept' || sortMode === 'Concept';
+
+  const displayResults = useMemo<Array<UnifiedSearchResult | { kind: 'conceptHeader'; id: string; concept: string; count: number }>>(() => {
+    if (!isGroupedByConcept) {
+      return activeResults;
+    }
+
+    const conceptMap: Record<string, UnifiedSearchResult[]> = {};
+    activeResults.forEach(r => {
+      const concept = getResultConceptKey(r);
+      if (!conceptMap[concept]) {
+        conceptMap[concept] = [];
+      }
+      conceptMap[concept].push(r);
+    });
+
+    // Exact matches first within each concept, followed by tier/score/PYQ/year
+    Object.keys(conceptMap).forEach(conceptKey => {
+      conceptMap[conceptKey].sort((a, b) => {
+        const matchA = isExactMatch(a) ? 1 : 0;
+        const matchB = isExactMatch(b) ? 1 : 0;
+        if (matchA !== matchB) return matchB - matchA;
+        return withinGroupSorter(a, b);
+      });
+    });
+
+    // Sort concept names alphabetically, pushing "General*" to the bottom
+    const sortedConcepts = Object.keys(conceptMap).sort((a, b) => {
+      const aIsGen = a.toLowerCase().startsWith('general');
+      const bIsGen = b.toLowerCase().startsWith('general');
+      if (aIsGen && !bIsGen) return 1;
+      if (!aIsGen && bIsGen) return -1;
+      return a.localeCompare(b);
+    });
+
+    const groupedList: Array<UnifiedSearchResult | { kind: 'conceptHeader'; id: string; concept: string; count: number }> = [];
+    sortedConcepts.forEach(concept => {
+      const itemsInConcept = conceptMap[concept];
+      groupedList.push({
+        kind: 'conceptHeader',
+        id: `concept-hdr-${concept}`,
+        concept,
+        count: itemsInConcept.length,
+      });
+
+      if (!collapsedConcepts[concept]) {
+        groupedList.push(...itemsInConcept);
+      }
+    });
+
+    return groupedList;
+  }, [activeResults, isGroupedByConcept, collapsedConcepts, isExactMatch]);
   const prelimsCount = useMemo(() => activeResults.filter(r => r.type === 'prelims').length, [activeResults]);
   const activeFilterCount = useMemo(() => countActiveFilters(filters), [filters]);
 
@@ -2435,7 +2497,84 @@ export default function IntegratedSearchScreen() {
   };
 
   // Rendering individual card - replica of Prelims search design
-  const renderItem = ({ item, index }: { item: UnifiedSearchResult; index: number }) => {
+  const renderItem = ({ item: rawItem, index }: { item: any; index: number }) => {
+    // ── CONCEPT SECTION HEADER ──
+    if (rawItem && rawItem.kind === 'conceptHeader') {
+      const conceptTitle = rawItem.concept || 'General Questions';
+      const count = rawItem.count || 0;
+      const isCollapsed = Boolean(collapsedConcepts[conceptTitle]);
+      return (
+        <TouchableOpacity
+          key={rawItem.id}
+          activeOpacity={0.8}
+          onPress={() => {
+            setCollapsedConcepts(prev => ({
+              ...prev,
+              [conceptTitle]: !prev[conceptTitle],
+            }));
+          }}
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            backgroundColor: isDark ? 'rgba(30, 41, 59, 0.85)' : '#ffffff',
+            borderRadius: 12,
+            paddingHorizontal: 14,
+            paddingVertical: 11,
+            marginTop: 14,
+            marginBottom: 8,
+            borderWidth: 1,
+            borderColor: isDark ? 'rgba(255,255,255,0.12)' : '#e2e8f0',
+            borderLeftWidth: 4,
+            borderLeftColor: '#ea580c',
+            shadowColor: '#000',
+            shadowOffset: { width: 0, height: 1 },
+            shadowOpacity: isDark ? 0.2 : 0.05,
+            shadowRadius: 2,
+            elevation: 1,
+          }}
+        >
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, flex: 1, marginRight: 8 }}>
+            <Text style={{ fontSize: 13 }}>🎯</Text>
+            <Text
+              style={{
+                fontSize: 13,
+                fontWeight: '800',
+                color: colors.textPrimary,
+                flexShrink: 1,
+                letterSpacing: 0.2,
+              }}
+              numberOfLines={1}
+            >
+              {conceptTitle}
+            </Text>
+            <View style={{
+              backgroundColor: isDark ? 'rgba(234, 88, 12, 0.2)' : '#ffedd5',
+              borderRadius: 10,
+              paddingHorizontal: 7,
+              paddingVertical: 2,
+            }}>
+              <Text style={{ fontSize: 10, fontWeight: '800', color: '#ea580c' }}>
+                {count} {count === 1 ? 'item' : 'items'}
+              </Text>
+            </View>
+          </View>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+            <Text style={{ fontSize: 10, fontWeight: '600', color: colors.textSecondary }}>
+              {isCollapsed ? 'Show' : 'Hide'}
+            </Text>
+            <ChevronDown
+              size={16}
+              color={colors.textSecondary}
+              style={{ transform: [{ rotate: isCollapsed ? '-90deg' : '0deg' }] }}
+            />
+          </View>
+        </TouchableOpacity>
+      );
+    }
+
+    const item = rawItem as UnifiedSearchResult;
+
     if (item.type === 'topper') {
       const tq = item.rawItem;
       const topperAns =
@@ -4330,25 +4469,35 @@ export default function IntegratedSearchScreen() {
             </Text>
 
             <View style={{ flexDirection: 'row', backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)', borderRadius: 16, padding: 2, gap: 2 }}>
-              {(['Relevance', 'Year', 'Subject', 'Concept'] as const).map((s) => (
-                <TouchableOpacity
-                  key={s}
-                  onPress={() => setSortMode(s)}
-                  style={[
-                    styles.sortBtn,
-                    {
-                      backgroundColor: sortMode === s ? colors.primary : 'transparent',
-                      paddingHorizontal: 9,
-                      paddingVertical: 4,
-                      borderRadius: 14,
-                    }
-                  ]}
-                >
-                  <Text style={[styles.sortBtnText, { color: sortMode === s ? '#fff' : colors.textTertiary, fontSize: 10 }]}>
-                    {s}
-                  </Text>
-                </TouchableOpacity>
-              ))}
+              {(['Relevance', 'Year', 'Subject', 'Concept'] as const).map((s) => {
+                const isActive = s === 'Concept' ? isGroupedByConcept : (sortMode === s && !isGroupedByConcept);
+                return (
+                  <TouchableOpacity
+                    key={s}
+                    onPress={() => {
+                      setSortMode(s);
+                      if (s === 'Concept') {
+                        setGroupBy('concept');
+                      } else {
+                        setGroupBy('relevance');
+                      }
+                    }}
+                    style={[
+                      styles.sortBtn,
+                      {
+                        backgroundColor: isActive ? colors.primary : 'transparent',
+                        paddingHorizontal: 9,
+                        paddingVertical: 4,
+                        borderRadius: 14,
+                      }
+                    ]}
+                  >
+                    <Text style={[styles.sortBtnText, { color: isActive ? '#fff' : colors.textTertiary, fontSize: 10 }]}>
+                      {s === 'Concept' ? '🎯 Concept' : s}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              })}
             </View>
           </View>
         )}
@@ -4616,7 +4765,7 @@ export default function IntegratedSearchScreen() {
             >
               <View style={{ flex: 1 }}>
                 <FlatList
-                  data={loading ? [] : activeResults}
+                  data={loading ? [] : (displayResults as any)}
                   keyExtractor={item => item.id}
                   renderItem={renderItem}
                   contentContainerStyle={{ paddingBottom: 85 }}
@@ -4633,6 +4782,9 @@ export default function IntegratedSearchScreen() {
                     keyBoxColor,
                     expandedResultId,
                     selectedResultInstitutes,
+                    groupBy,
+                    collapsedConcepts,
+                    isGroupedByConcept,
                   }}
                 />
               </View>

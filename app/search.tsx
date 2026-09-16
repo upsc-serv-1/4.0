@@ -1782,11 +1782,11 @@ export default function IntegratedSearchScreen() {
   };
 
   // ── Auto-run search when opened with a query param ──
-  const autoRanRef = useRef(false);
+  const lastRanQueryRef = useRef<string | null>(null);
   useEffect(() => {
     const incoming = typeof params.q === 'string' ? params.q.trim() : '';
-    if (incoming && !autoRanRef.current) {
-      autoRanRef.current = true;
+    if (incoming && lastRanQueryRef.current !== incoming) {
+      lastRanQueryRef.current = incoming;
       setQuery(incoming);
       runIntegratedSearch(incoming, filters);
     }

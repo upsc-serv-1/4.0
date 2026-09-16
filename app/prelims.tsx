@@ -26,6 +26,7 @@ import {
   Sparkles,
   Palette,
   Bookmark,
+  X,
 } from 'lucide-react-native';
 import PrelimsTagsView from '../src/components/prelims/PrelimsTagsView';
 
@@ -37,6 +38,7 @@ function PrelimsScreen() {
   const { width } = useWindowDimensions();
   const isTablet = width >= 768;
   const [currentScreen, setCurrentScreen] = useState<'hub' | 'revision-tags'>('hub');
+  const [searchQuery, setSearchQuery] = useState('');
 
   // Theme state: 'gradient' or 'white' (default is 'white' for prelims)
   const [prelimsTheme, setPrelimsTheme] = useState<'gradient' | 'white'>('white');
@@ -121,7 +123,7 @@ function PrelimsScreen() {
           colors={['#e0f2fe', '#fef3c7', '#fce7f3', '#d1fae5']}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
-          style={StyleSheet.absoluteFillObject}
+          style={StyleSheet.absoluteFill}
         />
       )}
 
@@ -177,26 +179,77 @@ function PrelimsScreen() {
           </Text>
 
           {/* Search Input */}
-          <TouchableOpacity
-            activeOpacity={0.8}
-            onPress={() => router.push('/search')}
+          <View
             style={[
               styles.largeSearchInput,
               {
-                backgroundColor: !isDark ? 'rgba(255, 255, 255, 0.75)' : 'rgba(30, 41, 59, 0.7)',
+                backgroundColor: !isDark ? 'rgba(255, 255, 255, 0.9)' : 'rgba(30, 41, 59, 0.7)',
                 borderColor: !isDark ? 'rgba(255, 255, 255, 0.85)' : 'rgba(255, 255, 255, 0.15)',
                 height: isTablet ? 64 : 54,
                 borderRadius: isTablet ? 32 : 27,
+                paddingRight: 8,
               }
             ]}
           >
-            <Search size={isTablet ? 22 : 18} color="#94a3b8" style={{ marginRight: 10 }} />
-            <Text
-              style={[styles.largeSearchText, { color: '#94a3b8' }]}
+            <TouchableOpacity
+              onPress={() => {
+                const q = searchQuery.trim();
+                router.push({ pathname: '/search', params: q ? { q } : {} } as any);
+              }}
+              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
             >
-              Search topics, PYQs, notes...
-            </Text>
-          </TouchableOpacity>
+              <Search size={isTablet ? 22 : 18} color={searchQuery.trim() ? colors.primary : '#94a3b8'} style={{ marginRight: 10 }} />
+            </TouchableOpacity>
+            <TextInput
+              placeholder="Search topics, PYQs, notes..."
+              placeholderTextColor="#94a3b8"
+              value={searchQuery}
+              onChangeText={setSearchQuery}
+              returnKeyType="search"
+              onSubmitEditing={() => {
+                const q = searchQuery.trim();
+                if (q) {
+                  router.push({ pathname: '/search', params: { q } } as any);
+                }
+              }}
+              style={[
+                styles.largeSearchText,
+                {
+                  color: colors.textPrimary,
+                  fontSize: isTablet ? 16 : 14,
+                }
+              ]}
+            />
+            {searchQuery.length > 0 && (
+              <TouchableOpacity
+                onPress={() => setSearchQuery('')}
+                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                style={{ padding: 4, marginRight: 6 }}
+              >
+                <X size={18} color="#94a3b8" />
+              </TouchableOpacity>
+            )}
+            <TouchableOpacity
+              onPress={() => {
+                const q = searchQuery.trim();
+                router.push({ pathname: '/search', params: q ? { q } : {} } as any);
+              }}
+              activeOpacity={0.8}
+              style={{
+                backgroundColor: colors.primary,
+                paddingHorizontal: isTablet ? 16 : 12,
+                height: isTablet ? 42 : 36,
+                borderRadius: isTablet ? 21 : 18,
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 5,
+              }}
+            >
+              <Search size={14} color="#fff" />
+              <Text style={{ color: '#fff', fontSize: 12, fontWeight: '800' }}>Search</Text>
+            </TouchableOpacity>
+          </View>
         </View>
 
         {/* Cards Grid */}

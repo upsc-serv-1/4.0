@@ -43,6 +43,7 @@ import {
   RotateCcw,
   Clock,
   Play,
+  RefreshCw,
 } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -61,7 +62,10 @@ import {
   getInitialMainsQuestions,
   normalizePaper,
   resolvePaper,
+  fetchMainsQuestionsFromSupabase,
+  MAINS_QUESTIONS_CACHE_KEY,
 } from '../src/data/mainsConsolidatedLoader';
+import { TopperImageCacheService } from '../src/services/TopperImageCacheService';
 import {
   mainsConsolidatedValueAdd,
   ValueAdditionItem,
@@ -139,6 +143,8 @@ type UnifiedFilters = {
 
   // Mains filters
   mainsYears: string[];
+  mainsSections?: string[];
+  mainsMicrotopics?: string[];
   subtopics: string[];
   nanotopics: string[];
   macrotags: string[];
@@ -173,6 +179,8 @@ const DEFAULT_FILTERS: UnifiedFilters = {
   searchAcross: ['Question', 'Explanation', 'Options'],
   sections: [],
   microtopics: [],
+  mainsSections: [],
+  mainsMicrotopics: [],
   revisionTags: [],
   yearRange: '',
   mainsYears: [],
@@ -182,27 +190,47 @@ const DEFAULT_FILTERS: UnifiedFilters = {
   microtags: [],
 };
 
+export function countActiveFiltersBySection(f: UnifiedFilters): {
+  content: number;
+  prelims: number;
+  mains: number;
+  common: number;
+  display: number;
+} {
+  let content = 0;
+  if (!f.showPrelims || !f.showMains || !f.showToppers || !f.showValueAdd) content++;
+  if (f.searchAcross.length !== 3) content++;
+
+  let prelims = 0;
+  if (f.ncertFilter !== 'All') prelims++;
+  if (f.examCategory !== 'All') prelims++;
+  if (f.sections.length > 0) prelims += f.sections.length;
+  if (f.microtopics.length > 0) prelims += f.microtopics.length;
+  if (f.yearRange) prelims++;
+
+  let mains = 0;
+  if (f.mainsPapers.length > 0) mains += f.mainsPapers.length;
+  if (f.subjects.length > 0) mains += f.subjects.length;
+  if ((f.mainsSections || []).length > 0) mains += f.mainsSections!.length;
+  if ((f.mainsMicrotopics || []).length > 0) mains += f.mainsMicrotopics!.length;
+  if (f.subtopics.length > 0) mains += f.subtopics.length;
+  if (f.nanotopics.length > 0) mains += f.nanotopics.length;
+  if (f.macrotags.length > 0) mains += f.macrotags.length;
+  if (f.microtags.length > 0) mains += f.microtags.length;
+  if (f.mainsYears.length > 0) mains += f.mainsYears.length;
+
+  let common = 0;
+  if (f.pyqFilter !== 'All') common++;
+  if (f.institutes.length > 0) common += f.institutes.length;
+  if (f.programmes.length > 0) common += f.programmes.length;
+  if (f.revisionTags.length > 0) common += f.revisionTags.length;
+
+  return { content, prelims, mains, common, display: 0 };
+}
+
 export function countActiveFilters(f: UnifiedFilters): number {
-  let count = 0;
-  if (!f.showPrelims || !f.showMains || !f.showToppers || !f.showValueAdd) count++;
-  if (f.searchAcross.length !== 3) count++;
-  if (f.pyqFilter !== 'All') count++;
-  if (f.institutes.length > 0) count += f.institutes.length;
-  if (f.programmes.length > 0) count += f.programmes.length;
-  if (f.revisionTags.length > 0) count += f.revisionTags.length;
-  if (f.examCategory !== 'All') count++;
-  if (f.ncertFilter !== 'All') count++;
-  if (f.sections.length > 0) count += f.sections.length;
-  if (f.microtopics.length > 0) count += f.microtopics.length;
-  if (f.yearRange) count++;
-  if (f.mainsPapers.length > 0) count += f.mainsPapers.length;
-  if (f.subjects.length > 0) count += f.subjects.length;
-  if (f.subtopics.length > 0) count += f.subtopics.length;
-  if (f.nanotopics.length > 0) count += f.nanotopics.length;
-  if (f.macrotags.length > 0) count += f.macrotags.length;
-  if (f.microtags.length > 0) count += f.microtags.length;
-  if (f.mainsYears.length > 0) count += f.mainsYears.length;
-  return count;
+  const s = countActiveFiltersBySection(f);
+  return s.content + s.prelims + s.mains + s.common;
 }
 
 export const PAPER_OPTIONS = ['GS1', 'GS2', 'GS3', 'GS4', 'Essay', 'Optional'] as const;
@@ -331,6 +359,8 @@ const getQuestionSection = (q: any): string => q?.sectionGroup || q?.section_gro
 const getQuestionMicro = (q: any): string => q?.microTopic || q?.microtopic || q?.micro_topic || '';
 const getQuestionSub = (q: any): string => q?.subTopic || q?.subtopic || q?.sub_topic || '';
 const getQuestionNano = (q: any): string => q?.nanoTopic || q?.nanotopic || q?.nano_topic || '';
+const getValueAddSection = (va: any): string => va?.sectionGroup || va?.section_group || va?.sectiongroup || '';
+const getValueAddMicro = (va: any): string => va?.microTopic || va?.microtopic || va?.micro_topic || '';
 const getValueAddSub = (va: any): string => va?.subtopic || va?.subTopic || va?.sub_topic || '';
 const getValueAddNano = (va: any): string => va?.nanotopic || va?.nanoTopic || va?.nano_topic || '';
 
@@ -709,6 +739,17 @@ export default function IntegratedSearchScreen() {
   // Active answer tab selected for each Mains question ID
   const [activeMainsTabs, setActiveMainsTabs] = useState<Record<string, string>>({});
 
+  // 5 Accordion Sections (CONTENT open by default, rest collapsed)
+  const [openSections, setOpenSections] = useState<Record<string, boolean>>({
+    content: true,
+    prelims: false,
+    mains: false,
+    common: false,
+    display: false,
+  });
+
+  const [syncing, setSyncing] = useState(false);
+
   // Collapsible Filters states (stages & PYQ open, rest collapsed by default)
   const [collapsedFilters, setCollapsedFilters] = useState<Record<string, boolean>>({
     searchStages: false,
@@ -722,6 +763,8 @@ export default function IntegratedSearchScreen() {
     // Mains
     mainsPaper: true,
     mainsSubject: true,
+    mainsSections: true,
+    mainsMicrotopics: true,
     mainsSubtopic: true,
     mainsNanotopic: true,
     mainsMacrotag: true,
@@ -1066,6 +1109,55 @@ export default function IntegratedSearchScreen() {
     });
   };
 
+  const handleForceSync = async () => {
+    if (syncing) return;
+    setSyncing(true);
+    try {
+      KVStore.delete(MAINS_QUESTIONS_CACHE_KEY);
+      KVStore.delete('@mains_cached_value_add_v2');
+      const liveQuestions = await fetchMainsQuestionsFromSupabase();
+      const liveValueAdd = await fetchValueAdditionFromSupabase();
+
+      if (liveQuestions && liveQuestions.length > 0) {
+        setMainsQuestions(liveQuestions);
+        console.log('[UnifiedSearch] Force sync questions loaded:', liveQuestions.length);
+        try {
+          await TopperImageCacheService.syncAllTopperImages(liveQuestions);
+        } catch (imgSyncErr) {
+          console.warn('[UnifiedSearch] Topper image sync warning:', imgSyncErr);
+        }
+      }
+
+      if (liveValueAdd && liveValueAdd.length > 0) {
+        const merged = liveValueAdd.map(item => {
+          if (item.category === 'ethics') {
+            const cleanText = (str: string) => (str || '').toLowerCase().replace(/[^a-z0-9]/g, '').trim();
+            const targetTitle = cleanText(item.title);
+            const localMatch = mainsConsolidatedValueAdd.find(
+              l => l.category === 'ethics' && cleanText(l.title) === targetTitle
+            );
+            if (localMatch?.ethicsData?.diagramsList) {
+              return {
+                ...item,
+                ethicsData: {
+                  ...item.ethicsData,
+                  diagramsList: localMatch.ethicsData.diagramsList,
+                },
+              };
+            }
+          }
+          return item;
+        });
+        setMainsValueAdd(merged);
+        console.log('[UnifiedSearch] Force sync value add loaded:', merged.length);
+      }
+    } catch (err) {
+      console.error('[UnifiedSearch] Force sync failed:', err);
+    } finally {
+      setSyncing(false);
+    }
+  };
+
   // Cache course-specific prelims questions to avoid calling the slow getOfflineQuestionsEnrichedSync() repeatedly
   const coursePrelims = useMemo(() => {
     const allPre = OfflineManager.getOfflineQuestionsEnrichedSync() || [];
@@ -1235,41 +1327,168 @@ export default function IntegratedSearchScreen() {
     return ['All', ...Array.from(progs).sort()];
   }, [coursePrelims, filters.institutes, filters.showPrelims, filters.showMains, filters.mainsPapers, filters.programmes, mainsQuestions, hasSearched, results]);
 
-  // Prelims facet options
+  // Prelims facet options - cascading: subject -> section -> microtopic
   const prelimsSectionOptions = useMemo(() => {
     const s = new Set<string>();
+    const subjectFilters = filters.subjects.map(sub => canonicalizeSubject(sub));
     coursePrelims.forEach((q: any) => {
-      if (q.section_group) s.add(q.section_group);
+      const matchSubject = subjectFilters.length === 0 || subjectFilters.includes(canonicalizeSubject(q.subject));
+      if (matchSubject && q.section_group) {
+        s.add(q.section_group);
+      }
     });
     return ['All', ...Array.from(s).sort()];
-  }, [coursePrelims]);
+  }, [coursePrelims, filters.subjects]);
 
   const prelimsMicrotopicOptions = useMemo(() => {
     const s = new Set<string>();
+    const subjectFilters = filters.subjects.map(sub => canonicalizeSubject(sub));
     coursePrelims.forEach((q: any) => {
-      if (q.micro_topic) s.add(q.micro_topic);
+      const matchSubject = subjectFilters.length === 0 || subjectFilters.includes(canonicalizeSubject(q.subject));
+      const matchSection = filters.sections.length === 0 || filters.sections.includes(q.section_group);
+      if (matchSubject && matchSection && q.micro_topic) {
+        s.add(q.micro_topic);
+      }
     });
-    return ['All', ...Array.from(s).slice(0, 40).sort()];
-  }, [coursePrelims]);
+    return ['All', ...Array.from(s).sort()];
+  }, [coursePrelims, filters.subjects, filters.sections]);
 
-  // Mains facet options
-  const mainsSubtopicOptions = useMemo(() => {
+  // Mains facet options - cascading: paper -> subject -> section -> microtopic -> subtopic -> nanotopic
+  const mainsSectionOptions = useMemo(() => {
+    const paperFilter = filters.mainsPapers;
+    const subjectFilters = filters.subjects.map(s => canonicalizeSubject(s));
     const s = new Set<string>();
     mainsQuestions.forEach((q: any) => {
-      const sub = getQuestionSub(q);
-      if (sub && sub !== 'General' && sub !== 'All') s.add(sub);
+      const matchPaper = paperFilter.length === 0 || paperFilter.includes(q.paper);
+      const matchSubject = subjectFilters.length === 0 || subjectFilters.includes(canonicalizeSubject(q.subject));
+      const sec = getQuestionSection(q);
+      if (matchPaper && matchSubject && sec) s.add(sec);
     });
-    return ['All', ...Array.from(s).slice(0, 40).sort()];
-  }, [mainsQuestions]);
+    mainsValueAdd.forEach((va: any) => {
+      const matchPaper = paperFilter.length === 0 || paperFilter.includes(va.paper || '');
+      const matchSubject = subjectFilters.length === 0 || subjectFilters.includes(canonicalizeSubject(va.subject || ''));
+      const sec = getValueAddSection(va);
+      if (matchPaper && matchSubject && sec) s.add(sec);
+    });
+    return ['All', ...Array.from(s).sort()];
+  }, [mainsQuestions, mainsValueAdd, filters.mainsPapers, filters.subjects]);
+
+  const mainsMicrotopicOptions = useMemo(() => {
+    const paperFilter = filters.mainsPapers;
+    const subjectFilters = filters.subjects.map(s => canonicalizeSubject(s));
+    const sectionFilter = filters.mainsSections || [];
+    const s = new Set<string>();
+    mainsQuestions.forEach((q: any) => {
+      const matchPaper = paperFilter.length === 0 || paperFilter.includes(q.paper);
+      const matchSubject = subjectFilters.length === 0 || subjectFilters.includes(canonicalizeSubject(q.subject));
+      const sec = getQuestionSection(q);
+      const matchSec = sectionFilter.length === 0 || sectionFilter.includes(sec);
+      const micro = getQuestionMicro(q);
+      if (matchPaper && matchSubject && matchSec && micro) s.add(micro);
+    });
+    mainsValueAdd.forEach((va: any) => {
+      const matchPaper = paperFilter.length === 0 || paperFilter.includes(va.paper || '');
+      const matchSubject = subjectFilters.length === 0 || subjectFilters.includes(canonicalizeSubject(va.subject || ''));
+      const sec = getValueAddSection(va);
+      const matchSec = sectionFilter.length === 0 || sectionFilter.includes(sec);
+      const micro = getValueAddMicro(va);
+      if (matchPaper && matchSubject && matchSec && micro) s.add(micro);
+    });
+    return ['All', ...Array.from(s).sort()];
+  }, [mainsQuestions, mainsValueAdd, filters.mainsPapers, filters.subjects, filters.mainsSections]);
+
+  const mainsSubtopicOptions = useMemo(() => {
+    const paperFilter = filters.mainsPapers;
+    const subjectFilters = filters.subjects.map(s => canonicalizeSubject(s));
+    const sectionFilter = filters.mainsSections || [];
+    const microtopicFilter = filters.mainsMicrotopics || [];
+    const s = new Set<string>();
+    mainsQuestions.forEach((q: any) => {
+      const matchPaper = paperFilter.length === 0 || paperFilter.includes(q.paper);
+      const matchSubject = subjectFilters.length === 0 || subjectFilters.includes(canonicalizeSubject(q.subject));
+      const matchSec = sectionFilter.length === 0 || sectionFilter.includes(getQuestionSection(q));
+      const matchMicro = microtopicFilter.length === 0 || microtopicFilter.includes(getQuestionMicro(q));
+      const sub = getQuestionSub(q);
+      if (matchPaper && matchSubject && matchSec && matchMicro && sub && sub !== 'General' && sub !== 'All') {
+        s.add(sub);
+      }
+    });
+    mainsValueAdd.forEach((va: any) => {
+      const matchPaper = paperFilter.length === 0 || paperFilter.includes(va.paper || '');
+      const matchSubject = subjectFilters.length === 0 || subjectFilters.includes(canonicalizeSubject(va.subject || ''));
+      const matchSec = sectionFilter.length === 0 || sectionFilter.includes(getValueAddSection(va));
+      const matchMicro = microtopicFilter.length === 0 || microtopicFilter.includes(getValueAddMicro(va));
+      const sub = getValueAddSub(va);
+      if (matchPaper && matchSubject && matchSec && matchMicro && sub && sub !== 'General' && sub !== 'All') {
+        s.add(sub);
+      }
+    });
+    return ['All', ...Array.from(s).sort()];
+  }, [mainsQuestions, mainsValueAdd, filters.mainsPapers, filters.subjects, filters.mainsSections, filters.mainsMicrotopics]);
 
   const mainsNanotopicOptions = useMemo(() => {
+    const paperFilter = filters.mainsPapers;
+    const subjectFilters = filters.subjects.map(s => canonicalizeSubject(s));
+    const subtopicFilter = filters.subtopics;
     const s = new Set<string>();
     mainsQuestions.forEach((q: any) => {
+      const matchPaper = paperFilter.length === 0 || paperFilter.includes(q.paper);
+      const matchSubject = subjectFilters.length === 0 || subjectFilters.includes(canonicalizeSubject(q.subject));
+      const sub = getQuestionSub(q);
+      const matchSub = subtopicFilter.length === 0 || subtopicFilter.includes(sub);
       const nano = getQuestionNano(q);
-      if (nano && nano !== 'General') s.add(nano);
+      if (matchPaper && matchSubject && matchSub && nano && nano !== 'General') {
+        s.add(nano);
+      }
     });
-    return ['All', ...Array.from(s).slice(0, 40).sort()];
-  }, [mainsQuestions]);
+    mainsValueAdd.forEach((va: any) => {
+      const matchPaper = paperFilter.length === 0 || paperFilter.includes(va.paper || '');
+      const matchSubject = subjectFilters.length === 0 || subjectFilters.includes(canonicalizeSubject(va.subject || ''));
+      const sub = getValueAddSub(va);
+      const matchSub = subtopicFilter.length === 0 || subtopicFilter.includes(sub);
+      const nano = getValueAddNano(va);
+      if (matchPaper && matchSubject && matchSub && nano && nano !== 'General') {
+        s.add(nano);
+      }
+    });
+    return ['All', ...Array.from(s).sort()];
+  }, [mainsQuestions, mainsValueAdd, filters.mainsPapers, filters.subjects, filters.subtopics]);
+
+  // Prune orphaned child selections when parent selections change
+  useEffect(() => {
+    const nextSections = filters.sections.filter(s => prelimsSectionOptions.includes(s));
+    const nextMicrotopics = filters.microtopics.filter(m => prelimsMicrotopicOptions.includes(m));
+    const nextMainsSec = (filters.mainsSections || []).filter(s => mainsSectionOptions.includes(s));
+    const nextMainsMicro = (filters.mainsMicrotopics || []).filter(m => mainsMicrotopicOptions.includes(m));
+    const nextSubtopics = filters.subtopics.filter(s => mainsSubtopicOptions.includes(s));
+    const nextNanotopics = filters.nanotopics.filter(n => mainsNanotopicOptions.includes(n));
+
+    if (
+      nextSections.length !== filters.sections.length ||
+      nextMicrotopics.length !== filters.microtopics.length ||
+      nextMainsSec.length !== (filters.mainsSections || []).length ||
+      nextMainsMicro.length !== (filters.mainsMicrotopics || []).length ||
+      nextSubtopics.length !== filters.subtopics.length ||
+      nextNanotopics.length !== filters.nanotopics.length
+    ) {
+      setFilters(prev => ({
+        ...prev,
+        sections: nextSections,
+        microtopics: nextMicrotopics,
+        mainsSections: nextMainsSec,
+        mainsMicrotopics: nextMainsMicro,
+        subtopics: nextSubtopics,
+        nanotopics: nextNanotopics,
+      }));
+    }
+  }, [
+    prelimsSectionOptions,
+    prelimsMicrotopicOptions,
+    mainsSectionOptions,
+    mainsMicrotopicOptions,
+    mainsSubtopicOptions,
+    mainsNanotopicOptions,
+  ]);
 
   const mainsMacrotagOptions = useMemo(() => {
     const s = new Set<string>();
@@ -1958,6 +2177,36 @@ export default function IntegratedSearchScreen() {
       });
     }
 
+    // Filter by Mains Sections
+    if (filters.mainsSections && filters.mainsSections.length > 0) {
+      list = list.filter(item => {
+        if (item.type === 'mains' || item.type === 'topper') {
+          const sec = getQuestionSection(item.rawItem);
+          return sec && filters.mainsSections!.includes(sec);
+        }
+        if (item.type === 'value_add') {
+          const sec = getValueAddSection(item.rawItem);
+          return sec && filters.mainsSections!.includes(sec);
+        }
+        return false;
+      });
+    }
+
+    // Filter by Mains Microtopics
+    if (filters.mainsMicrotopics && filters.mainsMicrotopics.length > 0) {
+      list = list.filter(item => {
+        if (item.type === 'mains' || item.type === 'topper') {
+          const micro = getQuestionMicro(item.rawItem);
+          return micro && filters.mainsMicrotopics!.includes(micro);
+        }
+        if (item.type === 'value_add') {
+          const micro = getValueAddMicro(item.rawItem);
+          return micro && filters.mainsMicrotopics!.includes(micro);
+        }
+        return false;
+      });
+    }
+
     // Filter by Mains Subtopics
     if (filters.subtopics.length > 0) {
       list = list.filter(item => {
@@ -2443,6 +2692,8 @@ export default function IntegratedSearchScreen() {
       | 'programmes'
       | 'sections'
       | 'microtopics'
+      | 'mainsSections'
+      | 'mainsMicrotopics'
       | 'revisionTags'
       | 'subtopics'
       | 'nanotopics'
@@ -2486,6 +2737,8 @@ export default function IntegratedSearchScreen() {
       // If Mains, Toppers, and ValueAdd all turned off, reset mains filters
       if (!next.showMains && !next.showToppers && !next.showValueAdd) {
         next.mainsPapers = [];
+        next.mainsSections = [];
+        next.mainsMicrotopics = [];
         next.subtopics = [];
         next.nanotopics = [];
         next.macrotags = [];
@@ -2496,6 +2749,176 @@ export default function IntegratedSearchScreen() {
     });
     setSidebarSubjectFilter(null);
   };
+
+  const activeSectionCounts = useMemo(() => countActiveFiltersBySection(filters), [filters]);
+
+  const activeFilterChips = useMemo(() => {
+    const chips: { id: string; label: string; onRemove: () => void }[] = [];
+
+    // Stages
+    if (!filters.showPrelims) {
+      chips.push({
+        id: 'no-prelims',
+        label: 'No Prelims',
+        onRemove: () => setFilters(p => ({ ...p, showPrelims: true })),
+      });
+    }
+    if (!filters.showMains) {
+      chips.push({
+        id: 'no-mains',
+        label: 'No Mains',
+        onRemove: () => setFilters(p => ({ ...p, showMains: true })),
+      });
+    }
+    if (!filters.showToppers) {
+      chips.push({
+        id: 'no-toppers',
+        label: 'No Toppers',
+        onRemove: () => setFilters(p => ({ ...p, showToppers: true })),
+      });
+    }
+    if (!filters.showValueAdd) {
+      chips.push({
+        id: 'no-value-add',
+        label: 'No Value-Add',
+        onRemove: () => setFilters(p => ({ ...p, showValueAdd: true })),
+      });
+    }
+
+    // Prelims options
+    if (filters.ncertFilter !== 'All') {
+      chips.push({
+        id: `ncert-${filters.ncertFilter}`,
+        label: `NCERT: ${filters.ncertFilter}`,
+        onRemove: () => setFilters(p => ({ ...p, ncertFilter: 'All' })),
+      });
+    }
+    if (filters.examCategory !== 'All') {
+      chips.push({
+        id: `cat-${filters.examCategory}`,
+        label: `Exam: ${filters.examCategory}`,
+        onRemove: () => setFilters(p => ({ ...p, examCategory: 'All' })),
+      });
+    }
+    if (filters.yearRange) {
+      chips.push({
+        id: `pre-year-${filters.yearRange}`,
+        label: `Year: ${filters.yearRange}`,
+        onRemove: () => setFilters(p => ({ ...p, yearRange: '' })),
+      });
+    }
+    filters.sections.forEach(s => {
+      chips.push({
+        id: `pre-sec-${s}`,
+        label: `Sec: ${s}`,
+        onRemove: () => toggleFilterChip('sections', s),
+      });
+    });
+    filters.microtopics.forEach(m => {
+      chips.push({
+        id: `pre-micro-${m}`,
+        label: `Micro: ${m}`,
+        onRemove: () => toggleFilterChip('microtopics', m),
+      });
+    });
+
+    // Mains options
+    filters.mainsPapers.forEach(p => {
+      chips.push({
+        id: `paper-${p}`,
+        label: p,
+        onRemove: () => toggleFilterChip('mainsPapers', p),
+      });
+    });
+    filters.subjects.forEach(s => {
+      chips.push({
+        id: `sub-${s}`,
+        label: s,
+        onRemove: () => toggleFilterChip('subjects', s),
+      });
+    });
+    (filters.mainsSections || []).forEach(s => {
+      chips.push({
+        id: `mains-sec-${s}`,
+        label: `Sec: ${s}`,
+        onRemove: () => toggleFilterChip('mainsSections', s),
+      });
+    });
+    (filters.mainsMicrotopics || []).forEach(m => {
+      chips.push({
+        id: `mains-micro-${m}`,
+        label: `Micro: ${m}`,
+        onRemove: () => toggleFilterChip('mainsMicrotopics', m),
+      });
+    });
+    filters.subtopics.forEach(s => {
+      chips.push({
+        id: `mains-subtopic-${s}`,
+        label: `Sub: ${s}`,
+        onRemove: () => toggleFilterChip('subtopics', s),
+      });
+    });
+    filters.nanotopics.forEach(n => {
+      chips.push({
+        id: `mains-nano-${n}`,
+        label: `Nano: ${n}`,
+        onRemove: () => toggleFilterChip('nanotopics', n),
+      });
+    });
+    filters.macrotags.forEach(m => {
+      chips.push({
+        id: `mains-macro-${m}`,
+        label: `Macro: ${m}`,
+        onRemove: () => toggleFilterChip('macrotags', m),
+      });
+    });
+    filters.microtags.forEach(m => {
+      chips.push({
+        id: `mains-microtag-${m}`,
+        label: `Tag: ${m}`,
+        onRemove: () => toggleFilterChip('microtags', m),
+      });
+    });
+    filters.mainsYears.forEach(y => {
+      chips.push({
+        id: `mains-year-${y}`,
+        label: `Yr: ${y}`,
+        onRemove: () => toggleFilterChip('mainsYears', y),
+      });
+    });
+
+    // Common options
+    if (filters.pyqFilter !== 'All') {
+      chips.push({
+        id: `pyq-${filters.pyqFilter}`,
+        label: filters.pyqFilter,
+        onRemove: () => setFilters(p => ({ ...p, pyqFilter: 'All' })),
+      });
+    }
+    filters.institutes.forEach(i => {
+      chips.push({
+        id: `inst-${i}`,
+        label: i,
+        onRemove: () => toggleFilterChip('institutes', i),
+      });
+    });
+    filters.programmes.forEach(p => {
+      chips.push({
+        id: `prog-${p}`,
+        label: p,
+        onRemove: () => toggleFilterChip('programmes', p),
+      });
+    });
+    filters.revisionTags.forEach(r => {
+      chips.push({
+        id: `rev-${r}`,
+        label: `Tag: ${r}`,
+        onRemove: () => toggleFilterChip('revisionTags', r),
+      });
+    });
+
+    return chips;
+  }, [filters]);
 
   const mdStyles = buildMarkdownStyles(
     colors.textPrimary,
@@ -2541,8 +2964,103 @@ export default function IntegratedSearchScreen() {
     );
   };
 
+  const renderAccordionHeader = (
+    key: 'content' | 'prelims' | 'mains' | 'common' | 'display',
+    label: string,
+    badgeCount?: number,
+    accentColor: string = colors.primary
+  ) => {
+    const isOpen = openSections[key];
+    const hasActive = (badgeCount ?? 0) > 0;
+    return (
+      <TouchableOpacity
+        onPress={() => setOpenSections(prev => ({ ...prev, [key]: !prev[key] }))}
+        activeOpacity={0.7}
+        style={[
+          styles.sidebarSectionHeader,
+          hasActive && { backgroundColor: accentColor + '10', borderColor: accentColor + '30' },
+          { marginTop: 8, marginBottom: isOpen ? 6 : 4 },
+        ]}
+      >
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, flex: 1 }}>
+          <Text
+            style={{
+              fontSize: 11,
+              fontWeight: '900',
+              color: hasActive ? accentColor : colors.textPrimary,
+              letterSpacing: 1,
+            }}
+          >
+            {label}
+          </Text>
+          {hasActive && (
+            <View
+              style={{
+                backgroundColor: accentColor,
+                borderRadius: 10,
+                paddingHorizontal: 6,
+                paddingVertical: 1,
+                minWidth: 18,
+                alignItems: 'center',
+              }}
+            >
+              <Text style={{ fontSize: 9, fontWeight: '800', color: '#fff' }}>
+                {badgeCount}
+              </Text>
+            </View>
+          )}
+        </View>
+        <View
+          style={{
+            width: 22,
+            height: 22,
+            borderRadius: 11,
+            backgroundColor: isOpen ? accentColor + '18' : 'transparent',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          {isOpen ? (
+            <ChevronUp size={14} color={hasActive ? accentColor : colors.textSecondary} />
+          ) : (
+            <ChevronDown size={14} color={hasActive ? accentColor : colors.textSecondary} />
+          )}
+        </View>
+      </TouchableOpacity>
+    );
+  };
+
   const LeftPanelFilters = (
     <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 16 }} showsVerticalScrollIndicator={true}>
+      {/* Tablet Sidebar Close Header */}
+      {IS_IPAD && (
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            marginBottom: 12,
+            paddingBottom: 8,
+            borderBottomWidth: 0.5,
+            borderBottomColor: colors.border,
+          }}
+        >
+          <Text style={{ fontSize: 13, fontWeight: '800', color: colors.textPrimary, letterSpacing: 0.5 }}>
+            SEARCH FILTERS
+          </Text>
+          <TouchableOpacity
+            onPress={() => setSidebarOpen(false)}
+            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+            style={{
+              padding: 4,
+              borderRadius: 6,
+              backgroundColor: isDark ? '#334155' : '#e2e8f0',
+            }}
+          >
+            <X size={16} color={colors.textPrimary} />
+          </TouchableOpacity>
+        </View>
+      )}
       {/* 0. Live Search Stats Panel (matching ai-search and mains) */}
       {hasSearched && results.length > 0 && (
         <View style={{ marginBottom: 14, paddingBottom: 12, borderBottomWidth: 0.5, borderBottomColor: colors.border }}>
@@ -2720,290 +3238,111 @@ export default function IntegratedSearchScreen() {
       {/* ═══════════════════════════════════════════════════════════════════════
           SECTION 1: CONTENT
          ═══════════════════════════════════════════════════════════════════════ */}
-      <View style={{ marginBottom: 12, paddingBottom: 4, borderBottomWidth: 1, borderBottomColor: colors.border }}>
-        <Text style={{ fontSize: 11, fontWeight: '900', color: colors.primary, letterSpacing: 1.2 }}>
-          1. CONTENT
-        </Text>
-      </View>
-
-      {/* Search Stages */}
-      <View style={styles.filterGroup}>
-        {renderFilterGroupHeader(
-          'searchStages', 
-          'SEARCH STAGES', 
-          `${(filters.showPrelims ? 1 : 0) + (filters.showMains ? 1 : 0) + (filters.showToppers ? 1 : 0) + (filters.showValueAdd ? 1 : 0)}/4`,
-          !filters.showPrelims || !filters.showMains || !filters.showToppers || !filters.showValueAdd
-        )}
-        {!collapsedFilters.searchStages && (
-          <View>
-            <TouchableOpacity
-              onPress={() => toggleStage('showPrelims')}
-              style={styles.checkboxRow}
-            >
-              <View style={[styles.checkbox, filters.showPrelims && { backgroundColor: colors.primary, borderColor: colors.primary }]}>
-                {filters.showPrelims && <Check size={12} color="#fff" />}
-              </View>
-              <Text style={{ fontSize: 13, fontWeight: '600', color: colors.textSecondary, flex: 1 }}>Prelims Questions</Text>
-              {hasSearched && (
-                <Text style={{ fontSize: 11, fontWeight: '700', color: colors.textTertiary }}>
-                  {resultCounts.stageCounts.prelims}
-                </Text>
-              )}
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => toggleStage('showMains')}
-              style={styles.checkboxRow}
-            >
-              <View style={[styles.checkbox, filters.showMains && { backgroundColor: colors.primary, borderColor: colors.primary }]}>
-                {filters.showMains && <Check size={12} color="#fff" />}
-              </View>
-              <Text style={{ fontSize: 13, fontWeight: '600', color: colors.textSecondary, flex: 1 }}>Mains Questions</Text>
-              {hasSearched && (
-                <Text style={{ fontSize: 11, fontWeight: '700', color: colors.textTertiary }}>
-                  {resultCounts.stageCounts.mains}
-                </Text>
-              )}
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => toggleStage('showToppers')}
-              style={styles.checkboxRow}
-            >
-              <View style={[styles.checkbox, filters.showToppers && { backgroundColor: '#ea580c', borderColor: '#ea580c' }]}>
-                {filters.showToppers && <Check size={12} color="#fff" />}
-              </View>
-              <Text style={{ fontSize: 13, fontWeight: '600', color: colors.textSecondary, flex: 1 }}>Topper Copies</Text>
-              {hasSearched && (
-                <Text style={{ fontSize: 11, fontWeight: '700', color: colors.textTertiary }}>
-                  {resultCounts.stageCounts.topper}
-                </Text>
-              )}
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => toggleStage('showValueAdd')}
-              style={styles.checkboxRow}
-            >
-              <View style={[styles.checkbox, filters.showValueAdd && { backgroundColor: colors.primary, borderColor: colors.primary }]}>
-                {filters.showValueAdd && <Check size={12} color="#fff" />}
-              </View>
-              <Text style={{ fontSize: 13, fontWeight: '600', color: colors.textSecondary, flex: 1 }}>Value Additions</Text>
-              {hasSearched && (
-                <Text style={{ fontSize: 11, fontWeight: '700', color: colors.textTertiary }}>
-                  {resultCounts.stageCounts.value_add}
-                </Text>
-              )}
-            </TouchableOpacity>
-          </View>
-        )}
-      </View>
-
-      {/* Search Scope ("SEARCH IN") */}
-      <View style={styles.filterGroup}>
-        {renderFilterGroupHeader('searchScope', 'SEARCH IN', `${filters.searchAcross.length}/3`, filters.searchAcross.length !== 3)}
-        {!collapsedFilters.searchScope && (
-          <View style={styles.chipsWrap}>
-            {([
-              { key: 'Question', label: 'Question body' },
-              { key: 'Explanation', label: 'Explanation / Model Answers' },
-              { key: 'Options', label: 'Options (Prelims)' },
-            ] as const).map(opt => {
-              const isSelected = filters.searchAcross.includes(opt.key);
-              return (
-                <TouchableOpacity
-                  key={opt.key}
-                  onPress={() => {
-                    const next = filters.searchAcross.includes(opt.key)
-                      ? filters.searchAcross.filter(x => x !== opt.key)
-                      : [...filters.searchAcross, opt.key];
-                    if (next.length === 0) return;
-                    const newFilters = { ...filters, searchAcross: next };
-                    setFilters(newFilters);
-                    if (hasSearched && query.trim()) {
-                      runIntegratedSearch(query, newFilters, searchEngineMode);
-                    }
-                  }}
-                  style={[styles.fchip, isSelected && { backgroundColor: colors.primary, borderColor: colors.primary }]}
-                >
-                  <Text style={[styles.fchipText, { color: isSelected ? '#fff' : colors.textSecondary }]}>{opt.label}</Text>
-                  {isSelected && <Check size={10} color="#fff" style={{ marginLeft: 4 }} />}
-                </TouchableOpacity>
-              );
-            })}
-          </View>
-        )}
-      </View>
-
-      {/* ═══════════════════════════════════════════════════════════════════════
-          SECTION 2: PRELIMS FILTERS (Visible when showPrelims is enabled)
-         ═══════════════════════════════════════════════════════════════════════ */}
-      {filters.showPrelims && (
-        <View>
-          <View style={{ marginTop: 8, marginBottom: 12, paddingBottom: 4, borderBottomWidth: 1, borderBottomColor: '#16A34A40' }}>
-            <Text style={{ fontSize: 11, fontWeight: '900', color: '#16A34A', letterSpacing: 1.2 }}>
-              2. PRELIMS FILTERS
-            </Text>
-          </View>
-
-          {/* NCERT Filter */}
-          <View style={styles.filterGroup}>
-            {renderFilterGroupHeader('ncert', 'NCERT FILTER (PRELIMS)', filters.ncertFilter !== 'All' ? filters.ncertFilter : undefined, filters.ncertFilter !== 'All')}
-            {!collapsedFilters.ncert && (
-              <View style={styles.chipsWrap}>
-                {(['All', 'NCERT Only', 'Non-NCERT'] as const).map(opt => {
-                  const isSelected = filters.ncertFilter === opt;
-                  return (
-                    <TouchableOpacity
-                      key={opt}
-                      onPress={() => setFilters(p => ({ ...p, ncertFilter: opt }))}
-                      style={[styles.fchip, isSelected && { backgroundColor: '#16A34A', borderColor: '#16A34A' }]}
-                    >
-                      <Text style={[styles.fchipText, { color: isSelected ? '#fff' : colors.textSecondary }]}>{opt}</Text>
-                      {isSelected && <Check size={10} color="#fff" style={{ marginLeft: 4 }} />}
-                    </TouchableOpacity>
-                  );
-                })}
-              </View>
-            )}
-          </View>
-
-          {/* Exam Category Filter */}
-          <View style={styles.filterGroup}>
-            {renderFilterGroupHeader('examCategory', 'EXAM CATEGORY (PRELIMS)', filters.examCategory !== 'All' ? filters.examCategory : undefined, filters.examCategory !== 'All')}
-            {!collapsedFilters.examCategory && (
-              <View style={styles.chipsWrap}>
-                {(['All', 'UPSC', 'Allied', 'Others'] as const).map(opt => {
-                  const isSelected = filters.examCategory === opt;
-                  return (
-                    <TouchableOpacity
-                      key={opt}
-                      onPress={() => setFilters(p => ({ ...p, examCategory: opt }))}
-                      style={[styles.fchip, isSelected && { backgroundColor: '#16A34A', borderColor: '#16A34A' }]}
-                    >
-                      <Text style={[styles.fchipText, { color: isSelected ? '#fff' : colors.textSecondary }]}>{opt}</Text>
-                      {isSelected && <Check size={10} color="#fff" style={{ marginLeft: 4 }} />}
-                    </TouchableOpacity>
-                  );
-                })}
-              </View>
-            )}
-          </View>
-
-          {/* Sections / Modules Filter */}
+      {renderAccordionHeader('content', '1. CONTENT & SCOPE', activeSectionCounts.content, colors.primary)}
+      {openSections.content && (
+        <View style={{ marginBottom: 8 }}>
+          {/* Search Stages */}
           <View style={styles.filterGroup}>
             {renderFilterGroupHeader(
-              'prelimsSections',
-              'SECTIONS / MODULES (PRELIMS)',
-              filters.sections.length === 0 ? 'All' : `${filters.sections.length}/${Math.max(prelimsSectionOptions.length - 1, 1)}`,
-              filters.sections.length > 0
+              'searchStages', 
+              'SEARCH STAGES', 
+              `${(filters.showPrelims ? 1 : 0) + (filters.showMains ? 1 : 0) + (filters.showToppers ? 1 : 0) + (filters.showValueAdd ? 1 : 0)}/4`,
+              !filters.showPrelims || !filters.showMains || !filters.showToppers || !filters.showValueAdd
             )}
-            {!collapsedFilters.prelimsSections && (
-              <View style={styles.chipsWrap}>
-                <TouchableOpacity
-                  onPress={() => toggleFilterChip('sections', 'All')}
-                  style={[styles.fchip, filters.sections.length === 0 && { backgroundColor: '#16A34A', borderColor: '#16A34A' }]}
-                >
-                  <Text style={[styles.fchipText, { color: filters.sections.length === 0 ? '#fff' : colors.textSecondary }]}>All</Text>
-                  {filters.sections.length === 0 && <Check size={10} color="#fff" style={{ marginLeft: 4 }} />}
-                </TouchableOpacity>
-                {prelimsSectionOptions.filter(x => x !== 'All').map(sec => {
-                  const isSelected = filters.sections.includes(sec);
-                  return (
-                    <TouchableOpacity
-                      key={sec}
-                      onPress={() => toggleFilterChip('sections', sec)}
-                      style={[styles.fchip, isSelected && { backgroundColor: '#16A34A', borderColor: '#16A34A' }]}
-                    >
-                      <Text style={[styles.fchipText, { color: isSelected ? '#fff' : colors.textSecondary }]}>{sec}</Text>
-                      {isSelected && <Check size={10} color="#fff" style={{ marginLeft: 4 }} />}
-                    </TouchableOpacity>
-                  );
-                })}
-              </View>
-            )}
-          </View>
-
-          {/* Microtopics Filter */}
-          <View style={styles.filterGroup}>
-            {renderFilterGroupHeader(
-              'prelimsMicrotopics',
-              'MICROTOPICS (PRELIMS)',
-              filters.microtopics.length === 0 ? 'All' : `${filters.microtopics.length}/${Math.max(prelimsMicrotopicOptions.length - 1, 1)}`,
-              filters.microtopics.length > 0
-            )}
-            {!collapsedFilters.prelimsMicrotopics && (
-              <View style={styles.chipsWrap}>
-                <TouchableOpacity
-                  onPress={() => toggleFilterChip('microtopics', 'All')}
-                  style={[styles.fchip, filters.microtopics.length === 0 && { backgroundColor: '#16A34A', borderColor: '#16A34A' }]}
-                >
-                  <Text style={[styles.fchipText, { color: filters.microtopics.length === 0 ? '#fff' : colors.textSecondary }]}>All</Text>
-                  {filters.microtopics.length === 0 && <Check size={10} color="#fff" style={{ marginLeft: 4 }} />}
-                </TouchableOpacity>
-                {prelimsMicrotopicOptions.filter(x => x !== 'All').map(mt => {
-                  const isSelected = filters.microtopics.includes(mt);
-                  return (
-                    <TouchableOpacity
-                      key={mt}
-                      onPress={() => toggleFilterChip('microtopics', mt)}
-                      style={[styles.fchip, isSelected && { backgroundColor: '#16A34A', borderColor: '#16A34A' }]}
-                    >
-                      <Text style={[styles.fchipText, { color: isSelected ? '#fff' : colors.textSecondary }]}>{mt}</Text>
-                      {isSelected && <Check size={10} color="#fff" style={{ marginLeft: 4 }} />}
-                    </TouchableOpacity>
-                  );
-                })}
-              </View>
-            )}
-          </View>
-
-          {/* Prelims Year Range */}
-          <View style={styles.filterGroup}>
-            {renderFilterGroupHeader(
-              'prelimsYearRange',
-              'YEAR RANGE (PRELIMS)',
-              filters.yearRange ? filters.yearRange : 'All',
-              !!filters.yearRange
-            )}
-            {!collapsedFilters.prelimsYearRange && (
+            {!collapsedFilters.searchStages && (
               <View>
-                <View style={styles.chipsWrap}>
-                  {['All', '2024', '2023', '2022', '2021', '2020', '2015-2024', '2010-2019'].map(yr => {
-                    const isSelected = yr === 'All' ? !filters.yearRange : filters.yearRange === yr;
-                    return (
-                      <TouchableOpacity
-                        key={yr}
-                        onPress={() => setFilters(p => ({ ...p, yearRange: yr === 'All' ? '' : yr }))}
-                        style={[styles.fchip, isSelected && { backgroundColor: '#16A34A', borderColor: '#16A34A' }]}
-                      >
-                        <Text style={[styles.fchipText, { color: isSelected ? '#fff' : colors.textSecondary }]}>{yr}</Text>
-                        {isSelected && <Check size={10} color="#fff" style={{ marginLeft: 4 }} />}
-                      </TouchableOpacity>
-                    );
-                  })}
-                </View>
-                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 8 }}>
-                  <TextInput
-                    placeholder="Custom (e.g. 2018-2024)"
-                    placeholderTextColor={colors.textTertiary}
-                    value={filters.yearRange}
-                    onChangeText={txt => setFilters(p => ({ ...p, yearRange: txt }))}
-                    style={{
-                      flex: 1,
-                      height: 36,
-                      borderRadius: 10,
-                      borderWidth: 1,
-                      borderColor: colors.border,
-                      paddingHorizontal: 10,
-                      fontSize: 12,
-                      color: colors.textPrimary,
-                      backgroundColor: colors.surface,
-                    }}
-                  />
-                  {filters.yearRange ? (
-                    <TouchableOpacity onPress={() => setFilters(p => ({ ...p, yearRange: '' }))} style={{ padding: 4 }}>
-                      <X size={16} color={colors.textTertiary} />
+                <TouchableOpacity
+                  onPress={() => toggleStage('showPrelims')}
+                  style={styles.checkboxRow}
+                >
+                  <View style={[styles.checkbox, filters.showPrelims && { backgroundColor: colors.primary, borderColor: colors.primary }]}>
+                    {filters.showPrelims && <Check size={12} color="#fff" />}
+                  </View>
+                  <Text style={{ fontSize: 13, fontWeight: '600', color: colors.textSecondary, flex: 1 }}>Prelims Questions</Text>
+                  {hasSearched && (
+                    <Text style={{ fontSize: 11, fontWeight: '700', color: colors.textTertiary }}>
+                      {resultCounts.stageCounts.prelims}
+                    </Text>
+                  )}
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => toggleStage('showMains')}
+                  style={styles.checkboxRow}
+                >
+                  <View style={[styles.checkbox, filters.showMains && { backgroundColor: colors.primary, borderColor: colors.primary }]}>
+                    {filters.showMains && <Check size={12} color="#fff" />}
+                  </View>
+                  <Text style={{ fontSize: 13, fontWeight: '600', color: colors.textSecondary, flex: 1 }}>Mains Questions</Text>
+                  {hasSearched && (
+                    <Text style={{ fontSize: 11, fontWeight: '700', color: colors.textTertiary }}>
+                      {resultCounts.stageCounts.mains}
+                    </Text>
+                  )}
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => toggleStage('showToppers')}
+                  style={styles.checkboxRow}
+                >
+                  <View style={[styles.checkbox, filters.showToppers && { backgroundColor: '#ea580c', borderColor: '#ea580c' }]}>
+                    {filters.showToppers && <Check size={12} color="#fff" />}
+                  </View>
+                  <Text style={{ fontSize: 13, fontWeight: '600', color: colors.textSecondary, flex: 1 }}>Topper Copies</Text>
+                  {hasSearched && (
+                    <Text style={{ fontSize: 11, fontWeight: '700', color: colors.textTertiary }}>
+                      {resultCounts.stageCounts.topper}
+                    </Text>
+                  )}
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => toggleStage('showValueAdd')}
+                  style={styles.checkboxRow}
+                >
+                  <View style={[styles.checkbox, filters.showValueAdd && { backgroundColor: colors.primary, borderColor: colors.primary }]}>
+                    {filters.showValueAdd && <Check size={12} color="#fff" />}
+                  </View>
+                  <Text style={{ fontSize: 13, fontWeight: '600', color: colors.textSecondary, flex: 1 }}>Value Additions</Text>
+                  {hasSearched && (
+                    <Text style={{ fontSize: 11, fontWeight: '700', color: colors.textTertiary }}>
+                      {resultCounts.stageCounts.value_add}
+                    </Text>
+                  )}
+                </TouchableOpacity>
+              </View>
+            )}
+          </View>
+
+          {/* Search Scope ("SEARCH IN") */}
+          <View style={styles.filterGroup}>
+            {renderFilterGroupHeader('searchScope', 'SEARCH IN', `${filters.searchAcross.length}/3`, filters.searchAcross.length !== 3)}
+            {!collapsedFilters.searchScope && (
+              <View style={styles.chipsWrap}>
+                {([
+                  { key: 'Question', label: 'Question body' },
+                  { key: 'Explanation', label: 'Explanation / Model Answers' },
+                  { key: 'Options', label: 'Options (Prelims)' },
+                ] as const).map(opt => {
+                  const isSelected = filters.searchAcross.includes(opt.key);
+                  return (
+                    <TouchableOpacity
+                      key={opt.key}
+                      onPress={() => {
+                        const next = filters.searchAcross.includes(opt.key)
+                          ? filters.searchAcross.filter(x => x !== opt.key)
+                          : [...filters.searchAcross, opt.key];
+                        if (next.length === 0) return;
+                        const newFilters = { ...filters, searchAcross: next };
+                        setFilters(newFilters);
+                        if (hasSearched && query.trim()) {
+                          runIntegratedSearch(query, newFilters, searchEngineMode);
+                        }
+                      }}
+                      style={[styles.fchip, isSelected && { backgroundColor: colors.primary, borderColor: colors.primary }]}
+                    >
+                      <Text style={[styles.fchipText, { color: isSelected ? '#fff' : colors.textSecondary }]}>{opt.label}</Text>
+                      {isSelected && <Check size={10} color="#fff" style={{ marginLeft: 4 }} />}
                     </TouchableOpacity>
-                  ) : null}
-                </View>
+                  );
+                })}
               </View>
             )}
           </View>
@@ -3011,99 +3350,597 @@ export default function IntegratedSearchScreen() {
       )}
 
       {/* ═══════════════════════════════════════════════════════════════════════
+          SECTION 2: PRELIMS FILTERS (Visible when showPrelims is enabled)
+         ═══════════════════════════════════════════════════════════════════════ */}
+      {filters.showPrelims && (
+        <View style={{ marginBottom: 4 }}>
+          {renderAccordionHeader('prelims', '2. PRELIMS FILTERS', activeSectionCounts.prelims, '#16A34A')}
+          {openSections.prelims && (
+            <View style={{ marginBottom: 8 }}>
+              {/* NCERT Filter */}
+              <View style={styles.filterGroup}>
+                {renderFilterGroupHeader('ncert', 'NCERT FILTER (PRELIMS)', filters.ncertFilter !== 'All' ? filters.ncertFilter : undefined, filters.ncertFilter !== 'All')}
+                {!collapsedFilters.ncert && (
+                  <View style={styles.chipsWrap}>
+                    {(['All', 'NCERT Only', 'Non-NCERT'] as const).map(opt => {
+                      const isSelected = filters.ncertFilter === opt;
+                      return (
+                        <TouchableOpacity
+                          key={opt}
+                          onPress={() => setFilters(p => ({ ...p, ncertFilter: opt }))}
+                          style={[styles.fchip, isSelected && { backgroundColor: '#16A34A', borderColor: '#16A34A' }]}
+                        >
+                          <Text style={[styles.fchipText, { color: isSelected ? '#fff' : colors.textSecondary }]}>{opt}</Text>
+                          {isSelected && <Check size={10} color="#fff" style={{ marginLeft: 4 }} />}
+                        </TouchableOpacity>
+                      );
+                    })}
+                  </View>
+                )}
+              </View>
+
+              {/* Exam Category Filter */}
+              <View style={styles.filterGroup}>
+                {renderFilterGroupHeader('examCategory', 'EXAM CATEGORY (PRELIMS)', filters.examCategory !== 'All' ? filters.examCategory : undefined, filters.examCategory !== 'All')}
+                {!collapsedFilters.examCategory && (
+                  <View style={styles.chipsWrap}>
+                    {(['All', 'UPSC', 'Allied', 'Others'] as const).map(opt => {
+                      const isSelected = filters.examCategory === opt;
+                      return (
+                        <TouchableOpacity
+                          key={opt}
+                          onPress={() => setFilters(p => ({ ...p, examCategory: opt }))}
+                          style={[styles.fchip, isSelected && { backgroundColor: '#16A34A', borderColor: '#16A34A' }]}
+                        >
+                          <Text style={[styles.fchipText, { color: isSelected ? '#fff' : colors.textSecondary }]}>{opt}</Text>
+                          {isSelected && <Check size={10} color="#fff" style={{ marginLeft: 4 }} />}
+                        </TouchableOpacity>
+                      );
+                    })}
+                  </View>
+                )}
+              </View>
+
+              {/* Prelims Year Range */}
+              <View style={styles.filterGroup}>
+                {renderFilterGroupHeader(
+                  'prelimsYearRange',
+                  'YEAR RANGE (PRELIMS)',
+                  filters.yearRange ? filters.yearRange : 'All',
+                  !!filters.yearRange
+                )}
+                {!collapsedFilters.prelimsYearRange && (
+                  <View>
+                    <View style={styles.chipsWrap}>
+                      {['All', '2024', '2023', '2022', '2021', '2020', '2015-2024', '2010-2019'].map(yr => {
+                        const isSelected = yr === 'All' ? !filters.yearRange : filters.yearRange === yr;
+                        return (
+                          <TouchableOpacity
+                            key={yr}
+                            onPress={() => setFilters(p => ({ ...p, yearRange: yr === 'All' ? '' : yr }))}
+                            style={[styles.fchip, isSelected && { backgroundColor: '#16A34A', borderColor: '#16A34A' }]}
+                          >
+                            <Text style={[styles.fchipText, { color: isSelected ? '#fff' : colors.textSecondary }]}>{yr}</Text>
+                            {isSelected && <Check size={10} color="#fff" style={{ marginLeft: 4 }} />}
+                          </TouchableOpacity>
+                        );
+                      })}
+                    </View>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 8 }}>
+                      <TextInput
+                        placeholder="Custom (e.g. 2018-2024)"
+                        placeholderTextColor={colors.textTertiary}
+                        value={filters.yearRange}
+                        onChangeText={txt => setFilters(p => ({ ...p, yearRange: txt }))}
+                        style={{
+                          flex: 1,
+                          height: 36,
+                          borderRadius: 10,
+                          borderWidth: 1,
+                          borderColor: colors.border,
+                          paddingHorizontal: 10,
+                          fontSize: 12,
+                          color: colors.textPrimary,
+                          backgroundColor: colors.surface,
+                        }}
+                      />
+                      {filters.yearRange ? (
+                        <TouchableOpacity onPress={() => setFilters(p => ({ ...p, yearRange: '' }))} style={{ padding: 4 }}>
+                          <X size={16} color={colors.textTertiary} />
+                        </TouchableOpacity>
+                      ) : null}
+                    </View>
+                  </View>
+                )}
+              </View>
+
+              {/* Sections / Modules Filter */}
+              <View style={styles.filterGroup}>
+                {renderFilterGroupHeader(
+                  'prelimsSections',
+                  'SECTIONS / MODULES (PRELIMS)',
+                  filters.sections.length === 0 ? 'All' : `${filters.sections.length}/${Math.max(prelimsSectionOptions.length - 1, 1)}`,
+                  filters.sections.length > 0
+                )}
+                {!collapsedFilters.prelimsSections && (
+                  <View style={styles.chipsWrap}>
+                    <TouchableOpacity
+                      onPress={() => toggleFilterChip('sections', 'All')}
+                      style={[styles.fchip, filters.sections.length === 0 && { backgroundColor: '#16A34A', borderColor: '#16A34A' }]}
+                    >
+                      <Text style={[styles.fchipText, { color: filters.sections.length === 0 ? '#fff' : colors.textSecondary }]}>All</Text>
+                      {filters.sections.length === 0 && <Check size={10} color="#fff" style={{ marginLeft: 4 }} />}
+                    </TouchableOpacity>
+                    {prelimsSectionOptions.filter(x => x !== 'All').map(sec => {
+                      const isSelected = filters.sections.includes(sec);
+                      return (
+                        <TouchableOpacity
+                          key={sec}
+                          onPress={() => toggleFilterChip('sections', sec)}
+                          style={[styles.fchip, isSelected && { backgroundColor: '#16A34A', borderColor: '#16A34A' }]}
+                        >
+                          <Text style={[styles.fchipText, { color: isSelected ? '#fff' : colors.textSecondary }]}>{sec}</Text>
+                          {isSelected && <Check size={10} color="#fff" style={{ marginLeft: 4 }} />}
+                        </TouchableOpacity>
+                      );
+                    })}
+                  </View>
+                )}
+              </View>
+
+              {/* Microtopics Filter */}
+              <View style={styles.filterGroup}>
+                {renderFilterGroupHeader(
+                  'prelimsMicrotopics',
+                  'MICROTOPICS (PRELIMS)',
+                  filters.microtopics.length === 0 ? 'All' : `${filters.microtopics.length}/${Math.max(prelimsMicrotopicOptions.length - 1, 1)}`,
+                  filters.microtopics.length > 0
+                )}
+                {!collapsedFilters.prelimsMicrotopics && (
+                  <View style={styles.chipsWrap}>
+                    <TouchableOpacity
+                      onPress={() => toggleFilterChip('microtopics', 'All')}
+                      style={[styles.fchip, filters.microtopics.length === 0 && { backgroundColor: '#16A34A', borderColor: '#16A34A' }]}
+                    >
+                      <Text style={[styles.fchipText, { color: filters.microtopics.length === 0 ? '#fff' : colors.textSecondary }]}>All</Text>
+                      {filters.microtopics.length === 0 && <Check size={10} color="#fff" style={{ marginLeft: 4 }} />}
+                    </TouchableOpacity>
+                    {prelimsMicrotopicOptions.filter(x => x !== 'All').map(mt => {
+                      const isSelected = filters.microtopics.includes(mt);
+                      return (
+                        <TouchableOpacity
+                          key={mt}
+                          onPress={() => toggleFilterChip('microtopics', mt)}
+                          style={[styles.fchip, isSelected && { backgroundColor: '#16A34A', borderColor: '#16A34A' }]}
+                        >
+                          <Text style={[styles.fchipText, { color: isSelected ? '#fff' : colors.textSecondary }]}>{mt}</Text>
+                          {isSelected && <Check size={10} color="#fff" style={{ marginLeft: 4 }} />}
+                        </TouchableOpacity>
+                      );
+                    })}
+                  </View>
+                )}
+              </View>
+            </View>
+          )}
+        </View>
+      )}
+
+      {/* ═══════════════════════════════════════════════════════════════════════
+          SECTION 3: MAINS FILTERS (Visible when Mains, Toppers or ValueAdd enabled)
+         ═══════════════════════════════════════════════════════════════════════ */}
+      {/* ═══════════════════════════════════════════════════════════════════════
           SECTION 3: MAINS FILTERS (Visible when Mains, Toppers or ValueAdd enabled)
          ═══════════════════════════════════════════════════════════════════════ */}
       {(filters.showMains || filters.showToppers || filters.showValueAdd) && (
-        <View>
-          <View style={{ marginTop: 8, marginBottom: 12, paddingBottom: 4, borderBottomWidth: 1, borderBottomColor: '#EA580C40' }}>
-            <Text style={{ fontSize: 11, fontWeight: '900', color: '#EA580C', letterSpacing: 1.2 }}>
-              3. MAINS FILTERS
-            </Text>
-          </View>
-
-          {/* Paper (Mains) filter with Live Facet Counts */}
-          <View style={styles.filterGroup}>
-            {renderFilterGroupHeader(
-              'mainsPaper', 
-              'PAPER (MAINS)', 
-              filters.mainsPapers.length === 0 ? 'All' : `${filters.mainsPapers.length}/${PAPER_OPTIONS.length}`,
-              filters.mainsPapers.length > 0
-            )}
-            {!collapsedFilters.mainsPaper && (
-              <View style={styles.chipsWrap}>
-                <TouchableOpacity
-                  onPress={() => toggleFilterChip('mainsPapers', 'All')}
-                  style={[styles.fchip, filters.mainsPapers.length === 0 && { backgroundColor: '#EA580C', borderColor: '#EA580C' }]}
-                >
-                  <Text style={[styles.fchipText, { color: filters.mainsPapers.length === 0 ? '#fff' : colors.textSecondary }]}>All</Text>
-                  {filters.mainsPapers.length === 0 && <Check size={10} color="#fff" style={{ marginLeft: 4 }} />}
-                </TouchableOpacity>
-                {PAPER_OPTIONS.map(opt => {
-                  const isSelected = filters.mainsPapers.includes(opt);
-                  const count = resultCounts.paperCounts[opt] ?? 0;
-                  return (
+        <View style={{ marginBottom: 4 }}>
+          {renderAccordionHeader('mains', '3. MAINS FILTERS', activeSectionCounts.mains, '#EA580C')}
+          {openSections.mains && (
+            <View style={{ marginBottom: 8 }}>
+              {/* Paper (Mains) filter with Live Facet Counts */}
+              <View style={styles.filterGroup}>
+                {renderFilterGroupHeader(
+                  'mainsPaper', 
+                  'PAPER (MAINS)', 
+                  filters.mainsPapers.length === 0 ? 'All' : `${filters.mainsPapers.length}/${PAPER_OPTIONS.length}`,
+                  filters.mainsPapers.length > 0
+                )}
+                {!collapsedFilters.mainsPaper && (
+                  <View style={styles.chipsWrap}>
                     <TouchableOpacity
-                      key={opt}
-                      onPress={() => toggleFilterChip('mainsPapers', opt)}
-                      style={[styles.fchip, isSelected && { backgroundColor: '#EA580C', borderColor: '#EA580C' }]}
+                      onPress={() => toggleFilterChip('mainsPapers', 'All')}
+                      style={[styles.fchip, filters.mainsPapers.length === 0 && { backgroundColor: '#EA580C', borderColor: '#EA580C' }]}
                     >
-                      <Text style={[styles.fchipText, { color: isSelected ? '#fff' : colors.textSecondary }]}>{opt}</Text>
-                      {hasSearched && (
-                        <Text style={{ fontSize: 9, fontWeight: '700', marginLeft: 4, color: isSelected ? '#fff' : colors.textTertiary }}>
-                          ({count})
-                        </Text>
-                      )}
-                      {isSelected && <Check size={10} color="#fff" style={{ marginLeft: 4 }} />}
+                      <Text style={[styles.fchipText, { color: filters.mainsPapers.length === 0 ? '#fff' : colors.textSecondary }]}>All</Text>
+                      {filters.mainsPapers.length === 0 && <Check size={10} color="#fff" style={{ marginLeft: 4 }} />}
                     </TouchableOpacity>
-                  );
-                })}
-              </View>
-            )}
-          </View>
-
-          {/* Subject Filter with Live Facet Counts */}
-          <View style={styles.filterGroup}>
-            {renderFilterGroupHeader(
-              'mainsSubject', 
-              'SUBJECT (MAINS)', 
-              filters.subjects.length === 0 ? 'All' : `${filters.subjects.length}/${Math.max(subjectOptions.length - 1, 1)}`,
-              filters.subjects.length > 0
-            )}
-            {!collapsedFilters.mainsSubject && (
-              <View>
-                {filters.subjects.length > 0 && (
-                  <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginBottom: 8 }}>
-                    {filters.subjects.map(s => (
-                      <TouchableOpacity
-                        key={s}
-                        onPress={() => toggleFilterChip('subjects', s)}
-                        style={{ flexDirection: 'row', alignItems: 'center', gap: 4, paddingVertical: 3, paddingHorizontal: 8, borderRadius: 10, backgroundColor: '#FEE2E2', borderWidth: 1, borderColor: '#FCA5A5' }}
-                      >
-                        <X size={10} color="#EF4444" />
-                        <Text style={{ fontSize: 10, fontWeight: '700', color: '#DC2626' }}>Clear: {s}</Text>
-                      </TouchableOpacity>
-                    ))}
+                    {PAPER_OPTIONS.map(opt => {
+                      const isSelected = filters.mainsPapers.includes(opt);
+                      const count = resultCounts.paperCounts[opt] ?? 0;
+                      return (
+                        <TouchableOpacity
+                          key={opt}
+                          onPress={() => toggleFilterChip('mainsPapers', opt)}
+                          style={[styles.fchip, isSelected && { backgroundColor: '#EA580C', borderColor: '#EA580C' }]}
+                        >
+                          <Text style={[styles.fchipText, { color: isSelected ? '#fff' : colors.textSecondary }]}>{opt}</Text>
+                          {hasSearched && (
+                            <Text style={{ fontSize: 9, fontWeight: '700', marginLeft: 4, color: isSelected ? '#fff' : colors.textTertiary }}>
+                              ({count})
+                            </Text>
+                          )}
+                          {isSelected && <Check size={10} color="#fff" style={{ marginLeft: 4 }} />}
+                        </TouchableOpacity>
+                      );
+                    })}
                   </View>
                 )}
+              </View>
+
+              {/* Subject Filter with Live Facet Counts */}
+              <View style={styles.filterGroup}>
+                {renderFilterGroupHeader(
+                  'mainsSubject', 
+                  'SUBJECT (MAINS)', 
+                  filters.subjects.length === 0 ? 'All' : `${filters.subjects.length}/${Math.max(subjectOptions.length - 1, 1)}`,
+                  filters.subjects.length > 0
+                )}
+                {!collapsedFilters.mainsSubject && (
+                  <View>
+                    {filters.subjects.length > 0 && (
+                      <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginBottom: 8 }}>
+                        {filters.subjects.map(s => (
+                          <TouchableOpacity
+                            key={s}
+                            onPress={() => toggleFilterChip('subjects', s)}
+                            style={{ flexDirection: 'row', alignItems: 'center', gap: 4, paddingVertical: 3, paddingHorizontal: 8, borderRadius: 10, backgroundColor: '#FEE2E2', borderWidth: 1, borderColor: '#FCA5A5' }}
+                          >
+                            <X size={10} color="#EF4444" />
+                            <Text style={{ fontSize: 10, fontWeight: '700', color: '#DC2626' }}>Clear: {s}</Text>
+                          </TouchableOpacity>
+                        ))}
+                      </View>
+                    )}
+                    <View style={styles.chipsWrap}>
+                      <TouchableOpacity
+                        onPress={() => toggleFilterChip('subjects', 'All')}
+                        style={[styles.fchip, filters.subjects.length === 0 && { backgroundColor: '#EA580C', borderColor: '#EA580C' }]}
+                      >
+                        <Text style={[styles.fchipText, { color: filters.subjects.length === 0 ? '#fff' : colors.textSecondary }]}>All</Text>
+                        {filters.subjects.length === 0 && <Check size={10} color="#fff" style={{ marginLeft: 4 }} />}
+                      </TouchableOpacity>
+                      {subjectOptions.filter(x => x !== 'All').map(sub => {
+                        const canonSub = canonicalizeSubject(sub);
+                        const isSelected = filters.subjects.some(s => canonicalizeSubject(s) === canonSub);
+                        const count = resultCounts.subjectCounts[canonSub] ?? 0;
+                        return (
+                          <TouchableOpacity
+                            key={canonSub}
+                            onPress={() => toggleFilterChip('subjects', canonSub)}
+                            style={[styles.fchip, isSelected && { backgroundColor: '#EA580C', borderColor: '#EA580C' }]}
+                          >
+                            <Text style={[styles.fchipText, { color: isSelected ? '#fff' : colors.textSecondary }]}>{sub}</Text>
+                            {hasSearched && (
+                              <Text style={{ fontSize: 9, fontWeight: '700', marginLeft: 4, color: isSelected ? '#fff' : colors.textTertiary }}>
+                                ({count})
+                              </Text>
+                            )}
+                            {isSelected && <Check size={10} color="#fff" style={{ marginLeft: 4 }} />}
+                          </TouchableOpacity>
+                        );
+                      })}
+                    </View>
+                  </View>
+                )}
+              </View>
+
+              {/* Mains Sections Filter */}
+              {mainsSectionOptions.length > 1 && (
+                <View style={styles.filterGroup}>
+                  {renderFilterGroupHeader(
+                    'mainsSections',
+                    'SECTIONS (MAINS)',
+                    (filters.mainsSections || []).length === 0 ? 'All' : `${(filters.mainsSections || []).length}/${mainsSectionOptions.length - 1}`,
+                    (filters.mainsSections || []).length > 0
+                  )}
+                  {!collapsedFilters.mainsSections && (
+                    <View style={styles.chipsWrap}>
+                      <TouchableOpacity
+                        onPress={() => toggleFilterChip('mainsSections', 'All')}
+                        style={[styles.fchip, (filters.mainsSections || []).length === 0 && { backgroundColor: '#EA580C', borderColor: '#EA580C' }]}
+                      >
+                        <Text style={[styles.fchipText, { color: (filters.mainsSections || []).length === 0 ? '#fff' : colors.textSecondary }]}>All</Text>
+                        {(filters.mainsSections || []).length === 0 && <Check size={10} color="#fff" style={{ marginLeft: 4 }} />}
+                      </TouchableOpacity>
+                      {mainsSectionOptions.filter(x => x !== 'All').map(sec => {
+                        const isSelected = (filters.mainsSections || []).includes(sec);
+                        return (
+                          <TouchableOpacity
+                            key={sec}
+                            onPress={() => toggleFilterChip('mainsSections', sec)}
+                            style={[styles.fchip, isSelected && { backgroundColor: '#EA580C', borderColor: '#EA580C' }]}
+                          >
+                            <Text style={[styles.fchipText, { color: isSelected ? '#fff' : colors.textSecondary }]}>{sec}</Text>
+                            {isSelected && <Check size={10} color="#fff" style={{ marginLeft: 4 }} />}
+                          </TouchableOpacity>
+                        );
+                      })}
+                    </View>
+                  )}
+                </View>
+              )}
+
+              {/* Mains Microtopics Filter */}
+              {mainsMicrotopicOptions.length > 1 && (
+                <View style={styles.filterGroup}>
+                  {renderFilterGroupHeader(
+                    'mainsMicrotopics',
+                    'MICROTOPICS (MAINS)',
+                    (filters.mainsMicrotopics || []).length === 0 ? 'All' : `${(filters.mainsMicrotopics || []).length}/${mainsMicrotopicOptions.length - 1}`,
+                    (filters.mainsMicrotopics || []).length > 0
+                  )}
+                  {!collapsedFilters.mainsMicrotopics && (
+                    <View style={styles.chipsWrap}>
+                      <TouchableOpacity
+                        onPress={() => toggleFilterChip('mainsMicrotopics', 'All')}
+                        style={[styles.fchip, (filters.mainsMicrotopics || []).length === 0 && { backgroundColor: '#EA580C', borderColor: '#EA580C' }]}
+                      >
+                        <Text style={[styles.fchipText, { color: (filters.mainsMicrotopics || []).length === 0 ? '#fff' : colors.textSecondary }]}>All</Text>
+                        {(filters.mainsMicrotopics || []).length === 0 && <Check size={10} color="#fff" style={{ marginLeft: 4 }} />}
+                      </TouchableOpacity>
+                      {mainsMicrotopicOptions.filter(x => x !== 'All').map(micro => {
+                        const isSelected = (filters.mainsMicrotopics || []).includes(micro);
+                        return (
+                          <TouchableOpacity
+                            key={micro}
+                            onPress={() => toggleFilterChip('mainsMicrotopics', micro)}
+                            style={[styles.fchip, isSelected && { backgroundColor: '#EA580C', borderColor: '#EA580C' }]}
+                          >
+                            <Text style={[styles.fchipText, { color: isSelected ? '#fff' : colors.textSecondary }]}>{micro}</Text>
+                            {isSelected && <Check size={10} color="#fff" style={{ marginLeft: 4 }} />}
+                          </TouchableOpacity>
+                        );
+                      })}
+                    </View>
+                  )}
+                </View>
+              )}
+
+              {/* Subtopics Filter */}
+              <View style={styles.filterGroup}>
+                {renderFilterGroupHeader(
+                  'mainsSubtopic',
+                  'SUBTOPICS (MAINS)',
+                  filters.subtopics.length === 0 ? 'All' : `${filters.subtopics.length}/${Math.max(mainsSubtopicOptions.length - 1, 1)}`,
+                  filters.subtopics.length > 0
+                )}
+                {!collapsedFilters.mainsSubtopic && (
+                  <View style={styles.chipsWrap}>
+                    <TouchableOpacity
+                      onPress={() => toggleFilterChip('subtopics', 'All')}
+                      style={[styles.fchip, filters.subtopics.length === 0 && { backgroundColor: '#EA580C', borderColor: '#EA580C' }]}
+                    >
+                      <Text style={[styles.fchipText, { color: filters.subtopics.length === 0 ? '#fff' : colors.textSecondary }]}>All</Text>
+                      {filters.subtopics.length === 0 && <Check size={10} color="#fff" style={{ marginLeft: 4 }} />}
+                    </TouchableOpacity>
+                    {mainsSubtopicOptions.filter(x => x !== 'All').map(sub => {
+                      const isSelected = filters.subtopics.includes(sub);
+                      return (
+                        <TouchableOpacity
+                          key={sub}
+                          onPress={() => toggleFilterChip('subtopics', sub)}
+                          style={[styles.fchip, isSelected && { backgroundColor: '#EA580C', borderColor: '#EA580C' }]}
+                        >
+                          <Text style={[styles.fchipText, { color: isSelected ? '#fff' : colors.textSecondary }]}>{sub}</Text>
+                          {isSelected && <Check size={10} color="#fff" style={{ marginLeft: 4 }} />}
+                        </TouchableOpacity>
+                      );
+                    })}
+                  </View>
+                )}
+              </View>
+
+              {/* Nanotopics Filter */}
+              <View style={styles.filterGroup}>
+                {renderFilterGroupHeader(
+                  'mainsNanotopic',
+                  'NANOTOPICS (MAINS)',
+                  filters.nanotopics.length === 0 ? 'All' : `${filters.nanotopics.length}/${Math.max(mainsNanotopicOptions.length - 1, 1)}`,
+                  filters.nanotopics.length > 0
+                )}
+                {!collapsedFilters.mainsNanotopic && (
+                  <View style={styles.chipsWrap}>
+                    <TouchableOpacity
+                      onPress={() => toggleFilterChip('nanotopics', 'All')}
+                      style={[styles.fchip, filters.nanotopics.length === 0 && { backgroundColor: '#EA580C', borderColor: '#EA580C' }]}
+                    >
+                      <Text style={[styles.fchipText, { color: filters.nanotopics.length === 0 ? '#fff' : colors.textSecondary }]}>All</Text>
+                      {filters.nanotopics.length === 0 && <Check size={10} color="#fff" style={{ marginLeft: 4 }} />}
+                    </TouchableOpacity>
+                    {mainsNanotopicOptions.filter(x => x !== 'All').map(nano => {
+                      const isSelected = filters.nanotopics.includes(nano);
+                      return (
+                        <TouchableOpacity
+                          key={nano}
+                          onPress={() => toggleFilterChip('nanotopics', nano)}
+                          style={[styles.fchip, isSelected && { backgroundColor: '#EA580C', borderColor: '#EA580C' }]}
+                        >
+                          <Text style={[styles.fchipText, { color: isSelected ? '#fff' : colors.textSecondary }]}>{nano}</Text>
+                          {isSelected && <Check size={10} color="#fff" style={{ marginLeft: 4 }} />}
+                        </TouchableOpacity>
+                      );
+                    })}
+                  </View>
+                )}
+              </View>
+
+              {/* Macro Tags Filter */}
+              <View style={styles.filterGroup}>
+                {renderFilterGroupHeader(
+                  'mainsMacrotag',
+                  'MACRO TAGS (MAINS)',
+                  filters.macrotags.length === 0 ? 'All' : `${filters.macrotags.length}/${Math.max(mainsMacrotagOptions.length - 1, 1)}`,
+                  filters.macrotags.length > 0
+                )}
+                {!collapsedFilters.mainsMacrotag && (
+                  <View style={styles.chipsWrap}>
+                    <TouchableOpacity
+                      onPress={() => toggleFilterChip('macrotags', 'All')}
+                      style={[styles.fchip, filters.macrotags.length === 0 && { backgroundColor: '#EA580C', borderColor: '#EA580C' }]}
+                    >
+                      <Text style={[styles.fchipText, { color: filters.macrotags.length === 0 ? '#fff' : colors.textSecondary }]}>All</Text>
+                      {filters.macrotags.length === 0 && <Check size={10} color="#fff" style={{ marginLeft: 4 }} />}
+                    </TouchableOpacity>
+                    {mainsMacrotagOptions.filter(x => x !== 'All').map(tag => {
+                      const isSelected = filters.macrotags.includes(tag);
+                      return (
+                        <TouchableOpacity
+                          key={tag}
+                          onPress={() => toggleFilterChip('macrotags', tag)}
+                          style={[styles.fchip, isSelected && { backgroundColor: '#EA580C', borderColor: '#EA580C' }]}
+                        >
+                          <Text style={[styles.fchipText, { color: isSelected ? '#fff' : colors.textSecondary }]}>{tag}</Text>
+                          {isSelected && <Check size={10} color="#fff" style={{ marginLeft: 4 }} />}
+                        </TouchableOpacity>
+                      );
+                    })}
+                  </View>
+                )}
+              </View>
+
+              {/* Micro Tags Filter */}
+              <View style={styles.filterGroup}>
+                {renderFilterGroupHeader(
+                  'mainsMicrotag',
+                  'MICRO TAGS (MAINS)',
+                  filters.microtags.length === 0 ? 'All' : `${filters.microtags.length}/${Math.max(mainsMicrotagOptions.length - 1, 1)}`,
+                  filters.microtags.length > 0
+                )}
+                {!collapsedFilters.mainsMicrotag && (
+                  <View style={styles.chipsWrap}>
+                    <TouchableOpacity
+                      onPress={() => toggleFilterChip('microtags', 'All')}
+                      style={[styles.fchip, filters.microtags.length === 0 && { backgroundColor: '#EA580C', borderColor: '#EA580C' }]}
+                    >
+                      <Text style={[styles.fchipText, { color: filters.microtags.length === 0 ? '#fff' : colors.textSecondary }]}>All</Text>
+                      {filters.microtags.length === 0 && <Check size={10} color="#fff" style={{ marginLeft: 4 }} />}
+                    </TouchableOpacity>
+                    {mainsMicrotagOptions.filter(x => x !== 'All').map(tag => {
+                      const isSelected = filters.microtags.includes(tag);
+                      return (
+                        <TouchableOpacity
+                          key={tag}
+                          onPress={() => toggleFilterChip('microtags', tag)}
+                          style={[styles.fchip, isSelected && { backgroundColor: '#EA580C', borderColor: '#EA580C' }]}
+                        >
+                          <Text style={[styles.fchipText, { color: isSelected ? '#fff' : colors.textSecondary }]}>{tag}</Text>
+                          {isSelected && <Check size={10} color="#fff" style={{ marginLeft: 4 }} />}
+                        </TouchableOpacity>
+                      );
+                    })}
+                  </View>
+                )}
+              </View>
+
+              {/* Mains Years */}
+              <View style={styles.filterGroup}>
+                {renderFilterGroupHeader(
+                  'mainsYear',
+                  'EXAM YEAR (MAINS)',
+                  filters.mainsYears.length === 0 ? 'All' : `${filters.mainsYears.length}/${Math.max(mainsYearOptions.length - 1, 1)}`,
+                  filters.mainsYears.length > 0
+                )}
+                {!collapsedFilters.mainsYear && (
+                  <View style={styles.chipsWrap}>
+                    <TouchableOpacity
+                      onPress={() => toggleFilterChip('mainsYears', 'All')}
+                      style={[styles.fchip, filters.mainsYears.length === 0 && { backgroundColor: '#EA580C', borderColor: '#EA580C' }]}
+                    >
+                      <Text style={[styles.fchipText, { color: filters.mainsYears.length === 0 ? '#fff' : colors.textSecondary }]}>All</Text>
+                      {filters.mainsYears.length === 0 && <Check size={10} color="#fff" style={{ marginLeft: 4 }} />}
+                    </TouchableOpacity>
+                    {mainsYearOptions.filter(x => x !== 'All').map(yr => {
+                      const isSelected = filters.mainsYears.includes(yr);
+                      return (
+                        <TouchableOpacity
+                          key={yr}
+                          onPress={() => toggleFilterChip('mainsYears', yr)}
+                          style={[styles.fchip, isSelected && { backgroundColor: '#EA580C', borderColor: '#EA580C' }]}
+                        >
+                          <Text style={[styles.fchipText, { color: isSelected ? '#fff' : colors.textSecondary }]}>{yr}</Text>
+                          {isSelected && <Check size={10} color="#fff" style={{ marginLeft: 4 }} />}
+                        </TouchableOpacity>
+                      );
+                    })}
+                  </View>
+                )}
+              </View>
+            </View>
+          )}
+        </View>
+      )}
+
+      {/* ═══════════════════════════════════════════════════════════════════════
+          SECTION 4: COMMON
+         ═══════════════════════════════════════════════════════════════════════ */}
+      <View style={{ marginBottom: 4 }}>
+        {renderAccordionHeader('common', '4. COMMON', activeSectionCounts.common, '#3B82F6')}
+        {openSections.common && (
+          <View style={{ marginBottom: 8 }}>
+            {/* PYQ Status */}
+            <View style={styles.filterGroup}>
+              {renderFilterGroupHeader(
+                'pyqStatus', 
+                'PYQ STATUS', 
+                filters.pyqFilter !== 'All' ? filters.pyqFilter : 'All',
+                filters.pyqFilter !== 'All'
+              )}
+              {!collapsedFilters.pyqStatus && (
                 <View style={styles.chipsWrap}>
-                  <TouchableOpacity
-                    onPress={() => toggleFilterChip('subjects', 'All')}
-                    style={[styles.fchip, filters.subjects.length === 0 && { backgroundColor: '#EA580C', borderColor: '#EA580C' }]}
-                  >
-                    <Text style={[styles.fchipText, { color: filters.subjects.length === 0 ? '#fff' : colors.textSecondary }]}>All</Text>
-                    {filters.subjects.length === 0 && <Check size={10} color="#fff" style={{ marginLeft: 4 }} />}
-                  </TouchableOpacity>
-                  {subjectOptions.filter(x => x !== 'All').map(sub => {
-                    const canonSub = canonicalizeSubject(sub);
-                    const isSelected = filters.subjects.some(s => canonicalizeSubject(s) === canonSub);
-                    const count = resultCounts.subjectCounts[canonSub] ?? 0;
+                  {(['All', 'PYQ Only', 'Non-PYQ'] as const).map(opt => {
+                    const isSelected = filters.pyqFilter === opt;
                     return (
                       <TouchableOpacity
-                        key={canonSub}
-                        onPress={() => toggleFilterChip('subjects', canonSub)}
-                        style={[styles.fchip, isSelected && { backgroundColor: '#EA580C', borderColor: '#EA580C' }]}
+                        key={opt}
+                        onPress={() => setFilters(p => ({ ...p, pyqFilter: opt }))}
+                        style={[styles.fchip, isSelected && { backgroundColor: colors.primary, borderColor: colors.primary }]}
                       >
-                        <Text style={[styles.fchipText, { color: isSelected ? '#fff' : colors.textSecondary }]}>{sub}</Text>
+                        <Text style={[styles.fchipText, { color: isSelected ? '#fff' : colors.textSecondary }]}>{opt}</Text>
+                        {isSelected && <Check size={10} color="#fff" style={{ marginLeft: 4 }} />}
+                      </TouchableOpacity>
+                    );
+                  })}
+                </View>
+              )}
+            </View>
+
+            {/* Institute Filter with Live Facet Counts */}
+            <View style={styles.filterGroup}>
+              {renderFilterGroupHeader(
+                'institute', 
+                'INSTITUTE', 
+                filters.institutes.length === 0 ? 'All' : `${filters.institutes.length}/${Math.max(instituteOptions.length - 1, 1)}`,
+                filters.institutes.length > 0
+              )}
+              {!collapsedFilters.institute && (
+                <View style={styles.chipsWrap}>
+                  <TouchableOpacity
+                    onPress={() => toggleFilterChip('institutes', 'All')}
+                    style={[styles.fchip, filters.institutes.length === 0 && { backgroundColor: colors.primary, borderColor: colors.primary }]}
+                  >
+                    <Text style={[styles.fchipText, { color: filters.institutes.length === 0 ? '#fff' : colors.textSecondary }]}>All</Text>
+                    {filters.institutes.length === 0 && <Check size={10} color="#fff" style={{ marginLeft: 4 }} />}
+                  </TouchableOpacity>
+                  {instituteOptions.filter(x => x !== 'All').map(inst => {
+                    const isSelected = filters.institutes.includes(inst);
+                    const count = resultCounts.instituteCounts[inst] ?? 0;
+                    return (
+                      <TouchableOpacity
+                        key={inst}
+                        onPress={() => toggleFilterChip('institutes', inst)}
+                        style={[styles.fchip, isSelected && { backgroundColor: colors.primary, borderColor: colors.primary }]}
+                      >
+                        <Text style={[styles.fchipText, { color: isSelected ? '#fff' : colors.textSecondary }]}>{inst}</Text>
                         {hasSearched && (
                           <Text style={{ fontSize: 9, fontWeight: '700', marginLeft: 4, color: isSelected ? '#fff' : colors.textTertiary }}>
                             ({count})
@@ -3114,339 +3951,132 @@ export default function IntegratedSearchScreen() {
                     );
                   })}
                 </View>
-              </View>
-            )}
-          </View>
+              )}
+            </View>
 
-          {/* Subtopics Filter */}
-          <View style={styles.filterGroup}>
-            {renderFilterGroupHeader(
-              'mainsSubtopic',
-              'SUBTOPICS (MAINS)',
-              filters.subtopics.length === 0 ? 'All' : `${filters.subtopics.length}/${Math.max(mainsSubtopicOptions.length - 1, 1)}`,
-              filters.subtopics.length > 0
-            )}
-            {!collapsedFilters.mainsSubtopic && (
-              <View style={styles.chipsWrap}>
-                <TouchableOpacity
-                  onPress={() => toggleFilterChip('subtopics', 'All')}
-                  style={[styles.fchip, filters.subtopics.length === 0 && { backgroundColor: '#EA580C', borderColor: '#EA580C' }]}
-                >
-                  <Text style={[styles.fchipText, { color: filters.subtopics.length === 0 ? '#fff' : colors.textSecondary }]}>All</Text>
-                  {filters.subtopics.length === 0 && <Check size={10} color="#fff" style={{ marginLeft: 4 }} />}
-                </TouchableOpacity>
-                {mainsSubtopicOptions.filter(x => x !== 'All').map(sub => {
-                  const isSelected = filters.subtopics.includes(sub);
-                  return (
-                    <TouchableOpacity
-                      key={sub}
-                      onPress={() => toggleFilterChip('subtopics', sub)}
-                      style={[styles.fchip, isSelected && { backgroundColor: '#EA580C', borderColor: '#EA580C' }]}
-                    >
-                      <Text style={[styles.fchipText, { color: isSelected ? '#fff' : colors.textSecondary }]}>{sub}</Text>
-                      {isSelected && <Check size={10} color="#fff" style={{ marginLeft: 4 }} />}
-                    </TouchableOpacity>
-                  );
-                })}
-              </View>
-            )}
-          </View>
+            {/* Programme Filter */}
+            <View style={styles.filterGroup}>
+              {renderFilterGroupHeader(
+                'programme', 
+                'PROGRAMME', 
+                filters.programmes.length === 0 ? 'All' : `${filters.programmes.length}/${Math.max(programmeOptions.length - 1, 1)}`,
+                filters.programmes.length > 0
+              )}
+              {!collapsedFilters.programme && (
+                <View style={styles.chipsWrap}>
+                  <TouchableOpacity
+                    onPress={() => toggleFilterChip('programmes', 'All')}
+                    style={[styles.fchip, filters.programmes.length === 0 && { backgroundColor: colors.primary, borderColor: colors.primary }]}
+                  >
+                    <Text style={[styles.fchipText, { color: filters.programmes.length === 0 ? '#fff' : colors.textSecondary }]}>All</Text>
+                    {filters.programmes.length === 0 && <Check size={10} color="#fff" style={{ marginLeft: 4 }} />}
+                  </TouchableOpacity>
+                  {programmeOptions.filter(x => x !== 'All').map(prog => {
+                    const isSelected = filters.programmes.includes(prog);
+                    return (
+                      <TouchableOpacity
+                        key={prog}
+                        onPress={() => toggleFilterChip('programmes', prog)}
+                        style={[styles.fchip, isSelected && { backgroundColor: colors.primary, borderColor: colors.primary }]}
+                      >
+                        <Text style={[styles.fchipText, { color: isSelected ? '#fff' : colors.textSecondary }]}>{prog}</Text>
+                        {isSelected && <Check size={10} color="#fff" style={{ marginLeft: 4 }} />}
+                      </TouchableOpacity>
+                    );
+                  })}
+                </View>
+              )}
+            </View>
 
-          {/* Nanotopics Filter */}
-          <View style={styles.filterGroup}>
-            {renderFilterGroupHeader(
-              'mainsNanotopic',
-              'NANOTOPICS (MAINS)',
-              filters.nanotopics.length === 0 ? 'All' : `${filters.nanotopics.length}/${Math.max(mainsNanotopicOptions.length - 1, 1)}`,
-              filters.nanotopics.length > 0
-            )}
-            {!collapsedFilters.mainsNanotopic && (
-              <View style={styles.chipsWrap}>
-                <TouchableOpacity
-                  onPress={() => toggleFilterChip('nanotopics', 'All')}
-                  style={[styles.fchip, filters.nanotopics.length === 0 && { backgroundColor: '#EA580C', borderColor: '#EA580C' }]}
-                >
-                  <Text style={[styles.fchipText, { color: filters.nanotopics.length === 0 ? '#fff' : colors.textSecondary }]}>All</Text>
-                  {filters.nanotopics.length === 0 && <Check size={10} color="#fff" style={{ marginLeft: 4 }} />}
-                </TouchableOpacity>
-                {mainsNanotopicOptions.filter(x => x !== 'All').map(nano => {
-                  const isSelected = filters.nanotopics.includes(nano);
-                  return (
+            {/* Revision Tags Filter */}
+            {userTags.length > 0 && (
+              <View style={styles.filterGroup}>
+                {renderFilterGroupHeader(
+                  'revisionTags',
+                  'REVISION TAGS',
+                  filters.revisionTags.length === 0 ? 'All' : `${filters.revisionTags.length}/${userTags.length}`,
+                  filters.revisionTags.length > 0
+                )}
+                {!collapsedFilters.revisionTags && (
+                  <View style={styles.chipsWrap}>
                     <TouchableOpacity
-                      key={nano}
-                      onPress={() => toggleFilterChip('nanotopics', nano)}
-                      style={[styles.fchip, isSelected && { backgroundColor: '#EA580C', borderColor: '#EA580C' }]}
+                      onPress={() => toggleFilterChip('revisionTags', 'All')}
+                      style={[styles.fchip, filters.revisionTags.length === 0 && { backgroundColor: colors.primary, borderColor: colors.primary }]}
                     >
-                      <Text style={[styles.fchipText, { color: isSelected ? '#fff' : colors.textSecondary }]}>{nano}</Text>
-                      {isSelected && <Check size={10} color="#fff" style={{ marginLeft: 4 }} />}
+                      <Text style={[styles.fchipText, { color: filters.revisionTags.length === 0 ? '#fff' : colors.textSecondary }]}>All</Text>
+                      {filters.revisionTags.length === 0 && <Check size={10} color="#fff" style={{ marginLeft: 4 }} />}
                     </TouchableOpacity>
-                  );
-                })}
+                    {userTags.map(tag => {
+                      const isSelected = filters.revisionTags.includes(tag);
+                      return (
+                        <TouchableOpacity
+                          key={tag}
+                          onPress={() => toggleFilterChip('revisionTags', tag)}
+                          style={[styles.fchip, isSelected && { backgroundColor: colors.primary, borderColor: colors.primary }]}
+                        >
+                          <Text style={[styles.fchipText, { color: isSelected ? '#fff' : colors.textSecondary }]}>{tag}</Text>
+                          {isSelected && <Check size={10} color="#fff" style={{ marginLeft: 4 }} />}
+                        </TouchableOpacity>
+                      );
+                    })}
+                  </View>
+                )}
               </View>
             )}
           </View>
-
-          {/* Macro Tags Filter */}
-          <View style={styles.filterGroup}>
-            {renderFilterGroupHeader(
-              'mainsMacrotag',
-              'MACRO TAGS (MAINS)',
-              filters.macrotags.length === 0 ? 'All' : `${filters.macrotags.length}/${Math.max(mainsMacrotagOptions.length - 1, 1)}`,
-              filters.macrotags.length > 0
-            )}
-            {!collapsedFilters.mainsMacrotag && (
-              <View style={styles.chipsWrap}>
-                <TouchableOpacity
-                  onPress={() => toggleFilterChip('macrotags', 'All')}
-                  style={[styles.fchip, filters.macrotags.length === 0 && { backgroundColor: '#EA580C', borderColor: '#EA580C' }]}
-                >
-                  <Text style={[styles.fchipText, { color: filters.macrotags.length === 0 ? '#fff' : colors.textSecondary }]}>All</Text>
-                  {filters.macrotags.length === 0 && <Check size={10} color="#fff" style={{ marginLeft: 4 }} />}
-                </TouchableOpacity>
-                {mainsMacrotagOptions.filter(x => x !== 'All').map(tag => {
-                  const isSelected = filters.macrotags.includes(tag);
-                  return (
-                    <TouchableOpacity
-                      key={tag}
-                      onPress={() => toggleFilterChip('macrotags', tag)}
-                      style={[styles.fchip, isSelected && { backgroundColor: '#EA580C', borderColor: '#EA580C' }]}
-                    >
-                      <Text style={[styles.fchipText, { color: isSelected ? '#fff' : colors.textSecondary }]}>{tag}</Text>
-                      {isSelected && <Check size={10} color="#fff" style={{ marginLeft: 4 }} />}
-                    </TouchableOpacity>
-                  );
-                })}
-              </View>
-            )}
-          </View>
-
-          {/* Micro Tags Filter */}
-          <View style={styles.filterGroup}>
-            {renderFilterGroupHeader(
-              'mainsMicrotag',
-              'MICRO TAGS (MAINS)',
-              filters.microtags.length === 0 ? 'All' : `${filters.microtags.length}/${Math.max(mainsMicrotagOptions.length - 1, 1)}`,
-              filters.microtags.length > 0
-            )}
-            {!collapsedFilters.mainsMicrotag && (
-              <View style={styles.chipsWrap}>
-                <TouchableOpacity
-                  onPress={() => toggleFilterChip('microtags', 'All')}
-                  style={[styles.fchip, filters.microtags.length === 0 && { backgroundColor: '#EA580C', borderColor: '#EA580C' }]}
-                >
-                  <Text style={[styles.fchipText, { color: filters.microtags.length === 0 ? '#fff' : colors.textSecondary }]}>All</Text>
-                  {filters.microtags.length === 0 && <Check size={10} color="#fff" style={{ marginLeft: 4 }} />}
-                </TouchableOpacity>
-                {mainsMicrotagOptions.filter(x => x !== 'All').map(tag => {
-                  const isSelected = filters.microtags.includes(tag);
-                  return (
-                    <TouchableOpacity
-                      key={tag}
-                      onPress={() => toggleFilterChip('microtags', tag)}
-                      style={[styles.fchip, isSelected && { backgroundColor: '#EA580C', borderColor: '#EA580C' }]}
-                    >
-                      <Text style={[styles.fchipText, { color: isSelected ? '#fff' : colors.textSecondary }]}>{tag}</Text>
-                      {isSelected && <Check size={10} color="#fff" style={{ marginLeft: 4 }} />}
-                    </TouchableOpacity>
-                  );
-                })}
-              </View>
-            )}
-          </View>
-
-          {/* Mains Years */}
-          <View style={styles.filterGroup}>
-            {renderFilterGroupHeader(
-              'mainsYear',
-              'EXAM YEAR (MAINS)',
-              filters.mainsYears.length === 0 ? 'All' : `${filters.mainsYears.length}/${Math.max(mainsYearOptions.length - 1, 1)}`,
-              filters.mainsYears.length > 0
-            )}
-            {!collapsedFilters.mainsYear && (
-              <View style={styles.chipsWrap}>
-                <TouchableOpacity
-                  onPress={() => toggleFilterChip('mainsYears', 'All')}
-                  style={[styles.fchip, filters.mainsYears.length === 0 && { backgroundColor: '#EA580C', borderColor: '#EA580C' }]}
-                >
-                  <Text style={[styles.fchipText, { color: filters.mainsYears.length === 0 ? '#fff' : colors.textSecondary }]}>All</Text>
-                  {filters.mainsYears.length === 0 && <Check size={10} color="#fff" style={{ marginLeft: 4 }} />}
-                </TouchableOpacity>
-                {mainsYearOptions.filter(x => x !== 'All').map(yr => {
-                  const isSelected = filters.mainsYears.includes(yr);
-                  return (
-                    <TouchableOpacity
-                      key={yr}
-                      onPress={() => toggleFilterChip('mainsYears', yr)}
-                      style={[styles.fchip, isSelected && { backgroundColor: '#EA580C', borderColor: '#EA580C' }]}
-                    >
-                      <Text style={[styles.fchipText, { color: isSelected ? '#fff' : colors.textSecondary }]}>{yr}</Text>
-                      {isSelected && <Check size={10} color="#fff" style={{ marginLeft: 4 }} />}
-                    </TouchableOpacity>
-                  );
-                })}
-              </View>
-            )}
-          </View>
-        </View>
-      )}
+        )}
+      </View>
 
       {/* ═══════════════════════════════════════════════════════════════════════
-          SECTION 4: COMMON
+          SECTION 5: DISPLAY & READING
          ═══════════════════════════════════════════════════════════════════════ */}
-      <View style={{ marginTop: 8, marginBottom: 12, paddingBottom: 4, borderBottomWidth: 1, borderBottomColor: colors.border }}>
-        <Text style={{ fontSize: 11, fontWeight: '900', color: colors.textSecondary, letterSpacing: 1.2 }}>
-          4. COMMON
-        </Text>
-      </View>
-
-      {/* PYQ Status */}
-      <View style={styles.filterGroup}>
-        {renderFilterGroupHeader(
-          'pyqStatus', 
-          'PYQ STATUS', 
-          filters.pyqFilter !== 'All' ? filters.pyqFilter : 'All',
-          filters.pyqFilter !== 'All'
-        )}
-        {!collapsedFilters.pyqStatus && (
-          <View style={styles.chipsWrap}>
-            {(['All', 'PYQ Only', 'Non-PYQ'] as const).map(opt => {
-              const isSelected = filters.pyqFilter === opt;
-              return (
-                <TouchableOpacity
-                  key={opt}
-                  onPress={() => setFilters(p => ({ ...p, pyqFilter: opt }))}
-                  style={[styles.fchip, isSelected && { backgroundColor: colors.primary, borderColor: colors.primary }]}
-                >
-                  <Text style={[styles.fchipText, { color: isSelected ? '#fff' : colors.textSecondary }]}>{opt}</Text>
-                  {isSelected && <Check size={10} color="#fff" style={{ marginLeft: 4 }} />}
-                </TouchableOpacity>
-              );
-            })}
+      <View style={{ marginBottom: 4 }}>
+        {renderAccordionHeader('display', '5. DISPLAY & READING', 0, '#8B5CF6')}
+        {openSections.display && (
+          <View style={{ marginBottom: 8 }}>
+            <SidebarDisplayPreferences
+              textColorMode={textColorMode}
+              onChangeTextColorMode={handleUpdateTextColorMode}
+              keyBoxMode={keyBoxMode}
+              onChangeKeyBoxMode={handleUpdateKeyBoxMode}
+              keyBoxColor={keyBoxColor}
+              onChangeKeyBoxColor={handleUpdateKeyBoxColor}
+              colors={colors}
+              isDark={isDark}
+            />
           </View>
         )}
       </View>
 
-      {/* Institute Filter with Live Facet Counts */}
-      <View style={styles.filterGroup}>
-        {renderFilterGroupHeader(
-          'institute', 
-          'INSTITUTE', 
-          filters.institutes.length === 0 ? 'All' : `${filters.institutes.length}/${Math.max(instituteOptions.length - 1, 1)}`,
-          filters.institutes.length > 0
-        )}
-        {!collapsedFilters.institute && (
-          <View style={styles.chipsWrap}>
-            <TouchableOpacity
-              onPress={() => toggleFilterChip('institutes', 'All')}
-              style={[styles.fchip, filters.institutes.length === 0 && { backgroundColor: colors.primary, borderColor: colors.primary }]}
-            >
-              <Text style={[styles.fchipText, { color: filters.institutes.length === 0 ? '#fff' : colors.textSecondary }]}>All</Text>
-              {filters.institutes.length === 0 && <Check size={10} color="#fff" style={{ marginLeft: 4 }} />}
-            </TouchableOpacity>
-            {instituteOptions.filter(x => x !== 'All').map(inst => {
-              const isSelected = filters.institutes.includes(inst);
-              const count = resultCounts.instituteCounts[inst] ?? 0;
-              return (
-                <TouchableOpacity
-                  key={inst}
-                  onPress={() => toggleFilterChip('institutes', inst)}
-                  style={[styles.fchip, isSelected && { backgroundColor: colors.primary, borderColor: colors.primary }]}
-                >
-                  <Text style={[styles.fchipText, { color: isSelected ? '#fff' : colors.textSecondary }]}>{inst}</Text>
-                  {hasSearched && (
-                    <Text style={{ fontSize: 9, fontWeight: '700', marginLeft: 4, color: isSelected ? '#fff' : colors.textTertiary }}>
-                      ({count})
-                    </Text>
-                  )}
-                  {isSelected && <Check size={10} color="#fff" style={{ marginLeft: 4 }} />}
-                </TouchableOpacity>
-              );
-            })}
-          </View>
-        )}
-      </View>
-
-      {/* Programme Filter */}
-      <View style={styles.filterGroup}>
-        {renderFilterGroupHeader(
-          'programme', 
-          'PROGRAMME', 
-          filters.programmes.length === 0 ? 'All' : `${filters.programmes.length}/${Math.max(programmeOptions.length - 1, 1)}`,
-          filters.programmes.length > 0
-        )}
-        {!collapsedFilters.programme && (
-          <View style={styles.chipsWrap}>
-            <TouchableOpacity
-              onPress={() => toggleFilterChip('programmes', 'All')}
-              style={[styles.fchip, filters.programmes.length === 0 && { backgroundColor: colors.primary, borderColor: colors.primary }]}
-            >
-              <Text style={[styles.fchipText, { color: filters.programmes.length === 0 ? '#fff' : colors.textSecondary }]}>All</Text>
-              {filters.programmes.length === 0 && <Check size={10} color="#fff" style={{ marginLeft: 4 }} />}
-            </TouchableOpacity>
-            {programmeOptions.filter(x => x !== 'All').map(prog => {
-              const isSelected = filters.programmes.includes(prog);
-              return (
-                <TouchableOpacity
-                  key={prog}
-                  onPress={() => toggleFilterChip('programmes', prog)}
-                  style={[styles.fchip, isSelected && { backgroundColor: colors.primary, borderColor: colors.primary }]}
-                >
-                  <Text style={[styles.fchipText, { color: isSelected ? '#fff' : colors.textSecondary }]}>{prog}</Text>
-                  {isSelected && <Check size={10} color="#fff" style={{ marginLeft: 4 }} />}
-                </TouchableOpacity>
-              );
-            })}
-          </View>
-        )}
-      </View>
-
-      {/* Revision Tags Filter */}
-      {userTags.length > 0 && (
-        <View style={styles.filterGroup}>
-          {renderFilterGroupHeader(
-            'revisionTags',
-            'REVISION TAGS',
-            filters.revisionTags.length === 0 ? 'All' : `${filters.revisionTags.length}/${userTags.length}`,
-            filters.revisionTags.length > 0
+      {/* Parity Extra: Force Sync Data Button */}
+      <View style={{ marginTop: 16, paddingTop: 14, borderTopWidth: 0.5, borderTopColor: colors.border, marginBottom: 20 }}>
+        <TouchableOpacity
+          onPress={handleForceSync}
+          disabled={syncing}
+          activeOpacity={0.7}
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'center',
+            paddingVertical: 10,
+            paddingHorizontal: 14,
+            borderRadius: 10,
+            backgroundColor: isDark ? '#1e293b' : '#f1f5f9',
+            borderWidth: 1,
+            borderColor: colors.border,
+            gap: 8,
+          }}
+        >
+          {syncing ? (
+            <ActivityIndicator size="small" color={colors.primary} />
+          ) : (
+            <RefreshCw size={14} color={colors.textSecondary} />
           )}
-          {!collapsedFilters.revisionTags && (
-            <View style={styles.chipsWrap}>
-              <TouchableOpacity
-                onPress={() => toggleFilterChip('revisionTags', 'All')}
-                style={[styles.fchip, filters.revisionTags.length === 0 && { backgroundColor: colors.primary, borderColor: colors.primary }]}
-              >
-                <Text style={[styles.fchipText, { color: filters.revisionTags.length === 0 ? '#fff' : colors.textSecondary }]}>All</Text>
-                {filters.revisionTags.length === 0 && <Check size={10} color="#fff" style={{ marginLeft: 4 }} />}
-              </TouchableOpacity>
-              {userTags.map(tag => {
-                const isSelected = filters.revisionTags.includes(tag);
-                return (
-                  <TouchableOpacity
-                    key={tag}
-                    onPress={() => toggleFilterChip('revisionTags', tag)}
-                    style={[styles.fchip, isSelected && { backgroundColor: colors.primary, borderColor: colors.primary }]}
-                  >
-                    <Text style={[styles.fchipText, { color: isSelected ? '#fff' : colors.textSecondary }]}>{tag}</Text>
-                    {isSelected && <Check size={10} color="#fff" style={{ marginLeft: 4 }} />}
-                  </TouchableOpacity>
-                );
-              })}
-            </View>
-          )}
-        </View>
-      )}
-
-      {/* READING & DISPLAY PREFERENCES */}
-      <SidebarDisplayPreferences
-        textColorMode={textColorMode}
-        onChangeTextColorMode={handleUpdateTextColorMode}
-        keyBoxMode={keyBoxMode}
-        onChangeKeyBoxMode={handleUpdateKeyBoxMode}
-        keyBoxColor={keyBoxColor}
-        onChangeKeyBoxColor={handleUpdateKeyBoxColor}
-        colors={colors}
-        isDark={isDark}
-      />
+          <Text style={{ fontSize: 12, fontWeight: '700', color: colors.textSecondary }}>
+            {syncing ? 'Syncing Mains...' : 'Force Sync Data'}
+          </Text>
+        </TouchableOpacity>
+      </View>
     </ScrollView>
   );
 
@@ -3637,6 +4267,60 @@ export default function IntegratedSearchScreen() {
             </View>
           )}
         </View>
+
+        {/* Active Filters Horizontal Chip Bar */}
+        {hasSearched && activeFilterChips.length > 0 && (
+          <View style={{
+            paddingHorizontal: 16,
+            paddingVertical: 7,
+            borderBottomWidth: 0.5,
+            borderBottomColor: colors.border,
+            backgroundColor: isDark ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.01)',
+          }}>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ alignItems: 'center', gap: 6 }}>
+              {activeFilterChips.map(chip => (
+                <TouchableOpacity
+                  key={chip.id}
+                  onPress={chip.onRemove}
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    backgroundColor: colors.primary + '18',
+                    borderWidth: 1,
+                    borderColor: colors.primary + '35',
+                    paddingHorizontal: 8,
+                    paddingVertical: 4,
+                    borderRadius: 12,
+                    gap: 5,
+                  }}
+                >
+                  <Text style={{ fontSize: 11, fontWeight: '600', color: colors.primary }}>
+                    {chip.label}
+                  </Text>
+                  <X size={12} color={colors.primary} />
+                </TouchableOpacity>
+              ))}
+
+              {activeFilterCount > 1 && (
+                <TouchableOpacity
+                  onPress={() => setFilters(DEFAULT_FILTERS)}
+                  style={{
+                    paddingHorizontal: 8,
+                    paddingVertical: 4,
+                    borderRadius: 12,
+                    backgroundColor: '#ef444415',
+                    borderWidth: 1,
+                    borderColor: '#ef444435',
+                  }}
+                >
+                  <Text style={{ fontSize: 11, fontWeight: '700', color: '#ef4444' }}>
+                    Clear all
+                  </Text>
+                </TouchableOpacity>
+              )}
+            </ScrollView>
+          </View>
+        )}
 
         {/* Consolidated Results Header */}
         {!loading && activeResults.length > 0 && (
@@ -4812,5 +5496,20 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     borderWidth: 1,
     borderColor: 'transparent',
+  },
+  sidebarSectionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: 9,
+    paddingHorizontal: 10,
+    borderRadius: 10,
+    borderWidth: 0.5,
+    borderColor: 'transparent',
+    marginVertical: 2,
+  },
+  sidebarSectionHeaderActive: {
+    backgroundColor: 'rgba(124, 58, 237, 0.05)',
+    borderColor: 'rgba(124, 58, 237, 0.12)',
   },
 });

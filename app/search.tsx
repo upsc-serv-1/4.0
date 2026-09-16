@@ -41,6 +41,8 @@ import {
   ChevronUp,
   ExternalLink,
   RotateCcw,
+  Clock,
+  Play,
 } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -78,7 +80,7 @@ import {
   normalizeQuestionKey,
   buildTopperAttachmentMap,
 } from '../src/utils/topperHelpers';
-import { DetailedQuestionView, ValueAddCardBody, getMarkdownRules, parseIntroductoryBox } from './mains';
+import { DetailedQuestionView, ValueAddCardBody, getMarkdownRules, parseIntroductoryBox, resolveItemConcept } from './mains';
 import MainsQuestionCard from '../src/components/mains/MainsQuestionCard';
 import SidebarDisplayPreferences from '../src/components/mains/SidebarDisplayPreferences';
 import {
@@ -696,7 +698,10 @@ export default function IntegratedSearchScreen() {
   const [excludedKeywords, setExcludedKeywords] = useState<Set<string>>(new Set());
 
   // Sorting
-  const [sortMode, setSortMode] = useState<'Relevance' | 'Year' | 'Subject'>('Relevance');
+  const [sortMode, setSortMode] = useState<'Relevance' | 'Year' | 'Subject' | 'Concept'>('Relevance');
+
+  // Engine mode picker bottom sheet
+  const [modePickerOpen, setModePickerOpen] = useState(false);
 
   // Inline Expand / Collapse State
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
@@ -2103,6 +2108,19 @@ export default function IntegratedSearchScreen() {
       });
     }
 
+    if (sortMode === 'Concept') {
+      return list.sort((a, b) => {
+        const cA = a.type === 'prelims'
+          ? (a.rawItem?.micro_topic || a.rawItem?.section_group || a.subject || 'General')
+          : resolveItemConcept(a.rawItem || a);
+        const cB = b.type === 'prelims'
+          ? (b.rawItem?.micro_topic || b.rawItem?.section_group || b.subject || 'General')
+          : resolveItemConcept(b.rawItem || b);
+        if (cA !== cB) return cA.localeCompare(cB);
+        return withinGroupSorter(a, b);
+      });
+    }
+
     // Exact matches always come first, followed by semantic/fuzzy matches
     const exactMatches = list.filter(isExactMatch).sort(withinGroupSorter);
     const semanticMatches = list.filter(r => !isExactMatch(r)).sort(withinGroupSorter);
@@ -2111,6 +2129,7 @@ export default function IntegratedSearchScreen() {
   }, [results, filters, excludedKeywords, sortMode, sidebarSubjectFilter, userQuestionStates, prelimsTaggedMap, query]);
 
   const activeResults = sortedAndFilteredResults;
+  const prelimsCount = useMemo(() => activeResults.filter(r => r.type === 'prelims').length, [activeResults]);
   const activeFilterCount = useMemo(() => countActiveFilters(filters), [filters]);
 
   // Toggle expanded state for Mains & Value Addition items
@@ -3431,91 +3450,9 @@ export default function IntegratedSearchScreen() {
     </ScrollView>
   );
 
-  const renderHistoryDropdown = () => {
-    if (!showHistory || searchHistory.length === 0) return null;
-    return (
-      <View style={[styles.historyDropdown, { backgroundColor: colors.surface, borderColor: colors.border, position: 'absolute', top: '100%', left: 0, right: 0, marginHorizontal: 0, marginTop: 4, zIndex: 1000 }]}>
-        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 12, paddingTop: 8, paddingBottom: 6 }}>
-          <Text style={{ fontSize: 10, fontWeight: '800', color: colors.textTertiary, letterSpacing: 0.5 }}>RECENT SEARCHES</Text>
-          <TouchableOpacity onPressIn={() => {
-            setSearchHistory([]);
-            clearSearchHistory().catch(() => {});
-            setShowHistory(false);
-          }}>
-            <Text style={{ fontSize: 10, fontWeight: '700', color: colors.textTertiary }}>Clear</Text>
-          </TouchableOpacity>
-        </View>
-        {searchHistory.map((h, i) => (
-          <TouchableOpacity
-            key={i}
-            style={[styles.historyItem, { borderBottomColor: colors.border }]}
-            onPressIn={() => { setQuery(h); setShowHistory(false); runIntegratedSearch(h, filters); }}
-          >
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, flex: 1 }}>
-              <Text style={{ fontSize: 13, fontWeight: '500', color: colors.textSecondary }} numberOfLines={1}>{h}</Text>
-            </View>
-            <TouchableOpacity
-              onPressIn={() => {
-                removeSearchItem(h)
-                  .then(next => setSearchHistory(next))
-                  .catch(() => {});
-              }}
-              style={{ padding: 4 }}
-            >
-              <X size={12} color={colors.textTertiary} />
-            </TouchableOpacity>
-          </TouchableOpacity>
-        ))}
-      </View>
-    );
-  };
-
   const renderFlatListHeader = () => {
     return (
       <View style={{ backgroundColor: colors.bg, zIndex: 999 }}>
-        {/* Header Bar inside FlatList (only shown on landing page, hidden once searched) */}
-        {!hasSearched && (
-          <View style={[styles.header, { borderBottomColor: colors.border, paddingTop: insets.top, paddingHorizontal: 16, height: 60 }]}>
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-              <TouchableOpacity
-                onPress={() => router.back()}
-                style={{ padding: 8, marginLeft: -8 }}
-                hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
-                testID="search-back-button"
-              >
-                <ChevronLeft size={24} color={colors.textPrimary} />
-              </TouchableOpacity>
-              <Image
-                source={require('../assets/icon.png')}
-                style={{ width: 28, height: 28, borderRadius: 6 }}
-                resizeMode="contain"
-              />
-              <Text style={[styles.headerTitle, { color: colors.textPrimary }]}>Dr. UPSC AI Search</Text>
-            </View>
-            
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
-              <TouchableOpacity
-                onPress={toggleMainsTheme}
-                style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  backgroundColor: colors.surface + '88',
-                  borderWidth: 1,
-                  borderColor: colors.border,
-                  paddingHorizontal: 10,
-                  paddingVertical: 6,
-                  borderRadius: 12,
-                }}
-              >
-                <Palette size={16} color={mainsTheme === 'gradient' ? colors.primary : colors.textSecondary} />
-                <Text style={{ fontSize: 12, fontWeight: '600', color: mainsTheme === 'gradient' ? colors.primary : colors.textSecondary, marginLeft: 4 }}>
-                  {mainsTheme === 'gradient' ? 'Theme 1' : 'Theme 2'}
-                </Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        )}
-
         {/* Search Input Bar */}
         <View style={{
           paddingHorizontal: 16,
@@ -3558,25 +3495,52 @@ export default function IntegratedSearchScreen() {
               </TouchableOpacity>
             )}
 
-            <View style={[styles.searchBox, { backgroundColor: colors.surface, borderColor: colors.border, flex: 1 }]}>
-              <Search size={18} color={colors.textTertiary} />
+            <View style={[styles.searchBox, { backgroundColor: colors.surface, borderColor: colors.border, flex: 1, paddingLeft: 10 }]}>
+              {/* Compact Engine Mode Badge */}
+              <TouchableOpacity
+                onPress={() => setModePickerOpen(true)}
+                activeOpacity={0.7}
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  gap: 3,
+                  backgroundColor:
+                    searchEngineMode === 'AI' ? '#7c3aed15' :
+                    searchEngineMode === 'AI+Fuzzy' ? '#06b6d415' :
+                    searchEngineMode === 'Matching' ? '#0ea5e915' : '#f59e0b15',
+                  paddingHorizontal: 7,
+                  paddingVertical: 4,
+                  borderRadius: 10,
+                  marginRight: 6,
+                }}
+              >
+                {searchEngineMode === 'AI' && <Brain size={11} color="#7c3aed" />}
+                {searchEngineMode === 'AI+Fuzzy' && <Zap size={11} color="#06b6d4" />}
+                {searchEngineMode === 'Matching' && <Zap size={11} color="#0ea5e9" />}
+                {searchEngineMode === 'Exact' && <Target size={11} color="#f59e0b" />}
+                <Text
+                  style={{
+                    fontSize: 10,
+                    fontWeight: '800',
+                    color:
+                      searchEngineMode === 'AI' ? '#7c3aed' :
+                      searchEngineMode === 'AI+Fuzzy' ? '#06b6d4' :
+                      searchEngineMode === 'Matching' ? '#0ea5e9' : '#f59e0b',
+                  }}
+                >
+                  {searchEngineMode === 'AI' ? 'AI' : searchEngineMode === 'AI+Fuzzy' ? 'AI+Fuzzy' : searchEngineMode === 'Matching' ? 'Fuzzy' : 'Exact'}
+                </Text>
+                <ChevronDown size={10} color={colors.textTertiary} />
+              </TouchableOpacity>
+
               <TextInput
                 placeholder="Search concepts across Prelims, Mains, and Value Addition..."
                 placeholderTextColor={colors.textTertiary}
                 value={query}
                 onChangeText={setQuery}
                 returnKeyType="search"
-                onFocus={() => {
-                  loadSearchHistory().then(h => {
-                    setSearchHistory(h);
-                    if (h.length > 0) setShowHistory(true);
-                  }).catch(() => {
-                    if (searchHistory.length > 0) setShowHistory(true);
-                  });
-                }}
-                onBlur={() => setTimeout(() => setShowHistory(false), 200)}
                 onSubmitEditing={() => runIntegratedSearch(query, filters)}
-                style={[styles.input, { color: colors.textPrimary }]}
+                style={[styles.input, { color: colors.textPrimary, fontSize: 14 }]}
               />
               {query.length > 0 && (
                 <TouchableOpacity onPress={() => { setQuery(''); }}>
@@ -3617,139 +3581,90 @@ export default function IntegratedSearchScreen() {
             >
               {loading ? <ActivityIndicator size="small" color="#fff" /> : <ChevronRight size={18} color="#fff" />}
             </TouchableOpacity>
-            {renderHistoryDropdown()}
           </View>
 
-          {/* Engine mode switchers */}
-          <View style={{ flexDirection: 'row', gap: 6, marginTop: 8 }}>
-            {([
-              { mode: 'AI' as const, icon: <Brain size={10} color={searchEngineMode === 'AI' ? '#fff' : '#7c3aed'} />, label: 'AI Semantic' },
-              { mode: 'AI+Fuzzy' as const, icon: <Zap size={10} color={searchEngineMode === 'AI+Fuzzy' ? '#fff' : '#06b6d4'} />, label: 'AI+Fuzzy' },
-              { mode: 'Matching' as const, icon: <Zap size={10} color={searchEngineMode === 'Matching' ? '#fff' : colors.textSecondary} />, label: 'Fuzzy' },
-              { mode: 'Exact' as const, icon: <Target size={10} color={searchEngineMode === 'Exact' ? '#fff' : colors.textSecondary} />, label: 'Exact' },
-            ]).map(({ mode, icon, label }) => (
-              <TouchableOpacity
-                key={mode}
-                onPress={() => {
-                  setSearchEngineMode(mode);
-                  if (hasSearched && query.trim()) runIntegratedSearch(query, filters, mode);
-                }}
-                style={[
-                  styles.modeBtn,
-                  {
-                    backgroundColor: searchEngineMode === mode
-                      ? (mode === 'AI' ? '#7c3aed' : (mode === 'AI+Fuzzy' ? '#06b6d4' : (mode === 'Matching' ? '#0ea5e9' : '#f59e0b')))
-                      : colors.surface,
-                    borderColor: searchEngineMode === mode ? 'transparent' : colors.border,
-                  }
-                ]}
-              >
-                {icon}
-                <Text style={[styles.modeBtnText, { color: searchEngineMode === mode ? '#fff' : colors.textSecondary }]}>{label}</Text>
-              </TouchableOpacity>
-            ))}
-          </View>
-
-          {/* Keywords panel */}
+          {/* AI Keywords 1-line horizontal scroll strip */}
           {keywords.length > 0 && (
-            <View style={{ marginTop: 8 }}>
-              <TouchableOpacity
-                onPress={() => setKeywordsExpanded(prev => !prev)}
-                style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 4 }}
-              >
-                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, flex: 1 }}>
-                  <Sparkles size={11} color="#7c3aed" />
-                  <Text style={{ fontSize: 10, fontWeight: '800', color: '#7c3aed', letterSpacing: 0.5 }}>
-                    {keywords.length - excludedKeywords.size}/{keywords.length} AI KEYWORDS USED
-                  </Text>
-                </View>
-                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-                  {excludedKeywords.size > 0 && (
-                    <TouchableOpacity onPress={() => setExcludedKeywords(new Set())} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
-                      <Text style={{ fontSize: 10, fontWeight: '700', color: '#EF4444' }}>Clear All</Text>
-                    </TouchableOpacity>
-                  )}
-                  {keywordsExpanded ? <ChevronUp size={13} color="#7c3aed" /> : <ChevronDown size={13} color={colors.textTertiary} />}
-                </View>
-              </TouchableOpacity>
+            <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 8, gap: 6 }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: '#7c3aed15', paddingHorizontal: 7, paddingVertical: 4, borderRadius: 10 }}>
+                <Sparkles size={11} color="#7c3aed" />
+                <Text style={{ fontSize: 10, fontWeight: '800', color: '#7c3aed' }}>
+                  {keywords.length - excludedKeywords.size}/{keywords.length} AI
+                </Text>
+              </View>
 
-              {keywordsExpanded && (
-                <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 4, marginTop: 4 }}>
-                  {keywords.map((kw, i) => {
-                    const isExcluded = excludedKeywords.has(kw);
-                    return (
-                      <TouchableOpacity
-                        key={i}
-                        onPress={() => toggleExcludedKeyword(kw)}
-                        style={[
-                          styles.pill,
-                          {
-                            backgroundColor: isExcluded ? '#f1f5f9' : '#ede9fe',
-                            borderColor: isExcluded ? colors.border : '#c4b5fd',
-                            opacity: isExcluded ? 0.5 : 1,
-                          }
-                        ]}
-                      >
-                        <Text
-                          style={{
-                            fontSize: 10,
-                            fontWeight: '700',
-                            color: isExcluded ? colors.textTertiary : '#7c3aed',
-                            textDecorationLine: isExcluded ? 'line-through' : 'none',
-                          }}
-                        >
-                          {kw}
-                        </Text>
-                      </TouchableOpacity>
-                    );
-                  })}
-                </View>
+              {excludedKeywords.size > 0 && (
+                <TouchableOpacity
+                  onPress={() => setExcludedKeywords(new Set())}
+                  style={{ backgroundColor: '#fee2e2', paddingHorizontal: 6, paddingVertical: 4, borderRadius: 10 }}
+                >
+                  <Text style={{ fontSize: 9, fontWeight: '800', color: '#ef4444' }}>Reset</Text>
+                </TouchableOpacity>
               )}
+
+              <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 4, paddingRight: 8 }}>
+                {keywords.map((kw, i) => {
+                  const isExcluded = excludedKeywords.has(kw);
+                  return (
+                    <TouchableOpacity
+                      key={i}
+                      onPress={() => toggleExcludedKeyword(kw)}
+                      style={[
+                        styles.pill,
+                        {
+                          backgroundColor: isExcluded ? (isDark ? '#334155' : '#f1f5f9') : '#ede9fe',
+                          borderColor: isExcluded ? colors.border : '#c4b5fd',
+                          opacity: isExcluded ? 0.45 : 1,
+                          paddingVertical: 3,
+                          paddingHorizontal: 8,
+                        }
+                      ]}
+                    >
+                      <Text
+                        style={{
+                          fontSize: 10,
+                          fontWeight: '700',
+                          color: isExcluded ? colors.textTertiary : '#7c3aed',
+                          textDecorationLine: isExcluded ? 'line-through' : 'none',
+                        }}
+                      >
+                        {kw}
+                      </Text>
+                    </TouchableOpacity>
+                  );
+                })}
+              </ScrollView>
             </View>
           )}
         </View>
 
-        {/* Relevance / Year / Subject sorting headers */}
+        {/* Consolidated Results Header */}
         {!loading && activeResults.length > 0 && (
-          <View style={[styles.resultsHeader, { borderBottomColor: colors.border }]}>
-            <View style={{ flex: 1 }}>
-              <Text style={{ fontSize: 11, fontWeight: '700', color: colors.textTertiary }}>
-                {activeResults.length} results
-              </Text>
-              <View style={{ flexDirection: 'row', gap: 6, marginTop: 6 }}>
-                {(['Relevance', 'Year', 'Subject'] as const).map((s) => (
-                  <TouchableOpacity
-                    key={s}
-                    onPress={() => setSortMode(s)}
-                    style={[
-                      styles.sortBtn,
-                      { backgroundColor: sortMode === s ? '#7c3aed' : colors.surfaceStrong }
-                    ]}
-                  >
-                    <Text style={[styles.sortBtnText, { color: sortMode === s ? '#fff' : colors.textSecondary }]}>
-                      {s}
-                    </Text>
-                  </TouchableOpacity>
-                ))}
-              </View>
-            </View>
+          <View style={[styles.resultsHeader, { borderBottomColor: colors.border, paddingVertical: 8, alignItems: 'center', flexDirection: 'row', justifyContent: 'space-between' }]}>
+            <Text style={{ fontSize: 12, fontWeight: '800', color: colors.textSecondary }}>
+              {activeResults.length} results
+            </Text>
 
-            {/* Learn / Exam launch buttons */}
-            <View style={{ flexDirection: 'row', gap: 6 }}>
-              <TouchableOpacity
-                onPress={() => openBatchQuiz('learning')}
-                style={[styles.batchBtn, { backgroundColor: colors.surfaceStrong, borderColor: colors.border }]}
-              >
-                <BookOpen size={12} color={colors.primary} />
-                <Text style={{ fontSize: 10, fontWeight: '800', color: colors.primary }}>Learn</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={() => openBatchQuiz('exam')}
-                style={[styles.batchBtn, { backgroundColor: '#7c3aed', borderColor: '#7c3aed' }]}
-              >
-                <Target size={12} color="#fff" />
-                <Text style={{ fontSize: 10, fontWeight: '800', color: '#fff' }}>Exam</Text>
-              </TouchableOpacity>
+            <View style={{ flexDirection: 'row', backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)', borderRadius: 16, padding: 2, gap: 2 }}>
+              {(['Relevance', 'Year', 'Subject', 'Concept'] as const).map((s) => (
+                <TouchableOpacity
+                  key={s}
+                  onPress={() => setSortMode(s)}
+                  style={[
+                    styles.sortBtn,
+                    {
+                      backgroundColor: sortMode === s ? colors.primary : 'transparent',
+                      paddingHorizontal: 9,
+                      paddingVertical: 4,
+                      borderRadius: 14,
+                    }
+                  ]}
+                >
+                  <Text style={[styles.sortBtnText, { color: sortMode === s ? '#fff' : colors.textTertiary, fontSize: 10 }]}>
+                    {s}
+                  </Text>
+                </TouchableOpacity>
+              ))}
             </View>
           </View>
         )}
@@ -3810,24 +3725,6 @@ export default function IntegratedSearchScreen() {
             </View>
             
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
-              <TouchableOpacity
-                onPress={toggleMainsTheme}
-                style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  backgroundColor: colors.surface + '88',
-                  borderWidth: 1,
-                  borderColor: colors.border,
-                  paddingHorizontal: 10,
-                  paddingVertical: 6,
-                  borderRadius: 12,
-                }}
-              >
-                <Palette size={16} color={mainsTheme === 'gradient' ? colors.primary : colors.textSecondary} />
-                <Text style={{ fontSize: 12, fontWeight: '600', color: mainsTheme === 'gradient' ? colors.primary : colors.textSecondary, marginLeft: 4 }}>
-                  {mainsTheme === 'gradient' ? 'Theme 1' : 'Theme 2'}
-                </Text>
-              </TouchableOpacity>
               {IS_IPAD && (
                 <TouchableOpacity
                   onPress={() => setSidebarOpen(!sidebarOpen)}
@@ -3866,33 +3763,50 @@ export default function IntegratedSearchScreen() {
             {/* Centered Search Bar */}
             <View style={{ width: '100%', maxWidth: 580, position: 'relative', zIndex: 999 }}>
               <View style={{ flexDirection: 'row', gap: 8, position: 'relative', zIndex: 999 }}>
-                <View style={[styles.searchBox, { height: 52, borderRadius: 26, paddingHorizontal: 18, backgroundColor: colors.surface, borderColor: colors.border, flex: 1 }]}>
-                  <Search size={20} color={colors.textTertiary} />
+                <View style={[styles.searchBox, { height: 52, borderRadius: 26, paddingHorizontal: 14, backgroundColor: colors.surface, borderColor: colors.border, flex: 1, alignItems: 'center' }]}>
+                  {/* Compact Engine Mode Badge */}
+                  <TouchableOpacity
+                    onPress={() => setModePickerOpen(true)}
+                    activeOpacity={0.7}
+                    style={{
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      gap: 4,
+                      backgroundColor:
+                        searchEngineMode === 'AI' ? '#7c3aed15' :
+                        searchEngineMode === 'AI+Fuzzy' ? '#06b6d415' :
+                        searchEngineMode === 'Matching' ? '#0ea5e915' : '#f59e0b15',
+                      paddingHorizontal: 8,
+                      paddingVertical: 5,
+                      borderRadius: 12,
+                      marginRight: 6,
+                    }}
+                  >
+                    {searchEngineMode === 'AI' && <Brain size={12} color="#7c3aed" />}
+                    {searchEngineMode === 'AI+Fuzzy' && <Zap size={12} color="#06b6d4" />}
+                    {searchEngineMode === 'Matching' && <Zap size={12} color="#0ea5e9" />}
+                    {searchEngineMode === 'Exact' && <Target size={12} color="#f59e0b" />}
+                    <Text
+                      style={{
+                        fontSize: 11,
+                        fontWeight: '800',
+                        color:
+                          searchEngineMode === 'AI' ? '#7c3aed' :
+                          searchEngineMode === 'AI+Fuzzy' ? '#06b6d4' :
+                          searchEngineMode === 'Matching' ? '#0ea5e9' : '#f59e0b',
+                      }}
+                    >
+                      {searchEngineMode === 'AI' ? 'AI' : searchEngineMode === 'AI+Fuzzy' ? 'AI+Fuzzy' : searchEngineMode === 'Matching' ? 'Fuzzy' : 'Exact'}
+                    </Text>
+                    <ChevronDown size={11} color={colors.textTertiary} />
+                  </TouchableOpacity>
+
                   <TextInput
                     placeholder="Ask a question or search key concepts..."
                     placeholderTextColor={colors.textTertiary}
                     value={query}
                     onChangeText={setQuery}
                     returnKeyType="search"
-                    onFocus={() => {
-                      loadSearchHistory().then(h => {
-                        setSearchHistory(h);
-                        if (h.length > 0) {
-                          setShowHistory(true);
-                          setTimeout(() => {
-                            landingScrollRef.current?.scrollToEnd({ animated: true });
-                          }, 50);
-                        }
-                      }).catch(() => {
-                        if (searchHistory.length > 0) {
-                          setShowHistory(true);
-                          setTimeout(() => {
-                            landingScrollRef.current?.scrollToEnd({ animated: true });
-                          }, 50);
-                        }
-                      });
-                    }}
-                    onBlur={() => setTimeout(() => setShowHistory(false), 200)}
                     onSubmitEditing={() => runIntegratedSearch(query, filters)}
                     style={[styles.input, { color: colors.textPrimary, fontSize: 15 }]}
                   />
@@ -3937,43 +3851,68 @@ export default function IntegratedSearchScreen() {
                 </TouchableOpacity>
               </View>
 
-              {renderHistoryDropdown()}
-
-              {/* Engine mode switchers centered */}
-              <View style={{ flexDirection: 'row', gap: 6, marginTop: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
-                {([
-                  { mode: 'AI' as const, icon: <Brain size={10} color={searchEngineMode === 'AI' ? '#fff' : '#7c3aed'} />, label: 'AI Semantic' },
-                  { mode: 'AI+Fuzzy' as const, icon: <Zap size={10} color={searchEngineMode === 'AI+Fuzzy' ? '#fff' : '#06b6d4'} />, label: 'AI+Fuzzy' },
-                  { mode: 'Matching' as const, icon: <Zap size={10} color={searchEngineMode === 'Matching' ? '#fff' : colors.textSecondary} />, label: 'Fuzzy' },
-                  { mode: 'Exact' as const, icon: <Target size={10} color={searchEngineMode === 'Exact' ? '#fff' : colors.textSecondary} />, label: 'Exact' },
-                ]).map(({ mode, icon, label }) => (
-                  <TouchableOpacity
-                    key={mode}
-                    onPress={() => {
-                      setSearchEngineMode(mode);
-                      if (hasSearched && query.trim()) runIntegratedSearch(query, filters, mode);
-                    }}
-                    style={[
-                      styles.modeBtn,
-                      {
-                        paddingVertical: 6,
-                        paddingHorizontal: 12,
-                        borderRadius: 14,
-                        backgroundColor: searchEngineMode === mode
-                          ? (mode === 'AI' ? '#7c3aed' : (mode === 'AI+Fuzzy' ? '#06b6d4' : (mode === 'Matching' ? '#0ea5e9' : '#f59e0b')))
-                          : colors.surface,
-                        borderColor: searchEngineMode === mode ? 'transparent' : colors.border,
-                      }
-                    ]}
-                  >
-                    {icon}
-                    <Text style={[styles.modeBtnText, { color: searchEngineMode === mode ? '#fff' : colors.textSecondary }]}>{label}</Text>
-                  </TouchableOpacity>
-                ))}
-              </View>
+              {/* Inline Recent Searches Chips */}
+              {searchHistory.length > 0 && (
+                <View style={{ marginTop: 18, width: '100%' }}>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10, paddingHorizontal: 4 }}>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                      <Clock size={12} color={colors.textTertiary} />
+                      <Text style={{ fontSize: 11, fontWeight: '700', color: colors.textTertiary, letterSpacing: 0.5 }}>
+                        RECENT SEARCHES
+                      </Text>
+                    </View>
+                    <TouchableOpacity
+                      onPress={() => {
+                        setSearchHistory([]);
+                        clearSearchHistory().catch(() => {});
+                      }}
+                      hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                    >
+                      <Text style={{ fontSize: 11, fontWeight: '700', color: colors.textTertiary }}>Clear</Text>
+                    </TouchableOpacity>
+                  </View>
+                  <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
+                    {searchHistory.slice(0, 8).map((h, i) => (
+                      <TouchableOpacity
+                        key={i}
+                        onPress={() => {
+                          setQuery(h);
+                          runIntegratedSearch(h, filters);
+                        }}
+                        style={{
+                          flexDirection: 'row',
+                          alignItems: 'center',
+                          backgroundColor: colors.surface,
+                          borderWidth: 1,
+                          borderColor: colors.border,
+                          paddingVertical: 7,
+                          paddingHorizontal: 12,
+                          borderRadius: 16,
+                          gap: 6,
+                          maxWidth: '100%',
+                        }}
+                      >
+                        <Clock size={11} color={colors.textTertiary} />
+                        <Text style={{ fontSize: 12, fontWeight: '600', color: colors.textSecondary }} numberOfLines={1}>
+                          {h}
+                        </Text>
+                        <TouchableOpacity
+                          onPress={(e) => {
+                            e.stopPropagation();
+                            removeSearchItem(h)
+                              .then(next => setSearchHistory(next))
+                              .catch(() => {});
+                          }}
+                          hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
+                        >
+                          <X size={11} color={colors.textTertiary} />
+                        </TouchableOpacity>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+                </View>
+              )}
             </View>
-
-            {showHistory && <View style={{ height: 280 }} />}
             <View style={{ flex: 1.5 }} />
           </ScrollView>
       ) : (
@@ -3996,7 +3935,7 @@ export default function IntegratedSearchScreen() {
                   data={loading ? [] : activeResults}
                   keyExtractor={item => item.id}
                   renderItem={renderItem}
-                  contentContainerStyle={{ paddingBottom: 60 }}
+                  contentContainerStyle={{ paddingBottom: 85 }}
                   ListHeaderComponent={renderFlatListHeader()}
                   ListEmptyComponent={renderListEmptyOrLoading()}
                   keyboardShouldPersistTaps="handled"
@@ -4034,40 +3973,219 @@ export default function IntegratedSearchScreen() {
         </View>
       )}
 
-      {/* Floating Sidebar Toggle Button (matching ai-search and mains) */}
-      <TouchableOpacity
-        testID="search-toggle-sidebar"
-        onPress={() => {
-          if (IS_IPAD) {
-            setSidebarOpen(!sidebarOpen);
-          } else {
-            setFilterOpen(!filterOpen);
-          }
-        }}
-        style={{
-          position: 'absolute',
-          bottom: 24,
-          left: 20,
-          width: 44,
-          height: 44,
-          borderRadius: 22,
-          backgroundColor: (IS_IPAD ? sidebarOpen : filterOpen) ? (isDark ? '#475569' : '#64748B') : colors.primary,
-          alignItems: 'center',
-          justifyContent: 'center',
-          shadowColor: colors.primary,
-          shadowOpacity: 0.35,
-          shadowRadius: 8,
-          shadowOffset: { width: 0, height: 4 },
-          elevation: 6,
-          zIndex: 9999,
-        }}
+      {/* Floating Sidebar Toggle Button (Tablet/iPad only) */}
+      {IS_IPAD && (
+        <TouchableOpacity
+          testID="search-toggle-sidebar"
+          onPress={() => setSidebarOpen(!sidebarOpen)}
+          style={{
+            position: 'absolute',
+            bottom: 24,
+            left: 20,
+            width: 44,
+            height: 44,
+            borderRadius: 22,
+            backgroundColor: sidebarOpen ? (isDark ? '#475569' : '#64748B') : colors.primary,
+            alignItems: 'center',
+            justifyContent: 'center',
+            shadowColor: colors.primary,
+            shadowOpacity: 0.35,
+            shadowRadius: 8,
+            shadowOffset: { width: 0, height: 4 },
+            elevation: 6,
+            zIndex: 9999,
+          }}
+        >
+          {sidebarOpen ? (
+            <ChevronLeft size={20} color="#fff" />
+          ) : (
+            <SlidersHorizontal size={18} color="#fff" />
+          )}
+        </TouchableOpacity>
+      )}
+
+      {/* Sticky Bottom Practice Capsule for Prelims */}
+      {hasSearched && !loading && prelimsCount > 0 && (
+        <View
+          style={{
+            position: 'absolute',
+            bottom: IS_IPAD ? 28 : 20,
+            left: 0,
+            right: 0,
+            alignItems: 'center',
+            zIndex: 9998,
+            pointerEvents: 'box-none',
+          }}
+        >
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              backgroundColor: isDark ? '#1e293b' : '#0f172a',
+              paddingVertical: 8,
+              paddingLeft: 16,
+              paddingRight: 10,
+              borderRadius: 28,
+              gap: 12,
+              shadowColor: '#000',
+              shadowOffset: { width: 0, height: 4 },
+              shadowOpacity: 0.3,
+              shadowRadius: 12,
+              elevation: 8,
+              borderWidth: 1,
+              borderColor: isDark ? '#334155' : '#1e293b',
+            }}
+          >
+            <Text style={{ fontSize: 13, fontWeight: '700', color: '#f8fafc' }}>
+              🎯 Practice {prelimsCount} Prelims {prelimsCount === 1 ? 'MCQ' : 'MCQs'}
+            </Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+              <TouchableOpacity
+                onPress={() => openBatchQuiz('learning')}
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  gap: 5,
+                  paddingHorizontal: 12,
+                  paddingVertical: 7,
+                  borderRadius: 16,
+                  backgroundColor: colors.primary,
+                }}
+              >
+                <BookOpen size={13} color="#fff" />
+                <Text style={{ fontSize: 12, fontWeight: '800', color: '#fff' }}>Learn</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => openBatchQuiz('exam')}
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  gap: 5,
+                  paddingHorizontal: 12,
+                  paddingVertical: 7,
+                  borderRadius: 16,
+                  backgroundColor: '#10b981',
+                }}
+              >
+                <Play size={13} color="#fff" />
+                <Text style={{ fontSize: 12, fontWeight: '800', color: '#fff' }}>Exam</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      )}
+
+      {/* Engine Mode Picker Modal */}
+      <Modal
+        visible={modePickerOpen}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setModePickerOpen(false)}
       >
-        {(IS_IPAD ? sidebarOpen : filterOpen) ? (
-          <ChevronLeft size={20} color="#fff" />
-        ) : (
-          <SlidersHorizontal size={18} color="#fff" />
-        )}
-      </TouchableOpacity>
+        <Pressable style={styles.overlay} onPress={() => setModePickerOpen(false)}>
+          <Pressable style={[styles.bottomSheet, { backgroundColor: colors.surface, maxHeight: 460 }]} onPress={e => e.stopPropagation()}>
+            <View style={[styles.bottomSheetHeader, { borderBottomColor: colors.border }]}>
+              <View>
+                <Text style={{ fontSize: 16, fontWeight: '800', color: colors.textPrimary }}>Search Engine Mode</Text>
+                <Text style={{ fontSize: 12, fontWeight: '600', color: colors.textTertiary, marginTop: 2 }}>Select matching algorithm</Text>
+              </View>
+              <TouchableOpacity onPress={() => setModePickerOpen(false)}>
+                <X size={20} color={colors.textSecondary} />
+              </TouchableOpacity>
+            </View>
+
+            <View style={{ padding: 16, gap: 10 }}>
+              {[
+                {
+                  mode: 'AI' as const,
+                  icon: <Brain size={18} color="#7c3aed" />,
+                  title: 'AI Semantic Search (Default)',
+                  desc: 'Uses 768-dim embeddings & Gemini AI keywords to find conceptually related questions even with different wording.',
+                  activeColor: '#7c3aed',
+                },
+                {
+                  mode: 'AI+Fuzzy' as const,
+                  icon: <Zap size={18} color="#06b6d4" />,
+                  title: 'AI + Fuzzy Search',
+                  desc: 'Combines semantic embeddings with spelling-tolerant keyword fuzzy scoring for balanced depth.',
+                  activeColor: '#06b6d4',
+                },
+                {
+                  mode: 'Matching' as const,
+                  icon: <Zap size={18} color="#0ea5e9" />,
+                  title: 'Fuzzy Text Search',
+                  desc: 'Traditional text search with typo tolerance across Prelims, Mains, and Value Addition Hub.',
+                  activeColor: '#0ea5e9',
+                },
+                {
+                  mode: 'Exact' as const,
+                  icon: <Target size={18} color="#f59e0b" />,
+                  title: 'Exact Match',
+                  desc: 'Strict keyword & phrase matching across questions, syllabus topics, and model answers.',
+                  activeColor: '#f59e0b',
+                },
+              ].map(({ mode, icon, title, desc, activeColor }) => {
+                const isSelected = searchEngineMode === mode;
+                return (
+                  <TouchableOpacity
+                    key={mode}
+                    onPress={() => {
+                      setSearchEngineMode(mode);
+                      setModePickerOpen(false);
+                      if (hasSearched && query.trim()) {
+                        runIntegratedSearch(query, filters, mode);
+                      }
+                    }}
+                    style={{
+                      flexDirection: 'row',
+                      alignItems: 'flex-start',
+                      gap: 12,
+                      padding: 12,
+                      borderRadius: 14,
+                      borderWidth: 1.5,
+                      borderColor: isSelected ? activeColor : colors.border,
+                      backgroundColor: isSelected ? activeColor + '10' : colors.surfaceStrong,
+                    }}
+                  >
+                    <View style={{
+                      width: 32,
+                      height: 32,
+                      borderRadius: 10,
+                      backgroundColor: isSelected ? activeColor + '20' : colors.surface,
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      marginTop: 2,
+                    }}>
+                      {icon}
+                    </View>
+                    <View style={{ flex: 1 }}>
+                      <Text style={{ fontSize: 14, fontWeight: '800', color: isSelected ? activeColor : colors.textPrimary }}>
+                        {title}
+                      </Text>
+                      <Text style={{ fontSize: 11, fontWeight: '500', color: colors.textSecondary, marginTop: 2, lineHeight: 16 }}>
+                        {desc}
+                      </Text>
+                    </View>
+                    {isSelected && (
+                      <View style={{
+                        width: 20,
+                        height: 20,
+                        borderRadius: 10,
+                        backgroundColor: activeColor,
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        marginTop: 4,
+                      }}>
+                        <Check size={12} color="#fff" />
+                      </View>
+                    )}
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
+          </Pressable>
+        </Pressable>
+      </Modal>
 
       {/* Mobile Filter Modal */}
       <Modal

@@ -68,7 +68,7 @@ export default function SidebarDisplayPreferences({
       {expanded && (
         <View style={{ paddingTop: 8, paddingBottom: 6, paddingHorizontal: 2 }}>
           {/* TEXT READABILITY */}
-          <Text style={{ fontSize: 9, fontWeight: '900', color: colors.textTertiary + '99', letterSpacing: 1.5, marginBottom: 6 }}>
+          <Text style={{ fontSize: 10, fontFamily: 'PlusJakartaSans-Bold', fontWeight: '900', color: colors.textTertiary + '99', letterSpacing: 1.5, marginBottom: 8 }}>
             TEXT READABILITY
           </Text>
           <View style={{ flexDirection: 'row', backgroundColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)', borderRadius: 8, padding: 3, gap: 4 }}>
@@ -76,7 +76,7 @@ export default function SidebarDisplayPreferences({
               onPress={() => onChangeTextColorMode?.('default')}
               style={{
                 flex: 1,
-                paddingVertical: 7,
+                paddingVertical: 8,
                 alignItems: 'center',
                 borderRadius: 6,
                 backgroundColor: textColorMode === 'default' ? (isDark ? '#334155' : '#ffffff') : 'transparent',
@@ -94,7 +94,7 @@ export default function SidebarDisplayPreferences({
               onPress={() => onChangeTextColorMode?.('black')}
               style={{
                 flex: 1,
-                paddingVertical: 7,
+                paddingVertical: 8,
                 alignItems: 'center',
                 borderRadius: 6,
                 backgroundColor: textColorMode === 'black' ? (isDark ? '#334155' : '#ffffff') : 'transparent',
@@ -111,7 +111,7 @@ export default function SidebarDisplayPreferences({
           </View>
 
           {/* KEYWORD BOXES */}
-          <Text style={{ fontSize: 9, fontWeight: '900', color: colors.textTertiary + '99', letterSpacing: 1.5, marginTop: 12, marginBottom: 6 }}>
+          <Text style={{ fontSize: 10, fontFamily: 'PlusJakartaSans-Bold', fontWeight: '900', color: colors.textTertiary + '99', letterSpacing: 1.5, marginTop: 14, marginBottom: 8 }}>
             KEYWORD BOXES
           </Text>
           <View style={{ flexDirection: 'row', backgroundColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)', borderRadius: 8, padding: 3, gap: 4 }}>
@@ -119,7 +119,7 @@ export default function SidebarDisplayPreferences({
               onPress={() => onChangeKeyBoxMode?.('boxed')}
               style={{
                 flex: 1,
-                paddingVertical: 7,
+                paddingVertical: 8,
                 alignItems: 'center',
                 borderRadius: 6,
                 backgroundColor: keyBoxMode === 'boxed' ? (isDark ? '#334155' : '#ffffff') : 'transparent',
@@ -137,7 +137,7 @@ export default function SidebarDisplayPreferences({
               onPress={() => onChangeKeyBoxMode?.('bold')}
               style={{
                 flex: 1,
-                paddingVertical: 7,
+                paddingVertical: 8,
                 alignItems: 'center',
                 borderRadius: 6,
                 backgroundColor: keyBoxMode === 'bold' ? (isDark ? '#334155' : '#ffffff') : 'transparent',
@@ -154,7 +154,7 @@ export default function SidebarDisplayPreferences({
           </View>
 
           {/* HIGHLIGHT COLOR */}
-          <Text style={{ fontSize: 9, fontWeight: '900', color: colors.textTertiary + '99', letterSpacing: 1.5, marginTop: 12, marginBottom: 6 }}>
+          <Text style={{ fontSize: 10, fontFamily: 'PlusJakartaSans-Bold', fontWeight: '900', color: colors.textTertiary + '99', letterSpacing: 1.5, marginTop: 14, marginBottom: 8 }}>
             HIGHLIGHT COLOR
           </Text>
           <View style={{ flexDirection: 'row', gap: 10, alignItems: 'center' }}>

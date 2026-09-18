@@ -296,26 +296,44 @@ export const getMarkdownRules = (colors: any, isDark: boolean, onImagePress?: (u
       </TouchableOpacity>
     );
   },
-  mark: (node: any, children: any) => (
-    <View
-      key={node.key}
-      style={{
-        backgroundColor: isDark ? 'rgba(234, 179, 8, 0.25)' : '#fef08a',
-        borderWidth: 1,
-        borderColor: isDark ? '#eab308' : '#ca8a04',
-        borderRadius: 3,
-        paddingHorizontal: 4,
-        paddingVertical: 1,
-        marginHorizontal: 2,
-        alignSelf: 'inline',
-        display: 'inline-flex'
-      } as any}
-    >
-      <Text style={{ fontSize: 13, fontWeight: '700', color: isDark ? '#fef08a' : '#854d0e' }}>
-        {children}
-      </Text>
-    </View>
-  ),
+  mark: (node: any, children: any) => {
+    let markBg = isDark ? 'rgba(234, 179, 8, 0.25)' : '#fef08a';
+    let markBorder = isDark ? '#eab308' : '#ca8a04';
+    let markText = isDark ? '#fef08a' : '#854d0e';
+    if (globalKeyBoxColor === 'blue') {
+      markBg = isDark ? 'rgba(59, 130, 246, 0.25)' : '#bfdbfe';
+      markBorder = isDark ? '#3b82f6' : '#2563eb';
+      markText = isDark ? '#bfdbfe' : '#1e3a8a';
+    } else if (globalKeyBoxColor === 'green') {
+      markBg = isDark ? 'rgba(34, 197, 94, 0.25)' : '#bbf7d0';
+      markBorder = isDark ? '#22c55e' : '#16a34a';
+      markText = isDark ? '#bbf7d0' : '#14532d';
+    } else if (globalKeyBoxColor === 'pink') {
+      markBg = isDark ? 'rgba(236, 72, 153, 0.25)' : '#fbcfe8';
+      markBorder = isDark ? '#ec4899' : '#db2777';
+      markText = isDark ? '#fbcfe8' : '#831843';
+    }
+    return (
+      <View
+        key={node.key}
+        style={{
+          backgroundColor: markBg,
+          borderWidth: 1,
+          borderColor: markBorder,
+          borderRadius: 3,
+          paddingHorizontal: 4,
+          paddingVertical: 1,
+          marginHorizontal: 2,
+          alignSelf: 'inline',
+          display: 'inline-flex'
+        } as any}
+      >
+        <Text style={{ fontSize: 13, fontWeight: '700', color: markText }}>
+          {children}
+        </Text>
+      </View>
+    );
+  },
   html_inline: (node: any) => {
     const raw: string = node.content || '';
     if (/^(?:<|&lt;|&amp;lt;)br\s*(?:\/|&gt;|\/&gt;|&amp;gt;|\/&amp;gt;)?/i.test(raw.trim())) {
@@ -477,25 +495,25 @@ export const getMarkdownStyles = (
     : colors.textPrimary;
 
   // KeyBox theme styles
-  let codeBg = '#fef08a';
-  let codeBorder = '#eab308';
-  let codeText = '#854d0e';
+  let codeBg = isDark ? 'rgba(234, 179, 8, 0.25)' : '#fef08a';
+  let codeBorder = isDark ? '#eab308' : '#ca8a04';
+  let codeText = isDark ? '#fef08a' : '#854d0e';
 
   if (keyBoxColor === 'blue') {
-    codeBg = isDark ? 'rgba(59, 130, 246, 0.25)' : '#eff6ff';
-    codeBorder = isDark ? '#3b82f6' : '#93c5fd';
-    codeText = isDark ? '#bfdbfe' : '#1e40af';
+    codeBg = isDark ? 'rgba(59, 130, 246, 0.25)' : '#bfdbfe';
+    codeBorder = isDark ? '#3b82f6' : '#2563eb';
+    codeText = isDark ? '#bfdbfe' : '#1e3a8a';
   } else if (keyBoxColor === 'green') {
-    codeBg = isDark ? 'rgba(34, 197, 94, 0.25)' : '#f0fdf4';
-    codeBorder = isDark ? '#22c55e' : '#86efac';
-    codeText = isDark ? '#bbf7d0' : '#15803d';
+    codeBg = isDark ? 'rgba(34, 197, 94, 0.25)' : '#bbf7d0';
+    codeBorder = isDark ? '#22c55e' : '#16a34a';
+    codeText = isDark ? '#bbf7d0' : '#14532d';
   } else if (keyBoxColor === 'pink') {
-    codeBg = isDark ? 'rgba(244, 63, 94, 0.25)' : '#fff1f2';
-    codeBorder = isDark ? '#f43f5e' : '#fda4af';
-    codeText = isDark ? '#fecdd3' : '#be123c';
+    codeBg = isDark ? 'rgba(236, 72, 153, 0.25)' : '#fbcfe8';
+    codeBorder = isDark ? '#ec4899' : '#db2777';
+    codeText = isDark ? '#fbcfe8' : '#831843';
   } else {
-    codeBg = isDark ? 'rgba(234, 179, 8, 0.25)' : '#fef9c3';
-    codeBorder = isDark ? '#eab308' : '#fde047';
+    codeBg = isDark ? 'rgba(234, 179, 8, 0.25)' : '#fef08a';
+    codeBorder = isDark ? '#eab308' : '#ca8a04';
     codeText = isDark ? '#fef08a' : '#854d0e';
   }
 
@@ -550,11 +568,12 @@ export const getMarkdownStyles = (
       borderColor: codeBorder,
       borderWidth: 1,
       borderRadius: 4,
-      paddingHorizontal: 4,
+      paddingHorizontal: 5,
       paddingVertical: 1,
       fontSize: 13,
       fontWeight: '700',
       color: codeText,
+      fontFamily: undefined,
     },
     fence: {
       backgroundColor: isDark ? '#1e293b' : '#f8fafc',

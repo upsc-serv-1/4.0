@@ -89,6 +89,7 @@ import {
   Modal,
   Pressable,
   FlatList,
+  Keyboard,
   KeyboardAvoidingView,
   AppState,
   AppStateStatus,
@@ -264,25 +265,73 @@ const KNOWN_SYLLABUS_CONCEPTS: Array<{ name: string; patterns: RegExp[] }> = [
   { name: 'Public Service Values & Integrity', patterns: [/\bprobity\b/i, /\bcode\s*of\s*ethics\b/i, /\bcitizen\s*charter\b/i] },
 ];
 
-export const resolveItemConcept = (item: any): string => {
-  if (!item) return 'General / Conceptual Questions';
+const DIRECTIVE_WORDS_REGEX = /^(examine\s+critically|critically\s+examine|critically\s+analyze|critically\s+analyse|critically\s+evaluate|examine|describe|discuss|explain|analyze|analyse|evaluate|elucidate|comment\s+on|comment|illustrate|outline|substantiate|assess|justify|distinguish\s+between|distinguish|contrast|trace|briefly\s+discuss|briefly\s+explain|write\s+a\s+note\s+on|give\s+an\s+account\s+of)\b[:\s-]*/i;
 
-  // 1. Direct nanoTopic / microtag if available
-  const nano = getQuestionNano(item) || getValueAddNano(item);
-  if (nano && nano.trim() && nano.trim().toLowerCase() !== 'all' && nano.trim().toLowerCase() !== 'general') {
-    return nano.trim();
+const cleanLayerName = (val: any): string => {
+  if (!val || typeof val !== 'string') return '';
+  let cleaned = val.trim();
+  if (!cleaned) return '';
+  const lower = cleaned.toLowerCase();
+  if (lower === 'all' || lower === 'general' || lower === 'none' || lower === 'n/a' || lower === 'others') {
+    return '';
   }
+  // Strip leading action/directive words like "Discuss", "Examine", etc.
+  cleaned = cleaned.replace(DIRECTIVE_WORDS_REGEX, '').trim();
+  // Strip trailing question directive clauses like "...? Discuss" or "...Discuss."
+  cleaned = cleaned.replace(/[,;.?\s]+(discuss|examine|describe|explain|evaluate|elucidate|comment)\s*$/i, '').trim();
+  if (!cleaned || cleaned.length < 2) return '';
+  return cleaned;
+};
 
-  // 2. Microtag / macrotag
-  const tag = item.microtag || item.macrotag;
-  if (tag && typeof tag === 'string' && tag.trim()) {
-    const firstTag = tag.split(',')[0].trim();
-    if (firstTag && firstTag.toLowerCase() !== 'general' && firstTag.toLowerCase() !== 'all') {
-      return firstTag;
+export const resolveItemConcept = (item: any): string => {
+  if (!item) return 'General';
+
+  // 1. Nanotopic (deepest layer of hierarchy)
+  const nano = cleanLayerName(
+    item.nanoTopic || item.nanotopic || item.nano_topic ||
+    getValueAddNano(item) || getQuestionNano(item)
+  );
+  if (nano) return nano;
+
+  // 2. Subtopic (next deepest layer of hierarchy)
+  const sub = cleanLayerName(
+    item.subTopic || item.subtopic || item.sub_topic ||
+    getValueAddSub(item) || getQuestionSub(item)
+  );
+  if (sub) return sub;
+
+  // 3. Scan hierarchy_path backwards for the last layer (skipping root paper names)
+  if (Array.isArray(item.hierarchy_path) && item.hierarchy_path.length > 0) {
+    for (let i = item.hierarchy_path.length - 1; i >= 0; i--) {
+      const candidate = cleanLayerName(item.hierarchy_path[i]);
+      if (candidate && !['gs1', 'gs2', 'gs3', 'gs4', 'essay', 'optional'].includes(candidate.toLowerCase())) {
+        return candidate;
+      }
     }
   }
 
-  // 3. Smart concept keyword detection from question text / statement / title / content
+  // 4. Microtopic
+  const micro = cleanLayerName(
+    item.microTopic || item.microtopic || item.micro_topic ||
+    getValueAddMicro(item) || getQuestionMicro(item)
+  );
+  if (micro) return micro;
+
+  // 5. Section Group / Section
+  const section = cleanLayerName(
+    item.sectionGroup || item.section_group || item.sectiongroup || item.section ||
+    getValueAddSection(item) || getQuestionSection(item)
+  );
+  if (section) return section;
+
+  // 6. Microtag / Macrotag (if valid topic and not a directive)
+  const tag = item.microtag || item.macrotag;
+  if (tag && typeof tag === 'string') {
+    const firstTag = cleanLayerName(tag.split(',')[0]);
+    if (firstTag) return firstTag;
+  }
+
+  // 7. Known Syllabus Concepts pattern match
   const text = (
     item.questionText ||
     item.statement ||
@@ -300,22 +349,11 @@ export const resolveItemConcept = (item: any): string => {
     }
   }
 
-  // 4. Check hierarchy path (often index 5 or 4 has the micro/nanotopic)
-  if (Array.isArray(item.hierarchy_path) && item.hierarchy_path.length >= 5) {
-    const lastItem = item.hierarchy_path[item.hierarchy_path.length - 1];
-    if (lastItem && typeof lastItem === 'string' && lastItem.trim() && lastItem.trim().toLowerCase() !== 'general') {
-      return lastItem.trim();
-    }
-  }
+  // 8. Subject fallback
+  const subject = cleanLayerName(item.subject);
+  if (subject) return subject;
 
-  // 5. If microTopic exists and is distinct from subTopic, use it
-  const micro = getQuestionMicro(item) || getValueAddMicro(item);
-  const sub = getQuestionSub(item) || getValueAddSub(item);
-  if (micro && micro !== sub && micro.toLowerCase() !== 'general' && micro.toLowerCase() !== 'all') {
-    return micro;
-  }
-
-  return 'General / Conceptual Questions';
+  return 'General';
 };
 
 interface MainsFilters {
@@ -367,6 +405,7 @@ export function MainsScreenInner() {
   const [textColorMode, setTextColorMode] = useState<'default' | 'black'>('default');
   const [keyBoxMode, setKeyBoxMode] = useState<'boxed' | 'bold'>('boxed');
   const [keyBoxColor, setKeyBoxColor] = useState<KeyBoxColor>('blue');
+  const [qbSearchQuery, setQbSearchQuery] = useState<string>('');
 
   useEffect(() => {
     AsyncStorage.getItem('@mains_key_box_mode')
@@ -2022,6 +2061,10 @@ export function MainsScreenInner() {
                 setValueAddOrigin('hub');
                 setCurrentScreen('value-add');
               }}
+              onSearch={(query: string) => {
+                setQbSearchQuery(query);
+                setCurrentScreen('questions');
+              }}
               colors={colors}
               isTablet={isTablet}
             />
@@ -2050,6 +2093,7 @@ export function MainsScreenInner() {
             <QuestionBankView
               key={params._ts || (initialFiltersFromParams ? JSON.stringify(initialFiltersFromParams) : 'qb-view')}
               colors={colors}
+              initialSearch={qbSearchQuery}
               savedIds={savedQuestionIds}
               onToggleSaved={toggleBookmark}
               isTablet={isTablet}
@@ -2692,11 +2736,13 @@ export function MainsScreenInner() {
 function HubView({
   onSelect,
   onSelectVaHub,
+  onSearch,
   colors,
   isTablet,
 }: {
   onSelect: (s: any) => void;
   onSelectVaHub?: (category?: string) => void;
+  onSearch?: (query: string) => void;
   colors: any;
   isTablet: boolean;
 }) {
@@ -2705,6 +2751,15 @@ function HubView({
   const { width } = useWindowDimensions();
   const { selectedCourse } = useCourse();
   const [searchQuery, setSearchQuery] = useState('');
+
+  const handleSearchSubmit = () => {
+    const q = searchQuery.trim();
+    if (onSearch) {
+      onSearch(q);
+    } else {
+      onSelect('questions');
+    }
+  };
 
   const primaryCards = [
     {
@@ -2798,10 +2853,7 @@ function HubView({
           ]}
         >
           <TouchableOpacity
-            onPress={() => {
-              const q = searchQuery.trim();
-              router.push({ pathname: '/search', params: q ? { q } : {} } as any);
-            }}
+            onPress={handleSearchSubmit}
             hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
           >
             <Search size={isTablet ? 22 : 18} color={searchQuery.trim() ? colors.primary : '#94a3b8'} style={{ marginRight: 10 }} />
@@ -2812,12 +2864,7 @@ function HubView({
             value={searchQuery}
             onChangeText={setSearchQuery}
             returnKeyType="search"
-            onSubmitEditing={() => {
-              const q = searchQuery.trim();
-              if (q) {
-                router.push({ pathname: '/search', params: { q } } as any);
-              }
-            }}
+            onSubmitEditing={handleSearchSubmit}
             style={[
               styles.largeSearchText,
               {
@@ -2836,10 +2883,7 @@ function HubView({
             </TouchableOpacity>
           )}
           <TouchableOpacity
-            onPress={() => {
-              const q = searchQuery.trim();
-              router.push({ pathname: '/search', params: q ? { q } : {} } as any);
-            }}
+            onPress={handleSearchSubmit}
             activeOpacity={0.8}
             style={{
               backgroundColor: colors.primary,
@@ -5299,6 +5343,7 @@ function QuestionBankView({
   onChangeKeyBoxColor,
   onForceSync,
   syncing = false,
+  initialSearch = '',
 }: {
   colors: any;
   savedIds: string[];
@@ -5329,10 +5374,17 @@ function QuestionBankView({
   onChangeKeyBoxColor?: (color: KeyBoxColor) => void;
   onForceSync?: () => void;
   syncing?: boolean;
+  initialSearch?: string;
 }) {
   const { isDark } = useTheme();
   const router = useRouter();
-  const [search, setSearch] = useState('');
+  const [search, setSearch] = useState(initialSearch || '');
+
+  useEffect(() => {
+    if (initialSearch !== undefined) {
+      setSearch(initialSearch);
+    }
+  }, [initialSearch]);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [selectedInstitutes, setSelectedInstitutes] = useState<Record<string, string>>({});
   const [copyModalQuestion, setCopyModalQuestion] = useState<any>(null);
@@ -6431,10 +6483,7 @@ function QuestionBankView({
                     )}
                     <View style={[styles.largeSearchInput, { flex: 1, backgroundColor: colors.surface + '66', borderColor: 'rgba(255,255,255,0.7)', height: 60, borderRadius: 20, marginBottom: 0, paddingRight: 8 }]}>
                       <TouchableOpacity
-                        onPress={() => {
-                          const q = search.trim();
-                          router.push({ pathname: '/search', params: q ? { q } : {} } as any);
-                        }}
+                        onPress={() => Keyboard.dismiss()}
                         hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
                       >
                         <Search size={20} color={search.trim() ? colors.primary : '#94a3b8'} style={{ marginRight: 12 }} />
@@ -6445,10 +6494,7 @@ function QuestionBankView({
                         value={search}
                         onChangeText={setSearch}
                         returnKeyType="search"
-                        onSubmitEditing={() => {
-                          const q = search.trim();
-                          if (q) router.push({ pathname: '/search', params: { q } } as any);
-                        }}
+                        onSubmitEditing={() => Keyboard.dismiss()}
                         style={[styles.largeSearchText, { color: colors.textPrimary, fontSize: 15 }]}
                       />
                       {search.length > 0 && (
@@ -6457,10 +6503,7 @@ function QuestionBankView({
                         </TouchableOpacity>
                       )}
                       <TouchableOpacity
-                        onPress={() => {
-                          const q = search.trim();
-                          router.push({ pathname: '/search', params: q ? { q } : {} } as any);
-                        }}
+                        onPress={() => Keyboard.dismiss()}
                         activeOpacity={0.8}
                         style={{
                           backgroundColor: colors.primary,

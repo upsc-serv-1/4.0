@@ -21,7 +21,13 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { KVStore } from '../src/lib/kvStore';
 import { OfflineManager } from '../src/services/OfflineManager';
 import { QuestionCache } from '../src/services/QuestionCache';
-import { MAINS_QUESTIONS_CACHE_KEY, getInitialMainsQuestions } from '../src/data/mainsConsolidatedLoader';
+import {
+  MAINS_QUESTIONS_CACHE_KEY,
+  getInitialMainsQuestions,
+  normalizePaper,
+  resolvePaper,
+  fetchMainsQuestionsFromSupabase,
+} from '../src/data/mainsConsolidatedLoader';
 import { router, useLocalSearchParams, useFocusEffect } from 'expo-router';
 import * as Haptics from 'expo-haptics';
 import * as Print from 'expo-print';
@@ -809,15 +815,26 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
 
     // Check if hierarchy_path has valid data
     if (Array.isArray(hp) && hp.length > 0) {
-      // If hp[0] is the subject, shift mapping by 1
-      const startsWithSubject = String(hp[0]).toLowerCase() === String(subject).toLowerCase();
-      let offset = startsWithSubject ? 1 : 0;
+      const first = String(hp[0] || '').trim();
+      const firstNorm = normalizePaper(first);
+      const firstIsPaper = ['GS1', 'GS2', 'GS3', 'GS4', 'Essay', 'Optional'].includes(firstNorm);
+
+      let offset = 0;
+      if (firstIsPaper) {
+        offset = 1;
+        const second = String(hp[1] || '').trim();
+        if (second && (second.toLowerCase() === String(subject).toLowerCase())) {
+          offset = 2;
+        }
+      } else if (first.toLowerCase() === String(subject).toLowerCase()) {
+        offset = 1;
+      }
 
       // For optional subjects, there is an extra Anthro-1/Anthro-2/Socio-1/Socio-2 level in hierarchy
       const secondLevel = hp[1] ? String(hp[1]).toLowerCase() : '';
       const thirdLevel = hp[2] ? String(hp[2]).toLowerCase() : '';
       const isOptionalHierarchy = secondLevel.includes('anthro') || secondLevel.includes('socio') || thirdLevel.includes('paper');
-      if (isOptionalHierarchy && startsWithSubject) {
+      if (isOptionalHierarchy && offset < 2) {
         offset = 2;
       }
 
@@ -826,6 +843,12 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
       if (hp[1 + offset]) microTopic = hp[1 + offset];
       if (hp[2 + offset]) subTopic = hp[2 + offset];
       if (hp[3 + offset]) nanoTopic = hp[3 + offset];
+    }
+
+    // Guard: prevent sectionGroup from being a paper code
+    const sgNorm = normalizePaper(sectionGroup);
+    if (['GS1', 'GS2', 'GS3', 'GS4', 'Essay', 'Optional'].includes(sgNorm)) {
+      sectionGroup = dbSectionGroup || 'General';
     }
 
     return {
@@ -864,7 +887,7 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
     return match ? parseInt(match[1], 10) : null;
   };
 
-  const normalizePyqPaperGroup = (value = '', fallbackStage = '') => {
+  const normalizePyqPaperGroup = (value: string | null = '', fallbackStage = '') => {
     const text = String(value || '').trim().toLowerCase();
     const stage = String(fallbackStage || '').trim().toLowerCase();
     if (!text) return '';
@@ -922,7 +945,7 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
     const rangeSuffix = selectedRange === 'Custom Range'
       ? `Custom_Range_${customYearStart}_${customYearEnd}`
       : selectedRange.replace(/\s+/g, '_');
-    const cacheKey = `pyq_cache_v5_${stageNorm}_${targetPaperGroup.replace(/\s+/g, '_')}_${rangeSuffix}`;
+    const cacheKey = `pyq_cache_v6_${stageNorm}_${targetPaperGroup.replace(/\s+/g, '_')}_${rangeSuffix}`;
 
     if (!bypassCache) {
       try {
@@ -949,31 +972,45 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
         try {
           // Map UI paper labels to DB paper column values (mains_questions.paper)
           let mappedPaper = 'GS1';
-          if (targetPaperGroup === 'GS Paper 1') mappedPaper = 'GS1';
-          else if (targetPaperGroup === 'GS Paper 2') mappedPaper = 'GS2';
-          else if (targetPaperGroup === 'GS Paper 3') mappedPaper = 'GS3';
-          else if (targetPaperGroup === 'GS Paper 4') mappedPaper = 'GS4';
-          else if (targetPaperGroup === 'Optional') mappedPaper = 'Optional';
+          if (targetPaperGroup === 'GS Paper 1' || targetPaperGroup === 'GS1') mappedPaper = 'GS1';
+          else if (targetPaperGroup === 'GS Paper 2' || targetPaperGroup === 'GS2') mappedPaper = 'GS2';
+          else if (targetPaperGroup === 'GS Paper 3' || targetPaperGroup === 'GS3') mappedPaper = 'GS3';
+          else if (targetPaperGroup === 'GS Paper 4' || targetPaperGroup === 'GS4') mappedPaper = 'GS4';
+          else if (targetPaperGroup === 'Optional' || targetPaperGroup.toLowerCase().includes('optional')) mappedPaper = 'Optional';
           
           // STRICTLY LOCAL: mains PYQ rows come from the downloaded KVStore
           // snapshot (@mains_cached_questions_v2). Refresh is the only path
           // that re-reads the server.
-          const cachedMains = (
+          let cachedMains = (
             KVStore.getJson<any[]>(MAINS_QUESTIONS_CACHE_KEY)
             ?? (typeof getInitialMainsQuestions === 'function' ? (getInitialMainsQuestions() as any[]) : [])
             ?? []
           );
+
+          if (!cachedMains || cachedMains.length === 0) {
+            try {
+              const live = await fetchMainsQuestionsFromSupabase();
+              if (live && live.length > 0) {
+                cachedMains = live;
+                KVStore.setJson(MAINS_QUESTIONS_CACHE_KEY, live);
+              }
+            } catch (liveErr) {
+              console.warn('[MainsFetch] Failed to fetch mains questions on demand:', liveErr);
+            }
+          }
+
           const mainsQs: any[] = cachedMains.filter((q: any) => {
             if (!q?.is_pyq) return false;
+            const qPaper = resolvePaper(q);
             if (mappedPaper === 'Optional') {
-              return !['GS1', 'GS2', 'GS3', 'GS4', 'Essay'].includes(String(q.paper));
+              return !['GS1', 'GS2', 'GS3', 'GS4', 'Essay'].includes(qPaper) || qPaper === 'Optional';
             }
-            return q.paper === mappedPaper;
+            return qPaper === mappedPaper;
           });
-          console.log('[MainsFetch] Using local cache:', mainsQs.length, 'questions for paper:', mappedPaper);
+          console.log('[MainsFetch] Using cache:', mainsQs.length, 'questions for paper:', mappedPaper);
           
           if (mainsQs.length === 0) {
-            console.warn(`[MainsFetch] No questions found for paper=${mappedPaper} in mains_questions table`);
+            console.warn(`[MainsFetch] No questions found for paper=${mappedPaper} in mains questions`);
             clearComputedState();
             setRawQuestions([]);
             setTestsMetaById({});
@@ -996,37 +1033,42 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
             if (u === 'PHILOSOPHY') return 'Philosophy';
             return s;
           };
-          const allMainsQuestions = mainsQs.map((q: any) => ({
-            id: q.id,
-            questionNumber: q.question_number,
-            questionText: q.question_text,
-            marks: q.marks,
-            year: q.exam_year,
-            subject: mappedPaper === 'Optional' ? normalizeOptionalSubject(q.subject) : (q.subject || ''),
-            sectionGroup: q.section_group,
-            microTopic: q.microtopic,
-            subTopic: q.subtopic,
-            nanoTopic: q.nanotopic,
-            macrotag: q.macrotag,
-            microtag: q.microtag,
-            hierarchy_path: q.hierarchy_path || [],
-            paper: q.paper || mappedPaper,
-            is_pyq: q.is_pyq,
-            source_attribution_label: q.source_attribution_label,
-            exam_info: q.exam_info,
-            stage: q.stage,
-            exam: q.exam,
-            exam_group: q.exam_group,
-            is_upsc_cse: q.is_upsc_cse,
-            is_allied: q.is_allied,
-            is_others: q.is_others,
-            exam_category: q.exam_category,
-            answers: (q.answers || []).map((ans: any) => ({
-              id: ans.id,
-              institute: ans.institute,
-              answerText: ans.answer_text,
-            }))
-          }));
+          const allMainsQuestions = mainsQs.map((q: any) => {
+            const rawYear = q.year ?? q.exam_year ?? q.launch_year;
+            const parsedYear = Number(rawYear) || extractYearFromTitle(q.title || '') || (q.exam_info?.year ? Number(q.exam_info.year) : null);
+            const qPaper = resolvePaper(q) || mappedPaper;
+            return {
+              id: q.id,
+              questionNumber: q.questionNumber ?? q.question_number,
+              questionText: q.questionText ?? q.question_text ?? '',
+              marks: q.marks ?? 0,
+              year: parsedYear,
+              subject: mappedPaper === 'Optional' ? normalizeOptionalSubject(q.subject) : (q.subject || ''),
+              sectionGroup: q.sectionGroup ?? q.section_group ?? '',
+              microTopic: q.microTopic ?? q.microtopic ?? q.micro_topic ?? '',
+              subTopic: q.subTopic ?? q.subtopic ?? q.sub_topic ?? '',
+              nanoTopic: q.nanoTopic ?? q.nanotopic ?? q.nano_topic ?? '',
+              macrotag: q.macrotag ?? q.macro_tag ?? '',
+              microtag: q.microtag ?? q.micro_tag ?? '',
+              hierarchy_path: q.hierarchy_path || q.hierarchyPath || [],
+              paper: qPaper,
+              is_pyq: q.is_pyq,
+              source_attribution_label: q.source_attribution_label,
+              exam_info: q.exam_info,
+              stage: q.stage,
+              exam: q.exam,
+              exam_group: q.exam_group,
+              is_upsc_cse: q.is_upsc_cse,
+              is_allied: q.is_allied,
+              is_others: q.is_others,
+              exam_category: q.exam_category,
+              answers: (q.answers || []).map((ans: any) => ({
+                id: ans.id,
+                institute: ans.institute,
+                answerText: ans.answerText ?? ans.answer_text ?? '',
+              }))
+            };
+          });
 
           const visibleQs = allMainsQuestions.filter((q: any) => {
             const yr = q.year;
@@ -1281,6 +1323,15 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
       filteredTopicHeatmap[topic] = topicYearMap[topic] || {};
     });
     setTopicYearHeatmap(filteredTopicHeatmap);
+
+    if (pilotSubject && !sortedSubjects.some(([name]) => name === pilotSubject)) {
+      setPilotSubject(null);
+      setPilotSection(null);
+      setPilotSectionGroup(null);
+      setPilotMacroTopic(null);
+      setPilotMicro(null);
+      setPilotSubtopic(null);
+    }
   };
 
   useEffect(() => {
@@ -2071,12 +2122,14 @@ export default function PyqAnalysisTab({ isEmbedded }: { isEmbedded?: boolean })
   const handleSelect = (value: string) => {
     if (modalType === 'stage') {
       setExamStage(value);
+      selectSubject(null);
       // Get papers for this stage from the current course
       const papersForStage = currentPapersByStage[value as keyof typeof currentPapersByStage];
       const firstPaper = papersForStage?.[0] || null;
       setSelectedPaper(firstPaper);
     } else if (modalType === 'paper') {
       setSelectedPaper(value);
+      selectSubject(null);
     } else if (modalType === 'range') {
       setSelectedRange(value);
     }

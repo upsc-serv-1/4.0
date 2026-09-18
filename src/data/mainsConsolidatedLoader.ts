@@ -50,11 +50,16 @@ export interface ConsolidatedQuestion {
 
 export function normalizePaper(paper: string | null | undefined): string {
   if (!paper) return '';
+  const clean = paper.trim().toUpperCase().replace(/[\s\-_]/g, '');
+  if (clean === 'GS1' || clean === 'GSPAPER1' || clean === 'PAPER1' || clean === 'GSI' || clean === 'GS-I') return 'GS1';
+  if (clean === 'GS2' || clean === 'GSPAPER2' || clean === 'PAPER2' || clean === 'GSII' || clean === 'GS-II') return 'GS2';
+  if (clean === 'GS3' || clean === 'GSPAPER3' || clean === 'PAPER3' || clean === 'GSIII' || clean === 'GS-III') return 'GS3';
+  if (clean === 'GS4' || clean === 'GSPAPER4' || clean === 'PAPER4' || clean === 'GSIV' || clean === 'GS-IV') return 'GS4';
   const p = paper.trim().toUpperCase();
-  if (p.includes('GS1') || p.includes('GS-1') || p === 'GS-I' || p === 'GSI') return 'GS1';
-  if (p.includes('GS2') || p.includes('GS-2') || p === 'GS-II' || p === 'GSII') return 'GS2';
-  if (p.includes('GS3') || p.includes('GS-3') || p === 'GS-III' || p === 'GSIII') return 'GS3';
-  if (p.includes('GS4') || p.includes('GS-4') || p === 'GS-IV' || p === 'GSIV') return 'GS4';
+  if (p.includes('GS1') || p.includes('GS 1') || p.includes('GS-1') || p.includes('PAPER 1') || p === 'GS-I' || p === 'GSI') return 'GS1';
+  if (p.includes('GS2') || p.includes('GS 2') || p.includes('GS-2') || p.includes('PAPER 2') || p === 'GS-II' || p === 'GSII') return 'GS2';
+  if (p.includes('GS3') || p.includes('GS 3') || p.includes('GS-3') || p.includes('PAPER 3') || p === 'GS-III' || p === 'GSIII') return 'GS3';
+  if (p.includes('GS4') || p.includes('GS 4') || p.includes('GS-4') || p.includes('PAPER 4') || p === 'GS-IV' || p === 'GSIV') return 'GS4';
   if (p.includes('ESSAY')) return 'Essay';
   if (p.includes('OPTIONAL') || p.includes('ANTHRO') || p.includes('SOCIO') || p === 'ANTHRO1' || p === 'SOCIO1' || p === 'SOCIO2') return 'Optional';
   return paper;
@@ -156,7 +161,7 @@ try {
 }
 
 export function resolvePaper(q: any): string {
-  const norm = normalizePaper(q.paper);
+  const norm = normalizePaper(q.paper || q.paper_name);
   if (norm && ['GS1', 'GS2', 'GS3', 'GS4', 'Essay', 'Optional'].includes(norm)) {
     return norm;
   }
@@ -169,7 +174,10 @@ export function resolvePaper(q: any): string {
       if (second && (second === 'Anthropology' || second === 'Sociology' || second.toUpperCase().includes('ANTHRO') || second.toUpperCase().includes('SOCIO') || second.toUpperCase().includes('OPTIONAL'))) {
         return 'Optional';
       }
-      return normalizePaper(first);
+      const firstNorm = normalizePaper(first);
+      if (firstNorm && ['GS1', 'GS2', 'GS3', 'GS4', 'Essay', 'Optional'].includes(firstNorm)) {
+        return firstNorm;
+      }
     }
   }
   return norm || 'GS1';

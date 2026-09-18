@@ -686,6 +686,7 @@ export function MainsScreenInner() {
       } else if (currentScreen === 'search') {
         setCurrentScreen('hub');
       } else if (currentScreen === 'questions') {
+        setQbSearchQuery('');
         if (cameFromExternalRoute.current) {
           // Questions list was opened directly from PYQ heatmap.
           // Back should return to PYQ Analysis, not to the Mains hub.
@@ -696,8 +697,10 @@ export function MainsScreenInner() {
           setCurrentScreen('hub');
         }
       } else if (currentScreen === 'topper-copies') {
+        setQbSearchQuery('');
         setCurrentScreen('hub');
       } else {
+        setQbSearchQuery('');
         setCurrentScreen('hub');
       }
     }
@@ -794,6 +797,7 @@ export function MainsScreenInner() {
         } else if (currentScreen === 'search') {
           setCurrentScreen('hub');
         } else if (currentScreen === 'questions') {
+          setQbSearchQuery('');
           if (cameFromExternalRoute.current) {
             // Questions list opened from PYQ heatmap — swipe back exits to PYQ Analysis
             cameFromExternalRoute.current = false;
@@ -803,6 +807,7 @@ export function MainsScreenInner() {
             setCurrentScreen('hub');
           }
         } else {
+          setQbSearchQuery('');
           setCurrentScreen('hub');
         }
       }
@@ -1975,6 +1980,7 @@ export function MainsScreenInner() {
                     setValueAddOrigin(null);
                   }
                 } else if ((currentScreen as string) !== 'hub') {
+                  setQbSearchQuery('');
                   setCurrentScreen('hub');
                 } else {
                   router.navigate('/(tabs)');
@@ -2050,6 +2056,7 @@ export function MainsScreenInner() {
           {currentScreen === 'hub' && (
             <HubView
               onSelect={(scr: any) => {
+                setQbSearchQuery('');
                 if (scr === 'value-add') {
                   setValueAddCategory(null);
                   setValueAddOrigin('hub');
@@ -2057,6 +2064,7 @@ export function MainsScreenInner() {
                 setCurrentScreen(scr);
               }}
               onSelectVaHub={(category?: string) => {
+                setQbSearchQuery('');
                 setValueAddCategory(category ?? 'va_hub');
                 setValueAddOrigin('hub');
                 setCurrentScreen('value-add');
@@ -2094,6 +2102,7 @@ export function MainsScreenInner() {
               key={params._ts || (initialFiltersFromParams ? JSON.stringify(initialFiltersFromParams) : 'qb-view')}
               colors={colors}
               initialSearch={qbSearchQuery}
+              onClearSearch={() => setQbSearchQuery('')}
               savedIds={savedQuestionIds}
               onToggleSaved={toggleBookmark}
               isTablet={isTablet}
@@ -5344,6 +5353,7 @@ function QuestionBankView({
   onForceSync,
   syncing = false,
   initialSearch = '',
+  onClearSearch,
 }: {
   colors: any;
   savedIds: string[];
@@ -5375,6 +5385,7 @@ function QuestionBankView({
   onForceSync?: () => void;
   syncing?: boolean;
   initialSearch?: string;
+  onClearSearch?: () => void;
 }) {
   const { isDark } = useTheme();
   const router = useRouter();
@@ -6498,7 +6509,14 @@ function QuestionBankView({
                         style={[styles.largeSearchText, { color: colors.textPrimary, fontSize: 15 }]}
                       />
                       {search.length > 0 && (
-                        <TouchableOpacity onPress={() => setSearch('')} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }} style={{ padding: 4, marginRight: 6 }}>
+                        <TouchableOpacity
+                          onPress={() => {
+                            setSearch('');
+                            onClearSearch?.();
+                          }}
+                          hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                          style={{ padding: 4, marginRight: 6 }}
+                        >
                           <X size={20} color={colors.textTertiary} />
                         </TouchableOpacity>
                       )}

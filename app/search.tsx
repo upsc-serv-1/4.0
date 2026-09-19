@@ -179,7 +179,7 @@ const DEFAULT_FILTERS: UnifiedFilters = {
   mainsPapers: [],
   institutes: [],
   programmes: [],
-  searchAcross: ['Question', 'Explanation', 'Options'],
+  searchAcross: ['Question'],
   sections: [],
   microtopics: [],
   mainsSections: [],
@@ -352,17 +352,18 @@ export function canonicalizeSubject(sub: string | null | undefined): string {
 }
 
 export function truncateSubjectLabel(name: string): string {
-  const upper = (name || '').toUpperCase();
-  if (upper.includes('HISTORY')) return 'HISTO...';
-  if (upper.includes('POLITY')) return 'POLITY...';
-  if (upper.includes('ECONOM')) return 'ECONO...';
-  if (upper.includes('GEOGRAPH')) return 'GEOGR...';
-  if (upper.includes('ENVIRON')) return 'ENVIR...';
-  if (upper.includes('SCIENCE')) return 'SCI&T...';
-  if (upper.includes('INTERNAT')) return 'IR...';
-  if (upper.includes('CURRENT')) return 'CA...';
-  if (upper.includes('ETHIC')) return 'ETHIC...';
-  if (name.length > 9) return name.slice(0, 8) + '...';
+  const upper = (name || '').trim().toUpperCase();
+  if (upper.includes('HISTORY')) return 'History';
+  if (upper.includes('POLITY')) return 'Polity';
+  if (upper.includes('ECONOM')) return 'Economy';
+  if (upper.includes('GEOGRAPH')) return 'Geography';
+  if (upper.includes('ENVIRON')) return 'Environment';
+  if (upper.includes('SCIENCE') || upper.includes('TECH')) return 'Science & Tech';
+  if (upper.includes('INTERNAT')) return "Int'l Relations";
+  if (upper.includes('CURRENT')) return 'Current Affairs';
+  if (upper.includes('ETHIC')) return 'Ethics';
+  if (upper === 'CSAT') return 'CSAT';
+  if (name.length > 18) return name.slice(0, 17) + '...';
   return name;
 }
 
@@ -644,24 +645,16 @@ export function evaluateTextMatch(
     return { matched: false, score: 0, tier: 99 };
   }
 
-  // 2. Multi-word query handling (e.g. "bhagat singh")
+  // 2. Multi-word query handling (e.g. "fundamental right")
   if (userWords.length > 1) {
-    const matchedUserWords = userWords.filter(w => textMatchesKeyword(text, w));
+    const allWordsPresent = userWords.every(w => textMatchesKeyword(text, w));
 
-    // Tier 1: ALL user words must appear in the text
-    if (matchedUserWords.length === userWords.length) {
+    // In Fuzzy (Matching) mode, ALL meaningful terms MUST be present (AND-like matching)
+    if (allWordsPresent) {
       return { matched: true, score: 6 + userWords.length, tier: 1 };
     }
 
-    // Tier 2: For long queries (>= 4 words), majority (>= 70%) present
-    if (userWords.length >= 4) {
-      const matchRatio = matchedUserWords.length / userWords.length;
-      if (matchRatio >= 0.7) {
-        return { matched: true, score: 4 + matchedUserWords.length, tier: 2 };
-      }
-    }
-
-    // Tier 3: In AI modes, match if any AI expansion keyword appears
+    // In AI modes ONLY, allow semantic match if an AI-expanded keyword is present
     if (mode === 'AI' || mode === 'AI+Fuzzy') {
       const matchedAi = aiKeywords.filter(k => k.length > 2 && textMatchesKeyword(text, k));
       if (matchedAi.length > 0) {
@@ -669,7 +662,7 @@ export function evaluateTextMatch(
       }
     }
 
-    // Isolated words (e.g. "singh" without "bhagat") MUST NEVER MATCH!
+    // Isolated words (e.g. "fundamental" without "right") MUST NEVER MATCH!
     return { matched: false, score: 0, tier: 99 };
   }
 
@@ -814,19 +807,20 @@ export default function IntegratedSearchScreen() {
   // Active answer tab selected for each Mains question ID
   const [activeMainsTabs, setActiveMainsTabs] = useState<Record<string, string>>({});
 
-  // 5 Accordion Sections (prelims & mains OPEN by default, institutes/revision/display CLOSED by default)
+  // 6 Accordion Sections (prelims, mains & searchIn OPEN by default, institutes/revision/display CLOSED by default)
   const [openSections, setOpenSections] = useState<Record<string, boolean>>({
     prelims: true,
     mains: true,
     institutes: false,
     revision: false,
+    searchIn: true,
     display: false,
   });
   const [pyqExpanded, setPyqExpanded] = useState(false);
 
   const [syncing, setSyncing] = useState(false);
 
-
+  const sidebarScrollViewRef = useRef<ScrollView>(null);
   const landingScrollRef = useRef<ScrollView>(null);
 
   // Search History dropdown states
@@ -1434,19 +1428,25 @@ export default function IntegratedSearchScreen() {
   const prelimsSectionOptions = useMemo(() => {
     const s = new Set<string>();
     const subjectFilters = filters.subjects.map(sub => canonicalizeSubject(sub));
-    coursePrelims.forEach((q: any) => {
+    const pool = (hasSearched && results.length > 0)
+      ? results.filter(r => r.type === 'prelims').map(r => r.rawItem).filter(Boolean)
+      : coursePrelims;
+    pool.forEach((q: any) => {
       const matchSubject = subjectFilters.length === 0 || subjectFilters.includes(canonicalizeSubject(q.subject));
       if (matchSubject && q.section_group) {
         s.add(q.section_group);
       }
     });
     return ['All', ...Array.from(s).sort()];
-  }, [coursePrelims, filters.subjects]);
+  }, [hasSearched, results, coursePrelims, filters.subjects]);
 
   const prelimsMicrotopicOptions = useMemo(() => {
     const s = new Set<string>();
     const subjectFilters = filters.subjects.map(sub => canonicalizeSubject(sub));
-    coursePrelims.forEach((q: any) => {
+    const pool = (hasSearched && results.length > 0)
+      ? results.filter(r => r.type === 'prelims').map(r => r.rawItem).filter(Boolean)
+      : coursePrelims;
+    pool.forEach((q: any) => {
       const matchSubject = subjectFilters.length === 0 || subjectFilters.includes(canonicalizeSubject(q.subject));
       const matchSection = filters.sections.length === 0 || filters.sections.includes(q.section_group);
       if (matchSubject && matchSection && q.micro_topic) {
@@ -1454,7 +1454,7 @@ export default function IntegratedSearchScreen() {
       }
     });
     return ['All', ...Array.from(s).sort()];
-  }, [coursePrelims, filters.subjects, filters.sections]);
+  }, [hasSearched, results, coursePrelims, filters.subjects, filters.sections]);
 
   // Mains subjects cascading from selected papers
   const mainsSubjectOptions = useMemo(() => {
@@ -1482,27 +1482,41 @@ export default function IntegratedSearchScreen() {
     const paperFilter = filters.mainsPapers;
     const subjectFilters = filters.subjects.map(s => canonicalizeSubject(s));
     const s = new Set<string>();
-    mainsQuestions.forEach((q: any) => {
+    const qPool = (hasSearched && results.length > 0)
+      ? results.filter(r => r.type === 'mains' || r.type === 'topper').map(r => r.rawItem).filter(Boolean)
+      : mainsQuestions;
+    const vaPool = (hasSearched && results.length > 0)
+      ? results.filter(r => r.type === 'value_add').map(r => r.rawItem).filter(Boolean)
+      : mainsValueAdd;
+
+    qPool.forEach((q: any) => {
       const matchPaper = paperFilter.length === 0 || paperFilter.includes(q.paper);
       const matchSubject = subjectFilters.length === 0 || subjectFilters.includes(canonicalizeSubject(q.subject));
       const sec = getQuestionSection(q);
       if (matchPaper && matchSubject && sec) s.add(sec);
     });
-    mainsValueAdd.forEach((va: any) => {
+    vaPool.forEach((va: any) => {
       const matchPaper = paperFilter.length === 0 || paperFilter.includes(va.paper || '');
       const matchSubject = subjectFilters.length === 0 || subjectFilters.includes(canonicalizeSubject(va.subject || ''));
       const sec = getValueAddSection(va);
       if (matchPaper && matchSubject && sec) s.add(sec);
     });
     return ['All', ...Array.from(s).sort()];
-  }, [mainsQuestions, mainsValueAdd, filters.mainsPapers, filters.subjects]);
+  }, [hasSearched, results, mainsQuestions, mainsValueAdd, filters.mainsPapers, filters.subjects]);
 
   const mainsMicrotopicOptions = useMemo(() => {
     const paperFilter = filters.mainsPapers;
     const subjectFilters = filters.subjects.map(s => canonicalizeSubject(s));
     const sectionFilter = filters.mainsSections || [];
     const s = new Set<string>();
-    mainsQuestions.forEach((q: any) => {
+    const qPool = (hasSearched && results.length > 0)
+      ? results.filter(r => r.type === 'mains' || r.type === 'topper').map(r => r.rawItem).filter(Boolean)
+      : mainsQuestions;
+    const vaPool = (hasSearched && results.length > 0)
+      ? results.filter(r => r.type === 'value_add').map(r => r.rawItem).filter(Boolean)
+      : mainsValueAdd;
+
+    qPool.forEach((q: any) => {
       const matchPaper = paperFilter.length === 0 || paperFilter.includes(q.paper);
       const matchSubject = subjectFilters.length === 0 || subjectFilters.includes(canonicalizeSubject(q.subject));
       const sec = getQuestionSection(q);
@@ -1510,7 +1524,7 @@ export default function IntegratedSearchScreen() {
       const micro = getQuestionMicro(q);
       if (matchPaper && matchSubject && matchSec && micro) s.add(micro);
     });
-    mainsValueAdd.forEach((va: any) => {
+    vaPool.forEach((va: any) => {
       const matchPaper = paperFilter.length === 0 || paperFilter.includes(va.paper || '');
       const matchSubject = subjectFilters.length === 0 || subjectFilters.includes(canonicalizeSubject(va.subject || ''));
       const sec = getValueAddSection(va);
@@ -1519,7 +1533,7 @@ export default function IntegratedSearchScreen() {
       if (matchPaper && matchSubject && matchSec && micro) s.add(micro);
     });
     return ['All', ...Array.from(s).sort()];
-  }, [mainsQuestions, mainsValueAdd, filters.mainsPapers, filters.subjects, filters.mainsSections]);
+  }, [hasSearched, results, mainsQuestions, mainsValueAdd, filters.mainsPapers, filters.subjects, filters.mainsSections]);
 
   const mainsSubtopicOptions = useMemo(() => {
     const paperFilter = filters.mainsPapers;
@@ -1568,96 +1582,71 @@ export default function IntegratedSearchScreen() {
     mainsValueAdd.forEach((va: any) => {
       const matchPaper = paperFilter.length === 0 || paperFilter.includes(va.paper || '');
       const matchSubject = subjectFilters.length === 0 || subjectFilters.includes(canonicalizeSubject(va.subject || ''));
+      const sec = getValueAddSection(va);
+      const matchSec = (filters.mainsSections || []).length === 0 || (filters.mainsSections || []).includes(sec);
+      const micro = getValueAddMicro(va);
+      const matchMicro = (filters.mainsMicrotopics || []).length === 0 || (filters.mainsMicrotopics || []).includes(micro);
       const sub = getValueAddSub(va);
       const matchSub = subtopicFilter.length === 0 || subtopicFilter.includes(sub);
-      const nano = getValueAddNano(va);
-      if (matchPaper && matchSubject && matchSub && nano && nano !== 'General') {
+      const nano = va.nanotopic || '';
+      if (matchPaper && matchSubject && matchSec && matchMicro && matchSub && nano && nano !== 'General') {
         s.add(nano);
       }
     });
     return ['All', ...Array.from(s).sort()];
-  }, [mainsQuestions, mainsValueAdd, filters.mainsPapers, filters.subjects, filters.subtopics]);
+  }, [mainsQuestions, mainsValueAdd, filters.mainsPapers, filters.subjects, filters.mainsSections, filters.mainsMicrotopics, filters.subtopics]);
 
-  // Prune orphaned child selections when parent selections change
+  // Prune child selections only when top-level parent (subjects/papers) are cleared (Requirement 6: preserve micro topics across section groups)
   useEffect(() => {
-    const nextSections = filters.sections.filter(s => prelimsSectionOptions.includes(s));
-    const nextMicrotopics = filters.microtopics.filter(m => prelimsMicrotopicOptions.includes(m));
-    const nextMainsSec = (filters.mainsSections || []).filter(s => mainsSectionOptions.includes(s));
-    const nextMainsMicro = (filters.mainsMicrotopics || []).filter(m => mainsMicrotopicOptions.includes(m));
-    const nextSubtopics = filters.subtopics.filter(s => mainsSubtopicOptions.includes(s));
-    const nextNanotopics = filters.nanotopics.filter(n => mainsNanotopicOptions.includes(n));
-
-    if (
-      nextSections.length !== filters.sections.length ||
-      nextMicrotopics.length !== filters.microtopics.length ||
-      nextMainsSec.length !== (filters.mainsSections || []).length ||
-      nextMainsMicro.length !== (filters.mainsMicrotopics || []).length ||
-      nextSubtopics.length !== filters.subtopics.length ||
-      nextNanotopics.length !== filters.nanotopics.length
-    ) {
-      setFilters(prev => ({
-        ...prev,
-        sections: nextSections,
-        microtopics: nextMicrotopics,
-        mainsSections: nextMainsSec,
-        mainsMicrotopics: nextMainsMicro,
-        subtopics: nextSubtopics,
-        nanotopics: nextNanotopics,
-      }));
+    if (filters.subjects.length === 0) {
+      if (filters.sections.length > 0 || filters.microtopics.length > 0) {
+        setFilters(prev => ({ ...prev, sections: [], microtopics: [] }));
+      }
     }
-  }, [
-    prelimsSectionOptions,
-    prelimsMicrotopicOptions,
-    mainsSectionOptions,
-    mainsMicrotopicOptions,
-    mainsSubtopicOptions,
-    mainsNanotopicOptions,
-  ]);
-
-  const mainsTagOptions = useMemo(() => {
-    const s = new Set<string>();
-    mainsQuestions.forEach((q: any) => {
-      if (q.macrotag) {
-        q.macrotag.split(',').forEach((t: string) => {
-          const clean = t.trim();
-          if (clean) s.add(clean);
-        });
+    if (filters.mainsPapers.length === 0) {
+      if ((filters.mainsSections || []).length > 0 || (filters.mainsMicrotopics || []).length > 0 || filters.subtopics.length > 0 || filters.nanotopics.length > 0) {
+        setFilters(prev => ({ ...prev, mainsSections: [], mainsMicrotopics: [], subtopics: [], nanotopics: [] }));
       }
-      if (q.microtag) {
-        q.microtag.split(',').forEach((t: string) => {
-          const clean = t.trim();
-          if (clean) s.add(clean);
-        });
-      }
-    });
-    return ['All', ...Array.from(s).slice(0, 60).sort()];
-  }, [mainsQuestions]);
+    }
+  }, [filters.subjects.length, filters.mainsPapers.length]);
 
+  // Authentic Mains Question Bank Macro Tags (Requirement 9 & 10)
   const mainsMacrotagOptions = useMemo(() => {
     const s = new Set<string>();
-    mainsQuestions.forEach((q: any) => {
+    const pool = (hasSearched && results.length > 0)
+      ? results.filter(r => r.type === 'mains' || r.type === 'topper' || r.type === 'value_add').map(r => r.rawItem).filter(Boolean)
+      : mainsQuestions;
+    pool.forEach((q: any) => {
       if (q.macrotag) {
         q.macrotag.split(',').forEach((t: string) => {
-          const clean = t.trim();
+          const clean = t.trim().replace(/^#/, '');
           if (clean) s.add(clean);
         });
       }
     });
     return ['All', ...Array.from(s).sort()];
-  }, [mainsQuestions]);
+  }, [hasSearched, results, mainsQuestions]);
 
+  // Authentic Mains Question Bank Micro Tags: Only loaded contextually when Macro Tag is selected!
   const mainsMicrotagOptions = useMemo(() => {
+    const macroFilter = (filters.macrotags || []).map(m => m.replace(/^#/, ''));
+    if (macroFilter.length === 0) return ['All'];
     const s = new Set<string>();
-    mainsQuestions.forEach((q: any) => {
-      if (q.microtag) {
+    const pool = (hasSearched && results.length > 0)
+      ? results.filter(r => r.type === 'mains' || r.type === 'topper' || r.type === 'value_add').map(r => r.rawItem).filter(Boolean)
+      : mainsQuestions;
+    pool.forEach((q: any) => {
+      const qMacros = (q.macrotag || '').split(',').map((t: string) => t.trim().replace(/^#/, ''));
+      const matchMacro = macroFilter.some(m => qMacros.includes(m));
+      if (matchMacro && q.microtag) {
         q.microtag.split(',').forEach((t: string) => {
-          const clean = t.trim();
+          const clean = t.trim().replace(/^#/, '');
           if (clean) s.add(clean);
         });
       }
     });
     return ['All', ...Array.from(s).sort()];
-  }, [mainsQuestions]);
+  }, [hasSearched, results, mainsQuestions, filters.macrotags]);
 
   const mainsYearOptions = useMemo(() => {
     const s = new Set<string>();
@@ -1968,9 +1957,9 @@ export default function IntegratedSearchScreen() {
           return;
         }
 
-        const matchedInQ = matchQ.matched || (searchQuestion && userWords.length > 0 && userWords.some(w => textMatchesKeyword(qText, w)));
-        const matchedInExpl = matchExpl.matched || (searchExplanation && userWords.length > 0 && userWords.some(w => textMatchesKeyword(qExpl, w)));
-        const matchedInOpts = matchOpts.matched || (searchOptions && userWords.length > 0 && userWords.some(w => textMatchesKeyword(optsText, w)));
+        const matchedInQ = matchQ.matched;
+        const matchedInExpl = matchExpl.matched;
+        const matchedInOpts = matchOpts.matched;
 
         const bestTier = Math.min(matchQ.tier, matchExpl.tier, matchOpts.tier, matchCombined.tier);
         const score = (matchQ.matched ? matchQ.score * 2 : 0) +
@@ -2065,8 +2054,8 @@ export default function IntegratedSearchScreen() {
           return;
         }
 
-        const matchedInQ = matchQ.matched || (searchQuestion && userWords.length > 0 && userWords.some(w => textMatchesKeyword(qText, w)));
-        const matchedInAns = matchAns.matched || (searchExplanation && userWords.length > 0 && userWords.some(w => textMatchesKeyword(ansText, w)));
+        const matchedInQ = matchQ.matched;
+        const matchedInAns = matchAns.matched;
 
         let score = (matchQ.matched ? matchQ.score * 2 : 0) +
                     (matchAns.matched ? matchAns.score * 1.5 : 0) +
@@ -3070,23 +3059,18 @@ export default function IntegratedSearchScreen() {
         updated.mainsMicrotopics = [];
         updated.subtopics = [];
         updated.nanotopics = [];
-      } else if (key === 'sections') {
-        updated.microtopics = [];
-      } else if (key === 'mainsSections') {
-        updated.mainsMicrotopics = [];
-        updated.subtopics = [];
-        updated.nanotopics = [];
-      } else if (key === 'mainsMicrotopics') {
-        updated.subtopics = [];
-        updated.nanotopics = [];
-      } else if (key === 'subtopics') {
-        updated.nanotopics = [];
       } else if (key === 'institutes' && next.length === 0) {
         updated.programmes = [];
       }
 
       return updated;
     });
+
+    if ((key === 'sections' || key === 'mainsSections') && value !== 'All') {
+      setTimeout(() => {
+        sidebarScrollViewRef.current?.scrollTo({ y: 320, animated: true });
+      }, 50);
+    }
   };
 
   const toggleStage = (key: 'showPrelims' | 'showMains' | 'showToppers' | 'showValueAdd') => {
@@ -3133,10 +3117,9 @@ export default function IntegratedSearchScreen() {
 
 
   const renderAccordionHeader = (
-    key: 'prelims' | 'mains' | 'institutes' | 'revision' | 'display',
+    key: 'prelims' | 'mains' | 'institutes' | 'revision' | 'display' | 'searchIn',
     label: string,
-    badgeCount?: number,
-    accentColor: string = '#16A34A'
+    badgeCount?: number
   ) => {
     const isOpen = openSections[key];
     const hasActive = (badgeCount ?? 0) > 0;
@@ -3144,26 +3127,30 @@ export default function IntegratedSearchScreen() {
       <TouchableOpacity
         onPress={() => setOpenSections(prev => ({ ...prev, [key]: !prev[key] }))}
         activeOpacity={1}
-        style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          paddingVertical: 9,
-          paddingHorizontal: 12,
-          borderRadius: 10,
-          borderWidth: 1.5,
-          borderColor: accentColor,
-          backgroundColor: isDark ? `${accentColor}25` : `${accentColor}18`,
-          marginTop: 8,
-          marginBottom: isOpen ? 6 : 4,
-        }}
+        style={[
+          styles.sidebarSectionHeader,
+          (isOpen || hasActive) && styles.sidebarSectionHeaderActive,
+          {
+            marginVertical: 3,
+            paddingVertical: 8,
+            paddingHorizontal: 10,
+            borderRadius: 10,
+            backgroundColor: (isOpen || hasActive)
+              ? (isDark ? 'rgba(124, 58, 237, 0.12)' : 'rgba(124, 58, 237, 0.06)')
+              : (isDark ? 'rgba(255, 255, 255, 0.03)' : 'transparent'),
+            borderColor: (isOpen || hasActive)
+              ? (isDark ? 'rgba(124, 58, 237, 0.3)' : 'rgba(124, 58, 237, 0.18)')
+              : 'transparent',
+            borderWidth: 1,
+          }
+        ]}
       >
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, flex: 1 }}>
           <Text
             style={{
               fontSize: 11,
-              fontWeight: '900',
-              color: accentColor,
+              fontWeight: '800',
+              color: (isOpen || hasActive) ? colors.primary : colors.textSecondary,
               letterSpacing: 0.5,
             }}
           >
@@ -3172,7 +3159,7 @@ export default function IntegratedSearchScreen() {
           {hasActive && (
             <View
               style={{
-                backgroundColor: accentColor,
+                backgroundColor: colors.primary,
                 borderRadius: 8,
                 paddingHorizontal: 6,
                 paddingVertical: 1,
@@ -3185,15 +3172,18 @@ export default function IntegratedSearchScreen() {
             </View>
           )}
         </View>
-        <Text style={{ fontSize: 10, fontWeight: '700', color: accentColor }}>
-          {isOpen ? 'Tap to collapse' : 'Tap to expand'}
-        </Text>
+        <View style={{ width: 20, height: 20, borderRadius: 10, backgroundColor: (isOpen || hasActive) ? colors.primary + '15' : 'transparent', alignItems: 'center', justifyContent: 'center' }}>
+          {isOpen
+            ? <ChevronUp size={13} color={(isOpen || hasActive) ? colors.primary : colors.textSecondary} />
+            : <ChevronDown size={13} color={colors.textTertiary} />
+          }
+        </View>
       </TouchableOpacity>
     );
   };
 
   const LeftPanelFilters = (
-    <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 16 }} showsVerticalScrollIndicator={true}>
+    <ScrollView ref={sidebarScrollViewRef} style={{ flex: 1 }} contentContainerStyle={{ padding: 16 }} showsVerticalScrollIndicator={true}>
       {/* Result Breakdown - stats pills without heading */}
       {hasSearched && results.length > 0 && (
         <View style={{ marginBottom: 14, paddingBottom: 12, borderBottomWidth: 0.5, borderBottomColor: colors.border }}>
@@ -3360,40 +3350,58 @@ export default function IntegratedSearchScreen() {
         <TouchableOpacity
           onPress={() => setPyqExpanded(prev => !prev)}
           activeOpacity={1}
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            paddingVertical: 8,
-            paddingHorizontal: 10,
-            borderRadius: 10,
-            borderWidth: 1.5,
-            borderColor: filters.pyqFilter !== 'All' ? '#16A34A' : colors.border,
-            backgroundColor: filters.pyqFilter !== 'All'
-              ? (isDark ? 'rgba(22,163,74,0.18)' : '#DCFCE7')
-              : (isDark ? 'rgba(255,255,255,0.04)' : colors.surface),
-            marginBottom: pyqExpanded ? 8 : 2,
-          }}
+          style={[
+            styles.sidebarSectionHeader,
+            (pyqExpanded || filters.pyqFilter !== 'All') && styles.sidebarSectionHeaderActive,
+            {
+              marginVertical: 3,
+              paddingVertical: 8,
+              paddingHorizontal: 10,
+              borderRadius: 10,
+              backgroundColor: (pyqExpanded || filters.pyqFilter !== 'All')
+                ? (isDark ? 'rgba(124, 58, 237, 0.12)' : 'rgba(124, 58, 237, 0.06)')
+                : (isDark ? 'rgba(255, 255, 255, 0.03)' : 'transparent'),
+              borderColor: (pyqExpanded || filters.pyqFilter !== 'All')
+                ? (isDark ? 'rgba(124, 58, 237, 0.3)' : 'rgba(124, 58, 237, 0.18)')
+                : 'transparent',
+              borderWidth: 1,
+              marginBottom: pyqExpanded ? 6 : 2,
+            }
+          ]}
         >
-          <Text
-            style={{
-              fontSize: 11,
-              fontWeight: '800',
-              color: filters.pyqFilter !== 'All' ? '#15803D' : colors.textPrimary,
-              letterSpacing: 0.5,
-            }}
-          >
-            PYQ STATUS
-          </Text>
-          <Text
-            style={{
-              fontSize: 10,
-              fontWeight: '700',
-              color: filters.pyqFilter !== 'All' ? '#15803D' : colors.textTertiary,
-            }}
-          >
-            {pyqExpanded ? 'Tap to collapse' : (filters.pyqFilter !== 'All' ? filters.pyqFilter : 'Tap to expand')}
-          </Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, flex: 1 }}>
+            <Text
+              style={{
+                fontSize: 11,
+                fontWeight: '800',
+                color: (pyqExpanded || filters.pyqFilter !== 'All') ? colors.primary : colors.textSecondary,
+                letterSpacing: 0.5,
+              }}
+            >
+              PYQ STATUS
+            </Text>
+            {filters.pyqFilter !== 'All' && (
+              <View
+                style={{
+                  backgroundColor: colors.primary,
+                  borderRadius: 8,
+                  paddingHorizontal: 6,
+                  paddingVertical: 1,
+                  alignItems: 'center',
+                }}
+              >
+                <Text style={{ fontSize: 9, fontWeight: '800', color: '#fff' }}>
+                  {filters.pyqFilter === 'PYQ Only' ? 'PYQ' : 'Non-PYQ'}
+                </Text>
+              </View>
+            )}
+          </View>
+          <View style={{ width: 20, height: 20, borderRadius: 10, backgroundColor: (pyqExpanded || filters.pyqFilter !== 'All') ? colors.primary + '15' : 'transparent', alignItems: 'center', justifyContent: 'center' }}>
+            {pyqExpanded
+              ? <ChevronUp size={13} color={(pyqExpanded || filters.pyqFilter !== 'All') ? colors.primary : colors.textSecondary} />
+              : <ChevronDown size={13} color={colors.textTertiary} />
+            }
+          </View>
         </TouchableOpacity>
 
         {pyqExpanded && (
@@ -3597,7 +3605,7 @@ export default function IntegratedSearchScreen() {
                     styles.compactChip,
                     { marginBottom: 5, alignSelf: 'flex-start' },
                     filters.subjects.length === 0
-                      ? { backgroundColor: '#16A34A', borderColor: '#16A34A' }
+                      ? { backgroundColor: colors.primary, borderColor: colors.primary }
                       : { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : colors.surface, borderColor: colors.border },
                   ]}
                 >
@@ -3619,7 +3627,7 @@ export default function IntegratedSearchScreen() {
                           styles.compactChip,
                           { width: '48.5%', justifyContent: 'space-between' },
                           isSelected
-                            ? { backgroundColor: '#16A34A', borderColor: '#16A34A' }
+                            ? { backgroundColor: colors.primary, borderColor: colors.primary }
                             : { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : colors.surface, borderColor: colors.border },
                         ]}
                       >
@@ -3653,7 +3661,7 @@ export default function IntegratedSearchScreen() {
                       style={[
                         styles.compactChip,
                         filters.sections.length === 0
-                          ? { backgroundColor: '#16A34A', borderColor: '#16A34A' }
+                          ? { backgroundColor: colors.primary, borderColor: colors.primary }
                           : { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : colors.surface, borderColor: colors.border },
                       ]}
                     >
@@ -3670,7 +3678,7 @@ export default function IntegratedSearchScreen() {
                           style={[
                             styles.compactChip,
                             isSelected
-                              ? { backgroundColor: '#16A34A', borderColor: '#16A34A' }
+                              ? { backgroundColor: colors.primary, borderColor: colors.primary }
                               : { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : colors.surface, borderColor: colors.border },
                           ]}
                         >
@@ -3696,7 +3704,7 @@ export default function IntegratedSearchScreen() {
                       style={[
                         styles.compactChip,
                         filters.microtopics.length === 0
-                          ? { backgroundColor: '#16A34A', borderColor: '#16A34A' }
+                          ? { backgroundColor: colors.primary, borderColor: colors.primary }
                           : { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : colors.surface, borderColor: colors.border },
                       ]}
                     >
@@ -3713,7 +3721,7 @@ export default function IntegratedSearchScreen() {
                           style={[
                             styles.compactChip,
                             isSelected
-                              ? { backgroundColor: '#16A34A', borderColor: '#16A34A' }
+                              ? { backgroundColor: colors.primary, borderColor: colors.primary }
                               : { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : colors.surface, borderColor: colors.border },
                           ]}
                         >
@@ -3735,7 +3743,7 @@ export default function IntegratedSearchScreen() {
          ═══════════════════════════════════════════════════════════════════════ */}
       {(filters.showMains || filters.showToppers || filters.showValueAdd) && (
         <View style={{ marginBottom: 4 }}>
-          {renderAccordionHeader('mains', 'MAINS FILTERS', activeSectionCounts.mains, '#EA580C')}
+          {renderAccordionHeader('mains', 'MAINS FILTERS', activeSectionCounts.mains)}
           {openSections.mains && (
             <View style={{ marginBottom: 8, gap: 8 }}>
               {/* 1. Papers (Always visible) */}
@@ -3750,7 +3758,7 @@ export default function IntegratedSearchScreen() {
                     style={[
                       styles.compactChip,
                       filters.mainsPapers.length === 0
-                        ? { backgroundColor: '#EA580C', borderColor: '#EA580C' }
+                        ? { backgroundColor: colors.primary, borderColor: colors.primary }
                         : { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : colors.surface, borderColor: colors.border },
                     ]}
                   >
@@ -3768,7 +3776,7 @@ export default function IntegratedSearchScreen() {
                         style={[
                           styles.compactChip,
                           isSelected
-                            ? { backgroundColor: '#EA580C', borderColor: '#EA580C' }
+                            ? { backgroundColor: colors.primary, borderColor: colors.primary }
                             : { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : colors.surface, borderColor: colors.border },
                         ]}
                       >
@@ -3798,7 +3806,7 @@ export default function IntegratedSearchScreen() {
                       style={[
                         styles.compactChip,
                         filters.subjects.length === 0
-                          ? { backgroundColor: '#EA580C', borderColor: '#EA580C' }
+                          ? { backgroundColor: colors.primary, borderColor: colors.primary }
                           : { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : colors.surface, borderColor: colors.border },
                       ]}
                     >
@@ -3817,7 +3825,7 @@ export default function IntegratedSearchScreen() {
                           style={[
                             styles.compactChip,
                             isSelected
-                              ? { backgroundColor: '#EA580C', borderColor: '#EA580C' }
+                              ? { backgroundColor: colors.primary, borderColor: colors.primary }
                               : { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : colors.surface, borderColor: colors.border },
                           ]}
                         >
@@ -3848,7 +3856,7 @@ export default function IntegratedSearchScreen() {
                       style={[
                         styles.compactChip,
                         (filters.mainsSections || []).length === 0
-                          ? { backgroundColor: '#EA580C', borderColor: '#EA580C' }
+                          ? { backgroundColor: colors.primary, borderColor: colors.primary }
                           : { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : colors.surface, borderColor: colors.border },
                       ]}
                     >
@@ -3865,7 +3873,7 @@ export default function IntegratedSearchScreen() {
                           style={[
                             styles.compactChip,
                             isSelected
-                              ? { backgroundColor: '#EA580C', borderColor: '#EA580C' }
+                              ? { backgroundColor: colors.primary, borderColor: colors.primary }
                               : { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : colors.surface, borderColor: colors.border },
                           ]}
                         >
@@ -3891,7 +3899,7 @@ export default function IntegratedSearchScreen() {
                       style={[
                         styles.compactChip,
                         (filters.mainsMicrotopics || []).length === 0
-                          ? { backgroundColor: '#EA580C', borderColor: '#EA580C' }
+                          ? { backgroundColor: colors.primary, borderColor: colors.primary }
                           : { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : colors.surface, borderColor: colors.border },
                       ]}
                     >
@@ -3908,7 +3916,7 @@ export default function IntegratedSearchScreen() {
                           style={[
                             styles.compactChip,
                             isSelected
-                              ? { backgroundColor: '#EA580C', borderColor: '#EA580C' }
+                              ? { backgroundColor: colors.primary, borderColor: colors.primary }
                               : { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : colors.surface, borderColor: colors.border },
                           ]}
                         >
@@ -3934,7 +3942,7 @@ export default function IntegratedSearchScreen() {
                       style={[
                         styles.compactChip,
                         filters.subtopics.length === 0
-                          ? { backgroundColor: '#EA580C', borderColor: '#EA580C' }
+                          ? { backgroundColor: colors.primary, borderColor: colors.primary }
                           : { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : colors.surface, borderColor: colors.border },
                       ]}
                     >
@@ -3951,7 +3959,7 @@ export default function IntegratedSearchScreen() {
                           style={[
                             styles.compactChip,
                             isSelected
-                              ? { backgroundColor: '#EA580C', borderColor: '#EA580C' }
+                              ? { backgroundColor: colors.primary, borderColor: colors.primary }
                               : { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : colors.surface, borderColor: colors.border },
                           ]}
                         >
@@ -3977,7 +3985,7 @@ export default function IntegratedSearchScreen() {
                       style={[
                         styles.compactChip,
                         filters.nanotopics.length === 0
-                          ? { backgroundColor: '#EA580C', borderColor: '#EA580C' }
+                          ? { backgroundColor: colors.primary, borderColor: colors.primary }
                           : { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : colors.surface, borderColor: colors.border },
                       ]}
                     >
@@ -3994,7 +4002,7 @@ export default function IntegratedSearchScreen() {
                           style={[
                             styles.compactChip,
                             isSelected
-                              ? { backgroundColor: '#EA580C', borderColor: '#EA580C' }
+                              ? { backgroundColor: colors.primary, borderColor: colors.primary }
                               : { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : colors.surface, borderColor: colors.border },
                           ]}
                         >
@@ -4007,8 +4015,53 @@ export default function IntegratedSearchScreen() {
                 </View>
               )}
 
-              {/* 7. Micro Tags (Imported from Mains Question Bank) */}
-              {mainsMicrotagOptions.filter(x => x !== 'All').length > 0 && (
+              {/* 7. Macro Tags (Imported from Mains Question Bank) */}
+              {mainsMacrotagOptions.filter(x => x !== 'All').length > 0 && (
+                <View style={{ marginBottom: 4 }}>
+                  <Text style={{ fontSize: 10, fontWeight: '800', color: colors.textTertiary, letterSpacing: 1, marginBottom: 4 }}>
+                    MACRO TAGS {(filters.macrotags || []).length > 0 ? `(${(filters.macrotags || []).length})` : ''}
+                  </Text>
+                  <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 5 }}>
+                    <TouchableOpacity
+                      onPress={() => toggleFilterChip('macrotags', 'All')}
+                      activeOpacity={1}
+                      style={[
+                        styles.compactChip,
+                        (filters.macrotags || []).length === 0
+                          ? { backgroundColor: colors.primary, borderColor: colors.primary }
+                          : { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : colors.surface, borderColor: colors.border },
+                      ]}
+                    >
+                      <Text style={[styles.compactChipText, { color: (filters.macrotags || []).length === 0 ? '#fff' : colors.textSecondary }]}>All</Text>
+                      {(filters.macrotags || []).length === 0 && <Check size={10} color="#fff" style={{ marginLeft: 3 }} />}
+                    </TouchableOpacity>
+                    {mainsMacrotagOptions.filter(x => x !== 'All').map(tag => {
+                      const isSelected = (filters.macrotags || []).includes(tag);
+                      return (
+                        <TouchableOpacity
+                          key={tag}
+                          onPress={() => toggleFilterChip('macrotags', tag)}
+                          activeOpacity={1}
+                          style={[
+                            styles.compactChip,
+                            isSelected
+                              ? { backgroundColor: colors.primary, borderColor: colors.primary }
+                              : { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : colors.surface, borderColor: colors.border },
+                          ]}
+                        >
+                          <Text style={[styles.compactChipText, { color: isSelected ? '#fff' : colors.textSecondary }]}>
+                            #{tag}
+                          </Text>
+                          {isSelected && <Check size={10} color="#fff" style={{ marginLeft: 3 }} />}
+                        </TouchableOpacity>
+                      );
+                    })}
+                  </View>
+                </View>
+              )}
+
+              {/* 8. Micro Tags (Contextual from Mains Question Bank) */}
+              {(filters.macrotags || []).length > 0 && mainsMicrotagOptions.filter(x => x !== 'All').length > 0 && (
                 <View style={{ marginBottom: 4 }}>
                   <Text style={{ fontSize: 10, fontWeight: '800', color: colors.textTertiary, letterSpacing: 1, marginBottom: 4 }}>
                     MICRO TAGS {(filters.microtags || []).length > 0 ? `(${(filters.microtags || []).length})` : ''}
@@ -4020,7 +4073,7 @@ export default function IntegratedSearchScreen() {
                       style={[
                         styles.compactChip,
                         (filters.microtags || []).length === 0
-                          ? { backgroundColor: '#EA580C', borderColor: '#EA580C' }
+                          ? { backgroundColor: colors.primary, borderColor: colors.primary }
                           : { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : colors.surface, borderColor: colors.border },
                       ]}
                     >
@@ -4037,7 +4090,7 @@ export default function IntegratedSearchScreen() {
                           style={[
                             styles.compactChip,
                             isSelected
-                              ? { backgroundColor: '#EA580C', borderColor: '#EA580C' }
+                              ? { backgroundColor: colors.primary, borderColor: colors.primary }
                               : { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : colors.surface, borderColor: colors.border },
                           ]}
                         >
@@ -4161,7 +4214,7 @@ export default function IntegratedSearchScreen() {
          ═══════════════════════════════════════════════════════════════════════ */}
       {userTags.length > 0 && (
         <View style={{ marginBottom: 4 }}>
-          {renderAccordionHeader('revision', 'REVISION TAGS', activeSectionCounts.revision, '#EC4899')}
+          {renderAccordionHeader('revision', 'REVISION TAGS', activeSectionCounts.revision)}
           {openSections.revision && (
             <View style={{ marginBottom: 8 }}>
               <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 5 }}>
@@ -4171,7 +4224,7 @@ export default function IntegratedSearchScreen() {
                   style={[
                     styles.compactChip,
                     filters.revisionTags.length === 0
-                      ? { backgroundColor: '#EC4899', borderColor: '#EC4899' }
+                      ? { backgroundColor: colors.primary, borderColor: colors.primary }
                       : { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : colors.surface, borderColor: colors.border },
                   ]}
                 >
@@ -4188,7 +4241,7 @@ export default function IntegratedSearchScreen() {
                       style={[
                         styles.compactChip,
                         isSelected
-                          ? { backgroundColor: '#EC4899', borderColor: '#EC4899' }
+                          ? { backgroundColor: colors.primary, borderColor: colors.primary }
                           : { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : colors.surface, borderColor: colors.border },
                       ]}
                     >
@@ -4204,10 +4257,70 @@ export default function IntegratedSearchScreen() {
       )}
 
       {/* ═══════════════════════════════════════════════════════════════════════
+          ROW 6.5: SEARCH IN ACCORDION (default open)
+         ═══════════════════════════════════════════════════════════════════════ */}
+      <View style={{ marginBottom: 4 }}>
+        {renderAccordionHeader('searchIn', 'SEARCH IN', (filters.searchAcross && filters.searchAcross.length > 0 && filters.searchAcross.length < 2) ? 1 : 0)}
+        {openSections.searchIn && (
+          <View style={{ marginBottom: 8, flexDirection: 'row', flexWrap: 'wrap', gap: 5, paddingTop: 4 }}>
+            <TouchableOpacity
+              onPress={() => {
+                const list = filters.searchAcross || ['Question'];
+                const hasQ = list.includes('Question');
+                let next: ('Question' | 'Explanation' | 'Options')[];
+                if (hasQ) {
+                  next = list.filter(x => x !== 'Question');
+                  if (next.length === 0) next = ['Question']; // keep at least one
+                } else {
+                  next = [...list, 'Question'];
+                }
+                setFilters(p => ({ ...p, searchAcross: next }));
+              }}
+              activeOpacity={1}
+              style={[
+                styles.compactChip,
+                (filters.searchAcross || []).includes('Question')
+                  ? { backgroundColor: colors.primary, borderColor: colors.primary }
+                  : { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : colors.surface, borderColor: colors.border },
+              ]}
+            >
+              <Text style={[styles.compactChipText, { color: (filters.searchAcross || []).includes('Question') ? '#fff' : colors.textSecondary }]}>Question Text</Text>
+              {(filters.searchAcross || []).includes('Question') && <Check size={10} color="#fff" style={{ marginLeft: 3 }} />}
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              onPress={() => {
+                const list = filters.searchAcross || ['Question'];
+                const hasE = list.includes('Explanation');
+                let next: ('Question' | 'Explanation' | 'Options')[];
+                if (hasE) {
+                  next = list.filter(x => x !== 'Explanation');
+                  if (next.length === 0) next = ['Question'];
+                } else {
+                  next = [...list, 'Explanation'];
+                }
+                setFilters(p => ({ ...p, searchAcross: next }));
+              }}
+              activeOpacity={1}
+              style={[
+                styles.compactChip,
+                (filters.searchAcross || []).includes('Explanation')
+                  ? { backgroundColor: colors.primary, borderColor: colors.primary }
+                  : { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : colors.surface, borderColor: colors.border },
+              ]}
+            >
+              <Text style={[styles.compactChipText, { color: (filters.searchAcross || []).includes('Explanation') ? '#fff' : colors.textSecondary }]}>Answer Text</Text>
+              {(filters.searchAcross || []).includes('Explanation') && <Check size={10} color="#fff" style={{ marginLeft: 3 }} />}
+            </TouchableOpacity>
+          </View>
+        )}
+      </View>
+
+      {/* ═══════════════════════════════════════════════════════════════════════
           ROW 7: DISPLAY & READING ACCORDION (default closed)
          ═══════════════════════════════════════════════════════════════════════ */}
       <View style={{ marginBottom: 4 }}>
-        {renderAccordionHeader('display', 'READING & DISPLAY', 0, '#8B5CF6')}
+        {renderAccordionHeader('display', 'READING & DISPLAY', 0)}
         {openSections.display && (
           <View style={{ marginBottom: 8 }}>
             <SidebarDisplayPreferences
@@ -4279,7 +4392,7 @@ export default function IntegratedSearchScreen() {
                 <ChevronLeft size={24} color={colors.textPrimary} />
               </TouchableOpacity>
             )}
-            {/* Sidebar toggle chevron (Tablet/iPad only) */}
+            {/* Sidebar toggle (Tablet/iPad only) */}
             {IS_IPAD && (
               <TouchableOpacity
                 onPress={() => setSidebarOpen(!sidebarOpen)}
@@ -4294,15 +4407,11 @@ export default function IntegratedSearchScreen() {
                   justifyContent: 'center',
                 }}
               >
-                {sidebarOpen ? (
-                  <ChevronLeft size={18} color={colors.primary} />
-                ) : (
-                  <ChevronRight size={18} color={colors.primary} />
-                )}
+                <SlidersHorizontal size={18} color={sidebarOpen ? colors.primary : colors.textSecondary} />
               </TouchableOpacity>
             )}
 
-            <View style={[styles.searchBox, { backgroundColor: colors.surface, borderColor: colors.border, flex: 1, paddingLeft: 10 }]}>
+            <View style={[styles.searchBox, { height: 38, backgroundColor: colors.surface, borderColor: colors.border, flex: 1, paddingLeft: 8, paddingRight: 4, alignItems: 'center' }]}>
               {/* Compact Engine Mode Badge */}
               <TouchableOpacity
                 onPress={() => setModePickerOpen(true)}
@@ -4315,10 +4424,10 @@ export default function IntegratedSearchScreen() {
                     searchEngineMode === 'AI' ? '#7c3aed15' :
                     searchEngineMode === 'AI+Fuzzy' ? '#06b6d415' :
                     searchEngineMode === 'Matching' ? '#0ea5e915' : '#f59e0b15',
-                  paddingHorizontal: 7,
-                  paddingVertical: 4,
-                  borderRadius: 10,
-                  marginRight: 6,
+                  paddingHorizontal: 6,
+                  paddingVertical: 3,
+                  borderRadius: 8,
+                  marginRight: 4,
                 }}
               >
                 {searchEngineMode === 'AI' && <Brain size={11} color="#7c3aed" />}
@@ -4347,19 +4456,36 @@ export default function IntegratedSearchScreen() {
                 onChangeText={setQuery}
                 returnKeyType="search"
                 onSubmitEditing={() => runIntegratedSearch(query, filters)}
-                style={[styles.input, { color: colors.textPrimary, fontSize: 14 }]}
+                style={[styles.input, { color: colors.textPrimary, fontSize: 13, height: 36 }]}
               />
               {query.length > 0 && (
-                <TouchableOpacity onPress={() => { setQuery(''); }}>
-                  <X size={16} color={colors.textTertiary} />
+                <TouchableOpacity onPress={() => { setQuery(''); }} style={{ padding: 4 }}>
+                  <X size={15} color={colors.textTertiary} />
                 </TouchableOpacity>
               )}
+
+              {/* Inline Search Icon Button */}
+              <TouchableOpacity
+                onPress={() => runIntegratedSearch(query, filters)}
+                disabled={loading || !query.trim()}
+                style={{
+                  width: 30,
+                  height: 30,
+                  borderRadius: 15,
+                  backgroundColor: query.trim() ? colors.primary : (isDark ? 'rgba(255,255,255,0.06)' : '#e2e8f0'),
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  marginLeft: 4,
+                }}
+              >
+                {loading ? <ActivityIndicator size="small" color="#fff" /> : <Search size={14} color={query.trim() ? '#fff' : colors.textTertiary} />}
+              </TouchableOpacity>
             </View>
 
             {!IS_IPAD && (
               <TouchableOpacity
                 onPress={() => setFilterOpen(true)}
-                style={[styles.mobFilterBtn, { backgroundColor: colors.surface, borderColor: colors.border, position: 'relative' }]}
+                style={[styles.mobFilterBtn, { height: 38, width: 38, backgroundColor: colors.surface, borderColor: colors.border, position: 'relative' }]}
               >
                 <Filter size={18} color={activeFilterCount > 0 ? colors.primary : colors.textSecondary} />
                 {activeFilterCount > 0 && (
@@ -4380,18 +4506,10 @@ export default function IntegratedSearchScreen() {
                 )}
               </TouchableOpacity>
             )}
-
-            <TouchableOpacity
-              onPress={() => runIntegratedSearch(query, filters)}
-              disabled={loading || !query.trim()}
-              style={[styles.searchGoBtn, { backgroundColor: colors.primary }]}
-            >
-              {loading ? <ActivityIndicator size="small" color="#fff" /> : <ChevronRight size={18} color="#fff" />}
-            </TouchableOpacity>
           </View>
 
-          {/* AI Keywords 1-line horizontal scroll strip */}
-          {keywords.length > 0 && (
+          {/* AI Keywords 1-line horizontal scroll strip (Only visible in AI or AI+Fuzzy modes) */}
+          {(searchEngineMode === 'AI' || searchEngineMode === 'AI+Fuzzy') && keywords.length > 0 && (
             <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 8, gap: 6 }}>
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: '#7c3aed15', paddingHorizontal: 7, paddingVertical: 4, borderRadius: 10 }}>
                 <Sparkles size={11} color="#7c3aed" />
@@ -4475,7 +4593,7 @@ export default function IntegratedSearchScreen() {
                 <TouchableOpacity
                   key={stage.key}
                   onPress={() => toggleStage(stage.key)}
-                  activeOpacity={0.7}
+                  activeOpacity={1}
                   style={{
                     flexDirection: 'row',
                     alignItems: 'center',
@@ -4543,6 +4661,7 @@ export default function IntegratedSearchScreen() {
                           setGroupBy('relevance');
                         }
                       }}
+                      activeOpacity={1}
                       style={[
                         styles.sortBtn,
                         {
@@ -4557,7 +4676,7 @@ export default function IntegratedSearchScreen() {
                         style={[
                           styles.sortBtnText,
                           {
-                            color: isActive ? '#fff' : colors.textTertiary,
+                            color: isActive ? '#fff' : colors.textSecondary,
                             fontSize: 10,
                             fontWeight: isActive ? '800' : '600',
                           },
@@ -4720,7 +4839,7 @@ export default function IntegratedSearchScreen() {
             {/* Centered Search Bar */}
             <View style={{ width: '100%', maxWidth: 580, position: 'relative', zIndex: 999 }}>
               <View style={{ flexDirection: 'row', gap: 8, position: 'relative', zIndex: 999 }}>
-                <View style={[styles.searchBox, { height: 52, borderRadius: 26, paddingHorizontal: 14, backgroundColor: colors.surface, borderColor: colors.border, flex: 1, alignItems: 'center' }]}>
+                <View style={[styles.searchBox, { height: 42, borderRadius: 21, paddingHorizontal: 12, backgroundColor: colors.surface, borderColor: colors.border, flex: 1, alignItems: 'center' }]}>
                   {/* Compact Engine Mode Badge */}
                   <TouchableOpacity
                     onPress={() => setModePickerOpen(true)}
@@ -4733,9 +4852,9 @@ export default function IntegratedSearchScreen() {
                         searchEngineMode === 'AI' ? '#7c3aed15' :
                         searchEngineMode === 'AI+Fuzzy' ? '#06b6d415' :
                         searchEngineMode === 'Matching' ? '#0ea5e915' : '#f59e0b15',
-                      paddingHorizontal: 8,
-                      paddingVertical: 5,
-                      borderRadius: 12,
+                      paddingHorizontal: 7,
+                      paddingVertical: 4,
+                      borderRadius: 10,
                       marginRight: 6,
                     }}
                   >
@@ -4765,11 +4884,11 @@ export default function IntegratedSearchScreen() {
                     onChangeText={setQuery}
                     returnKeyType="search"
                     onSubmitEditing={() => runIntegratedSearch(query, filters)}
-                    style={[styles.input, { color: colors.textPrimary, fontSize: 15 }]}
+                    style={[styles.input, { color: colors.textPrimary, fontSize: 14 }]}
                   />
                   {query.length > 0 && (
                     <TouchableOpacity onPress={() => setQuery('')}>
-                      <X size={18} color={colors.textTertiary} />
+                      <X size={16} color={colors.textTertiary} />
                     </TouchableOpacity>
                   )}
                 </View>
@@ -4777,24 +4896,24 @@ export default function IntegratedSearchScreen() {
                 {!IS_IPAD && (
                   <TouchableOpacity
                     onPress={() => setFilterOpen(true)}
-                    style={[styles.mobFilterBtn, { height: 52, width: 52, borderRadius: 26, backgroundColor: colors.surface, borderColor: colors.border, position: 'relative' }]}
+                    style={[styles.mobFilterBtn, { height: 42, width: 42, borderRadius: 21, backgroundColor: colors.surface, borderColor: colors.border, position: 'relative' }]}
                   >
-                    <Filter size={20} color={activeFilterCount > 0 ? colors.primary : colors.textSecondary} />
+                    <Filter size={18} color={activeFilterCount > 0 ? colors.primary : colors.textSecondary} />
                     {activeFilterCount > 0 && (
-                      <View style={{
-                        position: 'absolute',
-                        top: -2,
-                        right: -2,
-                        backgroundColor: colors.primary,
-                        borderRadius: 10,
-                        minWidth: 20,
-                        height: 20,
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        paddingHorizontal: 4,
-                      }}>
-                        <Text style={{ fontSize: 10, fontWeight: '900', color: '#fff' }}>{activeFilterCount}</Text>
-                      </View>
+                  <View style={{
+                    position: 'absolute',
+                    top: -2,
+                    right: -2,
+                    backgroundColor: colors.primary,
+                    borderRadius: 10,
+                    minWidth: 18,
+                    height: 18,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    paddingHorizontal: 4,
+                  }}>
+                    <Text style={{ fontSize: 9, fontWeight: '900', color: '#fff' }}>{activeFilterCount}</Text>
+                  </View>
                     )}
                   </TouchableOpacity>
                 )}
@@ -4802,9 +4921,9 @@ export default function IntegratedSearchScreen() {
                 <TouchableOpacity
                   onPress={() => runIntegratedSearch(query, filters)}
                   disabled={loading || !query.trim()}
-                  style={[styles.searchGoBtn, { height: 52, width: 52, borderRadius: 26, backgroundColor: colors.primary }]}
+                  style={[styles.searchGoBtn, { height: 42, width: 42, borderRadius: 21, backgroundColor: colors.primary }]}
                 >
-                  {loading ? <ActivityIndicator size="small" color="#fff" /> : <ChevronRight size={20} color="#fff" />}
+                  {loading ? <ActivityIndicator size="small" color="#fff" /> : <Search size={18} color="#fff" />}
                 </TouchableOpacity>
               </View>
 
@@ -4925,7 +5044,7 @@ export default function IntegratedSearchScreen() {
                 zIndex: 9999,
               }}>
                 <Text style={{ color: '#fff', fontSize: 12, fontWeight: '700' }}>
-                  {Math.round(zoomFontSize)}pt
+                  ZOOM: {Math.round((zoomFontSize / 16) * 100)}%
                 </Text>
               </View>
             )}

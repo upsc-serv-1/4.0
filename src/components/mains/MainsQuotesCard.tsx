@@ -38,8 +38,6 @@ export default function MainsQuotesCard({
     }
   };
 
-  const isConnectingWords = item.subtopic === 'Essay Connectors' || item.category === 'Connecting Words';
-
   const connectingWordsMarkdownStyle = {
     ...getMarkdownStyles(colors),
     body: {
@@ -66,8 +64,9 @@ export default function MainsQuotesCard({
     }
   };
 
-  const isQuote = item.entry_type === 'quote' || !item.entry_type;
+  const isConnectingWords = item.subtopic === 'Essay Connectors' || item.category === 'Connecting Words' || item.entry_type === 'connecting_words' || item.category === 'connecting_words' || (item.title && /connecting\s*words/i.test(item.title));
   const isAnecdote = item.entry_type === 'anecdote';
+  const isQuote = !isConnectingWords && (item.entry_type === 'quote' || !item.entry_type || !isAnecdote);
 
   // ----- Old-format content parser ----------------------------------------
   // Some entries have content in the legacy markdown format:
@@ -107,16 +106,16 @@ export default function MainsQuotesCard({
     <View>
       {/* Entry type + Section Group + Topic classification badges */}
       <View style={localStyles.badgeRow}>
-        {/* Primary label: QUOTE or ANECDOTE based on entry_type */}
+        {/* Primary label: QUOTE, ANECDOTE, or CONNECTING WORDS */}
         <View style={[
           localStyles.badge,
           {
-            backgroundColor: isAnecdote ? 'rgba(139,92,246,0.12)' : 'rgba(217,119,6,0.1)',
-            borderColor: isAnecdote ? 'rgba(139,92,246,0.35)' : 'rgba(217,119,6,0.35)'
+            backgroundColor: isConnectingWords ? 'rgba(16,185,129,0.12)' : isAnecdote ? 'rgba(139,92,246,0.12)' : 'rgba(217,119,6,0.1)',
+            borderColor: isConnectingWords ? 'rgba(16,185,129,0.35)' : isAnecdote ? 'rgba(139,92,246,0.35)' : 'rgba(217,119,6,0.35)'
           }
         ]}>
-          <Text style={[localStyles.badgeText, { color: isAnecdote ? '#8b5cf6' : '#d97706', fontSize: 9 * zoomScale }]}>
-            {isAnecdote ? 'ANECDOTE' : 'QUOTE'}
+          <Text style={[localStyles.badgeText, { color: isConnectingWords ? '#10b981' : isAnecdote ? '#8b5cf6' : '#d97706', fontSize: 9 * zoomScale }]}>
+            {isConnectingWords ? 'CONNECTING WORDS' : isAnecdote ? 'ANECDOTE' : 'QUOTE'}
           </Text>
         </View>
 

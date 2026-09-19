@@ -147,6 +147,7 @@ import {
   Maximize2,
   RefreshCw,
   Award,
+  Globe,
 } from 'lucide-react-native';
 import { useTheme } from '../src/context/ThemeContext';
 import { useAuth } from '../src/context/AuthContext';
@@ -473,10 +474,16 @@ export function MainsScreenInner() {
     category?: string;
     questionId?: string;
     vaId?: string;
+    search?: string;
+    searchQuery?: string;
+    q?: string;
+    isExternalSearch?: string;
+    _ts?: string;
   }>();
 
   const [currentScreen, setCurrentScreen] = useState<'hub' | 'questions' | 'value-add' | 'search' | 'detailed-question' | 'revision-tags' | 'topper-copies'>('hub');
   const [sessionFilters, setSessionFilters] = useState<MainsFilters | null>(null);
+  const [isExternalSearch, setIsExternalSearch] = useState<boolean>(false);
 
   // ── Persist QB filters across tab switches ──
   const qbPersistLoaded = useRef(false);
@@ -571,11 +578,13 @@ export function MainsScreenInner() {
   }, [params.initialScreen, params.from, params.pyqFilter, params.paper, params.subject, params.section, params.microtopic, params.subtopic, params.nanotopic, params.year]);
 
   useEffect(() => {
-    const paramKey = `${params.initialScreen || ''}_${params.from || ''}_${params._ts || ''}_${params.paper || ''}_${params.subject || ''}_${params.section || ''}_${params.microtopic || ''}_${params.subtopic || ''}_${params.nanotopic || ''}_${params.year || ''}_${params.questionId || ''}`;
+    const paramKey = `${params.initialScreen || ''}_${params.from || ''}_${params._ts || ''}_${params.paper || ''}_${params.subject || ''}_${params.section || ''}_${params.microtopic || ''}_${params.subtopic || ''}_${params.nanotopic || ''}_${params.year || ''}_${params.questionId || ''}_${params.search || ''}_${params.searchQuery || ''}_${params.q || ''}_${params.isExternalSearch || ''}`;
     if (!paramKey.replace(/_/g, '') || paramKey === lastHandledParamsRef.current) return;
     lastHandledParamsRef.current = paramKey;
 
-    if (params.initialScreen === 'questions' || params.from === 'pyq') {
+    const extSearchTerm = (params.search || params.searchQuery || params.q || '').trim();
+
+    if (params.initialScreen === 'questions' || params.from === 'pyq' || extSearchTerm) {
       if (params.questionId) {
         const q = mainsConsolidatedQuestions.find(item => String(item.id) === String(params.questionId));
         if (q) {
@@ -591,16 +600,23 @@ export function MainsScreenInner() {
         cameFromExternalRoute.current = true;
       }
 
+      if (extSearchTerm) {
+        setQbSearchQuery(extSearchTerm);
+        setIsExternalSearch(true);
+      } else {
+        setIsExternalSearch(false);
+      }
+
       if (initialFiltersFromParams) {
         overrideWithParamsRef.current = true;
         setSessionFilters(initialFiltersFromParams);
       }
       setCurrentScreen('questions');
-    } else if (params.initialScreen === 'value-add' || params.initialScreen === 'value-addition') {
+    } else if (params.initialScreen === 'value-add' || params.initialScreen === 'value-addition' || params.initialScreen === 'va-hub' || params.initialScreen === 'va_hub') {
       cameFromExternalRoute.current = true;
       setCurrentScreen('value-add');
-      setValueAddCategory(params.category || null);
-      setValueAddOrigin(params.category ? 'submodules' : 'hub');
+      setValueAddCategory(params.category || 'va_hub');
+      setValueAddOrigin('hub');
     } else if (params.initialScreen === 'topper-copies' || params.initialScreen === 'toppers') {
       setCurrentScreen('topper-copies');
     }
@@ -617,12 +633,16 @@ export function MainsScreenInner() {
     params.year,
     params._ts,
     params.category,
+    params.search,
+    params.searchQuery,
+    params.q,
+    params.isExternalSearch,
     initialFiltersFromParams,
   ]);
 
   const [previousScreen, setPreviousScreen] = useState<'questions' | 'search'>('questions');
   const [detailedQuestion, setDetailedQuestion] = useState<ConsolidatedQuestion | null>(null);
-  const [valueAddCategory, setValueAddCategory] = useState<string | null>(null);
+  const [valueAddCategory, setValueAddCategory] = useState<string | null>('va_hub');
   const [valueAddOrigin, setValueAddOrigin] = useState<'hub' | 'submodules' | null>(null);
   const [detailedStudyTags, setDetailedStudyTags] = useState<string[]>([]);
   const [detailedConfidence, setDetailedConfidence] = useState<string | null>(null);
@@ -1966,19 +1986,14 @@ export function MainsScreenInner() {
                   if (cameFromExternalRoute.current) {
                     cameFromExternalRoute.current = false;
                     setCurrentScreen('hub');
-                    setValueAddCategory(null);
+                    setValueAddCategory('va_hub');
                     setValueAddOrigin(null);
                     router.back();
                     return;
                   }
-                  if (valueAddCategory !== null && valueAddOrigin === 'submodules') {
-                    setValueAddCategory(null);
-                    setValueAddOrigin('hub');
-                  } else {
-                    setCurrentScreen('hub');
-                    setValueAddCategory(null);
-                    setValueAddOrigin(null);
-                  }
+                  setCurrentScreen('hub');
+                  setValueAddCategory('va_hub');
+                  setValueAddOrigin(null);
                 } else if ((currentScreen as string) !== 'hub') {
                   setQbSearchQuery('');
                   setCurrentScreen('hub');
@@ -1990,9 +2005,7 @@ export function MainsScreenInner() {
             >
               <ChevronLeft size={20} color={colors.textPrimary} />
               <Text style={[styles.backButtonText, { color: colors.textSecondary }]}>
-                {currentScreen === 'value-add' && valueAddCategory !== null && valueAddOrigin === 'submodules'
-                  ? 'Back' 
-                  : (currentScreen as string) !== 'hub' ? 'Hub' : 'Home'}
+                {(currentScreen as string) !== 'hub' ? 'Hub' : 'Home'}
               </Text>
             </TouchableOpacity>
           ) : null}
@@ -2057,20 +2070,23 @@ export function MainsScreenInner() {
             <HubView
               onSelect={(scr: any) => {
                 setQbSearchQuery('');
+                setIsExternalSearch(false);
                 if (scr === 'value-add') {
-                  setValueAddCategory(null);
+                  setValueAddCategory('va_hub');
                   setValueAddOrigin('hub');
                 }
                 setCurrentScreen(scr);
               }}
               onSelectVaHub={(category?: string) => {
                 setQbSearchQuery('');
+                setIsExternalSearch(false);
                 setValueAddCategory(category ?? 'va_hub');
                 setValueAddOrigin('hub');
                 setCurrentScreen('value-add');
               }}
               onSearch={(query: string) => {
                 setQbSearchQuery(query);
+                setIsExternalSearch(true);
                 setCurrentScreen('questions');
               }}
               colors={colors}
@@ -2102,7 +2118,12 @@ export function MainsScreenInner() {
               key={params._ts || (initialFiltersFromParams ? JSON.stringify(initialFiltersFromParams) : 'qb-view')}
               colors={colors}
               initialSearch={qbSearchQuery}
-              onClearSearch={() => setQbSearchQuery('')}
+              onClearSearch={() => {
+                setQbSearchQuery('');
+                setIsExternalSearch(false);
+              }}
+              isExternalSearch={isExternalSearch}
+              onClearExternalSearch={() => setIsExternalSearch(false)}
               savedIds={savedQuestionIds}
               onToggleSaved={toggleBookmark}
               isTablet={isTablet}
@@ -2800,13 +2821,6 @@ function HubView({
       icon: FileText,
     },
     {
-      id: 'value-add',
-      title: 'Value Addition',
-      description: 'Ready-made answer enhancement tools',
-      color: '#f59e0b',
-      icon: Sparkles,
-    },
-    {
       id: 'syllabus',
       title: 'Syllabus',
       description: selectedCourse === 'Medical Science' ? 'Interactive Medical Science syllabus explorer' : 'Interactive UPSC syllabus explorer',
@@ -2931,7 +2945,7 @@ function HubView({
                     params: { defaultMode: 'mains' }
                   });
                 } else if (card.id === 'va-hub') {
-                  onSelectVaHub?.();
+                  onSelectVaHub?.('va_hub');
                 } else if (card.id === 'notes') {
                   // Navigate to value-add screen with notes category pre-selected
                   onSelectVaHub?.('notes');
@@ -3363,6 +3377,8 @@ export function ValueAddCardBody({
   zoomScale,
   onImagePress,
   onViewNoteFullscreen,
+  filters,
+  search,
 }: {
   item: any;
   colors: any;
@@ -3372,6 +3388,8 @@ export function ValueAddCardBody({
   zoomScale?: number;
   onImagePress?: (uri: string) => void;
   onViewNoteFullscreen?: (item: any) => void;
+  filters?: any;
+  search?: string;
 }) {
   const scale = zoomScale || 1.0;
   const { isDark } = useTheme();
@@ -3382,8 +3400,8 @@ export function ValueAddCardBody({
         <MainsDataFactsCard
           item={item}
           colors={colors}
-          filters={DEFAULT_MAINS_FILTERS}
-          search=""
+          filters={filters || DEFAULT_MAINS_FILTERS}
+          search={search || ""}
           zoomScale={scale}
         />
       )}
@@ -3494,6 +3512,8 @@ export const ValueAdditionCard = React.memo(function ValueAdditionCard({
   onDeleteNote,
   onExportNotePdf,
   onViewNoteFullscreen,
+  filters,
+  search,
 }: {
   item: any;
   colors: any;
@@ -3519,6 +3539,8 @@ export const ValueAdditionCard = React.memo(function ValueAdditionCard({
   onDeleteNote?: (item: any) => void;
   onExportNotePdf?: (item: any) => void;
   onViewNoteFullscreen?: (item: any) => void;
+  filters?: any;
+  search?: string;
 }) {
   const [collapsed, setCollapsed] = useState(initialCollapsed ?? true);
   const [showTagsSelector, setShowTagsSelector] = useState(false);
@@ -3653,6 +3675,8 @@ export const ValueAdditionCard = React.memo(function ValueAdditionCard({
             zoomScale={zoomScale}
             onImagePress={onImagePress}
             onViewNoteFullscreen={onViewNoteFullscreen}
+            filters={filters}
+            search={search}
           />
           <View style={{ flexDirection: 'row', justifyContent: 'flex-end', marginTop: 10, paddingRight: 4, gap: 8 }}>
             {item.category === 'notes' && onViewNoteFullscreen && (
@@ -5354,6 +5378,8 @@ function QuestionBankView({
   syncing = false,
   initialSearch = '',
   onClearSearch,
+  isExternalSearch,
+  onClearExternalSearch,
 }: {
   colors: any;
   savedIds: string[];
@@ -5386,16 +5412,25 @@ function QuestionBankView({
   syncing?: boolean;
   initialSearch?: string;
   onClearSearch?: () => void;
+  isExternalSearch?: boolean;
+  onClearExternalSearch?: () => void;
 }) {
   const { isDark } = useTheme();
   const router = useRouter();
   const [search, setSearch] = useState(initialSearch || '');
+  const [isGlobalSearchActive, setIsGlobalSearchActive] = useState<boolean>(Boolean(isExternalSearch));
 
   useEffect(() => {
     if (initialSearch !== undefined) {
       setSearch(initialSearch);
     }
   }, [initialSearch]);
+
+  useEffect(() => {
+    if (isExternalSearch !== undefined) {
+      setIsGlobalSearchActive(Boolean(isExternalSearch));
+    }
+  }, [isExternalSearch]);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [selectedInstitutes, setSelectedInstitutes] = useState<Record<string, string>>({});
   const [copyModalQuestion, setCopyModalQuestion] = useState<any>(null);
@@ -5890,9 +5925,9 @@ function QuestionBankView({
             const qTopperName = (q.topper_name || '').toLowerCase();
             const qAir = String(q.air_rank || '').toLowerCase();
             topperMatch =
-              qTextMatch ||
-              (qTopperName && qTopperName.includes(searchLower)) ||
-              (qAir && (qAir.includes(searchLower) || ('air ' + qAir).includes(searchLower) || ('air' + qAir).includes(searchLower)));
+              Boolean(qTextMatch) ||
+              Boolean(qTopperName && qTopperName.includes(searchLower)) ||
+              Boolean(qAir && (qAir.includes(searchLower) || ('air ' + qAir).includes(searchLower) || ('air' + qAir).includes(searchLower)));
 
             if (!topperMatch) {
               const key = normalizeQuestionKey(q);
@@ -5921,6 +5956,11 @@ function QuestionBankView({
             (searchInToppers && isTopper && topperMatch);
 
           if (!matchSearch) return false;
+
+          // External/global search bypasses persistent QB filters across papers/subjects
+          if (isGlobalSearchActive) {
+            return true;
+          }
         }
 
         // Paper matching: When paperFilter is 'All' (length === 0), include all papers (GS + Optional)
@@ -6032,6 +6072,11 @@ function QuestionBankView({
         const vaText = `${va.title || ''} ${va.description || ''} ${va.content || ''} ${va.quote || ''} ${va.author || ''} ${va.tags || ''} ${JSON.stringify(va.data_points || '')} ${JSON.stringify(va.examples || '')}`.toLowerCase();
         if (searchLower && !vaText.includes(searchLower)) return false;
 
+        // External/global search bypasses persistent QB filters across papers/subjects
+        if (searchLower && isGlobalSearchActive) {
+          return true;
+        }
+
         // Paper filter
         if (paperFilter.length > 0) {
           const matchPaper = paperFilter.includes(va.paper || '');
@@ -6132,7 +6177,7 @@ function QuestionBankView({
     return () => {
       if (filterTimerRef.current) clearTimeout(filterTimerRef.current);
     };
-  }, [search, filters, allQuestionsPool, valueAddItems, userQuestionStates, topperAttachmentMap]);
+  }, [search, filters, allQuestionsPool, valueAddItems, userQuestionStates, topperAttachmentMap, isGlobalSearchActive]);
 
   const activeContent = useMemo(() => {
     let list: Array<{
@@ -6513,6 +6558,8 @@ function QuestionBankView({
                           onPress={() => {
                             setSearch('');
                             onClearSearch?.();
+                            setIsGlobalSearchActive(false);
+                            onClearExternalSearch?.();
                           }}
                           hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
                           style={{ padding: 4, marginRight: 6 }}
@@ -6540,7 +6587,46 @@ function QuestionBankView({
                     </View>
                   </View>
 
-                  {/* ─── VIEW MODE SWITCHER ─── */}
+                  {/* ─── GLOBAL SEARCH BANNER (When entering from external search) ─── */}
+                  {isGlobalSearchActive && search.length > 0 && (
+                    <View style={{
+                      backgroundColor: isDark ? 'rgba(59, 130, 246, 0.15)' : '#eff6ff',
+                      borderColor: isDark ? 'rgba(59, 130, 246, 0.3)' : '#bfdbfe',
+                      borderWidth: 1,
+                      borderRadius: 10,
+                      paddingHorizontal: 12,
+                      paddingVertical: 8,
+                      marginBottom: 8,
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                    }}>
+                      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, flex: 1, marginRight: 8 }}>
+                        <Globe size={15} color="#3b82f6" />
+                        <Text style={{ fontSize: 12, color: colors.textPrimary, flex: 1 }}>
+                          Searching globally across Mains Question Bank
+                        </Text>
+                      </View>
+                      <TouchableOpacity
+                        onPress={() => {
+                          setIsGlobalSearchActive(false);
+                          onClearExternalSearch?.();
+                        }}
+                        style={{
+                          backgroundColor: colors.primary,
+                          paddingHorizontal: 10,
+                          paddingVertical: 5,
+                          borderRadius: 6,
+                        }}
+                      >
+                        <Text style={{ fontSize: 11, fontWeight: '700', color: '#fff' }}>
+                          Apply Active Filters
+                        </Text>
+                      </TouchableOpacity>
+                    </View>
+                  )}
+
+                  {/* ─── VIEW MODE SWITCHER (Questions, Value Additions & Topper Copies) ─── */}
                   {(() => {
                     const attachedCount = filteredQuestions.filter(q => {
                       const key = normalizeQuestionKey(q);
@@ -7390,11 +7476,11 @@ function ValueAdditionView({
   }, [khemkaSubTab]);
 
   // Actual filter states — used in filteredItems useMemo (may trigger heavy recompute)
-  const [templateFilter, setTemplateFilter] = useState<'All' | 'Templates' | 'IntroConclusionOnly'>('All');
+  const [templateFilter, setTemplateFilter] = useState<'All' | 'Templates' | 'IntroConclusionOnly' | 'Proposition'>('All');
   const [quotesEntryTypeTab, setQuotesEntryTypeTab] = useState<'All' | 'quote' | 'anecdote' | 'connecting_words'>('All');
 
   // Immediate chip UI states — update instantly on press so chip appears selected without waiting for filteredItems recompute
-  const [chipTemplateFilter, setChipTemplateFilter] = useState<'All' | 'Templates' | 'IntroConclusionOnly'>('All');
+  const [chipTemplateFilter, setChipTemplateFilter] = useState<'All' | 'Templates' | 'IntroConclusionOnly' | 'Proposition'>('All');
   const [chipQuotesEntryTypeTab, setChipQuotesEntryTypeTab] = useState<'All' | 'quote' | 'anecdote' | 'connecting_words'>('All');
 
   // Pinch-to-zoom state for Value Additions (ranges from 12 to 32, default 16, representing font size base)
@@ -7426,7 +7512,8 @@ function ValueAdditionView({
   
   // Per-category Hierarchy Filters state — each tab maintains its own independent filters
   const [categoryFilters, setCategoryFilters] = useState<Record<string, MainsFilters>>({});
-  const _catKey: string = activeCategory ?? 'root';
+  const effectiveCategory = activeCategory || 'va_hub';
+  const _catKey: string = effectiveCategory;
   const filters: MainsFilters = categoryFilters[_catKey] || DEFAULT_MAINS_FILTERS;
   const setFilters = (updater: MainsFilters | ((prev: MainsFilters) => MainsFilters)) => {
     setTimeout(() => {
@@ -7453,7 +7540,7 @@ function ValueAdditionView({
       setVisibleLimit(prev => Math.max(prev, 15));
     }, 50);
     return () => clearTimeout(timer);
-  }, [activeCategory, ethicsTab, search, filters]);
+  }, [effectiveCategory, ethicsTab, search, filters]);
 
   const submodules = [
     { id: 'data_facts', title: 'Data & Facts', subtitle: 'Sunya IAS & Metrics', icon: BarChart3, color: '#3b82f6', desc: 'Muted stats, percentages, and indicators sorted for instant citation.' },
@@ -7499,6 +7586,13 @@ function ValueAdditionView({
         item.microtopic || '',
         item.subtopic || '',
         item.examples || '',
+        item.tags || '',
+        item.keywords || '',
+        item.core_values || '',
+        item.ethicsType || '',
+        (item as any).pyq_code || (item as any).pyqCode || '',
+        item.rawContent || item.content || '',
+        typeof item.ethicsData === 'object' ? JSON.stringify(item.ethicsData) : (item.ethicsData || ''),
         parsedSubThemes.map(s => `${s.title} ${s.content}`).join(' ')
       ].join(' ').toLowerCase();
 
@@ -7514,7 +7608,7 @@ function ValueAdditionView({
 
   // Dynamic Options extraction for HierarchyModal based on value addition items or notes
   const activeCategoryItems = useMemo(() => {
-    if (activeCategory === 'notes') {
+    if (effectiveCategory === 'notes') {
       return (mainsNotes || []).map(note => ({
         ...note,
         category: 'notes',
@@ -7527,10 +7621,10 @@ function ValueAdditionView({
       }));
     }
     return uniqueValueAddItems.filter(item => {
-      if (activeCategory !== 'va_hub' && item.category !== activeCategory) return false;
+      if (effectiveCategory !== 'va_hub' && item.category !== effectiveCategory) return false;
 
       // If we are in Ethics, filter by the active sub-tab (or Khemka sub-tab) to only show relevant hierarchy options
-      if (activeCategory === 'ethics') {
+      if (effectiveCategory === 'ethics') {
         if (ethicsTab === 'khemka_toolkit') {
           if (khemkaSubTab === 'skeleton') {
             return item.title === "Khemka Sir's 5 Step Answer Skeleton (GS-4)";
@@ -7758,12 +7852,12 @@ function ValueAdditionView({
       }
     });
     return Array.from(sstSet).sort();
-  }, [activeCategoryItems, filters.subtopics, activeCategory]);
+  }, [activeCategoryItems, filters.subtopics, effectiveCategory]);
 
   const nanotopicOptions: string[] = [];
 
   const itemsToFilter = useMemo(() => {
-    if (activeCategory === 'notes') {
+    if (effectiveCategory === 'notes') {
       return (mainsNotes || []).map(note => ({
         ...note,
         category: 'notes',
@@ -7779,7 +7873,7 @@ function ValueAdditionView({
       }));
     }
     return uniqueValueAddItems;
-  }, [activeCategory, uniqueValueAddItems, mainsNotes]);
+  }, [effectiveCategory, uniqueValueAddItems, mainsNotes]);
 
   const filteredItems = useMemo(() => {
     const paperFilter = filters.paper !== 'All' ? filters.paper.split('|') : [];
@@ -7790,11 +7884,11 @@ function ValueAdditionView({
     const subSubThemeFilter = filters.macrotags !== 'All' ? filters.macrotags.split('|') : [];
 
     return itemsToFilter.filter(item => {
-      const matchCat = !activeCategory || activeCategory === 'va_hub' || item.category === activeCategory;
+      const matchCat = !effectiveCategory || effectiveCategory === 'va_hub' || item.category === effectiveCategory;
       const matchSearch = !search || item.searchableText.includes(search.toLowerCase());
 
       let matchHubCat = true;
-      if (activeCategory === 'va_hub' && vaHubCategories.length > 0) {
+      if (effectiveCategory === 'va_hub' && vaHubCategories.length > 0) {
         matchHubCat = vaHubCategories.includes(item.category);
       }
 
@@ -7829,7 +7923,7 @@ function ValueAdditionView({
         
         let matchTheme = true;
         if (themeFilter.length > 0) {
-          const currentCat = activeCategory === 'va_hub' ? item.category : activeCategory;
+          const currentCat = effectiveCategory === 'va_hub' ? item.category : effectiveCategory;
           const isStandardHierarchyCatTheme = ['intro_conclusion', 'quotes', 'mnemonics', 'frameworks', 'ethics', 'keywords_hub', 'case_studies_hub', 'sc_judgments_hub', 'data_facts', 'notes'].includes(currentCat);
           if (isStandardHierarchyCatTheme) {
             matchTheme = !!item.microtopic && themeFilter.includes(item.microtopic);
@@ -7841,7 +7935,7 @@ function ValueAdditionView({
 
         let matchSubTheme = true;
         if (subThemeFilter.length > 0) {
-          const currentCat2 = activeCategory === 'va_hub' ? item.category : activeCategory;
+          const currentCat2 = effectiveCategory === 'va_hub' ? item.category : effectiveCategory;
           const isStandardHierarchyCatSubTheme = ['intro_conclusion', 'quotes', 'mnemonics', 'frameworks', 'ethics', 'keywords_hub', 'case_studies_hub', 'sc_judgments_hub', 'data_facts', 'notes'].includes(currentCat2);
           if (isStandardHierarchyCatSubTheme) {
             matchSubTheme = !!item.subtopic && subThemeFilter.includes(item.subtopic);
@@ -7854,7 +7948,7 @@ function ValueAdditionView({
 
         let matchSubSubTheme = true;
         if (subSubThemeFilter.length > 0) {
-          const currentCat3 = activeCategory === 'va_hub' ? item.category : activeCategory;
+          const currentCat3 = effectiveCategory === 'va_hub' ? item.category : effectiveCategory;
           const isStandardHierarchyCatSubSubTheme = ['intro_conclusion', 'quotes', 'mnemonics', 'frameworks', 'ethics', 'keywords_hub', 'case_studies_hub', 'sc_judgments_hub', 'data_facts', 'notes'].includes(currentCat3);
           if (isStandardHierarchyCatSubSubTheme) {
             const cardTitleName = currentCat3 === 'data_facts' ? item.metric : item.title;
@@ -7870,12 +7964,15 @@ function ValueAdditionView({
       }
 
       let matchTemplate = true;
-      if (activeCategory === 'intro_conclusion') {
+      if (effectiveCategory === 'intro_conclusion') {
         const titleLower = (item.title || '').toLowerCase();
+        const contentLower = (item.rawContent || item.content || '').toLowerCase();
         if (templateFilter === 'Templates') {
-          matchTemplate = titleLower.includes('template');
+          matchTemplate = titleLower.includes('template') || contentLower.includes('template');
         } else if (templateFilter === 'IntroConclusionOnly') {
-          matchTemplate = !titleLower.includes('template');
+          matchTemplate = !titleLower.includes('template') && !titleLower.includes('proposition');
+        } else if (templateFilter === 'Proposition') {
+          matchTemplate = titleLower.includes('proposition') || contentLower.includes('proposition');
         }
       }
 
@@ -7887,12 +7984,12 @@ function ValueAdditionView({
 
       return matchCat && matchHubCat && matchSearch && matchesAnyPath && matchTemplate && matchRevisionTag;
     });
-  }, [activeCategory, search, itemsToFilter, filters, templateFilter, vaHubCategories, valueAddTags]);
+  }, [effectiveCategory, search, itemsToFilter, filters, templateFilter, vaHubCategories, valueAddTags]);
 
 
   const ethicsMappedItems = useMemo(() => {
     const list = filteredItems.filter(item => {
-      const isEthicsTabActive = activeCategory === 'ethics' || (activeCategory === 'va_hub' && (filters.paper === 'GS-4' || vaHubCategories.includes('ethics')));
+      const isEthicsTabActive = effectiveCategory === 'ethics' || (effectiveCategory === 'va_hub' && (filters.paper === 'GS-4' || vaHubCategories.includes('ethics')));
       if (isEthicsTabActive) {
         if (ethicsTab === 'all_formats') return true;
         if (item.category !== 'ethics') {
@@ -7933,8 +8030,11 @@ function ValueAdditionView({
           ethicsTab === 'pyq_quotes' ? 'pyq_quote' : ethicsTab;
         return item.ethicsType === mappedTab;
       }
-      if (activeCategory === 'quotes') {
+      if (effectiveCategory === 'quotes') {
         if (quotesEntryTypeTab !== 'All') {
+          if (quotesEntryTypeTab === 'connecting_words') {
+            return item.entry_type === 'connecting_words' || item.category === 'connecting_words' || (item.title && /connecting\s*words/i.test(item.title));
+          }
           return item.entry_type === quotesEntryTypeTab;
         }
       }
@@ -8093,7 +8193,7 @@ function ValueAdditionView({
           </View>
         )}
         <View style={{ flex: 1 }}>
-          {!sidebarOpen && activeCategory && (
+          {!sidebarOpen && effectiveCategory && (
             <TouchableOpacity
               onPress={() => setSidebarOpen(true)}
               style={[
@@ -8126,7 +8226,7 @@ function ValueAdditionView({
         </View>
       )}
 
-      {activeCategory ? (
+      {effectiveCategory ? (
         <PinchGestureHandler onGestureEvent={onPinchGestureEvent} onHandlerStateChange={onPinchHandlerStateChange}>
           <FlatList
           key={layoutColumns}
@@ -8170,10 +8270,10 @@ function ValueAdditionView({
                     </TouchableOpacity>
                   )}
                   <Text style={[styles.subAppHeaderTitle, { color: colors.textPrimary, marginVertical: 0 }]}>
-                    {submodules.find(s => s.id === activeCategory)?.title}
+                    {submodules.find(s => s.id === effectiveCategory)?.title || 'Value Additions Hub'}
                   </Text>
                 </View>
-                {activeCategory === 'notes' && onAddNewNoteClick && (
+                {effectiveCategory === 'notes' && onAddNewNoteClick && (
                   <TouchableOpacity
                     activeOpacity={0.8}
                     onPress={onAddNewNoteClick}
@@ -8255,12 +8355,12 @@ function ValueAdditionView({
                     paddingHorizontal: 12,
                     borderRadius: 8,
                     backgroundColor: colors.surface + 'b3',
-                    borderWidth: 0.5,
-                    borderColor: colors.border
+                    borderWidth: 1,
+                    borderColor: colors.border,
                   }}
                 >
-                  <ChevronsDown size={14} color={colors.textSecondary} style={{ marginRight: 4 }} />
-                  <Text style={{ fontSize: 11, fontWeight: '600', color: colors.textSecondary }}>Expand All</Text>
+                  <ChevronsDown size={14} color={colors.primary} style={{ marginRight: 4 }} />
+                  <Text style={{ fontSize: 11, fontWeight: '600', color: colors.primary }}>Expand All</Text>
                 </TouchableOpacity>
                 <TouchableOpacity 
                   onPress={() => setForceExpandCollapse('collapse')}
@@ -8271,8 +8371,8 @@ function ValueAdditionView({
                     paddingHorizontal: 12,
                     borderRadius: 8,
                     backgroundColor: colors.surface + 'b3',
-                    borderWidth: 0.5,
-                    borderColor: colors.border
+                    borderWidth: 1,
+                    borderColor: colors.border,
                   }}
                 >
                   <ChevronsUp size={14} color={colors.textSecondary} style={{ marginRight: 4 }} />
@@ -8280,60 +8380,52 @@ function ValueAdditionView({
                 </TouchableOpacity>
               </View>
 
-              {/* Category Filter Chips for VA Hub */}
-              {activeCategory === 'va_hub' && (
-                <View style={{ marginBottom: 12, paddingHorizontal: 2 }}>
-                  <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8, paddingVertical: 4 }}>
-                    {[
-                      { id: null, label: 'All', color: '#6366f1' },
-                      { id: 'data_facts', label: 'Data & Facts', color: '#3b82f6' },
-                      { id: 'intro_conclusion', label: 'Intro & Conclusion', color: '#10b981' },
-                      { id: 'quotes', label: 'Quotes & Anecdotes', color: '#8b5cf6' },
-                      { id: 'mnemonics', label: 'Mnemonics', color: '#f59e0b' },
-                      { id: 'frameworks', label: 'Frameworks', color: '#f43f5e' },
-                      { id: 'ethics', label: 'Ethics Specific', color: '#06b6d4' },
-                      { id: 'keywords_hub', label: 'Keywords', color: '#ec4899' },
-                      { id: 'case_studies_hub', label: 'Case Studies', color: '#f97316' },
-                      { id: 'sc_judgments_hub', label: 'SC Judgments', color: '#ef4444' },
-                    ].map(cat => {
-                      const isActive = cat.id === null 
-                        ? chipVaHubCategories.length === 0 
-                        : chipVaHubCategories.includes(cat.id);
-                      return (
-                        <TouchableOpacity
-                          key={String(cat.id)}
-                          onPress={() => {
-                            let nextCats: string[];
-                            if (cat.id === null) {
-                              nextCats = [];
-                            } else {
-                              if (chipVaHubCategories.includes(cat.id)) {
-                                nextCats = chipVaHubCategories.filter(id => id !== cat.id);
-                              } else {
-                                nextCats = [...chipVaHubCategories, cat.id];
-                              }
-                            }
-                            setChipVaHubCategories(nextCats);
-                            setTimeout(() => setVaHubCategories(nextCats), 0);
-                            Haptics.selectionAsync().catch(() => {});
-                          }}
-                          activeOpacity={0.75}
-                          style={[
-                            styles.tabFilterPill,
-                            isActive
-                              ? { backgroundColor: cat.color, borderColor: cat.color }
-                              : { backgroundColor: colors.surface + 'b3', borderColor: colors.border },
-                          ]}
-                        >
-                          <Text style={[styles.tabFilterPillText, isActive ? { color: '#ffffff', fontWeight: '700' } : { color: colors.textSecondary }]}>
-                            {cat.label}
-                          </Text>
-                        </TouchableOpacity>
-                      );
-                    })}
-                  </ScrollView>
-                </View>
-              )}
+              {/* Category Filter Chips for Value Addition Hub */}
+              <View style={{ marginBottom: 12, paddingHorizontal: 2 }}>
+                <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8, paddingVertical: 4 }}>
+                  {[
+                    { id: 'va_hub', label: 'All Value Adds', color: '#7c3aed' },
+                    { id: 'data_facts', label: 'Data & Facts', color: '#3b82f6' },
+                    { id: 'intro_conclusion', label: 'Intro & Conclusion', color: '#10b981' },
+                    { id: 'quotes', label: 'Quotes & Anecdotes', color: '#8b5cf6' },
+                    { id: 'mnemonics', label: 'Mnemonics', color: '#f59e0b' },
+                    { id: 'frameworks', label: 'Frameworks', color: '#f43f5e' },
+                    { id: 'ethics', label: 'Ethics Specific', color: '#06b6d4' },
+                    { id: 'keywords_hub', label: 'Keywords', color: '#ec4899' },
+                    { id: 'case_studies_hub', label: 'Case Studies', color: '#f97316' },
+                    { id: 'sc_judgments_hub', label: 'SC Judgments', color: '#ef4444' },
+                  ].map(cat => {
+                    const isActive = effectiveCategory === cat.id;
+                    return (
+                      <TouchableOpacity
+                        key={String(cat.id)}
+                        onPress={() => {
+                          setActiveCategory(cat.id);
+                          if (cat.id === 'va_hub') {
+                            setEthicsTab('all_formats');
+                            setVaHubCategories([]);
+                            setChipVaHubCategories([]);
+                          } else if (cat.id === 'ethics') {
+                            setEthicsTab('diagrams');
+                          }
+                          Haptics.selectionAsync().catch(() => {});
+                        }}
+                        activeOpacity={0.75}
+                        style={[
+                          styles.tabFilterPill,
+                          isActive
+                            ? { backgroundColor: cat.color, borderColor: cat.color }
+                            : { backgroundColor: colors.surface + 'b3', borderColor: colors.border },
+                        ]}
+                      >
+                        <Text style={[styles.tabFilterPillText, isActive ? { color: '#ffffff', fontWeight: '700' } : { color: colors.textSecondary }]}>
+                          {cat.label}
+                        </Text>
+                      </TouchableOpacity>
+                    );
+                  })}
+                </ScrollView>
+              </View>
               {activeCategoryItems.length > 0 && (() => {
                 const hasHierarchyActive = filters.paper !== 'All' || filters.subjects !== 'All' || filters.sections !== 'All' || filters.microtopics !== 'All' || filters.subtopics !== 'All';
                 const activeHierarchyLabel = filters.subtopics !== 'All' ? filters.subtopics : (filters.microtopics !== 'All' ? filters.microtopics : (filters.sections !== 'All' ? filters.sections : (filters.subjects !== 'All' ? filters.subjects : (filters.paper !== 'All' ? filters.paper : 'Browse Topics'))));
@@ -8658,13 +8750,14 @@ function ValueAdditionView({
                 );
               })()}
 
-              {/* Template filter bar for Intro/Conclusion tab — 3 chips */}
+              {/* Template filter bar for Intro/Conclusion tab */}
               {activeCategory === 'intro_conclusion' && (
-                <View style={{ flexDirection: 'row', gap: 8, marginBottom: 8, paddingVertical: 4 }}>
+                <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: 8 }} contentContainerStyle={{ alignItems: 'center', gap: 6, paddingVertical: 4 }}>
                   {[
                     { id: 'All' as const, label: 'All Entries' },
                     { id: 'Templates' as const, label: 'Templates' },
                     { id: 'IntroConclusionOnly' as const, label: 'Intro-Conclusion' },
+                    { id: 'Proposition' as const, label: 'Propositions' },
                   ].map(tab => (
                     <TouchableOpacity
                       key={tab.id}
@@ -8686,7 +8779,7 @@ function ValueAdditionView({
                       </Text>
                     </TouchableOpacity>
                   ))}
-                </View>
+                </ScrollView>
               )}
 
               {/* Entry-type filter bar for Quotes & Anecdotes tab */}
@@ -8942,6 +9035,8 @@ function ValueAdditionView({
                         onDeleteNote={onDeleteNote}
                         onExportNotePdf={onExportNotePdf}
                         onViewNoteFullscreen={onViewNoteFullscreen}
+                        filters={filters}
+                        search={search}
                       />
                     ))}
                   </View>
@@ -8973,6 +9068,8 @@ function ValueAdditionView({
                         onDeleteNote={onDeleteNote}
                         onExportNotePdf={onExportNotePdf}
                         onViewNoteFullscreen={onViewNoteFullscreen}
+                        filters={filters}
+                        search={search}
                       />
                     ))}
                   </View>
@@ -9006,6 +9103,8 @@ function ValueAdditionView({
                 onDeleteNote={onDeleteNote}
                 onExportNotePdf={onExportNotePdf}
                 onViewNoteFullscreen={onViewNoteFullscreen}
+                filters={filters}
+                search={search}
               />
             );
           }}
@@ -9127,17 +9226,17 @@ function ValueAdditionView({
         microtagOptions={[]}
         isTablet={isTablet}
         columnLabels={
-          activeCategory === 'quotes'
+          effectiveCategory === 'quotes'
             ? { paper: 'Paper', subject: 'Subject', section: 'Section Group', microtopic: 'Microtopic', subtopic: 'Category' }
-            : (activeCategory === 'mnemonics' || activeCategory === 'intro_conclusion' || activeCategory === 'keywords_hub' || activeCategory === 'case_studies_hub' || activeCategory === 'sc_judgments_hub')
+            : (effectiveCategory === 'mnemonics' || effectiveCategory === 'intro_conclusion' || effectiveCategory === 'keywords_hub' || effectiveCategory === 'case_studies_hub' || effectiveCategory === 'sc_judgments_hub')
             ? { paper: 'Paper', subject: 'Subject', section: 'Section Group', microtopic: 'Microtopic', subtopic: 'Subtopic' }
             : { microtopic: 'Theme', subtopic: 'Sub-theme' }
         }
         isMainsValueAdd={true}
-        isIntroConclusion={activeCategory === 'intro_conclusion'}
-        isQuotes={activeCategory === 'quotes'}
-        isMnemonics={activeCategory === 'mnemonics'}
-        activeCategory={activeCategory || undefined}
+        isIntroConclusion={effectiveCategory === 'intro_conclusion'}
+        isQuotes={effectiveCategory === 'quotes'}
+        isMnemonics={effectiveCategory === 'mnemonics'}
+        activeCategory={effectiveCategory || undefined}
         activeCategoryItems={activeCategoryItems || []}
       />
 

@@ -62,12 +62,12 @@ const getThemeForHeading = (heading: string) => {
       label: 'QUOTE'
     };
   }
-  if (h.includes('intro') || h.includes('concept')) {
+  if (h.includes('intro') || h.includes('concept') || h.includes('proposition')) {
     return {
       textColor: '#1d4ed8',
       bgColor: 'rgba(59, 130, 246, 0.08)',
       borderColor: '#dbeafe',
-      label: 'INTRODUCTION'
+      label: h.includes('proposition') ? 'PROPOSITION' : 'INTRODUCTION'
     };
   }
   if (h.includes('example') || h.includes('practice') || h.includes('case study') || h.includes('case studies')) {

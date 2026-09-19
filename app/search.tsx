@@ -248,123 +248,14 @@ export function countActiveFilters(f: UnifiedFilters): number {
 
 export const PAPER_OPTIONS = ['GS1', 'GS2', 'GS3', 'GS4', 'Essay', 'Optional'] as const;
 
-// Canonicalize subjects across Prelims, Mains, and Value Add to eliminate duplication
+// Preserve subject names and data labels exactly as they exist in data/app (Requirements 1 & 2)
 export function canonicalizeSubject(sub: string | null | undefined): string {
   if (!sub) return '';
-  const clean = String(sub).trim();
-  if (!clean) return '';
-  const lower = clean.toLowerCase();
-
-  // Ethics, Integrity & Aptitude
-  if (lower.includes('ethics') || lower.includes('integrity') || lower.includes('aptitude')) {
-    return 'Ethics, Integrity & Aptitude';
-  }
-  // Polity & Governance
-  if (
-    lower === 'polity' || 
-    lower === 'indian polity' || 
-    lower.includes('governance') || 
-    lower.includes('constitution') || 
-    lower === 'polity & governance'
-  ) {
-    return 'Polity & Governance';
-  }
-  // Economy
-  if (lower === 'economy' || lower === 'indian economy' || lower.includes('economic')) {
-    return 'Economy';
-  }
-  // Science & Technology
-  if (
-    lower.includes('science') || 
-    lower.includes('technology') || 
-    lower === 's&t' || 
-    lower.includes('science & technology') || 
-    lower.includes('science and tech')
-  ) {
-    return 'Science & Technology';
-  }
-  // History & Culture
-  if (
-    lower.includes('history') || 
-    lower.includes('ancient') || 
-    lower.includes('medieval') || 
-    lower.includes('modern') || 
-    lower.includes('art & culture') || 
-    lower.includes('art and culture') || 
-    lower.includes('culture')
-  ) {
-    return 'History & Culture';
-  }
-  // Geography
-  if (lower.includes('geography')) {
-    return 'Geography';
-  }
-  // Environment & Ecology
-  if (lower.includes('environment') || lower.includes('ecology') || lower.includes('biodiversity')) {
-    return 'Environment';
-  }
-  // International Relations
-  if (lower.includes('international relations') || lower === 'ir' || lower.includes('international')) {
-    return 'International Relations';
-  }
-  // Social Justice
-  if (lower.includes('social justice') || lower === 'justice') {
-    return 'Social Justice';
-  }
-  // Society
-  if (lower.includes('society') || lower.includes('social issues') || lower === 'indian society') {
-    return 'Indian Society';
-  }
-  // Internal Security
-  if (lower.includes('security') || lower.includes('internal security')) {
-    return 'Internal Security';
-  }
-  // Disaster Management
-  if (lower.includes('disaster') || lower === 'dm') {
-    return 'Disaster Management';
-  }
-  // Agriculture
-  if (lower.includes('agri') || lower.includes('agriculture')) {
-    return 'Agriculture';
-  }
-  // Anthropology
-  if (lower.includes('anthro')) {
-    return 'Anthropology';
-  }
-  // Sociology
-  if (lower.includes('socio')) {
-    return 'Sociology';
-  }
-  // Current Affairs
-  if (lower.includes('current') || lower.includes('ca')) {
-    return 'Current Affairs';
-  }
-  // Essay
-  if (lower.includes('essay')) {
-    return 'Essay';
-  }
-
-  // Proper Title Casing fallback
-  return clean
-    .split(/\s+/)
-    .map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
-    .join(' ');
+  return String(sub).trim();
 }
 
 export function truncateSubjectLabel(name: string): string {
-  const upper = (name || '').trim().toUpperCase();
-  if (upper.includes('HISTORY')) return 'History';
-  if (upper.includes('POLITY')) return 'Polity';
-  if (upper.includes('ECONOM')) return 'Economy';
-  if (upper.includes('GEOGRAPH')) return 'Geography';
-  if (upper.includes('ENVIRON')) return 'Environment';
-  if (upper.includes('SCIENCE') || upper.includes('TECH')) return 'Science & Tech';
-  if (upper.includes('INTERNAT')) return "Int'l Relations";
-  if (upper.includes('CURRENT')) return 'Current Affairs';
-  if (upper.includes('ETHIC')) return 'Ethics';
-  if (upper === 'CSAT') return 'CSAT';
-  if (name.length > 18) return name.slice(0, 17) + '...';
-  return name;
+  return (name || '').trim();
 }
 
 // Subject color mapper from Prelims AI search
@@ -372,11 +263,17 @@ function getSubjectColor(sub: string): string {
   const map: Record<string, string> = {
     history: '#b91c1c',
     polity: '#1d4ed8',
+    governance: '#1d4ed8',
+    constitution: '#1d4ed8',
     economy: '#059669',
+    economic: '#059669',
     geography: '#d97706',
     science: '#7c3aed',
+    tech: '#7c3aed',
     environment: '#0891b2',
+    ecology: '#0891b2',
     international: '#db2777',
+    ethics: '#c026d3',
     current: '#4b5563',
   };
   const key = (sub || '').toLowerCase();
@@ -955,7 +852,12 @@ export default function IntegratedSearchScreen() {
   const [previewPrelimsAnswer, setPreviewPrelimsAnswer] = useState<string | null>(null);
   const [previewPrelimsStudyTags, setPreviewPrelimsStudyTags] = useState<string[]>([]);
   const [previewPrelimsExplSource, setPreviewPrelimsExplSource] = useState<string>('UPSC');
-  const [previewFontSize, setPreviewFontSize] = useState(16);
+  const [previewFontSize, setPreviewFontSize] = useState<number>(15);
+  const [showPreviewZoomIndicator, setShowPreviewZoomIndicator] = useState(false);
+  const previewZoomTimerRef = useRef<any>(null);
+  const basePreviewFontSizeRef = useRef<number>(15);
+  const [macroTagsExpanded, setMacroTagsExpanded] = useState(false);
+  const [microTagsExpanded, setMicroTagsExpanded] = useState(false);
   const [previewNotes, setPreviewNotes] = useState('');
   const [isSavingNotes, setIsSavingNotes] = useState(false);
 
@@ -1119,6 +1021,16 @@ export default function IntegratedSearchScreen() {
     }
   };
 
+  const previewMdStyles = useMemo(() => {
+    return buildMarkdownStyles(
+      colors.textPrimary,
+      previewFontSize,
+      colors.surface,
+      colors.border,
+      colors.primary
+    );
+  }, [colors, previewFontSize]);
+
   const baseFontSizeRef = useRef(16);
   const previewScrollRef = useRef<ScrollView>(null);
 
@@ -1273,7 +1185,7 @@ export default function IntegratedSearchScreen() {
 
       if (filters.showMains || filters.showToppers) {
         mainsQuestions.forEach(q => {
-          const normP = normalizePaper(q.paper);
+          const normP = normalizePaper(resolvePaper(q) || q.paper);
           if (filters.mainsPapers.length > 0 && (!normP || !filters.mainsPapers.some(p => normalizePaper(p) === normP || p === q.paper))) return;
           const canon = canonicalizeSubject(q.subject);
           if (canon) subjects.add(canon);
@@ -1296,48 +1208,67 @@ export default function IntegratedSearchScreen() {
   // Aggregate unique institutes dynamically - INTERCONNECTED with active stages & search results
   const instituteOptions = useMemo(() => {
     const insts = new Set<string>();
+    const paperFilter = filters.mainsPapers || [];
+    const subjectFilters = (filters.subjects || []).map(s => s.trim().toLowerCase());
 
     if (hasSearched && results.length > 0) {
       results.forEach(r => {
         if (r.type === 'prelims' && !filters.showPrelims) return;
         if (r.type === 'mains' && !filters.showMains) return;
-        if (r.type === 'value_add') return; // value add has no institutes
-        if (filters.mainsPapers.length > 0) {
-          if (r.type === 'mains') {
+        if (r.type === 'topper' && !filters.showToppers) return;
+        if (r.type === 'value_add') return;
+
+        if (paperFilter.length > 0) {
+          if (r.type === 'mains' || r.type === 'topper') {
             const normP = normalizePaper(r.paper);
-            if (!normP || !filters.mainsPapers.some(p => normalizePaper(p) === normP || p === r.paper)) return;
+            if (!normP || !paperFilter.some(p => normalizePaper(p) === normP || p === r.paper)) return;
           } else {
             return;
           }
         }
-        if (filters.subjects.length > 0 && (!r.subject || !filters.subjects.includes(r.subject))) return;
+        if (subjectFilters.length > 0) {
+          const rSub = (r.subject || '').trim().toLowerCase();
+          if (!rSub || !subjectFilters.includes(rSub)) return;
+        }
 
         const inst = r.rawItem?.institute || (Array.isArray(r.rawItem?.tests) ? r.rawItem.tests[0]?.institute : r.rawItem?.tests?.institute) || '';
         if (inst) insts.add(inst);
+        if (r.type === 'topper' || r.rawItem?.is_topper_copy || r.rawItem?.answers?.some((a: any) => a.is_topper || a.topper)) {
+          insts.add('Topper Copy');
+        }
       });
-      filters.institutes.forEach(i => insts.add(i));
+      (filters.institutes || []).forEach(i => insts.add(i));
     } else {
-      if (filters.showPrelims && filters.mainsPapers.length === 0) {
+      if (filters.showPrelims && paperFilter.length === 0) {
         coursePrelims.forEach((q: any) => {
-          if (filters.subjects.length > 0 && (!q.subject || !filters.subjects.includes(q.subject))) return;
+          if (subjectFilters.length > 0) {
+            const qSub = (q.subject || '').trim().toLowerCase();
+            if (!qSub || !subjectFilters.includes(qSub)) return;
+          }
           const tests = Array.isArray(q.tests) ? q.tests[0] : q.tests;
           const inst = tests?.institute || q.provider || q.source?.institute || '';
           if (inst) insts.add(inst);
         });
       }
 
-      if (filters.showMains) {
+      if (filters.showMains || filters.showToppers) {
         mainsQuestions.forEach(q => {
-          const normP = normalizePaper(q.paper);
-          if (filters.mainsPapers.length > 0 && (!normP || !filters.mainsPapers.some(p => normalizePaper(p) === normP || p === q.paper))) return;
-          if (filters.subjects.length > 0 && (!q.subject || !filters.subjects.includes(q.subject))) return;
+          const normP = normalizePaper(resolvePaper(q) || q.paper);
+          if (paperFilter.length > 0 && (!normP || !paperFilter.some(p => normalizePaper(p) === normP || p === q.paper))) return;
+          if (subjectFilters.length > 0) {
+            const qSub = (q.subject || '').trim().toLowerCase();
+            if (!qSub || !subjectFilters.includes(qSub)) return;
+          }
           if (q.institute) insts.add(q.institute);
+          if (q.is_topper_copy || q.answers?.some((a: any) => a.is_topper || a.topper)) {
+            insts.add('Topper Copy');
+          }
         });
       }
     }
 
     return ['All', ...Array.from(insts).sort()];
-  }, [mainsQuestions, coursePrelims, filters.showPrelims, filters.showMains, filters.mainsPapers, filters.subjects, filters.institutes, hasSearched, results]);
+  }, [mainsQuestions, coursePrelims, filters.showPrelims, filters.showMains, filters.showToppers, filters.mainsPapers, filters.subjects, filters.institutes, hasSearched, results]);
 
   const programmeOptions = useMemo(() => {
     const progs = new Set<string>();
@@ -1370,7 +1301,7 @@ export default function IntegratedSearchScreen() {
       // 2. Mains questions
       if (filters.showMains) {
         mainsQuestions.forEach((q: any) => {
-          const normP = normalizePaper(q.paper);
+          const normP = normalizePaper(resolvePaper(q) || q.paper);
           if (filters.mainsPapers.length > 0 && (!normP || !filters.mainsPapers.some(p => normalizePaper(p) === normP || p === q.paper))) return;
           const inst = q.institute || '';
           if (filters.institutes.length > 0 && !filters.institutes.includes(inst)) return;
@@ -1408,79 +1339,123 @@ export default function IntegratedSearchScreen() {
     return Array.from(set).sort();
   }, [hasSearched, results, coursePrelims]);
 
-  // Prelims subjects list
+  // Prelims subjects list: Result-driven when searching, preserves exact original name (Requirements 1, 13, 14, 15)
   const prelimsSubjectOptions = useMemo(() => {
     const s = new Set<string>();
-    coursePrelims.forEach((q: any) => {
-      const canon = canonicalizeSubject(q.subject);
-      if (canon) s.add(canon);
+    const pool = (hasSearched && results.length > 0)
+      ? results.filter(r => r.type === 'prelims').map(r => r.rawItem).filter(Boolean)
+      : coursePrelims;
+
+    pool.forEach((q: any) => {
+      const sub = (q.subject || '').trim();
+      if (sub) s.add(sub);
     });
-    if (s.size === 0) {
+
+    if (!hasSearched && s.size === 0) {
       ['History & Culture', 'Polity & Governance', 'Economy', 'Geography', 'Environment & Ecology', 'Science & Technology', 'International Relations', 'Current Affairs', 'CSAT'].forEach(x => s.add(x));
     }
-    if (!s.has('CSAT')) {
+    if (!hasSearched && !s.has('CSAT')) {
       s.add('CSAT');
     }
-    return Array.from(s).sort();
-  }, [coursePrelims]);
 
-  // Prelims facet options - cascading: subject -> section -> microtopic
-  const prelimsSectionOptions = useMemo(() => {
-    const s = new Set<string>();
-    const subjectFilters = filters.subjects.map(sub => canonicalizeSubject(sub));
-    const pool = (hasSearched && results.length > 0)
-      ? results.filter(r => r.type === 'prelims').map(r => r.rawItem).filter(Boolean)
-      : coursePrelims;
-    pool.forEach((q: any) => {
-      const matchSubject = subjectFilters.length === 0 || subjectFilters.includes(canonicalizeSubject(q.subject));
-      if (matchSubject && q.section_group) {
-        s.add(q.section_group);
-      }
+    // Preserve any currently selected subjects so user can see & deselect them (Requirements 19 & 20)
+    (filters.subjects || []).forEach(sub => {
+      if (sub && sub !== 'All') s.add(sub.trim());
     });
-    return ['All', ...Array.from(s).sort()];
+
+    return Array.from(s).sort();
   }, [hasSearched, results, coursePrelims, filters.subjects]);
 
-  const prelimsMicrotopicOptions = useMemo(() => {
+  // Prelims facet options - cascading: subject -> section -> microtopic (Result-driven, Requirements 13-16)
+  const prelimsSectionOptions = useMemo(() => {
     const s = new Set<string>();
-    const subjectFilters = filters.subjects.map(sub => canonicalizeSubject(sub));
+    const subjectFilters = (filters.subjects || []).map(sub => sub.trim().toLowerCase());
     const pool = (hasSearched && results.length > 0)
       ? results.filter(r => r.type === 'prelims').map(r => r.rawItem).filter(Boolean)
       : coursePrelims;
+
     pool.forEach((q: any) => {
-      const matchSubject = subjectFilters.length === 0 || subjectFilters.includes(canonicalizeSubject(q.subject));
-      const matchSection = filters.sections.length === 0 || filters.sections.includes(q.section_group);
-      if (matchSubject && matchSection && q.micro_topic) {
-        s.add(q.micro_topic);
+      const qSub = (q.subject || '').trim().toLowerCase();
+      const matchSubject = subjectFilters.length === 0 || subjectFilters.includes(qSub);
+      const sec = getQuestionSection(q);
+      if (matchSubject && sec) {
+        s.add(sec);
       }
     });
+
+    // Preserve any currently selected sections so user can deselect (Requirements 19 & 20)
+    (filters.sections || []).forEach(sec => {
+      if (sec && sec !== 'All') s.add(sec);
+    });
+
     return ['All', ...Array.from(s).sort()];
   }, [hasSearched, results, coursePrelims, filters.subjects, filters.sections]);
 
-  // Mains subjects cascading from selected papers
+  const prelimsMicrotopicOptions = useMemo(() => {
+    const s = new Set<string>();
+    const subjectFilters = (filters.subjects || []).map(sub => sub.trim().toLowerCase());
+    const sectionFilters = filters.sections || [];
+    const pool = (hasSearched && results.length > 0)
+      ? results.filter(r => r.type === 'prelims').map(r => r.rawItem).filter(Boolean)
+      : coursePrelims;
+
+    pool.forEach((q: any) => {
+      const qSub = (q.subject || '').trim().toLowerCase();
+      const matchSubject = subjectFilters.length === 0 || subjectFilters.includes(qSub);
+      const sec = getQuestionSection(q);
+      const matchSection = sectionFilters.length === 0 || sectionFilters.includes(sec);
+      const micro = getQuestionMicro(q);
+      if (matchSubject && matchSection && micro) {
+        s.add(micro);
+      }
+    });
+
+    // Preserve any currently selected microtopics (Requirements 19 & 20)
+    (filters.microtopics || []).forEach(mt => {
+      if (mt && mt !== 'All') s.add(mt);
+    });
+
+    return ['All', ...Array.from(s).sort()];
+  }, [hasSearched, results, coursePrelims, filters.subjects, filters.sections, filters.microtopics]);
+
+  // Mains subjects cascading from selected papers (Result-driven, Requirements 1, 13, 14, 15)
   const mainsSubjectOptions = useMemo(() => {
     const s = new Set<string>();
-    const paperFilter = filters.mainsPapers;
-    mainsQuestions.forEach((q: any) => {
-      const normP = normalizePaper(q.paper);
+    const paperFilter = filters.mainsPapers || [];
+    const qPool = (hasSearched && results.length > 0)
+      ? results.filter(r => r.type === 'mains' || r.type === 'topper').map(r => r.rawItem).filter(Boolean)
+      : mainsQuestions;
+    const vaPool = (hasSearched && results.length > 0)
+      ? results.filter(r => r.type === 'value_add').map(r => r.rawItem).filter(Boolean)
+      : mainsValueAdd;
+
+    qPool.forEach((q: any) => {
+      const normP = normalizePaper(resolvePaper(q) || q.paper);
       if (paperFilter.length === 0 || paperFilter.some(p => normalizePaper(p) === normP || p === q.paper)) {
-        const canon = canonicalizeSubject(q.subject);
-        if (canon) s.add(canon);
+        const sub = (q.subject || '').trim();
+        if (sub) s.add(sub);
       }
     });
-    mainsValueAdd.forEach((va: any) => {
+    vaPool.forEach((va: any) => {
       const normP = normalizePaper(va.paper);
       if (paperFilter.length === 0 || paperFilter.some(p => normalizePaper(p) === normP || p === va.paper)) {
-        const canon = canonicalizeSubject(va.subject);
-        if (canon) s.add(canon);
+        const sub = (va.subject || '').trim();
+        if (sub) s.add(sub);
       }
     });
-    return Array.from(s).sort();
-  }, [mainsQuestions, mainsValueAdd, filters.mainsPapers]);
 
-  // Mains facet options - cascading: paper -> subject -> section -> microtopic -> subtopic -> nanotopic
+    // Preserve any currently selected subjects (Requirements 19 & 20)
+    (filters.subjects || []).forEach(sub => {
+      if (sub && sub !== 'All') s.add(sub.trim());
+    });
+
+    return Array.from(s).sort();
+  }, [hasSearched, results, mainsQuestions, mainsValueAdd, filters.mainsPapers, filters.subjects]);
+
+  // Mains facet options - cascading: paper -> subject -> section -> microtopic -> subtopic -> nanotopic (Result-driven)
   const mainsSectionOptions = useMemo(() => {
-    const paperFilter = filters.mainsPapers;
-    const subjectFilters = filters.subjects.map(s => canonicalizeSubject(s));
+    const paperFilter = filters.mainsPapers || [];
+    const subjectFilters = (filters.subjects || []).map(s => s.trim().toLowerCase());
     const s = new Set<string>();
     const qPool = (hasSearched && results.length > 0)
       ? results.filter(r => r.type === 'mains' || r.type === 'topper').map(r => r.rawItem).filter(Boolean)
@@ -1490,23 +1465,33 @@ export default function IntegratedSearchScreen() {
       : mainsValueAdd;
 
     qPool.forEach((q: any) => {
-      const matchPaper = paperFilter.length === 0 || paperFilter.includes(q.paper);
-      const matchSubject = subjectFilters.length === 0 || subjectFilters.includes(canonicalizeSubject(q.subject));
+      const normP = normalizePaper(resolvePaper(q) || q.paper);
+      const matchPaper = paperFilter.length === 0 || paperFilter.some(p => normalizePaper(p) === normP || p === q.paper);
+      const qSub = (q.subject || '').trim().toLowerCase();
+      const matchSubject = subjectFilters.length === 0 || subjectFilters.includes(qSub);
       const sec = getQuestionSection(q);
       if (matchPaper && matchSubject && sec) s.add(sec);
     });
     vaPool.forEach((va: any) => {
-      const matchPaper = paperFilter.length === 0 || paperFilter.includes(va.paper || '');
-      const matchSubject = subjectFilters.length === 0 || subjectFilters.includes(canonicalizeSubject(va.subject || ''));
+      const normP = normalizePaper(va.paper || '');
+      const matchPaper = paperFilter.length === 0 || paperFilter.some(p => normalizePaper(p) === normP || p === va.paper);
+      const vaSub = (va.subject || '').trim().toLowerCase();
+      const matchSubject = subjectFilters.length === 0 || subjectFilters.includes(vaSub);
       const sec = getValueAddSection(va);
       if (matchPaper && matchSubject && sec) s.add(sec);
     });
+
+    // Preserve any currently selected mains sections (Requirements 19 & 20)
+    (filters.mainsSections || []).forEach(sec => {
+      if (sec && sec !== 'All') s.add(sec);
+    });
+
     return ['All', ...Array.from(s).sort()];
-  }, [hasSearched, results, mainsQuestions, mainsValueAdd, filters.mainsPapers, filters.subjects]);
+  }, [hasSearched, results, mainsQuestions, mainsValueAdd, filters.mainsPapers, filters.subjects, filters.mainsSections]);
 
   const mainsMicrotopicOptions = useMemo(() => {
-    const paperFilter = filters.mainsPapers;
-    const subjectFilters = filters.subjects.map(s => canonicalizeSubject(s));
+    const paperFilter = filters.mainsPapers || [];
+    const subjectFilters = (filters.subjects || []).map(s => s.trim().toLowerCase());
     const sectionFilter = filters.mainsSections || [];
     const s = new Set<string>();
     const qPool = (hasSearched && results.length > 0)
@@ -1517,33 +1502,52 @@ export default function IntegratedSearchScreen() {
       : mainsValueAdd;
 
     qPool.forEach((q: any) => {
-      const matchPaper = paperFilter.length === 0 || paperFilter.includes(q.paper);
-      const matchSubject = subjectFilters.length === 0 || subjectFilters.includes(canonicalizeSubject(q.subject));
+      const normP = normalizePaper(resolvePaper(q) || q.paper);
+      const matchPaper = paperFilter.length === 0 || paperFilter.some(p => normalizePaper(p) === normP || p === q.paper);
+      const qSub = (q.subject || '').trim().toLowerCase();
+      const matchSubject = subjectFilters.length === 0 || subjectFilters.includes(qSub);
       const sec = getQuestionSection(q);
       const matchSec = sectionFilter.length === 0 || sectionFilter.includes(sec);
       const micro = getQuestionMicro(q);
       if (matchPaper && matchSubject && matchSec && micro) s.add(micro);
     });
     vaPool.forEach((va: any) => {
-      const matchPaper = paperFilter.length === 0 || paperFilter.includes(va.paper || '');
-      const matchSubject = subjectFilters.length === 0 || subjectFilters.includes(canonicalizeSubject(va.subject || ''));
+      const normP = normalizePaper(va.paper || '');
+      const matchPaper = paperFilter.length === 0 || paperFilter.some(p => normalizePaper(p) === normP || p === va.paper);
+      const vaSub = (va.subject || '').trim().toLowerCase();
+      const matchSubject = subjectFilters.length === 0 || subjectFilters.includes(vaSub);
       const sec = getValueAddSection(va);
       const matchSec = sectionFilter.length === 0 || sectionFilter.includes(sec);
       const micro = getValueAddMicro(va);
       if (matchPaper && matchSubject && matchSec && micro) s.add(micro);
     });
+
+    // Preserve any currently selected mains microtopics (Requirements 19 & 20)
+    (filters.mainsMicrotopics || []).forEach(mt => {
+      if (mt && mt !== 'All') s.add(mt);
+    });
+
     return ['All', ...Array.from(s).sort()];
-  }, [hasSearched, results, mainsQuestions, mainsValueAdd, filters.mainsPapers, filters.subjects, filters.mainsSections]);
+  }, [hasSearched, results, mainsQuestions, mainsValueAdd, filters.mainsPapers, filters.subjects, filters.mainsSections, filters.mainsMicrotopics]);
 
   const mainsSubtopicOptions = useMemo(() => {
-    const paperFilter = filters.mainsPapers;
-    const subjectFilters = filters.subjects.map(s => canonicalizeSubject(s));
+    const paperFilter = filters.mainsPapers || [];
+    const subjectFilters = (filters.subjects || []).map(s => s.trim().toLowerCase());
     const sectionFilter = filters.mainsSections || [];
     const microtopicFilter = filters.mainsMicrotopics || [];
     const s = new Set<string>();
-    mainsQuestions.forEach((q: any) => {
-      const matchPaper = paperFilter.length === 0 || paperFilter.includes(q.paper);
-      const matchSubject = subjectFilters.length === 0 || subjectFilters.includes(canonicalizeSubject(q.subject));
+    const qPool = (hasSearched && results.length > 0)
+      ? results.filter(r => r.type === 'mains' || r.type === 'topper').map(r => r.rawItem).filter(Boolean)
+      : mainsQuestions;
+    const vaPool = (hasSearched && results.length > 0)
+      ? results.filter(r => r.type === 'value_add').map(r => r.rawItem).filter(Boolean)
+      : mainsValueAdd;
+
+    qPool.forEach((q: any) => {
+      const normP = normalizePaper(resolvePaper(q) || q.paper);
+      const matchPaper = paperFilter.length === 0 || paperFilter.some(p => normalizePaper(p) === normP || p === q.paper);
+      const qSub = (q.subject || '').trim().toLowerCase();
+      const matchSubject = subjectFilters.length === 0 || subjectFilters.includes(qSub);
       const matchSec = sectionFilter.length === 0 || sectionFilter.includes(getQuestionSection(q));
       const matchMicro = microtopicFilter.length === 0 || microtopicFilter.includes(getQuestionMicro(q));
       const sub = getQuestionSub(q);
@@ -1551,9 +1555,11 @@ export default function IntegratedSearchScreen() {
         s.add(sub);
       }
     });
-    mainsValueAdd.forEach((va: any) => {
-      const matchPaper = paperFilter.length === 0 || paperFilter.includes(va.paper || '');
-      const matchSubject = subjectFilters.length === 0 || subjectFilters.includes(canonicalizeSubject(va.subject || ''));
+    vaPool.forEach((va: any) => {
+      const normP = normalizePaper(va.paper || '');
+      const matchPaper = paperFilter.length === 0 || paperFilter.some(p => normalizePaper(p) === normP || p === va.paper);
+      const vaSub = (va.subject || '').trim().toLowerCase();
+      const matchSubject = subjectFilters.length === 0 || subjectFilters.includes(vaSub);
       const matchSec = sectionFilter.length === 0 || sectionFilter.includes(getValueAddSection(va));
       const matchMicro = microtopicFilter.length === 0 || microtopicFilter.includes(getValueAddMicro(va));
       const sub = getValueAddSub(va);
@@ -1561,54 +1567,67 @@ export default function IntegratedSearchScreen() {
         s.add(sub);
       }
     });
+
+    // Preserve any currently selected subtopics (Requirements 19 & 20)
+    (filters.subtopics || []).forEach(sub => {
+      if (sub && sub !== 'All') s.add(sub);
+    });
+
     return ['All', ...Array.from(s).sort()];
-  }, [mainsQuestions, mainsValueAdd, filters.mainsPapers, filters.subjects, filters.mainsSections, filters.mainsMicrotopics]);
+  }, [hasSearched, results, mainsQuestions, mainsValueAdd, filters.mainsPapers, filters.subjects, filters.mainsSections, filters.mainsMicrotopics, filters.subtopics]);
 
   const mainsNanotopicOptions = useMemo(() => {
-    const paperFilter = filters.mainsPapers;
-    const subjectFilters = filters.subjects.map(s => canonicalizeSubject(s));
-    const subtopicFilter = filters.subtopics;
+    const paperFilter = filters.mainsPapers || [];
+    const subjectFilters = (filters.subjects || []).map(s => s.trim().toLowerCase());
+    const sectionFilter = filters.mainsSections || [];
+    const microtopicFilter = filters.mainsMicrotopics || [];
+    const subtopicFilter = filters.subtopics || [];
     const s = new Set<string>();
-    mainsQuestions.forEach((q: any) => {
-      const matchPaper = paperFilter.length === 0 || paperFilter.includes(q.paper);
-      const matchSubject = subjectFilters.length === 0 || subjectFilters.includes(canonicalizeSubject(q.subject));
+    const qPool = (hasSearched && results.length > 0)
+      ? results.filter(r => r.type === 'mains' || r.type === 'topper').map(r => r.rawItem).filter(Boolean)
+      : mainsQuestions;
+    const vaPool = (hasSearched && results.length > 0)
+      ? results.filter(r => r.type === 'value_add').map(r => r.rawItem).filter(Boolean)
+      : mainsValueAdd;
+
+    qPool.forEach((q: any) => {
+      const normP = normalizePaper(resolvePaper(q) || q.paper);
+      const matchPaper = paperFilter.length === 0 || paperFilter.some(p => normalizePaper(p) === normP || p === q.paper);
+      const qSub = (q.subject || '').trim().toLowerCase();
+      const matchSubject = subjectFilters.length === 0 || subjectFilters.includes(qSub);
+      const matchSec = sectionFilter.length === 0 || sectionFilter.includes(getQuestionSection(q));
+      const matchMicro = microtopicFilter.length === 0 || microtopicFilter.includes(getQuestionMicro(q));
       const sub = getQuestionSub(q);
       const matchSub = subtopicFilter.length === 0 || subtopicFilter.includes(sub);
       const nano = getQuestionNano(q);
-      if (matchPaper && matchSubject && matchSub && nano && nano !== 'General') {
+      if (matchPaper && matchSubject && matchSec && matchMicro && matchSub && nano && nano !== 'General' && nano !== 'All') {
         s.add(nano);
       }
     });
-    mainsValueAdd.forEach((va: any) => {
-      const matchPaper = paperFilter.length === 0 || paperFilter.includes(va.paper || '');
-      const matchSubject = subjectFilters.length === 0 || subjectFilters.includes(canonicalizeSubject(va.subject || ''));
+    vaPool.forEach((va: any) => {
+      const normP = normalizePaper(va.paper || '');
+      const matchPaper = paperFilter.length === 0 || paperFilter.some(p => normalizePaper(p) === normP || p === va.paper);
+      const vaSub = (va.subject || '').trim().toLowerCase();
+      const matchSubject = subjectFilters.length === 0 || subjectFilters.includes(vaSub);
       const sec = getValueAddSection(va);
-      const matchSec = (filters.mainsSections || []).length === 0 || (filters.mainsSections || []).includes(sec);
+      const matchSec = sectionFilter.length === 0 || sectionFilter.includes(sec);
       const micro = getValueAddMicro(va);
-      const matchMicro = (filters.mainsMicrotopics || []).length === 0 || (filters.mainsMicrotopics || []).includes(micro);
+      const matchMicro = microtopicFilter.length === 0 || microtopicFilter.includes(micro);
       const sub = getValueAddSub(va);
       const matchSub = subtopicFilter.length === 0 || subtopicFilter.includes(sub);
       const nano = va.nanotopic || '';
-      if (matchPaper && matchSubject && matchSec && matchMicro && matchSub && nano && nano !== 'General') {
+      if (matchPaper && matchSubject && matchSec && matchMicro && matchSub && nano && nano !== 'General' && nano !== 'All') {
         s.add(nano);
       }
     });
-    return ['All', ...Array.from(s).sort()];
-  }, [mainsQuestions, mainsValueAdd, filters.mainsPapers, filters.subjects, filters.mainsSections, filters.mainsMicrotopics, filters.subtopics]);
 
-  // Prune child selections only when top-level parent (subjects/papers) are cleared (Requirement 6: preserve micro topics across section groups)
-  useEffect(() => {
-    if (filters.subjects.length === 0) {
-      if (filters.sections.length > 0 || filters.microtopics.length > 0) {
-        setFilters(prev => ({ ...prev, sections: [], microtopics: [] }));
-      }
-    }
-    if (filters.mainsPapers.length === 0) {
-      if ((filters.mainsSections || []).length > 0 || (filters.mainsMicrotopics || []).length > 0 || filters.subtopics.length > 0 || filters.nanotopics.length > 0) {
-        setFilters(prev => ({ ...prev, mainsSections: [], mainsMicrotopics: [], subtopics: [], nanotopics: [] }));
-      }
-    }
-  }, [filters.subjects.length, filters.mainsPapers.length]);
+    // Preserve any currently selected nanotopics (Requirements 19 & 20)
+    (filters.nanotopics || []).forEach(nano => {
+      if (nano && nano !== 'All') s.add(nano);
+    });
+
+    return ['All', ...Array.from(s).sort()];
+  }, [hasSearched, results, mainsQuestions, mainsValueAdd, filters.mainsPapers, filters.subjects, filters.mainsSections, filters.mainsMicrotopics, filters.subtopics, filters.nanotopics]);
 
   // Authentic Mains Question Bank Macro Tags (Requirement 9 & 10)
   const mainsMacrotagOptions = useMemo(() => {
@@ -1624,8 +1643,12 @@ export default function IntegratedSearchScreen() {
         });
       }
     });
+    (filters.macrotags || []).forEach(t => {
+      const clean = t.trim().replace(/^#/, '');
+      if (clean && clean !== 'All') s.add(clean);
+    });
     return ['All', ...Array.from(s).sort()];
-  }, [hasSearched, results, mainsQuestions]);
+  }, [hasSearched, results, mainsQuestions, filters.macrotags]);
 
   // Authentic Mains Question Bank Micro Tags: Only loaded contextually when Macro Tag is selected!
   const mainsMicrotagOptions = useMemo(() => {
@@ -1645,18 +1668,61 @@ export default function IntegratedSearchScreen() {
         });
       }
     });
+    (filters.microtags || []).forEach(t => {
+      const clean = t.trim().replace(/^#/, '');
+      if (clean && clean !== 'All') s.add(clean);
+    });
     return ['All', ...Array.from(s).sort()];
-  }, [hasSearched, results, mainsQuestions, filters.macrotags]);
+  }, [hasSearched, results, mainsQuestions, filters.macrotags, filters.microtags]);
 
   const mainsYearOptions = useMemo(() => {
     const s = new Set<string>();
-    mainsQuestions.forEach((q: any) => {
+    const pool = (hasSearched && results.length > 0)
+      ? results.filter(r => r.type === 'mains' || r.type === 'topper' || r.type === 'value_add').map(r => r.rawItem).filter(Boolean)
+      : mainsQuestions;
+    pool.forEach((q: any) => {
       if (q.year && String(q.year).trim() && String(q.year).trim() !== '0') {
         s.add(String(q.year).trim());
       }
     });
+    (filters.mainsYears || []).forEach(y => {
+      if (y && y !== 'All') s.add(String(y).trim());
+    });
     return ['All', ...Array.from(s).sort((a, b) => Number(b) - Number(a))];
-  }, [mainsQuestions]);
+  }, [hasSearched, results, mainsQuestions, filters.mainsYears]);
+
+  // Maps of sections per subject to support multi-subject section preservation (Requirements 3, 4, 19, 20)
+  const prelimsSubjectSectionsMap = useMemo(() => {
+    const map = new Map<string, Set<string>>();
+    const pool = (hasSearched && results.length > 0)
+      ? results.filter(r => r.type === 'prelims').map(r => r.rawItem).filter(Boolean)
+      : coursePrelims;
+    pool.forEach((q: any) => {
+      const sub = canonicalizeSubject(q?.subject);
+      const sec = getQuestionSection(q);
+      if (sub && sec) {
+        if (!map.has(sub)) map.set(sub, new Set());
+        map.get(sub)!.add(sec);
+      }
+    });
+    return map;
+  }, [hasSearched, results, coursePrelims]);
+
+  const mainsSubjectSectionsMap = useMemo(() => {
+    const map = new Map<string, Set<string>>();
+    const pool = (hasSearched && results.length > 0)
+      ? results.filter(r => r.type === 'mains' || r.type === 'topper' || r.type === 'value_add').map(r => r.rawItem).filter(Boolean)
+      : mainsQuestions;
+    pool.forEach((q: any) => {
+      const sub = canonicalizeSubject(q?.subject);
+      const sec = getQuestionSection(q) || getValueAddSection(q);
+      if (sub && sec) {
+        if (!map.has(sub)) map.set(sub, new Set());
+        map.get(sub)!.add(sec);
+      }
+    });
+    return map;
+  }, [hasSearched, results, mainsQuestions]);
 
   // Master subject counts and list derived from master/unfiltered results (ai-search parity)
   const masterSubjectCounts = useMemo(() => {
@@ -1727,14 +1793,19 @@ export default function IntegratedSearchScreen() {
     };
 
     const matchesInstitute = (item: UnifiedSearchResult) => {
-      if (filters.institutes.length === 0 || item.type === 'topper') return true;
+      if (filters.institutes.length === 0) return true;
+      const isTopperItem = item.type === 'topper' || !!item.rawItem?.is_topper_copy || (Array.isArray(item.rawItem?.answers) && item.rawItem.answers.some((a: any) => a?.is_topper || a?.topper || a?.is_topper_copy));
+      if (filters.institutes.includes('Topper Copy') && isTopperItem) {
+        return true;
+      }
+      if (item.type === 'topper') return filters.institutes.includes('Topper Copy');
       if (item.type === 'prelims') {
         const tests = Array.isArray(item.rawItem?.tests) ? item.rawItem.tests[0] : item.rawItem?.tests;
         const inst = tests?.institute || item.rawItem?.provider || item.rawItem?.source?.institute || '';
         return filters.institutes.includes(inst);
       }
       if (item.type === 'mains') {
-        return item.rawItem?.institute && filters.institutes.includes(item.rawItem.institute);
+        return !!item.rawItem?.institute && filters.institutes.includes(item.rawItem.institute);
       }
       return false;
     };
@@ -2291,7 +2362,11 @@ export default function IntegratedSearchScreen() {
     // Filter by institute
     if (filters.institutes.length > 0) {
       list = list.filter(item => {
-        if (item.type === 'topper') return true;
+        const isTopperItem = item.type === 'topper' || !!item.rawItem?.is_topper_copy || (Array.isArray(item.rawItem?.answers) && item.rawItem.answers.some((a: any) => a?.is_topper || a?.topper || a?.is_topper_copy));
+        if (filters.institutes.includes('Topper Copy') && isTopperItem) {
+          return true;
+        }
+        if (item.type === 'topper') return filters.institutes.includes('Topper Copy');
         if (item.type === 'prelims') {
           const tests = Array.isArray(item.rawItem.tests) ? item.rawItem.tests[0] : item.rawItem.tests;
           const inst = tests?.institute || item.rawItem.provider || item.rawItem.source?.institute || '';
@@ -2325,7 +2400,15 @@ export default function IntegratedSearchScreen() {
     if (filters.sections.length > 0) {
       list = list.filter(item => {
         if (item.type !== 'prelims') return true;
-        const sec = item.rawItem.section_group || item.rawItem.sectionGroup;
+        const sec = item.rawItem.section_group || item.rawItem.sectionGroup || getQuestionSection(item.rawItem);
+        if (filters.subjects.length > 1) {
+          const itemSub = canonicalizeSubject(item.subject);
+          const subSections = prelimsSubjectSectionsMap.get(itemSub);
+          const hasSectionForThisSubject = subSections && filters.sections.some(s => subSections.has(s));
+          if (!hasSectionForThisSubject) {
+            return true;
+          }
+        }
         return sec && filters.sections.includes(sec);
       });
     }
@@ -2361,15 +2444,17 @@ export default function IntegratedSearchScreen() {
     // Filter by Mains Sections
     if (filters.mainsSections && filters.mainsSections.length > 0) {
       list = list.filter(item => {
-        if (item.type === 'mains' || item.type === 'topper') {
-          const sec = getQuestionSection(item.rawItem);
-          return sec && filters.mainsSections!.includes(sec);
+        if (item.type !== 'mains' && item.type !== 'topper' && item.type !== 'value_add') return true;
+        const sec = item.type === 'value_add' ? getValueAddSection(item.rawItem) : getQuestionSection(item.rawItem);
+        if (filters.subjects.length > 1) {
+          const itemSub = canonicalizeSubject(item.subject);
+          const subSections = mainsSubjectSectionsMap.get(itemSub);
+          const hasSectionForThisSubject = subSections && filters.mainsSections!.some(s => subSections.has(s));
+          if (!hasSectionForThisSubject) {
+            return true;
+          }
         }
-        if (item.type === 'value_add') {
-          const sec = getValueAddSection(item.rawItem);
-          return sec && filters.mainsSections!.includes(sec);
-        }
-        return false;
+        return sec && filters.mainsSections!.includes(sec);
       });
     }
 
@@ -2653,13 +2738,17 @@ export default function IntegratedSearchScreen() {
 
   const onPinchGestureEvent = (event: any) => {
     const scale = event.nativeEvent.scale;
-    const next = Math.max(12, Math.min(32, baseFontSizeRef.current * scale));
-    setPreviewFontSize(next);
+    let next = basePreviewFontSizeRef.current * scale;
+    next = Math.max(12, Math.min(32, next));
+    setPreviewFontSize(Math.round(next));
+    setShowPreviewZoomIndicator(true);
+    if (previewZoomTimerRef.current) clearTimeout(previewZoomTimerRef.current);
+    previewZoomTimerRef.current = setTimeout(() => setShowPreviewZoomIndicator(false), 1500);
   };
 
   const onPinchHandlerStateChange = (event: any) => {
-    if (event.nativeEvent.oldState === State.ACTIVE) {
-      baseFontSizeRef.current = previewFontSize;
+    if (event.nativeEvent.state === State.END || event.nativeEvent.state === State.CANCELLED || event.nativeEvent.oldState === State.ACTIVE) {
+      basePreviewFontSizeRef.current = previewFontSize;
     }
   };
 
@@ -2874,11 +2963,11 @@ export default function IntegratedSearchScreen() {
 
           <View style={{ flex: 1 }}>
             {isExpanded ? (
-              <Text style={[styles.cardText, { color: colors.textPrimary }]}>
+              <Text style={[styles.cardText, { color: colors.textPrimary, fontSize: Math.max(12, zoomFontSize - 2) }]}>
                 {highlightKeywords(displayTitle, keywords)}
               </Text>
             ) : (
-              <Text style={[styles.cardText, { color: colors.textPrimary }]} numberOfLines={3}>
+              <Text style={[styles.cardText, { color: colors.textPrimary, fontSize: Math.max(12, zoomFontSize - 2) }]} numberOfLines={3}>
                 {highlightKeywords(displayTitle, keywords)}
               </Text>
             )}
@@ -3004,13 +3093,6 @@ export default function IntegratedSearchScreen() {
           next.mainsMicrotopics = [];
           next.subtopics = [];
           next.nanotopics = [];
-        } else if (key === 'subjects') {
-          next.sections = [];
-          next.microtopics = [];
-          next.mainsSections = [];
-          next.mainsMicrotopics = [];
-          next.subtopics = [];
-          next.nanotopics = [];
         } else if (key === 'sections') {
           next.microtopics = [];
         } else if (key === 'mainsSections') {
@@ -3037,12 +3119,6 @@ export default function IntegratedSearchScreen() {
         return {
           ...p,
           subjects: nextSubs,
-          sections: [],
-          microtopics: [],
-          mainsSections: [],
-          mainsMicrotopics: [],
-          subtopics: [],
-          nanotopics: [],
         };
       }
 
@@ -3119,10 +3195,12 @@ export default function IntegratedSearchScreen() {
   const renderAccordionHeader = (
     key: 'prelims' | 'mains' | 'institutes' | 'revision' | 'display' | 'searchIn',
     label: string,
-    badgeCount?: number
+    badgeCount?: number,
+    color?: string
   ) => {
     const isOpen = openSections[key];
-    const hasActive = (badgeCount ?? 0) > 0;
+    const hasActive = key !== 'searchIn' && (badgeCount ?? 0) > 0;
+    const activeColor = color || colors.primary;
     return (
       <TouchableOpacity
         onPress={() => setOpenSections(prev => ({ ...prev, [key]: !prev[key] }))}
@@ -3150,7 +3228,7 @@ export default function IntegratedSearchScreen() {
             style={{
               fontSize: 11,
               fontWeight: '800',
-              color: (isOpen || hasActive) ? colors.primary : colors.textSecondary,
+              color: (isOpen || hasActive) ? activeColor : colors.textSecondary,
               letterSpacing: 0.5,
             }}
           >
@@ -3159,7 +3237,7 @@ export default function IntegratedSearchScreen() {
           {hasActive && (
             <View
               style={{
-                backgroundColor: colors.primary,
+                backgroundColor: activeColor,
                 borderRadius: 8,
                 paddingHorizontal: 6,
                 paddingVertical: 1,
@@ -3172,9 +3250,9 @@ export default function IntegratedSearchScreen() {
             </View>
           )}
         </View>
-        <View style={{ width: 20, height: 20, borderRadius: 10, backgroundColor: (isOpen || hasActive) ? colors.primary + '15' : 'transparent', alignItems: 'center', justifyContent: 'center' }}>
+        <View style={{ width: 20, height: 20, borderRadius: 10, backgroundColor: (isOpen || hasActive) ? activeColor + '15' : 'transparent', alignItems: 'center', justifyContent: 'center' }}>
           {isOpen
-            ? <ChevronUp size={13} color={(isOpen || hasActive) ? colors.primary : colors.textSecondary} />
+            ? <ChevronUp size={13} color={(isOpen || hasActive) ? activeColor : colors.textSecondary} />
             : <ChevronDown size={13} color={colors.textTertiary} />
           }
         </View>
@@ -3184,32 +3262,41 @@ export default function IntegratedSearchScreen() {
 
   const LeftPanelFilters = (
     <ScrollView ref={sidebarScrollViewRef} style={{ flex: 1 }} contentContainerStyle={{ padding: 16 }} showsVerticalScrollIndicator={true}>
-      {/* Result Breakdown - stats pills without heading */}
+      {/* Result Breakdown - stats pills with indicator dots on top and counts below (Requirement 9) */}
       {hasSearched && results.length > 0 && (
         <View style={{ marginBottom: 14, paddingBottom: 12, borderBottomWidth: 0.5, borderBottomColor: colors.border }}>
           <View style={{ flexDirection: 'row', gap: 6 }}>
             <View style={{ flex: 1, paddingVertical: 6, paddingHorizontal: 4, borderRadius: 8, backgroundColor: '#DCFCE7', alignItems: 'center', justifyContent: 'center' }}>
-              <Text style={{ fontSize: 13, fontWeight: '800', color: '#15803D' }} numberOfLines={1}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                <View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: '#16A34A' }} />
+                <Text style={{ fontSize: 9, fontWeight: '700', color: '#166534', letterSpacing: 0.5 }} numberOfLines={1}>
+                  PRELIMS
+                </Text>
+              </View>
+              <Text style={{ fontSize: 13, fontWeight: '800', color: '#15803D', marginTop: 3 }} numberOfLines={1}>
                 {resultCounts.stageCounts.prelims}
-              </Text>
-              <Text style={{ fontSize: 9, fontWeight: '700', color: '#166534', letterSpacing: 0.5 }} numberOfLines={1}>
-                PRE
               </Text>
             </View>
             <View style={{ flex: 1, paddingVertical: 6, paddingHorizontal: 4, borderRadius: 8, backgroundColor: '#FFEDD5', alignItems: 'center', justifyContent: 'center' }}>
-              <Text style={{ fontSize: 13, fontWeight: '800', color: '#C2410C' }} numberOfLines={1}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                <View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: '#EA580C' }} />
+                <Text style={{ fontSize: 9, fontWeight: '700', color: '#9A3412', letterSpacing: 0.5 }} numberOfLines={1}>
+                  MAINS
+                </Text>
+              </View>
+              <Text style={{ fontSize: 13, fontWeight: '800', color: '#C2410C', marginTop: 3 }} numberOfLines={1}>
                 {resultCounts.stageCounts.mains}
-              </Text>
-              <Text style={{ fontSize: 9, fontWeight: '700', color: '#9A3412', letterSpacing: 0.5 }} numberOfLines={1}>
-                MAINS
               </Text>
             </View>
             <View style={{ flex: 1, paddingVertical: 6, paddingHorizontal: 4, borderRadius: 8, backgroundColor: '#FFF7ED', borderWidth: 0.5, borderColor: '#FED7AA', alignItems: 'center', justifyContent: 'center' }}>
-              <Text style={{ fontSize: 13, fontWeight: '800', color: '#EA580C' }} numberOfLines={1}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                <View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: '#F97316' }} />
+                <Text style={{ fontSize: 9, fontWeight: '700', color: '#C2410C', letterSpacing: 0.5 }} numberOfLines={1}>
+                  TOPPER
+                </Text>
+              </View>
+              <Text style={{ fontSize: 13, fontWeight: '800', color: '#EA580C', marginTop: 3 }} numberOfLines={1}>
                 {resultCounts.stageCounts.topper}
-              </Text>
-              <Text style={{ fontSize: 9, fontWeight: '700', color: '#C2410C', letterSpacing: 0.5 }} numberOfLines={1}>
-                TOPPER
               </Text>
             </View>
           </View>
@@ -3514,88 +3601,88 @@ export default function IntegratedSearchScreen() {
       </View>
 
       {/* ═══════════════════════════════════════════════════════════════════════
-          ROW 3: PRELIMS ACCORDION (default open)
+          ROW 3: PRELIMS ACCORDION (Always visible, default open)
          ═══════════════════════════════════════════════════════════════════════ */}
-      {filters.showPrelims && (
-        <View style={{ marginBottom: 4 }}>
-          {renderAccordionHeader('prelims', 'PRELIMS FILTERS', activeSectionCounts.prelims, '#16A34A')}
-          {openSections.prelims && (
-            <View style={{ marginBottom: 8, gap: 8 }}>
-              {/* 1. NCERT inline filter (Single line, 2 chips, both selected by default) */}
-              <View style={{ marginBottom: 4 }}>
-                <Text style={{ fontSize: 10, fontWeight: '800', color: colors.textTertiary, letterSpacing: 1, marginBottom: 4 }}>
-                  NCERT
-                </Text>
-                <View style={{ flexDirection: 'row', gap: 6 }}>
-                  {(() => {
-                    const isNcertSelected = filters.ncertFilter === 'All' || filters.ncertFilter === 'NCERT Only';
-                    const isNonNcertSelected = filters.ncertFilter === 'All' || filters.ncertFilter === 'Non-NCERT';
+      <View style={{ marginBottom: 4 }}>
+        {renderAccordionHeader('prelims', 'PRELIMS FILTERS', activeSectionCounts.prelims, '#16A34A')}
+        {openSections.prelims && (
+          <View style={{ marginBottom: 8, gap: 8 }}>
+            {/* 1. NCERT inline filter (Single line, 2 chips, both selected by default) */}
+            <View style={{ marginBottom: 4 }}>
+              <Text style={{ fontSize: 10, fontWeight: '800', color: colors.textTertiary, letterSpacing: 1, marginBottom: 4 }}>
+                NCERT
+              </Text>
+              <View style={{ flexDirection: 'row', gap: 6 }}>
+                {(() => {
+                  const isNcertSelected = filters.ncertFilter === 'All' || filters.ncertFilter === 'NCERT Only';
+                  const isNonNcertSelected = filters.ncertFilter === 'All' || filters.ncertFilter === 'Non-NCERT';
 
-                    const handleNcertPress = () => {
-                      if (filters.ncertFilter === 'All') {
-                        setFilters(p => ({ ...p, ncertFilter: 'NCERT Only' }));
-                      } else if (filters.ncertFilter === 'Non-NCERT') {
-                        setFilters(p => ({ ...p, ncertFilter: 'All' }));
-                      } else {
-                        setFilters(p => ({ ...p, ncertFilter: 'All' }));
-                      }
-                    };
+                  const handleNcertPress = () => {
+                    if (filters.ncertFilter === 'All') {
+                      setFilters(p => ({ ...p, ncertFilter: 'NCERT Only' }));
+                    } else if (filters.ncertFilter === 'Non-NCERT') {
+                      setFilters(p => ({ ...p, ncertFilter: 'All' }));
+                    } else {
+                      setFilters(p => ({ ...p, ncertFilter: 'All' }));
+                    }
+                  };
 
-                    const handleNonNcertPress = () => {
-                      if (filters.ncertFilter === 'All') {
-                        setFilters(p => ({ ...p, ncertFilter: 'Non-NCERT' }));
-                      } else if (filters.ncertFilter === 'NCERT Only') {
-                        setFilters(p => ({ ...p, ncertFilter: 'All' }));
-                      } else {
-                        setFilters(p => ({ ...p, ncertFilter: 'All' }));
-                      }
-                    };
+                  const handleNonNcertPress = () => {
+                    if (filters.ncertFilter === 'All') {
+                      setFilters(p => ({ ...p, ncertFilter: 'Non-NCERT' }));
+                    } else if (filters.ncertFilter === 'NCERT Only') {
+                      setFilters(p => ({ ...p, ncertFilter: 'All' }));
+                    } else {
+                      setFilters(p => ({ ...p, ncertFilter: 'All' }));
+                    }
+                  };
 
-                    return (
-                      <>
-                        <TouchableOpacity
-                          onPress={handleNcertPress}
-                          activeOpacity={1}
-                          style={[
-                            styles.compactChip,
-                            { flex: 1, justifyContent: 'center' },
-                            isNcertSelected
-                              ? { backgroundColor: '#16A34A', borderColor: '#16A34A' }
-                              : { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : colors.surface, borderColor: colors.border },
-                          ]}
-                        >
-                          <Text style={[styles.compactChipText, { color: isNcertSelected ? '#fff' : colors.textSecondary }]}>
-                            NCERT Only
-                          </Text>
-                          {isNcertSelected && <Check size={10} color="#fff" style={{ marginLeft: 4 }} />}
-                        </TouchableOpacity>
+                  return (
+                    <>
+                      <TouchableOpacity
+                        onPress={handleNcertPress}
+                        activeOpacity={1}
+                        style={[
+                          styles.compactChip,
+                          { flex: 1, justifyContent: 'center' },
+                          isNcertSelected
+                            ? { backgroundColor: '#16A34A', borderColor: '#16A34A' }
+                            : { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : colors.surface, borderColor: colors.border },
+                        ]}
+                      >
+                        <Text style={[styles.compactChipText, { color: isNcertSelected ? '#fff' : colors.textSecondary }]}>
+                          NCERT Only
+                        </Text>
+                        {isNcertSelected ? <Check size={10} color="#fff" style={{ marginLeft: 4 }} /> : null}
+                      </TouchableOpacity>
 
-                        <TouchableOpacity
-                          onPress={handleNonNcertPress}
-                          activeOpacity={1}
-                          style={[
-                            styles.compactChip,
-                            { flex: 1, justifyContent: 'center' },
-                            isNonNcertSelected
-                              ? { backgroundColor: '#16A34A', borderColor: '#16A34A' }
-                              : { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : colors.surface, borderColor: colors.border },
-                          ]}
-                        >
-                          <Text style={[styles.compactChipText, { color: isNonNcertSelected ? '#fff' : colors.textSecondary }]}>
-                            Non-NCERT
-                          </Text>
-                          {isNonNcertSelected && <Check size={10} color="#fff" style={{ marginLeft: 4 }} />}
-                        </TouchableOpacity>
-                      </>
-                    );
-                  })()}
-                </View>
+                      <TouchableOpacity
+                        onPress={handleNonNcertPress}
+                        activeOpacity={1}
+                        style={[
+                          styles.compactChip,
+                          { flex: 1, justifyContent: 'center' },
+                          isNonNcertSelected
+                            ? { backgroundColor: '#16A34A', borderColor: '#16A34A' }
+                            : { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : colors.surface, borderColor: colors.border },
+                        ]}
+                      >
+                        <Text style={[styles.compactChipText, { color: isNonNcertSelected ? '#fff' : colors.textSecondary }]}>
+                          Non-NCERT
+                        </Text>
+                        {isNonNcertSelected ? <Check size={10} color="#fff" style={{ marginLeft: 4 }} /> : null}
+                      </TouchableOpacity>
+                    </>
+                  );
+                })()}
               </View>
+            </View>
 
-              {/* 2. Subjects (2 per line, truncated names, includes CSAT) */}
+            {/* 2. Subjects (2 per line, exact original names visually truncated, includes CSAT) */}
+            {prelimsSubjectOptions.length > 0 && (
               <View style={{ marginBottom: 4 }}>
                 <Text style={{ fontSize: 10, fontWeight: '800', color: colors.textTertiary, letterSpacing: 1, marginBottom: 4 }}>
-                  SUBJECTS {filters.subjects.length > 0 ? `(${filters.subjects.length})` : ''}
+                  SUBJECTS {(filters?.subjects?.length ?? 0) > 0 ? `(${filters.subjects.length})` : ''}
                 </Text>
                 {/* All Button */}
                 <TouchableOpacity
@@ -3604,20 +3691,20 @@ export default function IntegratedSearchScreen() {
                   style={[
                     styles.compactChip,
                     { marginBottom: 5, alignSelf: 'flex-start' },
-                    filters.subjects.length === 0
+                    (filters?.subjects?.length ?? 0) === 0
                       ? { backgroundColor: colors.primary, borderColor: colors.primary }
                       : { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : colors.surface, borderColor: colors.border },
                   ]}
                 >
-                  <Text style={[styles.compactChipText, { color: filters.subjects.length === 0 ? '#fff' : colors.textSecondary }]}>All</Text>
-                  {filters.subjects.length === 0 && <Check size={10} color="#fff" style={{ marginLeft: 4 }} />}
+                  <Text style={[styles.compactChipText, { color: (filters?.subjects?.length ?? 0) === 0 ? '#fff' : colors.textSecondary }]}>All</Text>
+                  {(filters?.subjects?.length ?? 0) === 0 ? <Check size={10} color="#fff" style={{ marginLeft: 4 }} /> : null}
                 </TouchableOpacity>
 
                 {/* 2 Subject Chips per line */}
                 <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6 }}>
                   {prelimsSubjectOptions.map(sub => {
                     const canon = canonicalizeSubject(sub);
-                    const isSelected = filters.subjects.some(s => canonicalizeSubject(s) === canon);
+                    const isSelected = (filters?.subjects || []).some(s => canonicalizeSubject(s) === canon);
                     return (
                       <TouchableOpacity
                         key={canon}
@@ -3641,137 +3728,40 @@ export default function IntegratedSearchScreen() {
                         >
                           {truncateSubjectLabel(sub)}
                         </Text>
-                        {isSelected && <Check size={10} color="#fff" style={{ marginLeft: 3 }} />}
+                        {isSelected ? <Check size={10} color="#fff" style={{ marginLeft: 3 }} /> : null}
                       </TouchableOpacity>
                     );
                   })}
                 </View>
               </View>
+            )}
 
-              {/* 3. Section Group (visible ONLY when >= 1 subject selected) */}
-              {filters.subjects.length > 0 && prelimsSectionOptions.filter(x => x !== 'All').length > 0 && (
-                <View style={{ marginBottom: 4 }}>
-                  <Text style={{ fontSize: 10, fontWeight: '800', color: colors.textTertiary, letterSpacing: 1, marginBottom: 4 }}>
-                    SECTIONS / MODULES {filters.sections.length > 0 ? `(${filters.sections.length})` : ''}
-                  </Text>
-                  <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 5 }}>
-                    <TouchableOpacity
-                      onPress={() => toggleFilterChip('sections', 'All')}
-                      activeOpacity={1}
-                      style={[
-                        styles.compactChip,
-                        filters.sections.length === 0
-                          ? { backgroundColor: colors.primary, borderColor: colors.primary }
-                          : { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : colors.surface, borderColor: colors.border },
-                      ]}
-                    >
-                      <Text style={[styles.compactChipText, { color: filters.sections.length === 0 ? '#fff' : colors.textSecondary }]}>All</Text>
-                      {filters.sections.length === 0 && <Check size={10} color="#fff" style={{ marginLeft: 4 }} />}
-                    </TouchableOpacity>
-                    {prelimsSectionOptions.filter(x => x !== 'All').map(sec => {
-                      const isSelected = filters.sections.includes(sec);
-                      return (
-                        <TouchableOpacity
-                          key={sec}
-                          onPress={() => toggleFilterChip('sections', sec)}
-                          activeOpacity={1}
-                          style={[
-                            styles.compactChip,
-                            isSelected
-                              ? { backgroundColor: colors.primary, borderColor: colors.primary }
-                              : { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : colors.surface, borderColor: colors.border },
-                          ]}
-                        >
-                          <Text style={[styles.compactChipText, { color: isSelected ? '#fff' : colors.textSecondary }]}>{sec}</Text>
-                          {isSelected && <Check size={10} color="#fff" style={{ marginLeft: 3 }} />}
-                        </TouchableOpacity>
-                      );
-                    })}
-                  </View>
-                </View>
-              )}
-
-              {/* 4. Microtopics (visible ONLY when >= 1 section selected) */}
-              {filters.sections.length > 0 && prelimsMicrotopicOptions.filter(x => x !== 'All').length > 0 && (
-                <View style={{ marginBottom: 4 }}>
-                  <Text style={{ fontSize: 10, fontWeight: '800', color: colors.textTertiary, letterSpacing: 1, marginBottom: 4 }}>
-                    MICROTOPICS {filters.microtopics.length > 0 ? `(${filters.microtopics.length})` : ''}
-                  </Text>
-                  <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 5 }}>
-                    <TouchableOpacity
-                      onPress={() => toggleFilterChip('microtopics', 'All')}
-                      activeOpacity={1}
-                      style={[
-                        styles.compactChip,
-                        filters.microtopics.length === 0
-                          ? { backgroundColor: colors.primary, borderColor: colors.primary }
-                          : { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : colors.surface, borderColor: colors.border },
-                      ]}
-                    >
-                      <Text style={[styles.compactChipText, { color: filters.microtopics.length === 0 ? '#fff' : colors.textSecondary }]}>All</Text>
-                      {filters.microtopics.length === 0 && <Check size={10} color="#fff" style={{ marginLeft: 4 }} />}
-                    </TouchableOpacity>
-                    {prelimsMicrotopicOptions.filter(x => x !== 'All').map(mt => {
-                      const isSelected = filters.microtopics.includes(mt);
-                      return (
-                        <TouchableOpacity
-                          key={mt}
-                          onPress={() => toggleFilterChip('microtopics', mt)}
-                          activeOpacity={1}
-                          style={[
-                            styles.compactChip,
-                            isSelected
-                              ? { backgroundColor: colors.primary, borderColor: colors.primary }
-                              : { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : colors.surface, borderColor: colors.border },
-                          ]}
-                        >
-                          <Text style={[styles.compactChipText, { color: isSelected ? '#fff' : colors.textSecondary }]}>{mt}</Text>
-                          {isSelected && <Check size={10} color="#fff" style={{ marginLeft: 3 }} />}
-                        </TouchableOpacity>
-                      );
-                    })}
-                  </View>
-                </View>
-              )}
-            </View>
-          )}
-        </View>
-      )}
-
-      {/* ═══════════════════════════════════════════════════════════════════════
-          ROW 4: MAINS ACCORDION (default open)
-         ═══════════════════════════════════════════════════════════════════════ */}
-      {(filters.showMains || filters.showToppers || filters.showValueAdd) && (
-        <View style={{ marginBottom: 4 }}>
-          {renderAccordionHeader('mains', 'MAINS FILTERS', activeSectionCounts.mains)}
-          {openSections.mains && (
-            <View style={{ marginBottom: 8, gap: 8 }}>
-              {/* 1. Papers (Always visible) */}
+            {/* 3. Section Group (visible ONLY when >= 1 subject selected & sections exist) */}
+            {(filters?.subjects?.length ?? 0) > 0 && prelimsSectionOptions.filter(x => x !== 'All').length > 0 && (
               <View style={{ marginBottom: 4 }}>
                 <Text style={{ fontSize: 10, fontWeight: '800', color: colors.textTertiary, letterSpacing: 1, marginBottom: 4 }}>
-                  PAPERS {filters.mainsPapers.length > 0 ? `(${filters.mainsPapers.length})` : ''}
+                  SECTIONS / MODULES {(filters?.sections?.length ?? 0) > 0 ? `(${filters.sections.length})` : ''}
                 </Text>
                 <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 5 }}>
                   <TouchableOpacity
-                    onPress={() => toggleFilterChip('mainsPapers', 'All')}
+                    onPress={() => toggleFilterChip('sections', 'All')}
                     activeOpacity={1}
                     style={[
                       styles.compactChip,
-                      filters.mainsPapers.length === 0
+                      (filters?.sections?.length ?? 0) === 0
                         ? { backgroundColor: colors.primary, borderColor: colors.primary }
                         : { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : colors.surface, borderColor: colors.border },
                     ]}
                   >
-                    <Text style={[styles.compactChipText, { color: filters.mainsPapers.length === 0 ? '#fff' : colors.textSecondary }]}>All</Text>
-                    {filters.mainsPapers.length === 0 && <Check size={10} color="#fff" style={{ marginLeft: 3 }} />}
+                    <Text style={[styles.compactChipText, { color: (filters?.sections?.length ?? 0) === 0 ? '#fff' : colors.textSecondary }]}>All</Text>
+                    {(filters?.sections?.length ?? 0) === 0 ? <Check size={10} color="#fff" style={{ marginLeft: 4 }} /> : null}
                   </TouchableOpacity>
-                  {PAPER_OPTIONS.map(opt => {
-                    const isSelected = filters.mainsPapers.includes(opt);
-                    const count = resultCounts.paperCounts[opt] ?? 0;
+                  {prelimsSectionOptions.filter(x => x !== 'All').map(sec => {
+                    const isSelected = (filters?.sections || []).includes(sec);
                     return (
                       <TouchableOpacity
-                        key={opt}
-                        onPress={() => toggleFilterChip('mainsPapers', opt)}
+                        key={sec}
+                        onPress={() => toggleFilterChip('sections', sec)}
                         activeOpacity={1}
                         style={[
                           styles.compactChip,
@@ -3780,263 +3770,371 @@ export default function IntegratedSearchScreen() {
                             : { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : colors.surface, borderColor: colors.border },
                         ]}
                       >
-                        <Text style={[styles.compactChipText, { color: isSelected ? '#fff' : colors.textSecondary }]}>{opt}</Text>
-                        {hasSearched && count > 0 && (
-                          <Text style={{ fontSize: 8, fontWeight: '700', marginLeft: 3, color: isSelected ? '#fff' : colors.textTertiary }}>
-                            ({count})
-                          </Text>
-                        )}
-                        {isSelected && <Check size={10} color="#fff" style={{ marginLeft: 3 }} />}
+                        <Text style={[styles.compactChipText, { color: isSelected ? '#fff' : colors.textSecondary }]}>{sec}</Text>
+                        {isSelected ? <Check size={10} color="#fff" style={{ marginLeft: 3 }} /> : null}
                       </TouchableOpacity>
                     );
                   })}
                 </View>
               </View>
+            )}
 
-              {/* 2. Subjects (Appears ONLY when >= 1 paper selected) */}
-              {filters.mainsPapers.length > 0 && mainsSubjectOptions.length > 0 && (
-                <View style={{ marginBottom: 4 }}>
-                  <Text style={{ fontSize: 10, fontWeight: '800', color: colors.textTertiary, letterSpacing: 1, marginBottom: 4 }}>
-                    SUBJECTS {filters.subjects.length > 0 ? `(${filters.subjects.length})` : ''}
-                  </Text>
-                  <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 5 }}>
+            {/* 4. Microtopics (visible ONLY when >= 1 section selected & microtopics exist) */}
+            {(filters?.sections?.length ?? 0) > 0 && prelimsMicrotopicOptions.filter(x => x !== 'All').length > 0 && (
+              <View style={{ marginBottom: 4 }}>
+                <Text style={{ fontSize: 10, fontWeight: '800', color: colors.textTertiary, letterSpacing: 1, marginBottom: 4 }}>
+                  MICROTOPICS {(filters?.microtopics?.length ?? 0) > 0 ? `(${filters.microtopics.length})` : ''}
+                </Text>
+                <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 5 }}>
+                  <TouchableOpacity
+                    onPress={() => toggleFilterChip('microtopics', 'All')}
+                    activeOpacity={1}
+                    style={[
+                      styles.compactChip,
+                      (filters?.microtopics?.length ?? 0) === 0
+                        ? { backgroundColor: colors.primary, borderColor: colors.primary }
+                        : { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : colors.surface, borderColor: colors.border },
+                    ]}
+                  >
+                    <Text style={[styles.compactChipText, { color: (filters?.microtopics?.length ?? 0) === 0 ? '#fff' : colors.textSecondary }]}>All</Text>
+                    {(filters?.microtopics?.length ?? 0) === 0 ? <Check size={10} color="#fff" style={{ marginLeft: 4 }} /> : null}
+                  </TouchableOpacity>
+                  {prelimsMicrotopicOptions.filter(x => x !== 'All').map(mt => {
+                    const isSelected = (filters?.microtopics || []).includes(mt);
+                    return (
+                      <TouchableOpacity
+                        key={mt}
+                        onPress={() => toggleFilterChip('microtopics', mt)}
+                        activeOpacity={1}
+                        style={[
+                          styles.compactChip,
+                          isSelected
+                            ? { backgroundColor: colors.primary, borderColor: colors.primary }
+                            : { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : colors.surface, borderColor: colors.border },
+                        ]}
+                      >
+                        <Text style={[styles.compactChipText, { color: isSelected ? '#fff' : colors.textSecondary }]}>{mt}</Text>
+                        {isSelected ? <Check size={10} color="#fff" style={{ marginLeft: 3 }} /> : null}
+                      </TouchableOpacity>
+                    );
+                  })}
+                </View>
+              </View>
+            )}
+          </View>
+        )}
+      </View>
+
+      {/* ═══════════════════════════════════════════════════════════════════════
+          ROW 4: MAINS ACCORDION (Always visible, default open)
+         ═══════════════════════════════════════════════════════════════════════ */}
+      <View style={{ marginBottom: 4 }}>
+        {renderAccordionHeader('mains', 'MAINS FILTERS', activeSectionCounts.mains, '#EA580C')}
+        {openSections.mains && (
+          <View style={{ marginBottom: 8, gap: 8 }}>
+            {/* 1. Papers (Always visible) */}
+            <View style={{ marginBottom: 4 }}>
+              <Text style={{ fontSize: 10, fontWeight: '800', color: colors.textTertiary, letterSpacing: 1, marginBottom: 4 }}>
+                PAPERS {(filters?.mainsPapers?.length ?? 0) > 0 ? `(${filters.mainsPapers.length})` : ''}
+              </Text>
+              <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 5 }}>
+                <TouchableOpacity
+                  onPress={() => toggleFilterChip('mainsPapers', 'All')}
+                  activeOpacity={1}
+                  style={[
+                    styles.compactChip,
+                    (filters?.mainsPapers?.length ?? 0) === 0
+                      ? { backgroundColor: colors.primary, borderColor: colors.primary }
+                      : { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : colors.surface, borderColor: colors.border },
+                  ]}
+                >
+                  <Text style={[styles.compactChipText, { color: (filters?.mainsPapers?.length ?? 0) === 0 ? '#fff' : colors.textSecondary }]}>All</Text>
+                  {(filters?.mainsPapers?.length ?? 0) === 0 ? <Check size={10} color="#fff" style={{ marginLeft: 3 }} /> : null}
+                </TouchableOpacity>
+                {PAPER_OPTIONS.map(opt => {
+                  const isSelected = (filters?.mainsPapers || []).includes(opt);
+                  const count = resultCounts.paperCounts[opt] ?? 0;
+                  return (
                     <TouchableOpacity
-                      onPress={() => toggleFilterChip('subjects', 'All')}
+                      key={opt}
+                      onPress={() => toggleFilterChip('mainsPapers', opt)}
                       activeOpacity={1}
                       style={[
                         styles.compactChip,
-                        filters.subjects.length === 0
+                        isSelected
                           ? { backgroundColor: colors.primary, borderColor: colors.primary }
                           : { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : colors.surface, borderColor: colors.border },
                       ]}
                     >
-                      <Text style={[styles.compactChipText, { color: filters.subjects.length === 0 ? '#fff' : colors.textSecondary }]}>All</Text>
-                      {filters.subjects.length === 0 && <Check size={10} color="#fff" style={{ marginLeft: 3 }} />}
+                      <Text style={[styles.compactChipText, { color: isSelected ? '#fff' : colors.textSecondary }]}>{opt}</Text>
+                      {hasSearched && count > 0 && (
+                        <Text style={{ fontSize: 8, fontWeight: '700', marginLeft: 3, color: isSelected ? '#fff' : colors.textTertiary }}>
+                          ({count})
+                        </Text>
+                      )}
+                      {isSelected ? <Check size={10} color="#fff" style={{ marginLeft: 3 }} /> : null}
                     </TouchableOpacity>
-                    {mainsSubjectOptions.map(sub => {
-                      const canon = canonicalizeSubject(sub);
-                      const isSelected = filters.subjects.some(s => canonicalizeSubject(s) === canon);
-                      const count = resultCounts.subjectCounts[canon] ?? 0;
-                      return (
-                        <TouchableOpacity
-                          key={canon}
-                          onPress={() => toggleFilterChip('subjects', canon)}
-                          activeOpacity={1}
-                          style={[
-                            styles.compactChip,
-                            isSelected
-                              ? { backgroundColor: colors.primary, borderColor: colors.primary }
-                              : { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : colors.surface, borderColor: colors.border },
-                          ]}
-                        >
-                          <Text style={[styles.compactChipText, { color: isSelected ? '#fff' : colors.textSecondary }]}>{sub}</Text>
-                          {hasSearched && count > 0 && (
-                            <Text style={{ fontSize: 8, fontWeight: '700', marginLeft: 3, color: isSelected ? '#fff' : colors.textTertiary }}>
-                              ({count})
-                            </Text>
-                          )}
-                          {isSelected && <Check size={10} color="#fff" style={{ marginLeft: 3 }} />}
-                        </TouchableOpacity>
-                      );
-                    })}
-                  </View>
-                </View>
-              )}
+                  );
+                })}
+              </View>
+            </View>
 
-              {/* 3. Section Group (Appears ONLY when >= 1 subject selected) */}
-              {filters.subjects.length > 0 && mainsSectionOptions.filter(x => x !== 'All').length > 0 && (
-                <View style={{ marginBottom: 4 }}>
-                  <Text style={{ fontSize: 10, fontWeight: '800', color: colors.textTertiary, letterSpacing: 1, marginBottom: 4 }}>
-                    SECTIONS {(filters.mainsSections || []).length > 0 ? `(${(filters.mainsSections || []).length})` : ''}
-                  </Text>
-                  <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 5 }}>
-                    <TouchableOpacity
-                      onPress={() => toggleFilterChip('mainsSections', 'All')}
-                      activeOpacity={1}
-                      style={[
-                        styles.compactChip,
-                        (filters.mainsSections || []).length === 0
-                          ? { backgroundColor: colors.primary, borderColor: colors.primary }
-                          : { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : colors.surface, borderColor: colors.border },
-                      ]}
-                    >
-                      <Text style={[styles.compactChipText, { color: (filters.mainsSections || []).length === 0 ? '#fff' : colors.textSecondary }]}>All</Text>
-                      {(filters.mainsSections || []).length === 0 && <Check size={10} color="#fff" style={{ marginLeft: 3 }} />}
-                    </TouchableOpacity>
-                    {mainsSectionOptions.filter(x => x !== 'All').map(sec => {
-                      const isSelected = (filters.mainsSections || []).includes(sec);
-                      return (
-                        <TouchableOpacity
-                          key={sec}
-                          onPress={() => toggleFilterChip('mainsSections', sec)}
-                          activeOpacity={1}
-                          style={[
-                            styles.compactChip,
-                            isSelected
-                              ? { backgroundColor: colors.primary, borderColor: colors.primary }
-                              : { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : colors.surface, borderColor: colors.border },
-                          ]}
-                        >
-                          <Text style={[styles.compactChipText, { color: isSelected ? '#fff' : colors.textSecondary }]}>{sec}</Text>
-                          {isSelected && <Check size={10} color="#fff" style={{ marginLeft: 3 }} />}
-                        </TouchableOpacity>
-                      );
-                    })}
-                  </View>
+            {/* 2. Subjects (Appears ONLY when >= 1 paper selected & subjects exist) */}
+            {(filters?.mainsPapers?.length ?? 0) > 0 && mainsSubjectOptions.length > 0 && (
+              <View style={{ marginBottom: 4 }}>
+                <Text style={{ fontSize: 10, fontWeight: '800', color: colors.textTertiary, letterSpacing: 1, marginBottom: 4 }}>
+                  SUBJECTS {(filters?.subjects?.length ?? 0) > 0 ? `(${filters.subjects.length})` : ''}
+                </Text>
+                <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 5 }}>
+                  <TouchableOpacity
+                    onPress={() => toggleFilterChip('subjects', 'All')}
+                    activeOpacity={1}
+                    style={[
+                      styles.compactChip,
+                      (filters?.subjects?.length ?? 0) === 0
+                        ? { backgroundColor: colors.primary, borderColor: colors.primary }
+                        : { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : colors.surface, borderColor: colors.border },
+                    ]}
+                  >
+                    <Text style={[styles.compactChipText, { color: (filters?.subjects?.length ?? 0) === 0 ? '#fff' : colors.textSecondary }]}>All</Text>
+                    {(filters?.subjects?.length ?? 0) === 0 ? <Check size={10} color="#fff" style={{ marginLeft: 3 }} /> : null}
+                  </TouchableOpacity>
+                  {mainsSubjectOptions.map(sub => {
+                    const canon = canonicalizeSubject(sub);
+                    const isSelected = (filters?.subjects || []).some(s => canonicalizeSubject(s) === canon);
+                    const count = resultCounts.subjectCounts[canon] ?? 0;
+                    return (
+                      <TouchableOpacity
+                        key={canon}
+                        onPress={() => toggleFilterChip('subjects', canon)}
+                        activeOpacity={1}
+                        style={[
+                          styles.compactChip,
+                          isSelected
+                            ? { backgroundColor: colors.primary, borderColor: colors.primary }
+                            : { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : colors.surface, borderColor: colors.border },
+                        ]}
+                      >
+                        <Text style={[styles.compactChipText, { color: isSelected ? '#fff' : colors.textSecondary }]}>{sub}</Text>
+                        {hasSearched && count > 0 && (
+                          <Text style={{ fontSize: 8, fontWeight: '700', marginLeft: 3, color: isSelected ? '#fff' : colors.textTertiary }}>
+                            ({count})
+                          </Text>
+                        )}
+                        {isSelected ? <Check size={10} color="#fff" style={{ marginLeft: 3 }} /> : null}
+                      </TouchableOpacity>
+                    );
+                  })}
                 </View>
-              )}
+              </View>
+            )}
 
-              {/* 4. Microtopics (Appears ONLY when >= 1 section selected) */}
-              {(filters.mainsSections || []).length > 0 && mainsMicrotopicOptions.filter(x => x !== 'All').length > 0 && (
-                <View style={{ marginBottom: 4 }}>
-                  <Text style={{ fontSize: 10, fontWeight: '800', color: colors.textTertiary, letterSpacing: 1, marginBottom: 4 }}>
-                    MICROTOPICS {(filters.mainsMicrotopics || []).length > 0 ? `(${(filters.mainsMicrotopics || []).length})` : ''}
-                  </Text>
-                  <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 5 }}>
-                    <TouchableOpacity
-                      onPress={() => toggleFilterChip('mainsMicrotopics', 'All')}
-                      activeOpacity={1}
-                      style={[
-                        styles.compactChip,
-                        (filters.mainsMicrotopics || []).length === 0
-                          ? { backgroundColor: colors.primary, borderColor: colors.primary }
-                          : { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : colors.surface, borderColor: colors.border },
-                      ]}
-                    >
-                      <Text style={[styles.compactChipText, { color: (filters.mainsMicrotopics || []).length === 0 ? '#fff' : colors.textSecondary }]}>All</Text>
-                      {(filters.mainsMicrotopics || []).length === 0 && <Check size={10} color="#fff" style={{ marginLeft: 3 }} />}
-                    </TouchableOpacity>
-                    {mainsMicrotopicOptions.filter(x => x !== 'All').map(micro => {
-                      const isSelected = (filters.mainsMicrotopics || []).includes(micro);
-                      return (
-                        <TouchableOpacity
-                          key={micro}
-                          onPress={() => toggleFilterChip('mainsMicrotopics', micro)}
-                          activeOpacity={1}
-                          style={[
-                            styles.compactChip,
-                            isSelected
-                              ? { backgroundColor: colors.primary, borderColor: colors.primary }
-                              : { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : colors.surface, borderColor: colors.border },
-                          ]}
-                        >
-                          <Text style={[styles.compactChipText, { color: isSelected ? '#fff' : colors.textSecondary }]}>{micro}</Text>
-                          {isSelected && <Check size={10} color="#fff" style={{ marginLeft: 3 }} />}
-                        </TouchableOpacity>
-                      );
-                    })}
-                  </View>
+            {/* 3. Section Group (Appears ONLY when >= 1 subject selected & sections exist) */}
+            {(filters?.subjects?.length ?? 0) > 0 && mainsSectionOptions.filter(x => x !== 'All').length > 0 && (
+              <View style={{ marginBottom: 4 }}>
+                <Text style={{ fontSize: 10, fontWeight: '800', color: colors.textTertiary, letterSpacing: 1, marginBottom: 4 }}>
+                  SECTIONS {(filters?.mainsSections?.length ?? 0) > 0 ? `(${filters.mainsSections?.length})` : ''}
+                </Text>
+                <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 5 }}>
+                  <TouchableOpacity
+                    onPress={() => toggleFilterChip('mainsSections', 'All')}
+                    activeOpacity={1}
+                    style={[
+                      styles.compactChip,
+                      (filters?.mainsSections?.length ?? 0) === 0
+                        ? { backgroundColor: colors.primary, borderColor: colors.primary }
+                        : { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : colors.surface, borderColor: colors.border },
+                    ]}
+                  >
+                    <Text style={[styles.compactChipText, { color: (filters?.mainsSections?.length ?? 0) === 0 ? '#fff' : colors.textSecondary }]}>All</Text>
+                    {(filters?.mainsSections?.length ?? 0) === 0 ? <Check size={10} color="#fff" style={{ marginLeft: 3 }} /> : null}
+                  </TouchableOpacity>
+                  {mainsSectionOptions.filter(x => x !== 'All').map(sec => {
+                    const isSelected = (filters?.mainsSections || []).includes(sec);
+                    return (
+                      <TouchableOpacity
+                        key={sec}
+                        onPress={() => toggleFilterChip('mainsSections', sec)}
+                        activeOpacity={1}
+                        style={[
+                          styles.compactChip,
+                          isSelected
+                            ? { backgroundColor: colors.primary, borderColor: colors.primary }
+                            : { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : colors.surface, borderColor: colors.border },
+                        ]}
+                      >
+                        <Text style={[styles.compactChipText, { color: isSelected ? '#fff' : colors.textSecondary }]}>{sec}</Text>
+                        {isSelected ? <Check size={10} color="#fff" style={{ marginLeft: 3 }} /> : null}
+                      </TouchableOpacity>
+                    );
+                  })}
                 </View>
-              )}
+              </View>
+            )}
 
-              {/* 5. Subtopics (Appears ONLY when >= 1 microtopic selected) */}
-              {(filters.mainsMicrotopics || []).length > 0 && mainsSubtopicOptions.filter(x => x !== 'All').length > 0 && (
-                <View style={{ marginBottom: 4 }}>
-                  <Text style={{ fontSize: 10, fontWeight: '800', color: colors.textTertiary, letterSpacing: 1, marginBottom: 4 }}>
-                    SUBTOPICS {filters.subtopics.length > 0 ? `(${filters.subtopics.length})` : ''}
-                  </Text>
-                  <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 5 }}>
-                    <TouchableOpacity
-                      onPress={() => toggleFilterChip('subtopics', 'All')}
-                      activeOpacity={1}
-                      style={[
-                        styles.compactChip,
-                        filters.subtopics.length === 0
-                          ? { backgroundColor: colors.primary, borderColor: colors.primary }
-                          : { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : colors.surface, borderColor: colors.border },
-                      ]}
-                    >
-                      <Text style={[styles.compactChipText, { color: filters.subtopics.length === 0 ? '#fff' : colors.textSecondary }]}>All</Text>
-                      {filters.subtopics.length === 0 && <Check size={10} color="#fff" style={{ marginLeft: 3 }} />}
-                    </TouchableOpacity>
-                    {mainsSubtopicOptions.filter(x => x !== 'All').map(sub => {
-                      const isSelected = filters.subtopics.includes(sub);
-                      return (
-                        <TouchableOpacity
-                          key={sub}
-                          onPress={() => toggleFilterChip('subtopics', sub)}
-                          activeOpacity={1}
-                          style={[
-                            styles.compactChip,
-                            isSelected
-                              ? { backgroundColor: colors.primary, borderColor: colors.primary }
-                              : { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : colors.surface, borderColor: colors.border },
-                          ]}
-                        >
-                          <Text style={[styles.compactChipText, { color: isSelected ? '#fff' : colors.textSecondary }]}>{sub}</Text>
-                          {isSelected && <Check size={10} color="#fff" style={{ marginLeft: 3 }} />}
-                        </TouchableOpacity>
-                      );
-                    })}
-                  </View>
+            {/* 4. Microtopics (Appears ONLY when >= 1 section selected & microtopics exist) */}
+            {(filters?.mainsSections?.length ?? 0) > 0 && mainsMicrotopicOptions.filter(x => x !== 'All').length > 0 && (
+              <View style={{ marginBottom: 4 }}>
+                <Text style={{ fontSize: 10, fontWeight: '800', color: colors.textTertiary, letterSpacing: 1, marginBottom: 4 }}>
+                  MICROTOPICS {(filters?.mainsMicrotopics?.length ?? 0) > 0 ? `(${filters.mainsMicrotopics?.length})` : ''}
+                </Text>
+                <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 5 }}>
+                  <TouchableOpacity
+                    onPress={() => toggleFilterChip('mainsMicrotopics', 'All')}
+                    activeOpacity={1}
+                    style={[
+                      styles.compactChip,
+                      (filters?.mainsMicrotopics?.length ?? 0) === 0
+                        ? { backgroundColor: colors.primary, borderColor: colors.primary }
+                        : { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : colors.surface, borderColor: colors.border },
+                    ]}
+                  >
+                    <Text style={[styles.compactChipText, { color: (filters?.mainsMicrotopics?.length ?? 0) === 0 ? '#fff' : colors.textSecondary }]}>All</Text>
+                    {(filters?.mainsMicrotopics?.length ?? 0) === 0 ? <Check size={10} color="#fff" style={{ marginLeft: 3 }} /> : null}
+                  </TouchableOpacity>
+                  {mainsMicrotopicOptions.filter(x => x !== 'All').map(micro => {
+                    const isSelected = (filters?.mainsMicrotopics || []).includes(micro);
+                    return (
+                      <TouchableOpacity
+                        key={micro}
+                        onPress={() => toggleFilterChip('mainsMicrotopics', micro)}
+                        activeOpacity={1}
+                        style={[
+                          styles.compactChip,
+                          isSelected
+                            ? { backgroundColor: colors.primary, borderColor: colors.primary }
+                            : { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : colors.surface, borderColor: colors.border },
+                        ]}
+                      >
+                        <Text style={[styles.compactChipText, { color: isSelected ? '#fff' : colors.textSecondary }]}>{micro}</Text>
+                        {isSelected ? <Check size={10} color="#fff" style={{ marginLeft: 3 }} /> : null}
+                      </TouchableOpacity>
+                    );
+                  })}
                 </View>
-              )}
+              </View>
+            )}
 
-              {/* 6. Nanotopics (Appears ONLY when >= 1 subtopic selected) */}
-              {filters.subtopics.length > 0 && mainsNanotopicOptions.filter(x => x !== 'All').length > 0 && (
-                <View style={{ marginBottom: 4 }}>
-                  <Text style={{ fontSize: 10, fontWeight: '800', color: colors.textTertiary, letterSpacing: 1, marginBottom: 4 }}>
-                    NANOTOPICS {filters.nanotopics.length > 0 ? `(${filters.nanotopics.length})` : ''}
-                  </Text>
-                  <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 5 }}>
-                    <TouchableOpacity
-                      onPress={() => toggleFilterChip('nanotopics', 'All')}
-                      activeOpacity={1}
-                      style={[
-                        styles.compactChip,
-                        filters.nanotopics.length === 0
-                          ? { backgroundColor: colors.primary, borderColor: colors.primary }
-                          : { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : colors.surface, borderColor: colors.border },
-                      ]}
-                    >
-                      <Text style={[styles.compactChipText, { color: filters.nanotopics.length === 0 ? '#fff' : colors.textSecondary }]}>All</Text>
-                      {filters.nanotopics.length === 0 && <Check size={10} color="#fff" style={{ marginLeft: 3 }} />}
-                    </TouchableOpacity>
-                    {mainsNanotopicOptions.filter(x => x !== 'All').map(nano => {
-                      const isSelected = filters.nanotopics.includes(nano);
-                      return (
-                        <TouchableOpacity
-                          key={nano}
-                          onPress={() => toggleFilterChip('nanotopics', nano)}
-                          activeOpacity={1}
-                          style={[
-                            styles.compactChip,
-                            isSelected
-                              ? { backgroundColor: colors.primary, borderColor: colors.primary }
-                              : { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : colors.surface, borderColor: colors.border },
-                          ]}
-                        >
-                          <Text style={[styles.compactChipText, { color: isSelected ? '#fff' : colors.textSecondary }]}>{nano}</Text>
-                          {isSelected && <Check size={10} color="#fff" style={{ marginLeft: 3 }} />}
-                        </TouchableOpacity>
-                      );
-                    })}
-                  </View>
+            {/* 5. Subtopics (Appears ONLY when >= 1 microtopic selected & subtopics exist) */}
+            {(filters?.mainsMicrotopics?.length ?? 0) > 0 && mainsSubtopicOptions.filter(x => x !== 'All').length > 0 && (
+              <View style={{ marginBottom: 4 }}>
+                <Text style={{ fontSize: 10, fontWeight: '800', color: colors.textTertiary, letterSpacing: 1, marginBottom: 4 }}>
+                  SUBTOPICS {(filters?.subtopics?.length ?? 0) > 0 ? `(${filters.subtopics.length})` : ''}
+                </Text>
+                <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 5 }}>
+                  <TouchableOpacity
+                    onPress={() => toggleFilterChip('subtopics', 'All')}
+                    activeOpacity={1}
+                    style={[
+                      styles.compactChip,
+                      (filters?.subtopics?.length ?? 0) === 0
+                        ? { backgroundColor: colors.primary, borderColor: colors.primary }
+                        : { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : colors.surface, borderColor: colors.border },
+                    ]}
+                  >
+                    <Text style={[styles.compactChipText, { color: (filters?.subtopics?.length ?? 0) === 0 ? '#fff' : colors.textSecondary }]}>All</Text>
+                    {(filters?.subtopics?.length ?? 0) === 0 ? <Check size={10} color="#fff" style={{ marginLeft: 3 }} /> : null}
+                  </TouchableOpacity>
+                  {mainsSubtopicOptions.filter(x => x !== 'All').map(sub => {
+                    const isSelected = (filters?.subtopics || []).includes(sub);
+                    return (
+                      <TouchableOpacity
+                        key={sub}
+                        onPress={() => toggleFilterChip('subtopics', sub)}
+                        activeOpacity={1}
+                        style={[
+                          styles.compactChip,
+                          isSelected
+                            ? { backgroundColor: colors.primary, borderColor: colors.primary }
+                            : { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : colors.surface, borderColor: colors.border },
+                        ]}
+                      >
+                        <Text style={[styles.compactChipText, { color: isSelected ? '#fff' : colors.textSecondary }]}>{sub}</Text>
+                        {isSelected ? <Check size={10} color="#fff" style={{ marginLeft: 3 }} /> : null}
+                      </TouchableOpacity>
+                    );
+                  })}
                 </View>
-              )}
+              </View>
+            )}
 
-              {/* 7. Macro Tags (Imported from Mains Question Bank) */}
-              {mainsMacrotagOptions.filter(x => x !== 'All').length > 0 && (
-                <View style={{ marginBottom: 4 }}>
-                  <Text style={{ fontSize: 10, fontWeight: '800', color: colors.textTertiary, letterSpacing: 1, marginBottom: 4 }}>
-                    MACRO TAGS {(filters.macrotags || []).length > 0 ? `(${(filters.macrotags || []).length})` : ''}
+            {/* 6. Nanotopics (Appears ONLY when >= 1 subtopic selected & nanotopics exist) */}
+            {(filters?.subtopics?.length ?? 0) > 0 && mainsNanotopicOptions.filter(x => x !== 'All').length > 0 && (
+              <View style={{ marginBottom: 4 }}>
+                <Text style={{ fontSize: 10, fontWeight: '800', color: colors.textTertiary, letterSpacing: 1, marginBottom: 4 }}>
+                  NANOTOPICS {(filters?.nanotopics?.length ?? 0) > 0 ? `(${filters.nanotopics.length})` : ''}
+                </Text>
+                <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 5 }}>
+                  <TouchableOpacity
+                    onPress={() => toggleFilterChip('nanotopics', 'All')}
+                    activeOpacity={1}
+                    style={[
+                      styles.compactChip,
+                      (filters?.nanotopics?.length ?? 0) === 0
+                        ? { backgroundColor: colors.primary, borderColor: colors.primary }
+                        : { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : colors.surface, borderColor: colors.border },
+                    ]}
+                  >
+                    <Text style={[styles.compactChipText, { color: (filters?.nanotopics?.length ?? 0) === 0 ? '#fff' : colors.textSecondary }]}>All</Text>
+                    {(filters?.nanotopics?.length ?? 0) === 0 ? <Check size={10} color="#fff" style={{ marginLeft: 3 }} /> : null}
+                  </TouchableOpacity>
+                  {mainsNanotopicOptions.filter(x => x !== 'All').map(nano => {
+                    const isSelected = (filters?.nanotopics || []).includes(nano);
+                    return (
+                      <TouchableOpacity
+                        key={nano}
+                        onPress={() => toggleFilterChip('nanotopics', nano)}
+                        activeOpacity={1}
+                        style={[
+                          styles.compactChip,
+                          isSelected
+                            ? { backgroundColor: colors.primary, borderColor: colors.primary }
+                            : { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : colors.surface, borderColor: colors.border },
+                        ]}
+                      >
+                        <Text style={[styles.compactChipText, { color: isSelected ? '#fff' : colors.textSecondary }]}>{nano}</Text>
+                        {isSelected ? <Check size={10} color="#fff" style={{ marginLeft: 3 }} /> : null}
+                      </TouchableOpacity>
+                    );
+                  })}
+                </View>
+              </View>
+            )}
+
+            {/* 7. Macro Tags (Imported from Mains Question Bank, collapsed by default - Requirement 17) */}
+            {mainsMacrotagOptions.filter(x => x !== 'All').length > 0 && (
+              <View style={{ marginBottom: 4, marginTop: 4, paddingTop: 4, borderTopWidth: 0.5, borderTopColor: colors.border }}>
+                <TouchableOpacity
+                  onPress={() => setMacroTagsExpanded(p => !p)}
+                  activeOpacity={0.7}
+                  style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 4 }}
+                >
+                  <Text style={{ fontSize: 10, fontWeight: '800', color: colors.textTertiary, letterSpacing: 1 }}>
+                    MACRO TAGS {(filters?.macrotags?.length ?? 0) > 0 ? `(${filters.macrotags.length})` : ''}
                   </Text>
-                  <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 5 }}>
+                  {macroTagsExpanded ? (
+                    <ChevronUp size={12} color={colors.textTertiary} />
+                  ) : (
+                    <ChevronDown size={12} color={colors.textTertiary} />
+                  )}
+                </TouchableOpacity>
+                {macroTagsExpanded && (
+                  <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 5, marginTop: 4 }}>
                     <TouchableOpacity
                       onPress={() => toggleFilterChip('macrotags', 'All')}
                       activeOpacity={1}
                       style={[
                         styles.compactChip,
-                        (filters.macrotags || []).length === 0
+                        (filters?.macrotags?.length ?? 0) === 0
                           ? { backgroundColor: colors.primary, borderColor: colors.primary }
                           : { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : colors.surface, borderColor: colors.border },
                       ]}
                     >
-                      <Text style={[styles.compactChipText, { color: (filters.macrotags || []).length === 0 ? '#fff' : colors.textSecondary }]}>All</Text>
-                      {(filters.macrotags || []).length === 0 && <Check size={10} color="#fff" style={{ marginLeft: 3 }} />}
+                      <Text style={[styles.compactChipText, { color: (filters?.macrotags?.length ?? 0) === 0 ? '#fff' : colors.textSecondary }]}>All</Text>
+                      {(filters?.macrotags?.length ?? 0) === 0 ? <Check size={10} color="#fff" style={{ marginLeft: 3 }} /> : null}
                     </TouchableOpacity>
                     {mainsMacrotagOptions.filter(x => x !== 'All').map(tag => {
-                      const isSelected = (filters.macrotags || []).includes(tag);
+                      const isSelected = (filters?.macrotags || []).includes(tag);
                       return (
                         <TouchableOpacity
                           key={tag}
@@ -4052,36 +4150,49 @@ export default function IntegratedSearchScreen() {
                           <Text style={[styles.compactChipText, { color: isSelected ? '#fff' : colors.textSecondary }]}>
                             #{tag}
                           </Text>
-                          {isSelected && <Check size={10} color="#fff" style={{ marginLeft: 3 }} />}
+                          {isSelected ? <Check size={10} color="#fff" style={{ marginLeft: 3 }} /> : null}
                         </TouchableOpacity>
                       );
                     })}
                   </View>
-                </View>
-              )}
+                )}
+              </View>
+            )}
 
-              {/* 8. Micro Tags (Contextual from Mains Question Bank) */}
-              {(filters.macrotags || []).length > 0 && mainsMicrotagOptions.filter(x => x !== 'All').length > 0 && (
-                <View style={{ marginBottom: 4 }}>
-                  <Text style={{ fontSize: 10, fontWeight: '800', color: colors.textTertiary, letterSpacing: 1, marginBottom: 4 }}>
-                    MICRO TAGS {(filters.microtags || []).length > 0 ? `(${(filters.microtags || []).length})` : ''}
+            {/* 8. Micro Tags (Contextual from Mains Question Bank, collapsed by default - Requirement 17) */}
+            {(filters?.macrotags?.length ?? 0) > 0 && mainsMicrotagOptions.filter(x => x !== 'All').length > 0 && (
+              <View style={{ marginBottom: 4, marginTop: 2 }}>
+                <TouchableOpacity
+                  onPress={() => setMicroTagsExpanded(p => !p)}
+                  activeOpacity={0.7}
+                  style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 4 }}
+                >
+                  <Text style={{ fontSize: 10, fontWeight: '800', color: colors.textTertiary, letterSpacing: 1 }}>
+                    MICRO TAGS {(filters?.microtags?.length ?? 0) > 0 ? `(${filters.microtags.length})` : ''}
                   </Text>
-                  <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 5 }}>
+                  {microTagsExpanded ? (
+                    <ChevronUp size={12} color={colors.textTertiary} />
+                  ) : (
+                    <ChevronDown size={12} color={colors.textTertiary} />
+                  )}
+                </TouchableOpacity>
+                {microTagsExpanded && (
+                  <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 5, marginTop: 4 }}>
                     <TouchableOpacity
                       onPress={() => toggleFilterChip('microtags', 'All')}
                       activeOpacity={1}
                       style={[
                         styles.compactChip,
-                        (filters.microtags || []).length === 0
+                        (filters?.microtags?.length ?? 0) === 0
                           ? { backgroundColor: colors.primary, borderColor: colors.primary }
                           : { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : colors.surface, borderColor: colors.border },
                       ]}
                     >
-                      <Text style={[styles.compactChipText, { color: (filters.microtags || []).length === 0 ? '#fff' : colors.textSecondary }]}>All</Text>
-                      {(filters.microtags || []).length === 0 && <Check size={10} color="#fff" style={{ marginLeft: 3 }} />}
+                      <Text style={[styles.compactChipText, { color: (filters?.microtags?.length ?? 0) === 0 ? '#fff' : colors.textSecondary }]}>All</Text>
+                      {(filters?.microtags?.length ?? 0) === 0 ? <Check size={10} color="#fff" style={{ marginLeft: 3 }} /> : null}
                     </TouchableOpacity>
                     {mainsMicrotagOptions.filter(x => x !== 'All').map(tag => {
-                      const isSelected = (filters.microtags || []).includes(tag);
+                      const isSelected = (filters?.microtags || []).includes(tag);
                       return (
                         <TouchableOpacity
                           key={tag}
@@ -4097,17 +4208,17 @@ export default function IntegratedSearchScreen() {
                           <Text style={[styles.compactChipText, { color: isSelected ? '#fff' : colors.textSecondary }]}>
                             #{tag}
                           </Text>
-                          {isSelected && <Check size={10} color="#fff" style={{ marginLeft: 3 }} />}
+                          {isSelected ? <Check size={10} color="#fff" style={{ marginLeft: 3 }} /> : null}
                         </TouchableOpacity>
                       );
                     })}
                   </View>
-                </View>
-              )}
-            </View>
-          )}
-        </View>
-      )}
+                )}
+              </View>
+            )}
+          </View>
+        )}
+      </View>
 
       {/* ═══════════════════════════════════════════════════════════════════════
           ROW 5: INSTITUTES & PROGRAMMES ACCORDION (default closed)
@@ -4127,16 +4238,16 @@ export default function IntegratedSearchScreen() {
                   activeOpacity={1}
                   style={[
                     styles.compactChip,
-                    filters.institutes.length === 0
+                    (filters?.institutes?.length ?? 0) === 0
                       ? { backgroundColor: colors.primary, borderColor: colors.primary }
                       : { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : colors.surface, borderColor: colors.border },
                   ]}
                 >
-                  <Text style={[styles.compactChipText, { color: filters.institutes.length === 0 ? '#fff' : colors.textSecondary }]}>All</Text>
-                  {filters.institutes.length === 0 && <Check size={10} color="#fff" style={{ marginLeft: 3 }} />}
+                  <Text style={[styles.compactChipText, { color: (filters?.institutes?.length ?? 0) === 0 ? '#fff' : colors.textSecondary }]}>All</Text>
+                  {(filters?.institutes?.length ?? 0) === 0 ? <Check size={10} color="#fff" style={{ marginLeft: 3 }} /> : null}
                 </TouchableOpacity>
                 {instituteOptions.filter(x => x !== 'All').map(inst => {
-                  const isSelected = filters.institutes.includes(inst);
+                  const isSelected = (filters?.institutes || []).includes(inst);
                   const count = resultCounts.instituteCounts[inst] ?? 0;
                   return (
                     <TouchableOpacity
@@ -4156,18 +4267,18 @@ export default function IntegratedSearchScreen() {
                           ({count})
                         </Text>
                       )}
-                      {isSelected && <Check size={10} color="#fff" style={{ marginLeft: 3 }} />}
+                      {isSelected ? <Check size={10} color="#fff" style={{ marginLeft: 3 }} /> : null}
                     </TouchableOpacity>
                   );
                 })}
               </View>
             </View>
 
-            {/* Programmes (visible ONLY when >= 1 institute selected) */}
-            {filters.institutes.length > 0 && programmeOptions.filter(x => x !== 'All').length > 0 && (
+            {/* Programmes (visible ONLY when >= 1 institute selected & programmes exist) */}
+            {(filters?.institutes?.length ?? 0) > 0 && programmeOptions.filter(x => x !== 'All').length > 0 && (
               <View style={{ marginBottom: 4 }}>
                 <Text style={{ fontSize: 10, fontWeight: '800', color: colors.textTertiary, letterSpacing: 1, marginBottom: 4 }}>
-                  PROGRAMMES {filters.programmes.length > 0 ? `(${filters.programmes.length})` : ''}
+                  PROGRAMMES {(filters?.programmes?.length ?? 0) > 0 ? `(${filters.programmes.length})` : ''}
                 </Text>
                 <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 5 }}>
                   <TouchableOpacity
@@ -4175,16 +4286,16 @@ export default function IntegratedSearchScreen() {
                     activeOpacity={1}
                     style={[
                       styles.compactChip,
-                      filters.programmes.length === 0
+                      (filters?.programmes?.length ?? 0) === 0
                         ? { backgroundColor: colors.primary, borderColor: colors.primary }
                         : { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : colors.surface, borderColor: colors.border },
                     ]}
                   >
-                    <Text style={[styles.compactChipText, { color: filters.programmes.length === 0 ? '#fff' : colors.textSecondary }]}>All</Text>
-                    {filters.programmes.length === 0 && <Check size={10} color="#fff" style={{ marginLeft: 3 }} />}
+                    <Text style={[styles.compactChipText, { color: (filters?.programmes?.length ?? 0) === 0 ? '#fff' : colors.textSecondary }]}>All</Text>
+                    {(filters?.programmes?.length ?? 0) === 0 ? <Check size={10} color="#fff" style={{ marginLeft: 3 }} /> : null}
                   </TouchableOpacity>
                   {programmeOptions.filter(x => x !== 'All').map(prog => {
-                    const isSelected = filters.programmes.includes(prog);
+                    const isSelected = (filters?.programmes || []).includes(prog);
                     return (
                       <TouchableOpacity
                         key={prog}
@@ -4198,7 +4309,7 @@ export default function IntegratedSearchScreen() {
                         ]}
                       >
                         <Text style={[styles.compactChipText, { color: isSelected ? '#fff' : colors.textSecondary }]}>{prog}</Text>
-                        {isSelected && <Check size={10} color="#fff" style={{ marginLeft: 3 }} />}
+                        {isSelected ? <Check size={10} color="#fff" style={{ marginLeft: 3 }} /> : null}
                       </TouchableOpacity>
                     );
                   })}
@@ -4223,16 +4334,16 @@ export default function IntegratedSearchScreen() {
                   activeOpacity={1}
                   style={[
                     styles.compactChip,
-                    filters.revisionTags.length === 0
+                    (filters?.revisionTags?.length ?? 0) === 0
                       ? { backgroundColor: colors.primary, borderColor: colors.primary }
                       : { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : colors.surface, borderColor: colors.border },
                   ]}
                 >
-                  <Text style={[styles.compactChipText, { color: filters.revisionTags.length === 0 ? '#fff' : colors.textSecondary }]}>All</Text>
-                  {filters.revisionTags.length === 0 && <Check size={10} color="#fff" style={{ marginLeft: 3 }} />}
+                  <Text style={[styles.compactChipText, { color: (filters?.revisionTags?.length ?? 0) === 0 ? '#fff' : colors.textSecondary }]}>All</Text>
+                  {(filters?.revisionTags?.length ?? 0) === 0 ? <Check size={10} color="#fff" style={{ marginLeft: 3 }} /> : null}
                 </TouchableOpacity>
                 {userTags.map(tag => {
-                  const isSelected = filters.revisionTags.includes(tag);
+                  const isSelected = (filters?.revisionTags || []).includes(tag);
                   return (
                     <TouchableOpacity
                       key={tag}
@@ -4246,7 +4357,7 @@ export default function IntegratedSearchScreen() {
                       ]}
                     >
                       <Text style={[styles.compactChipText, { color: isSelected ? '#fff' : colors.textSecondary }]}>{tag}</Text>
-                      {isSelected && <Check size={10} color="#fff" style={{ marginLeft: 3 }} />}
+                      {isSelected ? <Check size={10} color="#fff" style={{ marginLeft: 3 }} /> : null}
                     </TouchableOpacity>
                   );
                 })}
@@ -4260,7 +4371,7 @@ export default function IntegratedSearchScreen() {
           ROW 6.5: SEARCH IN ACCORDION (default open)
          ═══════════════════════════════════════════════════════════════════════ */}
       <View style={{ marginBottom: 4 }}>
-        {renderAccordionHeader('searchIn', 'SEARCH IN', (filters.searchAcross && filters.searchAcross.length > 0 && filters.searchAcross.length < 2) ? 1 : 0)}
+        {renderAccordionHeader('searchIn', 'SEARCH IN', 0)}
         {openSections.searchIn && (
           <View style={{ marginBottom: 8, flexDirection: 'row', flexWrap: 'wrap', gap: 5, paddingTop: 4 }}>
             <TouchableOpacity
@@ -4377,21 +4488,11 @@ export default function IntegratedSearchScreen() {
         <View style={{
           paddingHorizontal: 16,
           paddingVertical: 10,
-          paddingTop: hasSearched ? insets.top + 8 : 10,
+          paddingTop: hasSearched ? Math.max(insets.top, 12) + 44 : 10,
           borderBottomWidth: 0.5,
           borderBottomColor: colors.border
         }}>
           <View style={{ flexDirection: 'row', gap: 8, position: 'relative', zIndex: 999, alignItems: 'center' }}>
-            {hasSearched && (
-              <TouchableOpacity
-                onPress={() => router.back()}
-                style={{ padding: 6, marginRight: -2 }}
-                hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
-                testID="search-back-button-searched"
-              >
-                <ChevronLeft size={24} color={colors.textPrimary} />
-              </TouchableOpacity>
-            )}
             {/* Sidebar toggle (Tablet/iPad only) */}
             {IS_IPAD && (
               <TouchableOpacity
@@ -4586,8 +4687,8 @@ export default function IntegratedSearchScreen() {
               {/* 4 Stage Toggle Chips */}
               {([
                 { key: 'showPrelims' as const, label: 'MCQ', isSelected: filters.showPrelims, color: '#16A34A' },
-                { key: 'showMains' as const, label: 'Questions', isSelected: filters.showMains, color: '#EA580C' },
-                { key: 'showToppers' as const, label: 'Topper Copies', isSelected: filters.showToppers, color: '#EA580C' },
+                { key: 'showMains' as const, label: 'Mains Ques.', isSelected: filters.showMains, color: '#EA580C' },
+                { key: 'showToppers' as const, label: 'Topper Copy', isSelected: filters.showToppers, color: '#EA580C' },
                 { key: 'showValueAdd' as const, label: 'Value Additions', isSelected: filters.showValueAdd, color: '#8B5CF6' },
               ]).map(stage => (
                 <TouchableOpacity
@@ -4627,6 +4728,40 @@ export default function IntegratedSearchScreen() {
                   </Text>
                 </TouchableOpacity>
               ))}
+
+              {/* Open in Mains Question Bank button for external search */}
+              {query.trim().length > 0 && (
+                <TouchableOpacity
+                  onPress={() => {
+                    router.push({
+                      pathname: '/mains',
+                      params: {
+                        initialScreen: 'questions',
+                        search: query.trim(),
+                        isExternalSearch: 'true',
+                        _ts: String(Date.now()),
+                      }
+                    } as any);
+                  }}
+                  activeOpacity={0.8}
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    paddingHorizontal: 10,
+                    paddingVertical: 5,
+                    borderRadius: 14,
+                    borderWidth: 1,
+                    borderColor: '#3b82f6',
+                    backgroundColor: isDark ? 'rgba(59, 130, 246, 0.2)' : 'rgba(59, 130, 246, 0.1)',
+                    gap: 4,
+                  }}
+                >
+                  <ExternalLink size={11} color="#3b82f6" />
+                  <Text style={{ fontSize: 11, fontWeight: '700', color: '#3b82f6' }}>
+                    Open in Question Bank
+                  </Text>
+                </TouchableOpacity>
+              )}
 
               {/* Vertical Divider */}
               <View
@@ -4780,18 +4915,34 @@ export default function IntegratedSearchScreen() {
           />
         )}
 
+        {/* Floating Back / Home Button (Requirement 8 - parity with app/mains.tsx) */}
+        <TouchableOpacity
+          onPress={() => {
+            try {
+              router.navigate('/(tabs)');
+            } catch {
+              router.back();
+            }
+          }}
+          activeOpacity={0.8}
+          style={[
+            styles.floatingBackButton,
+            {
+              top: Math.max(insets.top, 12),
+              backgroundColor: isDark ? 'rgba(30, 41, 59, 0.92)' : 'rgba(255, 255, 255, 0.92)',
+              borderColor: colors.border,
+            }
+          ]}
+          testID="search-floating-home-button"
+        >
+          <ChevronLeft size={18} color={colors.textPrimary} />
+          <Text style={[styles.backButtonText, { color: colors.textPrimary }]}>Home</Text>
+        </TouchableOpacity>
+
         {/* Header Bar */}
         {!hasSearched && (
-          <View style={[styles.header, { borderBottomColor: colors.border, paddingTop: insets.top }]}>
+          <View style={[styles.header, { borderBottomColor: colors.border, paddingTop: insets.top, paddingLeft: 100 }]}>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-              <TouchableOpacity
-                onPress={() => router.back()}
-                style={{ padding: 8, marginLeft: -8 }}
-                hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
-                testID="search-back-button-static"
-              >
-                <ChevronLeft size={24} color={colors.textPrimary} />
-              </TouchableOpacity>
               <Image
                 source={require('../assets/icon.png')}
                 style={{ width: 28, height: 28, borderRadius: 6 }}
@@ -5327,60 +5478,78 @@ export default function IntegratedSearchScreen() {
               </View>
 
               {/* Scrollable Card Panel with Zoom Support */}
-              <PinchGestureHandler onGestureEvent={onPinchGestureEvent} onHandlerStateChange={onPinchHandlerStateChange}>
-                <ScrollView 
-                  ref={previewScrollRef}
-                  style={{ flexShrink: 1 }}
-                  contentContainerStyle={{ padding: 16 }}
-                  showsVerticalScrollIndicator={true}
-                >
-                  <SharedQuestionCard
-                    item={{
-                      ...previewPrelimsQuestion,
-                      exam_info: {
-                        is_upsc_cse: previewPrelimsQuestion?.is_upsc_cse,
-                        is_allied: previewPrelimsQuestion?.is_allied,
-                        is_others: previewPrelimsQuestion?.is_others,
-                        group: previewPrelimsQuestion?.exam_group,
-                        exam_name: previewPrelimsQuestion?.exam_group,
-                        year: previewPrelimsQuestion?.exam_year,
-                        ...(previewPrelimsQuestion?.exam_info || {})
-                      },
-                      _explanations: previewPrelimsQuestion._explanations || [],
-                      _institutes: previewPrelimsQuestion._institutes || [],
-                    }}
-                    index={0}
-                    arenaMode="learning"
-                    isRevealed={previewPrelimsRevealed}
-                    colors={colors}
-                    mdStyles={mdStyles}
-                    mdRules={mdRules}
-                    fontSize={previewFontSize}
-                    answerData={{
-                      selectedAnswer: previewPrelimsAnswer,
-                      isReview: previewPrelimsStudyTags.length > 0,
-                      studyTags: previewPrelimsStudyTags
-                    }}
-                    userStudyTags={['Must Revise', 'Imp. Concept', 'Imp. Fact', 'Trap Question']}
-                    toggleStudyTag={handleTogglePrelimsTag}
-                    activeExplSource={previewPrelimsExplSource}
-                    onExplSourceChange={setPreviewPrelimsExplSource}
-                    onRevealExplanation={() => setPreviewPrelimsRevealed(true)}
-                    onOptionSelect={(qid: string, opt: string) => setPreviewPrelimsAnswer(opt)}
-                    onAnswerSelect={(ans: any) => {
-                      setPreviewPrelimsAnswer(ans);
-                      setPreviewPrelimsRevealed(true);
-                    }}
-                  />
+              <View style={{ flexShrink: 1, position: 'relative' }}>
+                {showPreviewZoomIndicator && (
+                  <View style={{
+                    position: 'absolute',
+                    top: 10,
+                    right: 14,
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    paddingHorizontal: 8,
+                    paddingVertical: 3,
+                    borderRadius: 10,
+                    zIndex: 999,
+                  }}>
+                    <Text style={{ color: '#fff', fontSize: 11, fontWeight: '800' }}>
+                      {Math.round((previewFontSize / 15) * 100)}%
+                    </Text>
+                  </View>
+                )}
+                <PinchGestureHandler onGestureEvent={onPinchGestureEvent} onHandlerStateChange={onPinchHandlerStateChange}>
+                  <ScrollView 
+                    ref={previewScrollRef}
+                    style={{ flexShrink: 1 }}
+                    contentContainerStyle={{ padding: 16 }}
+                    showsVerticalScrollIndicator={true}
+                  >
+                    <SharedQuestionCard
+                      item={{
+                        ...previewPrelimsQuestion,
+                        exam_info: {
+                          is_upsc_cse: previewPrelimsQuestion?.is_upsc_cse,
+                          is_allied: previewPrelimsQuestion?.is_allied,
+                          is_others: previewPrelimsQuestion?.is_others,
+                          group: previewPrelimsQuestion?.exam_group,
+                          exam_name: previewPrelimsQuestion?.exam_group,
+                          year: previewPrelimsQuestion?.exam_year,
+                          ...(previewPrelimsQuestion?.exam_info || {})
+                        },
+                        _explanations: previewPrelimsQuestion._explanations || [],
+                        _institutes: previewPrelimsQuestion._institutes || [],
+                      }}
+                      index={0}
+                      arenaMode="learning"
+                      isRevealed={previewPrelimsRevealed}
+                      colors={colors}
+                      mdStyles={previewMdStyles}
+                      mdRules={mdRules}
+                      fontSize={previewFontSize}
+                      answerData={{
+                        selectedAnswer: previewPrelimsAnswer,
+                        isReview: previewPrelimsStudyTags.length > 0,
+                        studyTags: previewPrelimsStudyTags
+                      }}
+                      userStudyTags={['Must Revise', 'Imp. Concept', 'Imp. Fact', 'Trap Question']}
+                      toggleStudyTag={handleTogglePrelimsTag}
+                      activeExplSource={previewPrelimsExplSource}
+                      onExplSourceChange={setPreviewPrelimsExplSource}
+                      onRevealExplanation={() => setPreviewPrelimsRevealed(true)}
+                      onOptionSelect={(qid: string, opt: string) => setPreviewPrelimsAnswer(opt)}
+                      onAnswerSelect={(ans: any) => {
+                        setPreviewPrelimsAnswer(ans);
+                        setPreviewPrelimsRevealed(true);
+                      }}
+                    />
 
-                  {previewPrelimsQuestion.micro_topic && (
-                    <View style={{ marginTop: 12, padding: 12, backgroundColor: colors.surfaceStrong, borderRadius: 16, borderWidth: 1, borderColor: colors.border + '50' }}>
-                      <Text style={{ fontSize: 10, fontWeight: '900', color: colors.textTertiary, letterSpacing: 1, marginBottom: 4 }}>SYLLABUS CONTEXT</Text>
-                      <Text style={{ fontSize: Math.max(11, previewFontSize - 3), color: colors.textSecondary, fontWeight: '600' }}>{previewPrelimsQuestion.micro_topic}</Text>
-                    </View>
-                  )}
-                </ScrollView>
-              </PinchGestureHandler>
+                    {previewPrelimsQuestion.micro_topic && (
+                      <View style={{ marginTop: 12, padding: 12, backgroundColor: colors.surfaceStrong, borderRadius: 16, borderWidth: 1, borderColor: colors.border + '50' }}>
+                        <Text style={{ fontSize: 10, fontWeight: '900', color: colors.textTertiary, letterSpacing: 1, marginBottom: 4 }}>SYLLABUS CONTEXT</Text>
+                        <Text style={{ fontSize: Math.max(11, previewFontSize - 3), color: colors.textSecondary, fontWeight: '600' }}>{previewPrelimsQuestion.micro_topic}</Text>
+                      </View>
+                    )}
+                  </ScrollView>
+                </PinchGestureHandler>
+              </View>
 
               {/* Quick Notes Editor */}
               <View style={{ paddingHorizontal: 14, paddingVertical: 10, borderTopWidth: 1, borderTopColor: colors.border, backgroundColor: colors.surface }}>
@@ -5616,6 +5785,27 @@ export default function IntegratedSearchScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  floatingBackButton: {
+    position: 'absolute',
+    left: 16,
+    zIndex: 9999,
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 12,
+    paddingVertical: 7,
+    borderRadius: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.12,
+    shadowRadius: 4,
+    elevation: 4,
+    borderWidth: 0.5,
+  },
+  backButtonText: {
+    fontSize: 13,
+    fontWeight: '700',
+    marginLeft: 2,
   },
   header: {
     height: 58,

@@ -19,6 +19,7 @@ export type SidebarDisplayPreferencesProps = {
   onChangeKeyBoxColor?: (color: KeyBoxColor) => void;
   colors: any;
   isDark?: boolean;
+  hideHeader?: boolean;
 };
 
 export default function SidebarDisplayPreferences({
@@ -30,42 +31,47 @@ export default function SidebarDisplayPreferences({
   onChangeKeyBoxColor,
   colors,
   isDark: propIsDark,
+  hideHeader = false,
 }: SidebarDisplayPreferencesProps) {
   const { isDark: contextIsDark } = useTheme();
   const isDark = propIsDark !== undefined ? propIsDark : contextIsDark;
   const [expanded, setExpanded] = useState(false);
 
-  return (
-    <View style={{ marginVertical: 2, marginTop: 12, borderTopWidth: 1, borderTopColor: colors.border + '60', paddingTop: 8 }}>
-      <TouchableOpacity
-        onPress={() => setExpanded(!expanded)}
-        activeOpacity={0.7}
-        style={[
-          styles.sidebarSectionHeader,
-          expanded && styles.sidebarSectionHeaderActive,
-        ]}
-      >
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-          <Text style={[styles.panelLabel, { color: colors.textTertiary, fontSize: 10, marginBottom: 0, letterSpacing: 1 }]}>
-            READING & DISPLAY
-          </Text>
-          <View style={{ backgroundColor: colors.border + '60', borderRadius: 8, paddingHorizontal: 6, paddingVertical: 2 }}>
-            <Text style={{ fontSize: 8, fontWeight: '800', color: colors.textTertiary }}>
-              3
-            </Text>
-          </View>
-        </View>
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-          <View style={{ width: 18, height: 18, borderRadius: 9, backgroundColor: expanded ? colors.primary + '15' : 'transparent', alignItems: 'center', justifyContent: 'center' }}>
-            {expanded
-              ? <ChevronUp size={13} color={colors.textSecondary} />
-              : <ChevronDown size={13} color={colors.textTertiary} />
-            }
-          </View>
-        </View>
-      </TouchableOpacity>
+  const isVisible = hideHeader || expanded;
 
-      {expanded && (
+  return (
+    <View style={hideHeader ? { marginVertical: 2 } : { marginVertical: 2, marginTop: 12, borderTopWidth: 1, borderTopColor: colors.border + '60', paddingTop: 8 }}>
+      {!hideHeader && (
+        <TouchableOpacity
+          onPress={() => setExpanded(!expanded)}
+          activeOpacity={0.7}
+          style={[
+            styles.sidebarSectionHeader,
+            expanded && styles.sidebarSectionHeaderActive,
+          ]}
+        >
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+            <Text style={[styles.panelLabel, { color: colors.textTertiary, fontSize: 10, marginBottom: 0, letterSpacing: 1 }]}>
+              READING & DISPLAY
+            </Text>
+            <View style={{ backgroundColor: colors.border + '60', borderRadius: 8, paddingHorizontal: 6, paddingVertical: 2 }}>
+              <Text style={{ fontSize: 8, fontWeight: '800', color: colors.textTertiary }}>
+                3
+              </Text>
+            </View>
+          </View>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+            <View style={{ width: 18, height: 18, borderRadius: 9, backgroundColor: expanded ? colors.primary + '15' : 'transparent', alignItems: 'center', justifyContent: 'center' }}>
+              {expanded
+                ? <ChevronUp size={13} color={colors.textSecondary} />
+                : <ChevronDown size={13} color={colors.textTertiary} />
+              }
+            </View>
+          </View>
+        </TouchableOpacity>
+      )}
+
+      {isVisible && (
         <View style={{ paddingTop: 8, paddingBottom: 6, paddingHorizontal: 2 }}>
           {/* TEXT READABILITY */}
           <Text style={{ fontSize: 10, fontFamily: 'PlusJakartaSans-Bold', fontWeight: '900', color: colors.textTertiary + '99', letterSpacing: 1.5, marginBottom: 8 }}>

@@ -912,7 +912,7 @@ export default function HomeScreen() {
 
 
           {/* ── 4. ROW 1 (3-COLUMN GRID) ── */}
-          <View style={[styles.rowGrid, { alignItems: 'flex-start' }]}>
+          <View style={[styles.rowGrid, { alignItems: 'flex-start', marginBottom: 8 }]}>
             {/* COLUMN 1: My Preparation (44% Width) */}
             <View style={[styles.card, styles.col1Card, { overflow: 'hidden', backgroundColor: '#F8FAFC', borderWidth: 1, borderColor: '#E2E8F0' }]}>
               {/* Premium Geometric Backgrounds */}
@@ -1309,9 +1309,12 @@ export default function HomeScreen() {
             </View>
 
             {/* COLUMN 3: Open Background & Quote (30% Width) */}
-            <View style={{ flex: IS_TABLET ? 1.5 : undefined, flexDirection: 'column', justifyContent: 'flex-start' }}>
+            <View style={{ flex: IS_TABLET ? 1.5 : undefined, flexDirection: 'column', minHeight: 290 }}>
+              {/* Spacer to push quote to bottom and leave top empty for background image */}
+              <View style={{ flex: 1 }} />
+
               {/* Bottom Card: Kalam Quote Card with Soft Mountain Graphic */}
-              <TouchableOpacity activeOpacity={0.8} onPress={handleNextQuote} style={[styles.card, styles.kalamQuoteCard]}>
+              <TouchableOpacity activeOpacity={0.8} onPress={handleNextQuote} style={[styles.card, styles.kalamQuoteCard, { marginTop: 16 }]}>
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 2 }}>
                   <Text style={styles.kalamQuoteMark}>“</Text>
                   <View style={{ flexDirection: 'row', gap: 12, alignItems: 'center', zIndex: 10 }}>

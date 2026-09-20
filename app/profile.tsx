@@ -211,7 +211,7 @@ export default function Profile() {
   const [syncDone, setSyncDone] = useState(false);
   const progressAnim = useRef(new RNAnimated.Value(0)).current;
 
-  const [aiProvider, setAiProvider] = useState<'gemini' | 'groq'>('gemini');
+  const [aiProvider, setAiProvider] = useState<'gemini' | 'groq' | 'openrouter' | 'deepseek' | 'custom'>('gemini');
   const [showAppGuide, setShowAppGuide] = useState(false);
   const [coursePickerVisible, setCoursePickerVisible] = useState(false);
   const { selectedCourse, setSelectedCourse } = useCourse();
@@ -739,11 +739,11 @@ export default function Profile() {
           </View>
           {/* Active provider badge */}
           <View style={{
-            backgroundColor: aiProvider === 'groq' ? '#f97316' : '#7c3aed',
+            backgroundColor: aiProvider === 'groq' ? '#f97316' : aiProvider === 'openrouter' ? '#0891b2' : aiProvider === 'deepseek' ? '#0ea5e9' : aiProvider === 'custom' ? '#10b981' : '#7c3aed',
             borderRadius: 6, paddingHorizontal: 8, paddingVertical: 2,
           }}>
             <Text style={{ fontSize: 9, fontWeight: '900', color: '#fff' }}>
-              {aiProvider.toUpperCase()}
+              {aiProvider === 'custom' ? 'CUSTOM' : aiProvider.toUpperCase()}
             </Text>
           </View>
           <ChevronRight size={16} color={colors.textTertiary} />

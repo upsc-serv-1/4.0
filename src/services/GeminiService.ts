@@ -23,8 +23,25 @@ export const GEMINI_MODELS = [
   { id: 'gemini-2.0-flash',        label: 'Flash 2.0',    sub: 'Fast · next-gen standard' },
 ] as const;
 
-export const AI_PROVIDER_KEY = 'ai_provider'; // 'gemini' | 'groq' | 'openrouter' | 'deepseek'
+export const AI_PROVIDER_KEY = 'ai_provider'; // 'gemini' | 'groq' | 'openrouter' | 'deepseek' | 'custom'
 export const GROQ_API_KEY_STORAGE = 'groq_api_key';
+
+// ── Custom OpenAI-Compatible / Self-Hosted Endpoint ───────────────
+export const CUSTOM_API_BASE_URL_KEY = 'custom_api_base_url';
+export const CUSTOM_API_KEY_STORAGE = 'custom_api_key';
+export const CUSTOM_MODEL_KEY = 'custom_api_model';
+export const CUSTOM_ENDPOINT_NAME_KEY = 'custom_endpoint_name';
+export const CUSTOM_API_HEADERS_KEY = 'custom_api_headers';
+export const CUSTOM_FETCHED_MODELS_KEY = 'custom_fetched_models';
+
+export const DEFAULT_CUSTOM_MODEL = 'default';
+export const DEFAULT_CUSTOM_ENDPOINT_NAME = 'Custom Node';
+
+export type CustomModelOption = {
+  id: string;
+  label: string;
+  sub?: string;
+};
 
 // ── DeepSeek ─────────────────────────────────────────────────────────────
 export const DEEPSEEK_API_KEY_STORAGE = 'deepseek_api_key';
@@ -170,7 +187,7 @@ Return ONLY raw JSON. No explanation, no markdown fences. Example:
 };
 
 // Helper — reads user's saved prompt or falls back to default
-async function getPrompt(key: keyof typeof PROMPT_KEYS): Promise<string> {
+async function getPrompt(key: 'explain' | 'summarize' | 'search'): Promise<string> {
   try {
     const saved = await AsyncStorage.getItem(PROMPT_KEYS[key]);
     return saved?.trim() || DEFAULT_PROMPTS[key];
@@ -309,6 +326,260 @@ async function callOpenRouter(prompt: string, maxTokens = 600): Promise<string> 
   return text.trim();
 }
 
+// ── Custom Endpoint Helpers ──────────────────────────────────────────────
+
+export function normalizeCustomBaseUrl(url: string): string {
+  let cleaned = (url || '').trim();
+  if (!cleaned) return '';
+  // If user omitted protocol, prepend http://
+  if (!cleaned.startsWith('http://') && !cleaned.startsWith('https://')) {
+    cleaned = 'http://' + cleaned;
+  }
+  // Strip trailing slashes
+  cleaned = cleaned.replace(/\/+$/, '');
+  // Strip trailing /chat/completions or /models if user pasted full path
+  cleaned = cleaned.replace(/\/chat\/completions$/i, '');
+  cleaned = cleaned.replace(/\/models$/i, '');
+  return cleaned.replace(/\/+$/, '');
+}
+
+export function getCustomChatUrl(baseUrl: string): string {
+  const normalized = normalizeCustomBaseUrl(baseUrl);
+  if (!normalized) return '';
+  // If base already contains /v1, append /chat/completions
+  if (normalized.endsWith('/v1')) {
+    return `${normalized}/chat/completions`;
+  }
+  // Standard OpenAI-compatible path
+  return `${normalized}/chat/completions`;
+}
+
+/**
+ * Fetch list of available models from a custom OpenAI-compatible endpoint.
+ * Probes standard /models, /v1/models, and Ollama /api/tags endpoints.
+ */
+export async function fetchCustomModels(
+  baseUrl: string,
+  apiKey?: string,
+  customHeaders?: Record<string, string>
+): Promise<{ success: boolean; models: CustomModelOption[]; error?: string }> {
+  const normalized = normalizeCustomBaseUrl(baseUrl);
+  if (!normalized) {
+    return { success: false, models: [], error: 'Base URL is required' };
+  }
+
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+    ...(customHeaders || {}),
+  };
+  if (apiKey && apiKey.trim()) {
+    headers['Authorization'] = `Bearer ${apiKey.trim()}`;
+  }
+
+  const candidateUrls: string[] = [];
+  if (normalized.endsWith('/v1')) {
+    candidateUrls.push(`${normalized}/models`);
+  } else {
+    candidateUrls.push(`${normalized}/v1/models`);
+    candidateUrls.push(`${normalized}/models`);
+    candidateUrls.push(`${normalized}/api/tags`); // Ollama native
+  }
+
+  let lastError = '';
+  for (const url of candidateUrls) {
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 12000); // 12s timeout
+
+      const res = await fetch(url, {
+        method: 'GET',
+        headers,
+        signal: controller.signal,
+      });
+      clearTimeout(timeoutId);
+
+      if (res.ok) {
+        const data = await res.json();
+        const extracted: CustomModelOption[] = [];
+
+        // 1. Standard OpenAI format: { data: [ { id: "model-id" } ] }
+        if (Array.isArray(data?.data)) {
+          data.data.forEach((item: any) => {
+            const id = typeof item === 'string' ? item : (item?.id || item?.name);
+            if (id) {
+              const label = typeof id === 'string' ? id : String(id);
+              const sub = item?.owned_by ? `Owner: ${item.owned_by}` : 'OpenAI Compatible';
+              extracted.push({ id: label, label, sub });
+            }
+          });
+        }
+        // 2. Ollama format: { models: [ { name: "llama3:latest", size: 4000000000 } ] }
+        else if (Array.isArray(data?.models)) {
+          data.models.forEach((item: any) => {
+            const id = typeof item === 'string' ? item : (item?.name || item?.model || item?.id);
+            if (id) {
+              const label = String(id);
+              const size = item?.size ? `${(item.size / (1024 * 1024 * 1024)).toFixed(1)} GB` : '';
+              extracted.push({ id: label, label, sub: size ? `Ollama · ${size}` : 'Ollama Model' });
+            }
+          });
+        }
+        // 3. Plain array: [ "model1", "model2" ] or [ { id: "..." } ]
+        else if (Array.isArray(data)) {
+          data.forEach((item: any) => {
+            const id = typeof item === 'string' ? item : (item?.id || item?.name);
+            if (id) {
+              const label = String(id);
+              extracted.push({ id: label, label, sub: 'Custom Model' });
+            }
+          });
+        }
+
+        if (extracted.length > 0) {
+          // Deduplicate by ID
+          const seen = new Set<string>();
+          const uniqueModels = extracted.filter(m => {
+            if (seen.has(m.id)) return false;
+            seen.add(m.id);
+            return true;
+          });
+          return { success: true, models: uniqueModels };
+        }
+      } else {
+        const errBody = await res.text().catch(() => '');
+        lastError = `HTTP ${res.status}: ${res.statusText || errBody.slice(0, 120)}`;
+      }
+    } catch (e: any) {
+      if (e?.name === 'AbortError') {
+        lastError = 'Connection timed out (12s). Check if endpoint IP/port is reachable.';
+      } else {
+        lastError = e?.message || 'Network request failed. Check server URL / CORS.';
+      }
+    }
+  }
+
+  return {
+    success: false,
+    models: [],
+    error: lastError || 'Could not fetch models from endpoint. Please check URL and API key.',
+  };
+}
+
+/**
+ * Test custom endpoint connectivity with a simple ping message
+ */
+export async function testCustomEndpoint(
+  baseUrl: string,
+  apiKey?: string,
+  model?: string,
+  customHeaders?: Record<string, string>
+): Promise<{ success: boolean; message: string }> {
+  const normalized = normalizeCustomBaseUrl(baseUrl);
+  if (!normalized) {
+    return { success: false, message: 'Base URL cannot be empty.' };
+  }
+
+  const endpoint = getCustomChatUrl(normalized);
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+    ...(customHeaders || {}),
+  };
+  if (apiKey && apiKey.trim()) {
+    headers['Authorization'] = `Bearer ${apiKey.trim()}`;
+  }
+
+  try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 15000);
+
+    const res = await fetch(endpoint, {
+      method: 'POST',
+      headers,
+      signal: controller.signal,
+      body: JSON.stringify({
+        model: model?.trim() || 'default',
+        messages: [{ role: 'user', content: 'Hi, return the single word "OK" only.' }],
+        temperature: 0.1,
+        max_tokens: 10,
+      }),
+    });
+    clearTimeout(timeoutId);
+
+    if (res.ok) {
+      const data = await res.json();
+      const text = data?.choices?.[0]?.message?.content || data?.choices?.[0]?.text || data?.response;
+      return {
+        success: true,
+        message: text ? `Connected successfully! Response: "${text.trim().slice(0, 50)}"` : 'Connected successfully!',
+      };
+    } else {
+      const errText = await res.text().catch(() => '');
+      return {
+        success: false,
+        message: `HTTP ${res.status}: ${errText.slice(0, 200) || res.statusText}`,
+      };
+    }
+  } catch (e: any) {
+    const isTimeout = e?.name === 'AbortError';
+    return {
+      success: false,
+      message: isTimeout ? 'Connection timed out (15s).' : (e?.message || 'Network request failed. Check IP & port.'),
+    };
+  }
+}
+
+async function callCustom(prompt: string, maxTokens = 600): Promise<string> {
+  const baseUrl = (await AsyncStorage.getItem(CUSTOM_API_BASE_URL_KEY)) || '';
+  if (!baseUrl.trim()) {
+    throw new Error('No Custom Base URL configured. Go to Settings → AI Settings and enter your Custom Endpoint URL.');
+  }
+
+  const apiKey = (await AsyncStorage.getItem(CUSTOM_API_KEY_STORAGE)) || '';
+  let model = (await AsyncStorage.getItem(CUSTOM_MODEL_KEY)) || '';
+  if (!model.trim()) {
+    model = DEFAULT_CUSTOM_MODEL;
+  }
+
+  let customHeaders: Record<string, string> = {};
+  try {
+    const raw = await AsyncStorage.getItem(CUSTOM_API_HEADERS_KEY);
+    if (raw) customHeaders = JSON.parse(raw);
+  } catch {}
+
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+    ...customHeaders,
+  };
+  if (apiKey.trim()) {
+    headers['Authorization'] = `Bearer ${apiKey.trim()}`;
+  }
+
+  const endpoint = getCustomChatUrl(baseUrl);
+  const res = await fetch(endpoint, {
+    method: 'POST',
+    headers,
+    body: JSON.stringify({
+      model,
+      messages: [{ role: 'user', content: prompt }],
+      temperature: 0.2,
+      max_tokens: maxTokens,
+    }),
+  });
+
+  if (res.status === 401 || res.status === 403) {
+    throw new Error(`${res.status} Unauthorized: Check your Custom API Key in Settings → AI Settings.`);
+  }
+  if (!res.ok) {
+    const err = await res.text().catch(() => '');
+    throw new Error(`Custom API error ${res.status}: ${err.slice(0, 300)}`);
+  }
+
+  const data = await res.json();
+  const text = data?.choices?.[0]?.message?.content || data?.choices?.[0]?.text || data?.response;
+  if (!text) throw new Error('Empty response from Custom AI endpoint');
+  return text.trim();
+}
+
 async function callDeepSeek(prompt: string, maxTokens = 600): Promise<string> {
   // Get active DeepSeek key
   let activeIndex = 0;
@@ -365,6 +636,9 @@ async function callAI(prompt: string, maxTokens = 600): Promise<string> {
     provider = (await AsyncStorage.getItem(AI_PROVIDER_KEY)) || 'gemini';
   } catch {}
 
+  if (provider === 'custom') {
+    return callCustom(prompt, maxTokens);
+  }
   if (provider === 'groq') {
     return callGroq(prompt, maxTokens);
   }
@@ -561,34 +835,16 @@ ${context.institute_explanations ? `CONTEXT: ${context.institute_explanations.sl
 ${systemPrompt}`;
   }
 
-  // Try backend proxy first (uses Emergent LLM key)
-  try {
-    const backendUrl = process.env.EXPO_PUBLIC_BACKEND_URL || '';
-    if (backendUrl) {
-      const res = await fetch(`${backendUrl}/api/ai/chat`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          messages,
-          system_prompt: systemPrompt,
-          model: 'gemini-1.5-flash',
-          max_tokens: 800,
-        }),
-      });
-      if (res.ok) {
-        const data = await res.json();
-        if (data.content) return data.content;
-      }
-    }
-  } catch {}
-
-  // Fallback to direct API call using user's saved keys
+  // Get active provider
   let provider = 'gemini';
   try {
     provider = (await AsyncStorage.getItem(AI_PROVIDER_KEY)) || 'gemini';
   } catch {}
 
   try {
+    if (provider === 'custom') {
+      return await generateCustomWithHistory(messages, systemPrompt);
+    }
     if (provider === 'groq') {
       return await generateGroqWithHistory(messages, systemPrompt);
     }
@@ -598,6 +854,28 @@ ${systemPrompt}`;
     if (provider === 'deepseek') {
       return await generateDeepSeekWithHistory(messages, systemPrompt);
     }
+
+    // Try backend proxy first for Gemini (uses Emergent LLM key)
+    try {
+      const backendUrl = process.env.EXPO_PUBLIC_BACKEND_URL || '';
+      if (backendUrl) {
+        const res = await fetch(`${backendUrl}/api/ai/chat`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            messages,
+            system_prompt: systemPrompt,
+            model: 'gemini-1.5-flash',
+            max_tokens: 800,
+          }),
+        });
+        if (res.ok) {
+          const data = await res.json();
+          if (data.content) return data.content;
+        }
+      }
+    } catch {}
+
     return await generateGeminiWithHistory(messages, systemPrompt);
   } catch (error) {
     console.error('Error generating with history:', error);
@@ -756,6 +1034,64 @@ async function generateDeepSeekWithHistory(
   const data = await res.json();
   const text = data?.choices?.[0]?.message?.content;
   if (!text) throw new Error('Empty response from DeepSeek');
+  return text.trim();
+}
+
+async function generateCustomWithHistory(
+  messages: Array<{ role: 'user' | 'assistant'; content: string }>,
+  systemPrompt: string
+): Promise<string> {
+  const baseUrl = (await AsyncStorage.getItem(CUSTOM_API_BASE_URL_KEY)) || '';
+  if (!baseUrl.trim()) {
+    throw new Error('No Custom Base URL configured. Go to Settings → AI Settings.');
+  }
+
+  const apiKey = (await AsyncStorage.getItem(CUSTOM_API_KEY_STORAGE)) || '';
+  let model = (await AsyncStorage.getItem(CUSTOM_MODEL_KEY)) || '';
+  if (!model.trim()) {
+    model = DEFAULT_CUSTOM_MODEL;
+  }
+
+  let customHeaders: Record<string, string> = {};
+  try {
+    const raw = await AsyncStorage.getItem(CUSTOM_API_HEADERS_KEY);
+    if (raw) customHeaders = JSON.parse(raw);
+  } catch {}
+
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+    ...customHeaders,
+  };
+  if (apiKey.trim()) {
+    headers['Authorization'] = `Bearer ${apiKey.trim()}`;
+  }
+
+  const endpoint = getCustomChatUrl(baseUrl);
+  const res = await fetch(endpoint, {
+    method: 'POST',
+    headers,
+    body: JSON.stringify({
+      model,
+      messages: [
+        { role: 'system', content: systemPrompt },
+        ...messages,
+      ],
+      temperature: 0.4,
+      max_tokens: 800,
+    }),
+  });
+
+  if (res.status === 401 || res.status === 403) {
+    throw new Error(`${res.status} Unauthorized: Check your Custom API Key in AI Settings.`);
+  }
+  if (!res.ok) {
+    const err = await res.text().catch(() => '');
+    throw new Error(`Custom API error ${res.status}: ${err.slice(0, 300)}`);
+  }
+
+  const data = await res.json();
+  const text = data?.choices?.[0]?.message?.content || data?.choices?.[0]?.text || data?.response;
+  if (!text) throw new Error('Empty response from Custom AI endpoint');
   return text.trim();
 }
 

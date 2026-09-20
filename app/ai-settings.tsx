@@ -26,6 +26,17 @@ import {
   Trash2,
   X,
   Check,
+  Server,
+  Globe,
+  RefreshCw,
+  Play,
+  Sliders,
+  CheckCircle2,
+  AlertCircle,
+  Eye,
+  EyeOff,
+  Layers,
+  Cpu,
 } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -45,6 +56,18 @@ import {
   DEEPSEEK_MODELS,
   DEFAULT_DEEPSEEK_MODEL,
   DEEPSEEK_MODEL_KEY,
+  CUSTOM_API_BASE_URL_KEY,
+  CUSTOM_API_KEY_STORAGE,
+  CUSTOM_MODEL_KEY,
+  CUSTOM_ENDPOINT_NAME_KEY,
+  CUSTOM_API_HEADERS_KEY,
+  CUSTOM_FETCHED_MODELS_KEY,
+  DEFAULT_CUSTOM_MODEL,
+  DEFAULT_CUSTOM_ENDPOINT_NAME,
+  CustomModelOption,
+  normalizeCustomBaseUrl,
+  fetchCustomModels,
+  testCustomEndpoint,
 } from '../src/services/GeminiService';
 import {
   AIPromptManager,
@@ -81,7 +104,7 @@ function AISettings() {
   const [groqModel, setGroqModel] = useState<string>(DEFAULT_GROQ_MODEL);
 
   // ── OpenRouter State ──────────────────────────
-  const [aiProvider, setAiProvider] = useState<'gemini' | 'groq' | 'openrouter' | 'deepseek'>('gemini');
+  const [aiProvider, setAiProvider] = useState<'gemini' | 'groq' | 'openrouter' | 'deepseek' | 'custom'>('gemini');
   const [openrouterKey, setOpenrouterKey] = useState<string>('');
   const [openrouterModel, setOpenrouterModel] = useState<string>(DEFAULT_OPENROUTER_MODEL);
 
@@ -89,6 +112,19 @@ function AISettings() {
   const [deepseekKeys, setDeepseekKeys] = useState<string[]>(['', '', '', '']);
   const [activeDeepSeekKeyIndex, setActiveDeepSeekKeyIndex] = useState<number>(0);
   const [deepseekModel, setDeepseekModel] = useState<string>(DEFAULT_DEEPSEEK_MODEL);
+
+  // ── Custom Endpoint State ─────────────────────
+  const [customBaseUrl, setCustomBaseUrl] = useState<string>('');
+  const [customApiKey, setCustomApiKey] = useState<string>('');
+  const [customModel, setCustomModel] = useState<string>(DEFAULT_CUSTOM_MODEL);
+  const [customEndpointName, setCustomEndpointName] = useState<string>(DEFAULT_CUSTOM_ENDPOINT_NAME);
+  const [customHeaders, setCustomHeaders] = useState<string>('');
+  const [customFetchedModels, setCustomFetchedModels] = useState<CustomModelOption[]>([]);
+  const [customFetching, setCustomFetching] = useState<boolean>(false);
+  const [customTesting, setCustomTesting] = useState<boolean>(false);
+  const [customFeedback, setCustomFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+  const [showCustomKey, setShowCustomKey] = useState<boolean>(false);
+  const [showAdvancedHeaders, setShowAdvancedHeaders] = useState<boolean>(false);
 
   // ── Prompts State ─────────────────────────────
   const [explainPrompt, setExplainPrompt]     = useState('');
@@ -154,7 +190,7 @@ function AISettings() {
       setActiveKeyIndex(activeIdx ? parseInt(activeIdx, 10) : 0);
       setGeminiModel(model || DEFAULT_MODEL);
       
-      setAiProvider((provider as 'gemini' | 'groq' | 'openrouter') || 'gemini');
+      setAiProvider((provider as 'gemini' | 'groq' | 'openrouter' | 'deepseek' | 'custom') || 'gemini');
       setGroqKeys([gk1 || '', gk2 || '', gk3 || '', gk4 || '']);
       setActiveGroqKeyIndex(groqActiveIdx ? parseInt(groqActiveIdx, 10) : 0);
       setGroqModel(groqMod || DEFAULT_GROQ_MODEL);
@@ -172,6 +208,26 @@ function AISettings() {
       setDeepseekKeys([dsk1 || '', dsk2 || '', dsk3 || '', dsk4 || '']);
       setActiveDeepSeekKeyIndex(dsActiveIdx ? parseInt(dsActiveIdx, 10) : 0);
       setDeepseekModel(dsModel || DEFAULT_DEEPSEEK_MODEL);
+
+      // Custom Endpoint
+      const cBaseUrl = await AsyncStorage.getItem(CUSTOM_API_BASE_URL_KEY);
+      const cApiKey = await AsyncStorage.getItem(CUSTOM_API_KEY_STORAGE);
+      const cModel = await AsyncStorage.getItem(CUSTOM_MODEL_KEY);
+      const cName = await AsyncStorage.getItem(CUSTOM_ENDPOINT_NAME_KEY);
+      const cHeaders = await AsyncStorage.getItem(CUSTOM_API_HEADERS_KEY);
+      const cFetched = await AsyncStorage.getItem(CUSTOM_FETCHED_MODELS_KEY);
+
+      if (cBaseUrl) setCustomBaseUrl(cBaseUrl);
+      if (cApiKey) setCustomApiKey(cApiKey);
+      if (cModel) setCustomModel(cModel);
+      if (cName) setCustomEndpointName(cName);
+      if (cHeaders) setCustomHeaders(cHeaders);
+      if (cFetched) {
+        try {
+          const parsed = JSON.parse(cFetched);
+          if (Array.isArray(parsed)) setCustomFetchedModels(parsed);
+        } catch {}
+      }
 
       setExplainPrompt(ep || DEFAULT_PROMPTS.explain);
       setSummarizePrompt(sp || DEFAULT_PROMPTS.summarize);
@@ -225,6 +281,14 @@ function AISettings() {
         AsyncStorage.setItem('deepseek_api_key_4', deepseekKeys[3].trim()),
         AsyncStorage.setItem('deepseek_active_key_index', String(activeDeepSeekKeyIndex)),
         AsyncStorage.setItem(DEEPSEEK_MODEL_KEY, deepseekModel),
+        // Custom Endpoint
+        AsyncStorage.setItem(CUSTOM_API_BASE_URL_KEY, customBaseUrl.trim()),
+        AsyncStorage.setItem(CUSTOM_API_KEY_STORAGE, customApiKey.trim()),
+        AsyncStorage.setItem(CUSTOM_MODEL_KEY, customModel.trim() || DEFAULT_CUSTOM_MODEL),
+        AsyncStorage.setItem(CUSTOM_ENDPOINT_NAME_KEY, customEndpointName.trim() || DEFAULT_CUSTOM_ENDPOINT_NAME),
+        AsyncStorage.setItem(CUSTOM_API_HEADERS_KEY, customHeaders.trim()),
+        AsyncStorage.setItem(CUSTOM_FETCHED_MODELS_KEY, JSON.stringify(customFetchedModels)),
+        // Prompts
         AsyncStorage.setItem(PROMPT_KEYS.explain,    explainPrompt.trim()   || DEFAULT_PROMPTS.explain),
         AsyncStorage.setItem(PROMPT_KEYS.summarize,  summarizePrompt.trim() || DEFAULT_PROMPTS.summarize),
         AsyncStorage.setItem(PROMPT_KEYS.search,     searchPrompt.trim()    || DEFAULT_PROMPTS.search),
@@ -251,6 +315,95 @@ function AISettings() {
       Alert.alert('Save failed', e?.message || '');
     } finally {
       setPromptSaving(false);
+    }
+  };
+
+  const parseCustomHeaders = (): Record<string, string> => {
+    if (!customHeaders.trim()) return {};
+    try {
+      return JSON.parse(customHeaders.trim());
+    } catch {
+      return {};
+    }
+  };
+
+  const handleFetchCustomModels = async () => {
+    const url = normalizeCustomBaseUrl(customBaseUrl);
+    if (!url) {
+      setCustomFeedback({
+        type: 'error',
+        message: 'Please enter a valid Base URL first (e.g., http://your-ip:8000/v1 or https://ai.example.com/v1).',
+      });
+      return;
+    }
+
+    setCustomFetching(true);
+    setCustomFeedback(null);
+
+    try {
+      const headers = parseCustomHeaders();
+      const res = await fetchCustomModels(url, customApiKey, headers);
+      if (res.success && res.models.length > 0) {
+        setCustomFetchedModels(res.models);
+        // If no model selected or default, auto-pick first model
+        if (!customModel || customModel === DEFAULT_CUSTOM_MODEL) {
+          setCustomModel(res.models[0].id);
+        }
+        await AsyncStorage.setItem(CUSTOM_FETCHED_MODELS_KEY, JSON.stringify(res.models));
+        setCustomFeedback({
+          type: 'success',
+          message: `✓ Connected! Found ${res.models.length} model${res.models.length === 1 ? '' : 's'}. Select one below.`,
+        });
+      } else {
+        setCustomFeedback({
+          type: 'error',
+          message: res.error || 'No models returned from endpoint. Ensure your server is running and accessible.',
+        });
+      }
+    } catch (e: any) {
+      setCustomFeedback({
+        type: 'error',
+        message: `Connection failed: ${e?.message || 'Network error'}`,
+      });
+    } finally {
+      setCustomFetching(false);
+    }
+  };
+
+  const handleTestCustomEndpoint = async () => {
+    const url = normalizeCustomBaseUrl(customBaseUrl);
+    if (!url) {
+      setCustomFeedback({
+        type: 'error',
+        message: 'Please enter a valid Base URL first.',
+      });
+      return;
+    }
+
+    setCustomTesting(true);
+    setCustomFeedback(null);
+
+    try {
+      const headers = parseCustomHeaders();
+      const res = await testCustomEndpoint(url, customApiKey, customModel, headers);
+      setCustomFeedback({
+        type: res.success ? 'success' : 'error',
+        message: res.message,
+      });
+    } catch (e: any) {
+      setCustomFeedback({
+        type: 'error',
+        message: `Test failed: ${e?.message || 'Network error'}`,
+      });
+    } finally {
+      setCustomTesting(false);
+    }
+  };
+
+  const handleSelectPreset = (presetUrl: string, defaultName: string) => {
+    setCustomBaseUrl(presetUrl);
+    if (!customEndpointName || customEndpointName === DEFAULT_CUSTOM_ENDPOINT_NAME) {
+      setCustomEndpointName(defaultName);
     }
   };
 
@@ -401,11 +554,11 @@ function AISettings() {
           AI Settings
         </Text>
         <View style={{
-          backgroundColor: aiProvider === 'groq' ? '#f97316' : aiProvider === 'openrouter' ? '#0891b2' : aiProvider === 'deepseek' ? '#0ea5e9' : '#7c3aed',
+          backgroundColor: aiProvider === 'groq' ? '#f97316' : aiProvider === 'openrouter' ? '#0891b2' : aiProvider === 'deepseek' ? '#0ea5e9' : aiProvider === 'custom' ? '#10b981' : '#7c3aed',
           borderRadius: 8, paddingHorizontal: 10, paddingVertical: 4,
         }}>
           <Text style={{ fontSize: 12, fontWeight: '900', color: '#fff' }}>
-            {aiProvider === 'groq' ? '⚡ Groq Active' : aiProvider === 'openrouter' ? '🌐 OpenRouter Active' : aiProvider === 'deepseek' ? '🌀 DeepSeek Active' : '✦ Gemini Active'}
+            {aiProvider === 'groq' ? '⚡ Groq Active' : aiProvider === 'openrouter' ? '🌐 OpenRouter Active' : aiProvider === 'deepseek' ? '🌀 DeepSeek Active' : aiProvider === 'custom' ? '⚙️ Custom API Active' : '✦ Gemini Active'}
           </Text>
         </View>
       </View>
@@ -423,7 +576,7 @@ function AISettings() {
         
         {/* ── PROVIDER TOGGLE ───────────────────────────────── */}
         <Text style={styles.sectionTitle}>AI PROVIDER</Text>
-        <View style={{ flexDirection: 'row', gap: 10, marginBottom: 20 }}>
+        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 20 }}>
           <TouchableOpacity
             onPress={() => setAiProvider('gemini')}
             style={[
@@ -471,7 +624,7 @@ function AISettings() {
           >
             <Text style={{ fontSize: 15 }}>🌐</Text>
             <Text style={[styles.providerName, { color: aiProvider === 'openrouter' ? '#0891b2' : colors.textPrimary }]}>OpenRouter</Text>
-            <Text style={styles.providerSub}>33+ free models · DeepSeek, Qwen, Llama</Text>
+            <Text style={styles.providerSub}>33+ free models</Text>
             {aiProvider === 'openrouter' && <View style={[styles.activeBadge, { backgroundColor: '#0891b2' }]}><Text style={styles.activeBadgeText}>ACTIVE</Text></View>}
           </TouchableOpacity>
 
@@ -488,130 +641,482 @@ function AISettings() {
           >
             <Text style={{ fontSize: 15 }}>🌀</Text>
             <Text style={[styles.providerName, { color: aiProvider === 'deepseek' ? '#0ea5e9' : colors.textPrimary }]}>DeepSeek</Text>
-            <Text style={styles.providerSub}>Direct API · V4 Flash, V3, R1</Text>
+            <Text style={styles.providerSub}>Direct API · V3, R1</Text>
             {aiProvider === 'deepseek' && <View style={[styles.activeBadge, { backgroundColor: '#0ea5e9' }]}><Text style={styles.activeBadgeText}>ACTIVE</Text></View>}
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={() => setAiProvider('custom')}
+            style={[
+              styles.providerCard,
+              { 
+                borderColor: aiProvider === 'custom' ? '#10b981' : colors.border,
+                backgroundColor: aiProvider === 'custom' ? '#10b98115' : colors.surface,
+                borderWidth: aiProvider === 'custom' ? 2 : 1,
+              }
+            ]}
+          >
+            <Text style={{ fontSize: 15 }}>⚙️</Text>
+            <Text style={[styles.providerName, { color: aiProvider === 'custom' ? '#10b981' : colors.textPrimary }]}>Custom API</Text>
+            <Text style={styles.providerSub}>vLLM · Ollama · Self-Hosted</Text>
+            {aiProvider === 'custom' && <View style={[styles.activeBadge, { backgroundColor: '#10b981' }]}><Text style={styles.activeBadgeText}>ACTIVE</Text></View>}
           </TouchableOpacity>
         </View>
 
-        {/* ── MODEL SELECTOR ─────────────────────────────────── */}
-        <Text style={styles.sectionTitle}>MODEL</Text>
-        <View style={{ flexDirection: 'row', gap: 8, flexWrap: 'wrap', marginBottom: 24 }}>
-          {(aiProvider === 'groq' ? GROQ_MODELS : aiProvider === 'openrouter' ? OPENROUTER_MODELS : aiProvider === 'deepseek' ? DEEPSEEK_MODELS : GEMINI_MODELS).map(m => {
-            const isSelected = (aiProvider === 'groq' ? groqModel : aiProvider === 'openrouter' ? openrouterModel : aiProvider === 'deepseek' ? deepseekModel : geminiModel) === m.id;
-            const accent = aiProvider === 'groq' ? '#f97316' : aiProvider === 'openrouter' ? '#0891b2' : aiProvider === 'deepseek' ? '#0ea5e9' : '#7c3aed';
-            return (
-              <TouchableOpacity
-                key={m.id}
-                onPress={() => {
-                  if (aiProvider === 'groq') setGroqModel(m.id);
-                  else if (aiProvider === 'openrouter') setOpenrouterModel(m.id);
-                  else if (aiProvider === 'deepseek') setDeepseekModel(m.id);
-                  else setGeminiModel(m.id);
-                }}
-                style={{
-                  flex: 1, minWidth: 100,
-                  paddingVertical: 10, paddingHorizontal: 12,
-                  borderRadius: 12, borderWidth: 1.5,
-                  borderColor: isSelected ? accent : colors.border,
-                  backgroundColor: isSelected ? accent + '10' : colors.surface,
-                  alignItems: 'center',
-                }}
-              >
-                <Text style={{ fontSize: 13, fontWeight: '800', color: isSelected ? accent : colors.textPrimary }}>{m.label}</Text>
-                <Text style={{ fontSize: 10, fontWeight: '500', marginTop: 2, textAlign: 'center', color: isSelected ? accent : colors.textTertiary }}>{m.sub}</Text>
-              </TouchableOpacity>
-            );
-          })}
-        </View>
+        {/* ── CUSTOM ENDPOINT SECTION ───────────────────────── */}
+        {aiProvider === 'custom' ? (
+          <View style={{ marginBottom: 24 }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+              <Text style={styles.sectionTitle}>CUSTOM ENDPOINT SETTINGS</Text>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                <Cpu size={14} color="#10b981" />
+                <Text style={{ fontSize: 11, fontWeight: '700', color: '#10b981' }}>OpenAI-Compatible</Text>
+              </View>
+            </View>
 
-        {/* ── API KEYS ───────────────────────────────────────── */}
-        <Text style={styles.sectionTitle}>{aiProvider.toUpperCase()} API KEYS</Text>
-        <View style={[styles.settingsGroup, { backgroundColor: colors.surface + '50', borderColor: colors.border }]}>
-          <View style={{ padding: 14 }}>
-            <Text style={{ fontSize: 11, color: colors.textTertiary, marginBottom: 12 }}>
-              {aiProvider === 'gemini' 
-                ? 'Add up to 4 keys from aistudio.google.com. Tap to set active.' 
-                : aiProvider === 'deepseek'
-                ? 'Add up to 4 keys from platform.deepseek.com/api_keys. Tap to set active.'
-                : 'Free keys from console.groq.com. 14,400 free requests/day.'}
-            </Text>
+            <View style={[styles.settingsGroup, { backgroundColor: colors.surface + '50', borderColor: colors.border, padding: 14 }]}>
+              
+              {/* Endpoint Preset Pills */}
+              <Text style={{ fontSize: 11, fontWeight: '700', color: colors.textSecondary, marginBottom: 8 }}>
+                QUICK PRESETS
+              </Text>
+              <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginBottom: 14 }}>
+                <TouchableOpacity
+                  onPress={() => handleSelectPreset('http://localhost:8000/v1', 'vLLM Server')}
+                  style={{
+                    paddingVertical: 5, paddingHorizontal: 10, borderRadius: 8,
+                    backgroundColor: colors.bg, borderWidth: 1, borderColor: colors.border,
+                  }}
+                >
+                  <Text style={{ fontSize: 11, color: colors.textPrimary, fontWeight: '600' }}>vLLM / LiteLLM (:8000)</Text>
+                </TouchableOpacity>
 
-            {(aiProvider !== 'openrouter') ? (['Key 1', 'Key 2', 'Key 3', 'Key 4'] as const).map((label, idx) => {
-              const keys = aiProvider === 'groq' ? groqKeys : aiProvider === 'deepseek' ? deepseekKeys : geminiKeys;
-              const activeIdx = aiProvider === 'groq' ? activeGroqKeyIndex : aiProvider === 'deepseek' ? activeDeepSeekKeyIndex : activeKeyIndex;
-              const isActive = activeIdx === idx;
-              const hasValue = !!keys[idx].trim();
-              const accent = aiProvider === 'groq' ? '#f97316' : aiProvider === 'deepseek' ? '#0ea5e9' : '#7c3aed';
+                <TouchableOpacity
+                  onPress={() => handleSelectPreset('http://localhost:11434/v1', 'Ollama Node')}
+                  style={{
+                    paddingVertical: 5, paddingHorizontal: 10, borderRadius: 8,
+                    backgroundColor: colors.bg, borderWidth: 1, borderColor: colors.border,
+                  }}
+                >
+                  <Text style={{ fontSize: 11, color: colors.textPrimary, fontWeight: '600' }}>Ollama (:11434)</Text>
+                </TouchableOpacity>
 
-              return (
-                <View key={idx} style={{ marginBottom: 10 }}>
-                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-                    <Text style={{ fontSize: 11, fontWeight: '700', color: isActive ? accent : colors.textTertiary }}>{label}</Text>
-                    {isActive && <View style={[styles.keyBadge, { backgroundColor: accent }]}><Text style={styles.keyBadgeText}>ACTIVE</Text></View>}
-                    {!isActive && hasValue && (
-                      <TouchableOpacity onPress={() => aiProvider === 'groq' ? setActiveGroqKeyIndex(idx) : aiProvider === 'deepseek' ? setActiveDeepSeekKeyIndex(idx) : setActiveKeyIndex(idx)} style={[styles.keyBadge, { borderWidth: 1, borderColor: accent }]}>
-                        <Text style={[styles.keyBadgeText, { color: accent }]}>SET ACTIVE</Text>
-                      </TouchableOpacity>
-                    )}
-                  </View>
-                  <TextInput
-                    value={keys[idx]}
-                    onChangeText={val => {
-                      if (aiProvider === 'groq') {
-                        const updated = [...groqKeys]; updated[idx] = val; setGroqKeys(updated);
-                      } else if (aiProvider === 'deepseek') {
-                        const updated = [...deepseekKeys]; updated[idx] = val; setDeepseekKeys(updated);
-                      } else {
-                        const updated = [...geminiKeys]; updated[idx] = val; setGeminiKeys(updated);
-                      }
-                    }}
-                    placeholder={idx === 0 ? `Paste your ${aiProvider === 'groq' ? 'gsk_...' : aiProvider === 'deepseek' ? 'sk-...' : 'AIzaSy...'} key here` : 'Optional key'}
-                    placeholderTextColor={colors.textTertiary}
-                    secureTextEntry
-                    autoCorrect={false}
-                    autoCapitalize="none"
-                    style={[
-                      styles.keyInput,
-                      { 
-                        backgroundColor: colors.bg,
-                        borderColor: isActive ? accent : colors.border,
-                        borderWidth: isActive ? 2 : 1,
-                        color: colors.textPrimary,
-                      }
-                    ]}
-                  />
-                </View>
-              );
-            }) : (
-              <View style={{ marginBottom: 10 }}>
-                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-                  <Text style={{ fontSize: 11, fontWeight: '700', color: '#0891b2' }}>API Key</Text>
+                <TouchableOpacity
+                  onPress={() => handleSelectPreset('http://localhost:1234/v1', 'LM Studio')}
+                  style={{
+                    paddingVertical: 5, paddingHorizontal: 10, borderRadius: 8,
+                    backgroundColor: colors.bg, borderWidth: 1, borderColor: colors.border,
+                  }}
+                >
+                  <Text style={{ fontSize: 11, color: colors.textPrimary, fontWeight: '600' }}>LM Studio (:1234)</Text>
+                </TouchableOpacity>
+              </View>
+
+              {/* Endpoint Name */}
+              <View style={{ marginBottom: 12 }}>
+                <Text style={{ fontSize: 11, fontWeight: '700', color: colors.textTertiary, marginBottom: 4 }}>
+                  ENDPOINT NAME
+                </Text>
+                <TextInput
+                  value={customEndpointName}
+                  onChangeText={setCustomEndpointName}
+                  placeholder="e.g. My Custom vLLM / Ollama Node"
+                  placeholderTextColor={colors.textTertiary}
+                  autoCorrect={false}
+                  style={[
+                    styles.keyInput,
+                    { 
+                      backgroundColor: colors.bg,
+                      borderColor: colors.border,
+                      borderWidth: 1,
+                      color: colors.textPrimary,
+                    }
+                  ]}
+                />
+              </View>
+
+              {/* Base URL */}
+              <View style={{ marginBottom: 12 }}>
+                <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
+                  <Text style={{ fontSize: 11, fontWeight: '700', color: '#10b981' }}>
+                    BASE URL * (PUBLIC IP / DOMAIN)
+                  </Text>
                 </View>
                 <TextInput
-                  value={openrouterKey}
-                  onChangeText={setOpenrouterKey}
-                  placeholder="Paste your sk-or-... key here"
+                  value={customBaseUrl}
+                  onChangeText={setCustomBaseUrl}
+                  placeholder="http://<public-ip>:8000/v1 or https://api.mydomain.com/v1"
                   placeholderTextColor={colors.textTertiary}
-                  secureTextEntry
                   autoCorrect={false}
                   autoCapitalize="none"
                   style={[
                     styles.keyInput,
                     { 
                       backgroundColor: colors.bg,
-                      borderColor: '#0891b2',
-                      borderWidth: 2,
+                      borderColor: customBaseUrl.trim() ? '#10b981' : colors.border,
+                      borderWidth: 1.5,
                       color: colors.textPrimary,
                     }
                   ]}
                 />
-                <Text style={{ fontSize: 11, color: colors.textTertiary, marginTop: 8 }}>
-                  Get keys from openrouter.ai → Keys. High-quality free models available.
+                <Text style={{ fontSize: 10, color: colors.textTertiary, marginTop: 4 }}>
+                  Enter your OpenAI-compatible base URL. Works with vLLM, Ollama (/v1), LiteLLM, FastChat, and self-hosted Hermes nodes.
                 </Text>
               </View>
-            )}
+
+              {/* API Key / Token */}
+              <View style={{ marginBottom: 14 }}>
+                <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
+                  <Text style={{ fontSize: 11, fontWeight: '700', color: colors.textTertiary }}>
+                    API KEY / BEARER TOKEN (OPTIONAL)
+                  </Text>
+                  <TouchableOpacity onPress={() => setShowCustomKey(v => !v)}>
+                    <Text style={{ fontSize: 10, color: '#10b981', fontWeight: '700' }}>
+                      {showCustomKey ? 'Hide' : 'Show'}
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+                <TextInput
+                  value={customApiKey}
+                  onChangeText={setCustomApiKey}
+                  placeholder="Bearer token or secret key (optional)"
+                  placeholderTextColor={colors.textTertiary}
+                  secureTextEntry={!showCustomKey}
+                  autoCorrect={false}
+                  autoCapitalize="none"
+                  style={[
+                    styles.keyInput,
+                    { 
+                      backgroundColor: colors.bg,
+                      borderColor: colors.border,
+                      borderWidth: 1,
+                      color: colors.textPrimary,
+                    }
+                  ]}
+                />
+              </View>
+
+              {/* Action Buttons: Fetch Models & Test Connection */}
+              <View style={{ flexDirection: 'row', gap: 10, marginBottom: 14 }}>
+                <TouchableOpacity
+                  onPress={handleFetchCustomModels}
+                  disabled={customFetching || !customBaseUrl.trim()}
+                  style={{
+                    flex: 1.2,
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: 6,
+                    paddingVertical: 11,
+                    paddingHorizontal: 12,
+                    borderRadius: 10,
+                    backgroundColor: customBaseUrl.trim() ? '#10b981' : colors.border,
+                    opacity: customFetching ? 0.7 : 1,
+                  }}
+                >
+                  {customFetching ? (
+                    <ActivityIndicator size="small" color="#fff" />
+                  ) : (
+                    <RefreshCw size={14} color="#fff" />
+                  )}
+                  <Text style={{ fontSize: 12, fontWeight: '800', color: '#fff' }}>
+                    {customFetching ? 'Fetching...' : 'Fetch Models'}
+                  </Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  onPress={handleTestCustomEndpoint}
+                  disabled={customTesting || !customBaseUrl.trim()}
+                  style={{
+                    flex: 1,
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: 6,
+                    paddingVertical: 11,
+                    paddingHorizontal: 12,
+                    borderRadius: 10,
+                    backgroundColor: colors.surface,
+                    borderWidth: 1.5,
+                    borderColor: '#10b981',
+                    opacity: customTesting ? 0.7 : 1,
+                  }}
+                >
+                  {customTesting ? (
+                    <ActivityIndicator size="small" color="#10b981" />
+                  ) : (
+                    <Play size={14} color="#10b981" />
+                  )}
+                  <Text style={{ fontSize: 12, fontWeight: '800', color: '#10b981' }}>
+                    {customTesting ? 'Testing...' : 'Test Connection'}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+
+              {/* Status Feedback Banner */}
+              {customFeedback && (
+                <View style={{
+                  padding: 10, borderRadius: 8, marginBottom: 14,
+                  backgroundColor: customFeedback.type === 'success' ? '#10b98115' : '#ef444415',
+                  borderWidth: 1,
+                  borderColor: customFeedback.type === 'success' ? '#10b981' : '#ef4444',
+                  flexDirection: 'row', alignItems: 'flex-start', gap: 8,
+                }}>
+                  {customFeedback.type === 'success' ? (
+                    <CheckCircle2 size={16} color="#10b981" style={{ marginTop: 1 }} />
+                  ) : (
+                    <AlertCircle size={16} color="#ef4444" style={{ marginTop: 1 }} />
+                  )}
+                  <Text style={{
+                    fontSize: 11,
+                    fontWeight: '600',
+                    color: customFeedback.type === 'success' ? '#10b981' : '#ef4444',
+                    flex: 1,
+                  }}>
+                    {customFeedback.message}
+                  </Text>
+                </View>
+              )}
+
+              {/* Model Selection from Fetched Models */}
+              {customFetchedModels.length > 0 && (
+                <View style={{ marginBottom: 14 }}>
+                  <Text style={{ fontSize: 11, fontWeight: '700', color: colors.textSecondary, marginBottom: 8 }}>
+                    DISCOVERED MODELS ({customFetchedModels.length}) — TAP TO SELECT
+                  </Text>
+                  <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6, maxHeight: 180 }}>
+                    <ScrollView nestedScrollEnabled style={{ maxHeight: 160 }} contentContainerStyle={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6 }}>
+                      {customFetchedModels.map(m => {
+                        const isSelected = customModel === m.id;
+                        return (
+                          <TouchableOpacity
+                            key={m.id}
+                            onPress={() => setCustomModel(m.id)}
+                            style={{
+                              paddingVertical: 7,
+                              paddingHorizontal: 10,
+                              borderRadius: 8,
+                              borderWidth: isSelected ? 2 : 1,
+                              borderColor: isSelected ? '#10b981' : colors.border,
+                              backgroundColor: isSelected ? '#10b98115' : colors.bg,
+                              minWidth: '47%',
+                              flex: 1,
+                            }}
+                          >
+                            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                              <Text 
+                                numberOfLines={1}
+                                style={{ 
+                                  fontSize: 12, 
+                                  fontWeight: isSelected ? '800' : '600', 
+                                  color: isSelected ? '#10b981' : colors.textPrimary,
+                                  flex: 1,
+                                }}
+                              >
+                                {m.label}
+                              </Text>
+                              {isSelected && <Check size={12} color="#10b981" />}
+                            </View>
+                            {m.sub && (
+                              <Text numberOfLines={1} style={{ fontSize: 9, color: colors.textTertiary, marginTop: 2 }}>
+                                {m.sub}
+                              </Text>
+                            )}
+                          </TouchableOpacity>
+                        );
+                      })}
+                    </ScrollView>
+                  </View>
+                </View>
+              )}
+
+              {/* Manual Model ID / Selected Model input */}
+              <View style={{ marginBottom: 12 }}>
+                <Text style={{ fontSize: 11, fontWeight: '700', color: colors.textTertiary, marginBottom: 4 }}>
+                  SELECTED MODEL ID / MANUAL OVERRIDE
+                </Text>
+                <TextInput
+                  value={customModel}
+                  onChangeText={setCustomModel}
+                  placeholder="e.g. meta-llama/Llama-3-8b, hermes-3-llama-3.1-8b, qwen2.5-coder"
+                  placeholderTextColor={colors.textTertiary}
+                  autoCorrect={false}
+                  autoCapitalize="none"
+                  style={[
+                    styles.keyInput,
+                    { 
+                      backgroundColor: colors.bg,
+                      borderColor: '#10b981',
+                      borderWidth: 1,
+                      color: colors.textPrimary,
+                    }
+                  ]}
+                />
+              </View>
+
+              {/* Advanced Custom Headers */}
+              <TouchableOpacity 
+                onPress={() => setShowAdvancedHeaders(v => !v)}
+                style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 4 }}
+              >
+                <Sliders size={12} color={colors.textTertiary} />
+                <Text style={{ fontSize: 11, fontWeight: '700', color: colors.textTertiary }}>
+                  {showAdvancedHeaders ? 'Hide Advanced Headers' : 'Advanced Headers (JSON)'}
+                </Text>
+              </TouchableOpacity>
+
+              {showAdvancedHeaders && (
+                <View style={{ marginTop: 8 }}>
+                  <TextInput
+                    value={customHeaders}
+                    onChangeText={setCustomHeaders}
+                    placeholder='{"X-Custom-Auth": "secret", "HTTP-Referer": "https://pilot.app"}'
+                    placeholderTextColor={colors.textTertiary}
+                    multiline
+                    autoCorrect={false}
+                    autoCapitalize="none"
+                    style={[
+                      styles.promptInput,
+                      {
+                        backgroundColor: colors.bg,
+                        borderColor: colors.border,
+                        minHeight: 60,
+                        fontSize: 11,
+                        color: colors.textPrimary,
+                      }
+                    ]}
+                  />
+                  <Text style={{ fontSize: 9, color: colors.textTertiary, marginTop: 4 }}>
+                    Optional JSON key-value object of headers passed to every request.
+                  </Text>
+                </View>
+              )}
+
+            </View>
           </View>
-        </View>
+        ) : (
+          <>
+            {/* ── MODEL SELECTOR (STANDARD PROVIDERS) ───────────── */}
+            <Text style={styles.sectionTitle}>MODEL</Text>
+            <View style={{ flexDirection: 'row', gap: 8, flexWrap: 'wrap', marginBottom: 24 }}>
+              {(aiProvider === 'groq' ? GROQ_MODELS : aiProvider === 'openrouter' ? OPENROUTER_MODELS : aiProvider === 'deepseek' ? DEEPSEEK_MODELS : GEMINI_MODELS).map(m => {
+                const isSelected = (aiProvider === 'groq' ? groqModel : aiProvider === 'openrouter' ? openrouterModel : aiProvider === 'deepseek' ? deepseekModel : geminiModel) === m.id;
+                const accent = aiProvider === 'groq' ? '#f97316' : aiProvider === 'openrouter' ? '#0891b2' : aiProvider === 'deepseek' ? '#0ea5e9' : '#7c3aed';
+                return (
+                  <TouchableOpacity
+                    key={m.id}
+                    onPress={() => {
+                      if (aiProvider === 'groq') setGroqModel(m.id);
+                      else if (aiProvider === 'openrouter') setOpenrouterModel(m.id);
+                      else if (aiProvider === 'deepseek') setDeepseekModel(m.id);
+                      else setGeminiModel(m.id);
+                    }}
+                    style={{
+                      flex: 1, minWidth: 100,
+                      paddingVertical: 10, paddingHorizontal: 12,
+                      borderRadius: 12, borderWidth: 1.5,
+                      borderColor: isSelected ? accent : colors.border,
+                      backgroundColor: isSelected ? accent + '10' : colors.surface,
+                      alignItems: 'center',
+                    }}
+                  >
+                    <Text style={{ fontSize: 13, fontWeight: '800', color: isSelected ? accent : colors.textPrimary }}>{m.label}</Text>
+                    <Text style={{ fontSize: 10, fontWeight: '500', marginTop: 2, textAlign: 'center', color: isSelected ? accent : colors.textTertiary }}>{m.sub}</Text>
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
+
+            {/* ── API KEYS (STANDARD PROVIDERS) ─────────────────── */}
+            <Text style={styles.sectionTitle}>{aiProvider.toUpperCase()} API KEYS</Text>
+            <View style={[styles.settingsGroup, { backgroundColor: colors.surface + '50', borderColor: colors.border, marginBottom: 20 }]}>
+              <View style={{ padding: 14 }}>
+                <Text style={{ fontSize: 11, color: colors.textTertiary, marginBottom: 12 }}>
+                  {aiProvider === 'gemini' 
+                    ? 'Add up to 4 keys from aistudio.google.com. Tap to set active.' 
+                    : aiProvider === 'deepseek'
+                    ? 'Add up to 4 keys from platform.deepseek.com/api_keys. Tap to set active.'
+                    : 'Free keys from console.groq.com. 14,400 free requests/day.'}
+                </Text>
+
+                {(aiProvider !== 'openrouter') ? (['Key 1', 'Key 2', 'Key 3', 'Key 4'] as const).map((label, idx) => {
+                  const keys = aiProvider === 'groq' ? groqKeys : aiProvider === 'deepseek' ? deepseekKeys : geminiKeys;
+                  const activeIdx = aiProvider === 'groq' ? activeGroqKeyIndex : aiProvider === 'deepseek' ? activeDeepSeekKeyIndex : activeKeyIndex;
+                  const isActive = activeIdx === idx;
+                  const hasValue = !!keys[idx].trim();
+                  const accent = aiProvider === 'groq' ? '#f97316' : aiProvider === 'deepseek' ? '#0ea5e9' : '#7c3aed';
+
+                  return (
+                    <View key={idx} style={{ marginBottom: 10 }}>
+                      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+                        <Text style={{ fontSize: 11, fontWeight: '700', color: isActive ? accent : colors.textTertiary }}>{label}</Text>
+                        {isActive && <View style={[styles.keyBadge, { backgroundColor: accent }]}><Text style={styles.keyBadgeText}>ACTIVE</Text></View>}
+                        {!isActive && hasValue && (
+                          <TouchableOpacity onPress={() => aiProvider === 'groq' ? setActiveGroqKeyIndex(idx) : aiProvider === 'deepseek' ? setActiveDeepSeekKeyIndex(idx) : setActiveKeyIndex(idx)} style={[styles.keyBadge, { borderWidth: 1, borderColor: accent }]}>
+                            <Text style={[styles.keyBadgeText, { color: accent }]}>SET ACTIVE</Text>
+                          </TouchableOpacity>
+                        )}
+                      </View>
+                      <TextInput
+                        value={keys[idx]}
+                        onChangeText={val => {
+                          if (aiProvider === 'groq') {
+                            const updated = [...groqKeys]; updated[idx] = val; setGroqKeys(updated);
+                          } else if (aiProvider === 'deepseek') {
+                            const updated = [...deepseekKeys]; updated[idx] = val; setDeepseekKeys(updated);
+                          } else {
+                            const updated = [...geminiKeys]; updated[idx] = val; setGeminiKeys(updated);
+                          }
+                        }}
+                        placeholder={idx === 0 ? `Paste your ${aiProvider === 'groq' ? 'gsk_...' : aiProvider === 'deepseek' ? 'sk-...' : 'AIzaSy...'} key here` : 'Optional key'}
+                        placeholderTextColor={colors.textTertiary}
+                        secureTextEntry
+                        autoCorrect={false}
+                        autoCapitalize="none"
+                        style={[
+                          styles.keyInput,
+                          { 
+                            backgroundColor: colors.bg,
+                            borderColor: isActive ? accent : colors.border,
+                            borderWidth: isActive ? 2 : 1,
+                            color: colors.textPrimary,
+                          }
+                        ]}
+                      />
+                    </View>
+                  );
+                }) : (
+                  <View style={{ marginBottom: 10 }}>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+                      <Text style={{ fontSize: 11, fontWeight: '700', color: '#0891b2' }}>API Key</Text>
+                    </View>
+                    <TextInput
+                      value={openrouterKey}
+                      onChangeText={setOpenrouterKey}
+                      placeholder="Paste your sk-or-... key here"
+                      placeholderTextColor={colors.textTertiary}
+                      secureTextEntry
+                      autoCorrect={false}
+                      autoCapitalize="none"
+                      style={[
+                        styles.keyInput,
+                        { 
+                          backgroundColor: colors.bg,
+                          borderColor: '#0891b2',
+                          borderWidth: 2,
+                          color: colors.textPrimary,
+                        }
+                      ]}
+                    />
+                    <Text style={{ fontSize: 11, color: colors.textTertiary, marginTop: 8 }}>
+                      Get keys from openrouter.ai → Keys. High-quality free models available.
+                    </Text>
+                  </View>
+                )}
+              </View>
+            </View>
+          </>
+        )}
 
         {/* ── PROMPTS ────────────────────────────────────────── */}
         <Text style={[styles.sectionTitle, { marginTop: 24 }]}>PROMPTS</Text>

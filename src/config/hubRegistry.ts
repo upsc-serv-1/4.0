@@ -545,35 +545,197 @@ Each object must fit the following schema:
       { name: 'microTopic', label: 'Microtopic', type: 'text', required: false },
       { name: 'subTopic', label: 'Subtopic', type: 'text', required: false },
       { name: 'is_pyq', label: 'Is PYQ?', type: 'boolean', required: true },
-      { name: 'nanotopic', label: 'Nanotopic (5th layer - Optional only)', type: 'text', required: false }
+      { name: 'nanotopic', label: 'Nanotopic (5th layer - Optional only)', type: 'text', required: false },
+      { name: 'macrotag', label: 'Macro Tag (Cognitive tag)', type: 'text', required: false },
+      { name: 'microtag', label: 'Micro Tag (Directives)', type: 'text', required: false }
     ],
     aiPromptTemplate: `You are an expert UPSC Mains Question Bank creator.
-${HIERARCHY_RULE}
+\${HIERARCHY_RULE}
 
-Generate a JSON object representing a UPSC Mains Question and its coaching answers.
+Generate a JSON array of UPSC Mains Questions and their multi-coaching model answers.
 ⚠️ Hierarchy Depth Rules:
 - GS (GS1/GS2/GS3/GS4/Essay) -> Stop at "subTopic". Do NOT generate "nanotopic".
 - Optional -> Generate "nanotopic" as well (5th layer).
+- 'hierarchy_path' must be a JSON array containing the exact taxonomy tokens: ["<paper>", "<subject>", "<sectionGroup>", "<microTopic>", "<subTopic>"].
+- Each answer in 'answers' MUST include a top markdown table approach summary:
+  | **Approach:** <br>• **Introduction:** ... <br>• **Body:** ... <br>• **Conclusion:** ... |
+  | --- |
+  followed by ### Introduction, ### Body, and ### Conclusion headers.
 
-The JSON object must match this schema:
-{
-  "questionText": "Full text of the question",
-  "marks": 10,
-  "year": 2024,
-  "paper": "Exact value from syllabus hierarchy (GS1/GS2/GS3/GS4/Essay/Optional)",
-  "subject": "Exact subject from syllabus hierarchy",
-  "sectionGroup": "Exact section group from syllabus hierarchy",
-  "microTopic": "Exact microtopic from syllabus hierarchy (optional)",
-  "subTopic": "Exact subtopic from syllabus hierarchy (optional)",
-  "is_pyq": true,
-  "nanotopic": "Exact nanotopic / 5th layer from syllabus hierarchy if present (ONLY for Optional papers; leave blank or omit for GS)",
-  "answers": [
-    {
-      "institute": "Vision IAS or Sunya IAS or PWOnlyIAS or Superkalam",
-      "answerText": "### Introduction\\n[Intro text in bullets]\\n\\n### Body\\n[Key points with bold sub-headers]\\n\\n### Conclusion\\n[Concluding bullets]"
+Strict Output Schema:
+[
+  {
+    "questionText": "Explain briefly the ecological and economic benefits of solar energy generation in India with suitable examples.",
+    "marks": 10,
+    "year": 2025,
+    "paper": "GS1",
+    "subject": "GEOGRAPHY",
+    "sectionGroup": "Economic & Resource Geography",
+    "microTopic": "Distribution of key Natural Resources (world, South Asia and Indian subcontinent)",
+    "subTopic": "Energy",
+    "nanotopic": "",
+    "macrotag": "Descriptive, Applied",
+    "microtag": "Explain, India",
+    "hierarchy_path": [
+      "GS1",
+      "GEOGRAPHY",
+      "Economic & Resource Geography",
+      "Distribution of key Natural Resources (world, South Asia and Indian subcontinent)",
+      "Energy"
+    ],
+    "source_attribution_label": "CSE Mains 2025",
+    "is_pyq": true,
+    "exam_info": {
+      "isPyq": true,
+      "is_ncert": false,
+      "exam": "Mains",
+      "group": "UPSC CSE",
+      "year": 2025,
+      "is_upsc_cse": true,
+      "stage": "mains",
+      "paper": "mains_gs1"
+    },
+    "answers": [
+      {
+        "institute": "Vision IAS",
+        "answerText": "| **Approach:** <br>• **Introduction:** Context of India's solar target (140+ GW). <br>• **Body:** Discuss ecological benefits (emissions, water) and economic benefits (jobs, cost savings). <br>• **Conclusion:** Forward roadmap with SDG-7 & Net Zero 2070. |\\n| --- |\\n\\n### Introduction\\nIndia has emerged as the world's 3rd largest solar producer...\\n\\n### Ecological Benefits\\n- **Carbon Abatement:** Avoids ~1.5 Mt CO2 per GW thermal replacement.\\n- **Water Conservation:** Uses 95% less water than thermal plants.\\n\\n### Economic Benefits\\n- **Job Creation:** Over 3.5 lakh green-collar jobs in installation & manufacturing.\\n\\n### Conclusion\\nAccelerating solar adoption is pivotal for India's 2070 Net Zero pledge."
+      }
+    ]
+  }
+]`
+  },
+  {
+    id: 'topper_copies',
+    displayName: 'Topper Copies',
+    targetTable: 'mains_questions',
+    uniqueKeyFn: (item: any) => item.id || `${item.questionText || ''}||${item.topper_name || ''}||${item.year || ''}`,
+    formFields: [
+      { name: 'questionText', label: 'Question Prompt', type: 'markdown', required: true },
+      { name: 'topper_name', label: 'Topper Name & AIR', type: 'text', required: true },
+      { name: 'air_rank', label: 'AIR Rank', type: 'text', required: true },
+      { name: 'year', label: 'Exam Year', type: 'text', required: true },
+      { name: 'marks', label: 'Marks', type: 'text', required: true },
+      { name: 'paper', label: 'GS / Optional Paper', type: 'select', required: true, options: ['GS1', 'GS2', 'GS3', 'GS4', 'Essay', 'Optional'] },
+      { name: 'subject', label: 'Subject', type: 'text', required: true },
+      { name: 'sectionGroup', label: 'Section Group', type: 'text', required: true },
+      { name: 'microTopic', label: 'Microtopic', type: 'text', required: false },
+      { name: 'subTopic', label: 'Subtopic', type: 'text', required: false },
+      { name: 'nanotopic', label: 'Nanotopic (5th layer - Optional only)', type: 'text', required: false },
+      { name: 'pages', label: 'Cloudflare R2 Page URLs (Markdown images or array)', type: 'markdown', required: true }
+    ],
+    aiPromptTemplate: `You are an expert UPSC Topper Copies compiler.
+\${HIERARCHY_RULE}
+
+Generate a JSON array of UPSC Topper Copies with handwritten scan links.
+⚠️ Handwritten diagrams, flowcharts, maps, and presentation are preserved as Cloudflare R2 image links inside 'answers' array.
+
+Strict Output Schema:
+[
+  {
+    "id": "topper-gs1-geo-q1",
+    "questionText": "How does the theory of plate tectonics help in explaining the differences in the formation of the Himalayas and Andes mountains?",
+    "marks": 10,
+    "year": 2024,
+    "paper": "GS1",
+    "subject": "Geography",
+    "sectionGroup": "Physical Geography & Geophysical Phenomena",
+    "microTopic": "Salient Features of World Physical Geography",
+    "subTopic": "Geomorphology",
+    "nanotopic": "",
+    "macrotag": "Analytical",
+    "microtag": "How does, help in explaining",
+    "hierarchy_path": [
+      "GS1",
+      "Geography",
+      "Physical Geography & Geophysical Phenomena",
+      "Salient Features of World Physical Geography",
+      "Geomorphology"
+    ],
+    "source_attribution_label": "Shakti Dubey (AIR 1 - 2024)",
+    "is_pyq": false,
+    "exam_info": {
+      "isPyq": false,
+      "is_ncert": false,
+      "exam": "Mains",
+      "group": "Topper Copies",
+      "year": 2024,
+      "is_upsc_cse": false,
+      "stage": "mains",
+      "paper": "mains_gs1",
+      "is_topper_copy": true,
+      "topper": "Shakti Dubey",
+      "air": "1"
+    },
+    "answers": [
+      {
+        "institute": "Topper Copies",
+        "topper": "Shakti Dubey",
+        "air": "1",
+        "is_topper": true,
+        "answerText": "![](https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/topper_copies/gs1/geography/pages/p006.jpg)\\n\\n![](https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/topper_copies/gs1/geography/pages/p007.jpg)",
+        "page_urls": [
+          "https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/topper_copies/gs1/geography/pages/p006.jpg",
+          "https://pub-cfb8b9095d7d4914990dbb6f73afeb92.r2.dev/topper_copies/gs1/geography/pages/p007.jpg"
+        ]
+      }
+    ]
+  }
+]`
+  },
+  {
+    id: 'prelims_questions',
+    displayName: 'Prelims PYQs / MCQs',
+    targetTable: 'questions',
+    uniqueKeyFn: (item: any) => item.id || `${item.questionText || item.question_text || ''}||${item.exam_year || item.year || ''}`,
+    formFields: [
+      { name: 'questionText', label: 'Question Text', type: 'markdown', required: true },
+      { name: 'option_a', label: 'Option A', type: 'text', required: true },
+      { name: 'option_b', label: 'Option B', type: 'text', required: true },
+      { name: 'option_c', label: 'Option C', type: 'text', required: true },
+      { name: 'option_d', label: 'Option D', type: 'text', required: true },
+      { name: 'correctAnswer', label: 'Correct Answer (a/b/c/d)', type: 'select', required: true, options: ['a', 'b', 'c', 'd'] },
+      { name: 'explanationMarkdown', label: 'Detailed Explanation', type: 'markdown', required: true },
+      { name: 'subject', label: 'Subject', type: 'text', required: true },
+      { name: 'sectionGroup', label: 'Section Group', type: 'text', required: true },
+      { name: 'microTopic', label: 'Microtopic', type: 'text', required: false },
+      { name: 'year', label: 'Exam Year', type: 'text', required: true },
+      { name: 'is_pyq', label: 'Is PYQ?', type: 'boolean', required: true }
+    ],
+    aiPromptTemplate: `You are an expert UPSC Prelims MCQ and PYQ creator.
+\${HIERARCHY_RULE}
+
+Generate a JSON array of UPSC Prelims MCQs matching the official test engine format.
+
+Strict Output Schema:
+[
+  {
+    "questionText": "Consider the following statements : Statement-I : The atmosphere is heated more by incoming solar radiation than by terrestrial radiation. Statement-II : Carbon dioxide and other greenhouse gases in the atmosphere are good absorbers of long wave radiation. Which one of the following is correct in respect of the above statements ?",
+    "options": {
+      "a": "Both Statement-I and Statement-II are correct and Statement-II explains Statement-I",
+      "b": "Both Statement-I and Statement-II are correct, but Statement-II does not explain Statement-I",
+      "c": "Statement-I is correct, but Statement-II is incorrect",
+      "d": "Statement-I is incorrect, but Statement-II is correct"
+    },
+    "correctAnswer": "d",
+    "explanationMarkdown": "**Exp) Option d is the correct answer.**\\n\\n### Detailed Breakdown\\n- **Statement-I is incorrect:** The atmosphere is primarily heated from below by long-wave terrestrial radiation, not directly by incoming solar short-wave radiation.\\n- **Statement-II is correct:** Greenhouse gases like CO2 and water vapor are transparent to incoming short-wave solar radiation but opaque to outgoing long-wave terrestrial radiation.",
+    "subject": "Geography",
+    "sectionGroup": "Physical Geography - Climatology",
+    "microTopic": "Solar Radiation, Heat Balance, Temperature",
+    "year": 2024,
+    "is_pyq": true,
+    "source_attribution_label": "CSE 2024",
+    "exam_info": {
+      "isPyq": true,
+      "is_ncert": false,
+      "exam": "Prelims",
+      "group": "UPSC CSE",
+      "year": 2024,
+      "is_upsc_cse": true,
+      "stage": "prelims",
+      "paper": "pre_gs1"
     }
-  ]
-}`
+  }
+]`
   }
 ];
 

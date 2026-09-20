@@ -64,7 +64,7 @@ export default function AdminScreen() {
   const [isAdmin, setIsAdmin] = useState(false);
 
   // Tab State
-  const [activeTab, setActiveTab] = useState<TabType>('users');
+  const [activeTab, setActiveTab] = useState<TabType>('content');
 
   // Summary Stats
   const [stats, setStats] = useState({

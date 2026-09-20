@@ -41,6 +41,36 @@ class R2UploadService {
   }
 
   /**
+   * Opens the image picker gallery and lets the user select multiple images.
+   */
+  async pickMultipleImages(): Promise<ImagePicker.ImagePickerAsset[]> {
+    try {
+      const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (!permission.granted) {
+        Alert.alert('Permission Required', 'You need to grant photo library permissions to upload topper copies.');
+        return [];
+      }
+
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsMultipleSelection: true,
+        quality: 1.0,
+        base64: true,
+      });
+
+      if (result.canceled || !result.assets || result.assets.length === 0) {
+        return [];
+      }
+
+      return result.assets;
+    } catch (e) {
+      console.error('Error picking multiple images:', e);
+      Alert.alert('Error', 'Failed to pick images from gallery.');
+      return [];
+    }
+  }
+
+  /**
    * Uploads an image asset to Cloudflare R2 bucket.
    * Uses backend proxy or direct worker URL if configured.
    */

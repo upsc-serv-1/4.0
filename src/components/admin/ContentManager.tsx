@@ -57,7 +57,11 @@ function detectHubAndNormalize(item: any): { hub: HubConfig | null, normalized: 
   
   // 1. Detect hub first using unique keys
   let targetHub: HubConfig | null = null;
-  if (norm.mnemonic_keyword !== undefined || norm.formula_expansion !== undefined) {
+  if (norm.options !== undefined || norm.option_a !== undefined || norm.correctAnswer !== undefined || norm.correct_answer !== undefined || norm.statementLines !== undefined) {
+    targetHub = hubRegistry.find(h => h.id === 'prelims_questions') || null;
+  } else if (norm.topper_name !== undefined || norm.topper !== undefined || norm.air_rank !== undefined || norm.is_topper_copy === true || norm.pages !== undefined || (Array.isArray(norm.answers) && norm.answers[0]?.is_topper)) {
+    targetHub = hubRegistry.find(h => h.id === 'topper_copies') || null;
+  } else if (norm.mnemonic_keyword !== undefined || norm.formula_expansion !== undefined) {
     targetHub = hubRegistry.find(h => h.id === 'mains_mnemonics') || null;
   } else if (norm.framework_name !== undefined || norm.breakdown_markdown !== undefined) {
     targetHub = hubRegistry.find(h => h.id === 'mains_frameworks') || null;
@@ -458,29 +462,178 @@ function HubCardPreview({ item, hub, colors }: { item: any; hub: HubConfig; colo
   // ── QUESTION BANK ──────────────────────────────────────────────────────────
   if (hub.id === 'mains_questions') {
     const qText = item.question_text || item.questionText || 'No Question Text';
-    const firstAns = Array.isArray(item.mains_answers) ? item.mains_answers[0] : null;
+    const firstAns = Array.isArray(item.mains_answers) ? item.mains_answers[0] : (Array.isArray(item.answers) ? item.answers[0] : null);
+    const ansText = firstAns?.answer_text || firstAns?.answerText || '';
+    const inst = firstAns?.institute || 'Model Answer';
     return (
       <View>
         <View style={{ backgroundColor: colors.surface, borderRadius: 12, padding: 10, borderWidth: 1, borderColor: colors.border, marginBottom: 8 }}>
-          <Text style={{ fontSize: 13, fontWeight: '900', color: colors.textPrimary }}>
-            {item.is_pyq ? `📜 [PYQ ${item.exam_year || item.year}] ` : ''}Marks: {item.marks}
-          </Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+            <Text style={{ fontSize: 13, fontWeight: '900', color: colors.textPrimary }}>
+              {item.is_pyq ? `📜 [PYQ ${item.exam_year || item.year || ''}] ` : ''}Marks: {item.marks || '10'}
+            </Text>
+            {item.year && <Text style={{ fontSize: 10, fontWeight: '800', color: colors.textTertiary }}>{item.year}</Text>}
+          </View>
           <TagRow />
         </View>
         <View style={{ borderWidth: 1, borderRadius: 12, padding: 12, borderColor: colors.border, backgroundColor: colors.surface }}>
           <Text style={{ fontSize: 12.5, color: colors.textPrimary, fontWeight: '800', marginBottom: 8 }}>{qText}</Text>
-          {firstAns ? (
+          {ansText ? (
             <View style={{ borderTopWidth: 0.5, borderTopColor: colors.border, paddingTop: 8 }}>
-              <Text style={{ fontSize: 9, fontWeight: '800', color: colors.primary, marginBottom: 4 }}>ANSWER PREVIEW ({firstAns.institute})</Text>
+              <Text style={{ fontSize: 9, fontWeight: '800', color: colors.primary, marginBottom: 4 }}>ANSWER PREVIEW ({inst})</Text>
               <ScrollView style={{ maxHeight: 150 }} nestedScrollEnabled>
                 <Markdown style={getMarkdownStyles(colors)}>
-                  {firstAns.answer_text}
+                  {ansText}
                 </Markdown>
               </ScrollView>
             </View>
           ) : (
             <Text style={{ fontSize: 11, color: colors.textTertiary, fontStyle: 'italic' }}>No model answer drafted yet.</Text>
           )}
+        </View>
+      </View>
+    );
+  }
+
+  // ── TOPPER COPIES ──────────────────────────────────────────────────────────
+  if (hub.id === 'topper_copies') {
+    const qText = item.questionText || item.question_text || 'No Question Prompt';
+    const topperName = item.topper_name || item.topper || 'Topper Copy';
+    const air = item.air_rank || item.air || '';
+    
+    let pageUrls: string[] = [];
+    if (Array.isArray(item.pages)) pageUrls = item.pages;
+    else if (Array.isArray(item.page_urls)) pageUrls = item.page_urls;
+    else if (item.answers && Array.isArray(item.answers)) {
+      item.answers.forEach((ans: any) => {
+        if (Array.isArray(ans.page_urls)) pageUrls.push(...ans.page_urls);
+        else if (ans.answerText || ans.answer_text) {
+          const text = ans.answerText || ans.answer_text;
+          const matches = text.matchAll(/!\[.*?\]\((https?:\/\/[^\)]+)\)/g);
+          for (const m of matches) {
+            pageUrls.push(m[1]);
+          }
+        }
+      });
+    }
+
+    return (
+      <View>
+        <View style={{ backgroundColor: colors.surface, borderRadius: 12, padding: 10, borderWidth: 1, borderColor: colors.border, marginBottom: 8 }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+              <View style={{ backgroundColor: '#f59e0b18', paddingHorizontal: 8, paddingVertical: 3, borderRadius: 6, borderWidth: 1, borderColor: '#f59e0b40' }}>
+                <Text style={{ fontSize: 11, fontWeight: '900', color: '#b45309' }}>🌟 {topperName} {air ? `(AIR ${air})` : ''}</Text>
+              </View>
+              {item.year && <Text style={{ fontSize: 10, fontWeight: '800', color: colors.textTertiary }}>{item.year}</Text>}
+            </View>
+            <Text style={{ fontSize: 11, fontWeight: '800', color: colors.primary }}>{item.marks ? `${item.marks} Marks` : ''}</Text>
+          </View>
+          <TagRow />
+        </View>
+
+        <View style={{ borderWidth: 1, borderRadius: 12, padding: 12, borderColor: colors.border, backgroundColor: colors.surface }}>
+          <Text style={{ fontSize: 12.5, color: colors.textPrimary, fontWeight: '800', marginBottom: 10 }}>{qText}</Text>
+          
+          <View style={{ borderTopWidth: 0.5, borderTopColor: colors.border, paddingTop: 10 }}>
+            <Text style={{ fontSize: 9.5, fontWeight: '900', color: colors.primary, marginBottom: 8, letterSpacing: 0.5 }}>
+              HANDWRITTEN PAGES ({pageUrls.length} SCANS)
+            </Text>
+            
+            {pageUrls.length > 0 ? (
+              <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ flexDirection: 'row' }}>
+                {pageUrls.map((url, pIdx) => (
+                  <View key={pIdx} style={{ width: 110, height: 150, borderRadius: 8, borderWidth: 1, borderColor: colors.border, overflow: 'hidden', marginRight: 8, backgroundColor: '#00000010' }}>
+                    <Image source={{ uri: url }} style={{ width: '100%', height: '100%' }} resizeMode="cover" />
+                    <View style={{ position: 'absolute', bottom: 4, right: 4, backgroundColor: 'rgba(0,0,0,0.6)', paddingHorizontal: 5, paddingVertical: 2, borderRadius: 4 }}>
+                      <Text style={{ color: '#fff', fontSize: 9, fontWeight: '800' }}>P.{pIdx + 1}</Text>
+                    </View>
+                  </View>
+                ))}
+              </ScrollView>
+            ) : (
+              <Text style={{ fontSize: 11, color: colors.textTertiary, fontStyle: 'italic' }}>No handwritten page images attached.</Text>
+            )}
+          </View>
+        </View>
+      </View>
+    );
+  }
+
+  // ── PRELIMS MCQS / PYQS ───────────────────────────────────────────────────
+  if (hub.id === 'prelims_questions') {
+    const qText = item.questionText || item.question_text || (Array.isArray(item.statementLines) ? item.statementLines.join('\n') : 'No Question Text');
+    const options = item.options || {
+      a: item.option_a || '',
+      b: item.option_b || '',
+      c: item.option_c || '',
+      d: item.option_d || ''
+    };
+    const correct = String(item.correctAnswer || item.correct_answer || 'a').toLowerCase();
+    const exp = item.explanationMarkdown || item.explanation || item.explanation_markdown || '';
+
+    return (
+      <View>
+        <View style={{ backgroundColor: colors.surface, borderRadius: 12, padding: 10, borderWidth: 1, borderColor: colors.border, marginBottom: 8 }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+            <Text style={{ fontSize: 12, fontWeight: '900', color: colors.primary }}>
+              🎯 {item.is_pyq ? `PYQ ${item.year || item.exam_year || ''}` : 'Practice MCQ'}
+            </Text>
+            <View style={{ backgroundColor: '#10b98115', paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4, borderWidth: 1, borderColor: '#10b98130' }}>
+              <Text style={{ fontSize: 10, fontWeight: '900', color: '#10b981' }}>Key: ({correct.toUpperCase()})</Text>
+            </View>
+          </View>
+          <TagRow />
+        </View>
+
+        <View style={{ borderWidth: 1, borderRadius: 12, padding: 12, borderColor: colors.border, backgroundColor: colors.surface }}>
+          <Text style={{ fontSize: 12.5, color: colors.textPrimary, fontWeight: '700', marginBottom: 12, lineHeight: 18 }}>{qText}</Text>
+          
+          <View style={{ gap: 6, marginBottom: 12 }}>
+            {(['a', 'b', 'c', 'd'] as const).map(optKey => {
+              const optText = options[optKey];
+              if (!optText) return null;
+              const isCorrect = correct === optKey;
+              return (
+                <View 
+                  key={optKey} 
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'flex-start',
+                    padding: 8,
+                    borderRadius: 8,
+                    backgroundColor: isCorrect ? '#10b98112' : colors.surfaceStrong,
+                    borderWidth: 1,
+                    borderColor: isCorrect ? '#10b981' : colors.border
+                  }}
+                >
+                  <View style={{
+                    width: 20,
+                    height: 20,
+                    borderRadius: 10,
+                    backgroundColor: isCorrect ? '#10b981' : colors.border,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    marginRight: 8
+                  }}>
+                    <Text style={{ fontSize: 10, fontWeight: '900', color: isCorrect ? '#fff' : colors.textSecondary }}>{optKey.toUpperCase()}</Text>
+                  </View>
+                  <Text style={{ fontSize: 11.5, color: isCorrect ? '#065f46' : colors.textPrimary, flex: 1, fontWeight: isCorrect ? '700' : '400', lineHeight: 16 }}>
+                    {optText}
+                  </Text>
+                </View>
+              );
+            })}
+          </View>
+
+          {exp ? (
+            <View style={{ borderTopWidth: 0.5, borderTopColor: colors.border, paddingTop: 8 }}>
+              <Text style={{ fontSize: 9.5, fontWeight: '900', color: colors.primary, marginBottom: 4 }}>EXPLANATION</Text>
+              <Markdown style={getMarkdownStyles(colors)}>
+                {exp}
+              </Markdown>
+            </View>
+          ) : null}
         </View>
       </View>
     );
@@ -1029,6 +1182,61 @@ export function ContentManager({ headerBlock, tabSelector }: { headerBlock?: Rea
       optionalFields.forEach(f => {
         if (item[f] !== undefined) cleaned[f] = item[f];
       });
+    } else if (hub.id === 'topper_copies') {
+      cleaned.question_text = item.questionText || item.question_text || '';
+      cleaned.exam_year = item.year !== undefined ? String(item.year) : (item.exam_year !== undefined ? String(item.exam_year) : '2024');
+      cleaned.section_group = item.sectionGroup || item.section_group || '';
+      cleaned.microtopic = item.microTopic || item.microtopic || '';
+      cleaned.subtopic = item.subTopic || item.subtopic || '';
+      cleaned.nanotopic = item.nanotopic || item.nanoTopic || item.nano_topic || '';
+      cleaned.is_pyq = false;
+      cleaned.marks = item.marks !== undefined ? String(item.marks) : '10';
+      cleaned.paper = item.paper || 'GS1';
+      cleaned.subject = item.subject || '';
+      cleaned.is_topper_copy = true;
+      cleaned.topper = item.topper_name || item.topper || '';
+      cleaned.air = item.air_rank || item.air || '';
+      cleaned.source_attribution_label = item.source_attribution_label || (cleaned.topper ? `${cleaned.topper} (AIR ${cleaned.air || ''})` : '');
+      cleaned.exam_info = item.exam_info || {
+        isPyq: false,
+        is_ncert: false,
+        exam: 'Mains',
+        group: 'Topper Copies',
+        year: Number(cleaned.exam_year) || 2024,
+        is_upsc_cse: false,
+        stage: 'mains',
+        paper: String(cleaned.paper).toLowerCase(),
+        is_topper_copy: true,
+        topper: cleaned.topper,
+        air: cleaned.air
+      };
+    } else if (hub.id === 'prelims_questions') {
+      cleaned.question_text = item.questionText || item.question_text || (Array.isArray(item.statementLines) ? item.statementLines.join('\n') : '');
+      cleaned.options = item.options || {
+        a: item.option_a || '',
+        b: item.option_b || '',
+        c: item.option_c || '',
+        d: item.option_d || ''
+      };
+      cleaned.correct_answer = item.correctAnswer || item.correct_answer || 'a';
+      cleaned.explanation = item.explanationMarkdown || item.explanation || item.explanation_markdown || '';
+      cleaned.subject = item.subject || '';
+      cleaned.section_group = item.sectionGroup || item.section_group || '';
+      cleaned.microtopic = item.microTopic || item.microtopic || '';
+      cleaned.exam_year = item.year !== undefined ? Number(item.year) : (item.exam_year !== undefined ? Number(item.exam_year) : 2024);
+      cleaned.is_pyq = item.is_pyq !== undefined ? (item.is_pyq === 'true' || item.is_pyq === true) : true;
+      cleaned.is_upsc_cse = item.is_upsc_cse !== undefined ? item.is_upsc_cse : true;
+      cleaned.source_attribution_label = item.source_attribution_label || `CSE ${cleaned.exam_year}`;
+      cleaned.exam_info = item.exam_info || {
+        isPyq: cleaned.is_pyq,
+        is_ncert: false,
+        exam: 'Prelims',
+        group: 'UPSC CSE',
+        year: cleaned.exam_year,
+        is_upsc_cse: cleaned.is_upsc_cse,
+        stage: 'prelims',
+        paper: 'pre_gs1'
+      };
     } else {
       let allowedColumns: string[] = [];
       
@@ -1087,20 +1295,46 @@ export function ContentManager({ headerBlock, tabSelector }: { headerBlock?: Rea
         if (error) throw new Error(error.message);
       }
 
-      // If Question Bank: upsert child answers relational payload
-      if (hubToUse.id === 'mains_questions') {
+      // If Question Bank or Topper Copies: upsert child answers relational payload
+      if (hubToUse.id === 'mains_questions' || hubToUse.id === 'topper_copies') {
         const answerPayloads: any[] = [];
         parsedPreview.forEach((item, itemIdx) => {
           const qId = payload[itemIdx].id;
           const ansList = item.answers || item.mains_answers || [];
-          ansList.forEach((ans: any, ansIdx: number) => {
-            answerPayloads.push({
-              id: ans.id || `${qId}-${ans.institute || 'model'}-${ansIdx}`,
-              question_id: qId,
-              institute: ans.institute || 'Model Answer',
-              answer_text: ans.answerText || ans.answer_text || ''
+          if (ansList.length > 0) {
+            ansList.forEach((ans: any, ansIdx: number) => {
+              let answerText = ans.answerText || ans.answer_text || '';
+              let pageUrls = ans.page_urls || ans.pages || [];
+              if ((!answerText || answerText.trim() === '') && Array.isArray(pageUrls) && pageUrls.length > 0) {
+                answerText = pageUrls.map((u: string) => `![](${u})`).join('\n\n');
+              }
+              answerPayloads.push({
+                id: ans.id || `${qId}-${ans.institute || (hubToUse.id === 'topper_copies' ? 'topper' : 'model')}-${ansIdx}`,
+                question_id: qId,
+                institute: ans.institute || (hubToUse.id === 'topper_copies' ? 'Topper Copies' : 'Model Answer'),
+                answer_text: answerText,
+                topper_name: ans.topper_name || ans.topper || item.topper_name || item.topper || null,
+                air: ans.air || ans.air_rank || item.air_rank || item.air || null,
+                is_topper: hubToUse.id === 'topper_copies' || !!ans.is_topper,
+                page_urls: Array.isArray(pageUrls) && pageUrls.length > 0 ? pageUrls : null
+              });
             });
-          });
+          } else if (hubToUse.id === 'topper_copies' && (item.pages || item.page_urls)) {
+            const pageUrls = Array.isArray(item.pages || item.page_urls) 
+              ? (item.pages || item.page_urls) 
+              : String(item.pages || item.page_urls).split('\n').map((s: string) => s.trim()).filter(Boolean);
+            const answerText = pageUrls.map((u: string) => u.startsWith('http') ? `![](${u})` : u).join('\n\n');
+            answerPayloads.push({
+              id: `${qId}-topper-0`,
+              question_id: qId,
+              institute: 'Topper Copies',
+              answer_text: answerText,
+              topper_name: item.topper_name || item.topper || null,
+              air: item.air_rank || item.air || null,
+              is_topper: true,
+              page_urls: pageUrls
+            });
+          }
         });
 
         if (answerPayloads.length > 0) {
@@ -1293,7 +1527,7 @@ export function ContentManager({ headerBlock, tabSelector }: { headerBlock?: Rea
   const hubInUse = detectedHub || selectedHub;
 
   return (
-    <View style={{ flex: 1, backgroundColor: colors.background }}>
+    <View style={{ flex: 1, backgroundColor: colors.bg }}>
       {headerBlock}
       {tabSelector}
 
@@ -1708,7 +1942,7 @@ export function ContentManager({ headerBlock, tabSelector }: { headerBlock?: Rea
                   <View style={{ flex: 1 }}>
                     <Text style={[styles.sectionLabel, { color: colors.textTertiary, marginBottom: 5 }]}>LIVE PREVIEW</Text>
                     {parsedPreview.length === 0 ? (
-                      <View style={[styles.previewPlaceholder, { borderColor: colors.border, backgroundColor: colors.background }]}>
+                      <View style={[styles.previewPlaceholder, { borderColor: colors.border, backgroundColor: colors.bg }]}>
                         <Text style={{ fontSize: 10, color: colors.textTertiary, textAlign: 'center', fontStyle: 'italic', lineHeight: 16 }}>
                           Paste JSON output here{'\n'}preview renders in real{'\n'}card layouts instantly
                         </Text>
@@ -2245,7 +2479,7 @@ export function ContentManager({ headerBlock, tabSelector }: { headerBlock?: Rea
                         </View>
 
                         {editingAnswers.map((ans, idx) => (
-                          <View key={idx} style={{ padding: 10, borderRadius: 10, borderWidth: 1, borderColor: colors.border, backgroundColor: colors.background, marginBottom: 12 }}>
+                          <View key={idx} style={{ padding: 10, borderRadius: 10, borderWidth: 1, borderColor: colors.border, backgroundColor: colors.bg, marginBottom: 12 }}>
                             <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
                               <Text style={{ fontSize: 10, fontWeight: '800', color: colors.textSecondary }}>Answer #{idx + 1}</Text>
                               <TouchableOpacity 
@@ -2321,7 +2555,7 @@ export function ContentManager({ headerBlock, tabSelector }: { headerBlock?: Rea
                             </ScrollView>
                           </View>
 
-                          <ScrollView style={{ flex: 1, backgroundColor: colors.background, padding: 12, borderRadius: 12, borderWidth: 1, borderColor: colors.border }}>
+                          <ScrollView style={{ flex: 1, backgroundColor: colors.bg, padding: 12, borderRadius: 12, borderWidth: 1, borderColor: colors.border }}>
                             <Text style={{ fontSize: 13, fontWeight: '900', color: colors.textPrimary, marginBottom: 12 }}>
                               {editFormValues.questionText}
                             </Text>
@@ -2551,12 +2785,26 @@ export function ContentManager({ headerBlock, tabSelector }: { headerBlock?: Rea
 
 // ── Reusable item row ──────────────────────────────────────────────────────────
 function ItemCard({ item, colors, isStaging, onPublish, onEdit, onDelete }: any) {
-  const title = item.question_text || item.questionText || item.card_title || item.title || item.mnemonic_number_title || item.framework_name || 'No Title';
+  let title = item.question_text || item.questionText || item.card_title || item.title || item.mnemonic_number_title || item.framework_name || 'No Title';
+  let badgeLabel = '';
+  let badgeColor = colors.primary;
+
+  if (item.is_topper_copy || item.topper_name || item.topper) {
+    const tName = item.topper || item.topper_name || 'Topper Copy';
+    const tAir = item.air || item.air_rank ? ` (AIR ${item.air || item.air_rank})` : '';
+    badgeLabel = `🌟 ${tName}${tAir}`;
+    badgeColor = '#d97706';
+  } else if (item.options || item.correct_answer || item.correctAnswer) {
+    badgeLabel = `🎯 Prelims MCQ (Key: ${String(item.correct_answer || item.correctAnswer || 'A').toUpperCase()})`;
+    badgeColor = '#059669';
+  }
   
   let body = '';
   if (item.question_text || item.questionText) {
     const firstAns = Array.isArray(item.mains_answers) ? item.mains_answers[0] : null;
     body = firstAns ? firstAns.answer_text : 'No answer drafted yet.';
+  } else if (item.explanation || item.explanation_markdown) {
+    body = item.explanation || item.explanation_markdown;
   } else {
     body = item.body || item.content_markdown || item.content || item.explanation_examples || '';
   }
@@ -2566,6 +2814,13 @@ function ItemCard({ item, colors, isStaging, onPublish, onEdit, onDelete }: any)
   return (
     <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}>
       <View style={{ flex: 1 }}>
+        {badgeLabel ? (
+          <View style={{ marginBottom: 4, flexDirection: 'row', alignItems: 'center' }}>
+            <View style={{ backgroundColor: badgeColor + '18', paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4, borderWidth: 1, borderColor: badgeColor + '35' }}>
+              <Text style={{ fontSize: 10, fontWeight: '900', color: badgeColor }}>{badgeLabel}</Text>
+            </View>
+          </View>
+        ) : null}
         <Text style={{ fontSize: 13, fontWeight: '800', color: colors.textPrimary }} numberOfLines={2}>{title}</Text>
         <Text style={{ fontSize: 10, color: colors.textTertiary, marginTop: 2 }} numberOfLines={2}>{preview}…</Text>
         <View style={{ flexDirection: 'row', gap: 5, marginTop: 5, flexWrap: 'wrap' }}>

@@ -1208,9 +1208,9 @@ export function ContentManager({ headerBlock, tabSelector }: { headerBlock?: Rea
       cleaned.paper = item.paper || 'GS1';
       cleaned.subject = item.subject || '';
       cleaned.is_topper_copy = true;
-      cleaned.topper = item.topper_name || item.topper || '';
-      cleaned.air = item.air_rank || item.air || '';
-      cleaned.source_attribution_label = item.source_attribution_label || (cleaned.topper ? `${cleaned.topper} (AIR ${cleaned.air || ''})` : '');
+      cleaned.topper_name = item.topper_name || item.topper || '';
+      cleaned.air_rank = item.air_rank || item.air || '';
+      cleaned.source_attribution_label = item.source_attribution_label || (cleaned.topper_name ? `${cleaned.topper_name} (AIR ${cleaned.air_rank || ''})` : '');
       cleaned.exam_info = item.exam_info || {
         isPyq: false,
         is_ncert: false,
@@ -1328,7 +1328,7 @@ export function ContentManager({ headerBlock, tabSelector }: { headerBlock?: Rea
                 institute: ans.institute || (hubToUse.id === 'topper_copies' ? 'Topper Copies' : 'Model Answer'),
                 answer_text: answerText,
                 topper_name: ans.topper_name || ans.topper || item.topper_name || item.topper || null,
-                air: ans.air || ans.air_rank || item.air_rank || item.air || null,
+                air_rank: ans.air_rank || ans.air || item.air_rank || item.air || null,
                 is_topper: hubToUse.id === 'topper_copies' || !!ans.is_topper,
                 page_urls: Array.isArray(pageUrls) && pageUrls.length > 0 ? pageUrls : null
               });
@@ -1344,7 +1344,7 @@ export function ContentManager({ headerBlock, tabSelector }: { headerBlock?: Rea
               institute: 'Topper Copies',
               answer_text: answerText,
               topper_name: item.topper_name || item.topper || null,
-              air: item.air_rank || item.air || null,
+              air_rank: item.air_rank || item.air || null,
               is_topper: true,
               page_urls: pageUrls
             });
@@ -1577,15 +1577,18 @@ export function ContentManager({ headerBlock, tabSelector }: { headerBlock?: Rea
       });
       if (qErr) console.warn('Question upsert notice:', qErr.message);
 
+      const airMatch = topperName.match(/AIR\s*(\d+)/i);
+      const airRank = airMatch ? airMatch[1] : null;
+
       const answerId = deterministicUUID('mains_answers', `topper_ans_${Date.now()}`);
       const { error: ansErr } = await supabase.from('mains_answers').insert({
         id: answerId,
         question_id: questionId,
         is_topper: true,
         topper_name: topperName,
-        model_answer_markdown: `**Topper:** ${topperName}\n**Subject:** ${topperSubject}\n\n*Handwritten multi-page copy attached.*`,
+        air_rank: airRank,
+        answer_text: `**Topper:** ${topperName}\n**Subject:** ${topperSubject}\n\n*Handwritten multi-page copy attached.*`,
         page_urls: topperScans,
-        presentation_features: ['Handwritten Pages', 'R2 High Resolution Scans', 'Diagrams & Flowcharts'],
       });
 
       if (ansErr) throw ansErr;

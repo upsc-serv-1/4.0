@@ -718,6 +718,7 @@ export default function IntegratedSearchScreen() {
   const [syncing, setSyncing] = useState(false);
 
   const sidebarScrollViewRef = useRef<ScrollView>(null);
+  const sidebarSectionOffsets = useRef<Record<string, number>>({});
   const landingScrollRef = useRef<ScrollView>(null);
 
   // Search History dropdown states
@@ -3142,10 +3143,32 @@ export default function IntegratedSearchScreen() {
       return updated;
     });
 
-    if ((key === 'sections' || key === 'mainsSections') && value !== 'All') {
-      setTimeout(() => {
-        sidebarScrollViewRef.current?.scrollTo({ y: 320, animated: true });
-      }, 50);
+    if (value !== 'All') {
+      if (key === 'sections' || key === 'mainsSections') {
+        setTimeout(() => {
+          const targetY = sidebarSectionOffsets.current['mainsMicrotopics']
+            ?? sidebarSectionOffsets.current['microtopics']
+            ?? (sidebarSectionOffsets.current['mainsSections'] ? sidebarSectionOffsets.current['mainsSections'] + 50 : 320);
+          sidebarScrollViewRef.current?.scrollTo({ y: Math.max(0, targetY - 30), animated: true });
+        }, 70);
+      } else if (key === 'microtopics' || key === 'mainsMicrotopics') {
+        setTimeout(() => {
+          const targetY = sidebarSectionOffsets.current['subtopics']
+            ?? (sidebarSectionOffsets.current['mainsMicrotopics'] ? sidebarSectionOffsets.current['mainsMicrotopics'] + 70 : (sidebarSectionOffsets.current['microtopics'] ? sidebarSectionOffsets.current['microtopics'] + 70 : 500));
+          sidebarScrollViewRef.current?.scrollTo({ y: Math.max(0, targetY - 30), animated: true });
+        }, 70);
+      } else if (key === 'subtopics') {
+        setTimeout(() => {
+          const targetY = sidebarSectionOffsets.current['nanotopics']
+            ?? (sidebarSectionOffsets.current['subtopics'] ? sidebarSectionOffsets.current['subtopics'] + 70 : 680);
+          sidebarScrollViewRef.current?.scrollTo({ y: Math.max(0, targetY - 30), animated: true });
+        }, 70);
+      } else if (key === 'nanotopics') {
+        setTimeout(() => {
+          const targetY = sidebarSectionOffsets.current['nanotopics'] ?? 840;
+          sidebarScrollViewRef.current?.scrollTo({ y: Math.max(0, targetY - 20), animated: true });
+        }, 70);
+      }
     }
   };
 
@@ -3738,7 +3761,10 @@ export default function IntegratedSearchScreen() {
 
             {/* 3. Section Group (visible ONLY when >= 1 subject selected & sections exist) */}
             {(filters?.subjects?.length ?? 0) > 0 && prelimsSectionOptions.filter(x => x !== 'All').length > 0 && (
-              <View style={{ marginBottom: 4 }}>
+              <View 
+                onLayout={(e) => { sidebarSectionOffsets.current['sections'] = e.nativeEvent.layout.y; }}
+                style={{ marginBottom: 4 }}
+              >
                 <Text style={{ fontSize: 10, fontWeight: '800', color: colors.textTertiary, letterSpacing: 1, marginBottom: 4 }}>
                   SECTIONS / MODULES {(filters?.sections?.length ?? 0) > 0 ? `(${filters.sections.length})` : ''}
                 </Text>
@@ -3781,7 +3807,10 @@ export default function IntegratedSearchScreen() {
 
             {/* 4. Microtopics (visible ONLY when >= 1 section selected & microtopics exist) */}
             {(filters?.sections?.length ?? 0) > 0 && prelimsMicrotopicOptions.filter(x => x !== 'All').length > 0 && (
-              <View style={{ marginBottom: 4 }}>
+              <View 
+                onLayout={(e) => { sidebarSectionOffsets.current['microtopics'] = e.nativeEvent.layout.y; }}
+                style={{ marginBottom: 4 }}
+              >
                 <Text style={{ fontSize: 10, fontWeight: '800', color: colors.textTertiary, letterSpacing: 1, marginBottom: 4 }}>
                   MICROTOPICS {(filters?.microtopics?.length ?? 0) > 0 ? `(${filters.microtopics.length})` : ''}
                 </Text>
@@ -3931,7 +3960,10 @@ export default function IntegratedSearchScreen() {
 
             {/* 3. Section Group (Appears ONLY when >= 1 subject selected & sections exist) */}
             {(filters?.subjects?.length ?? 0) > 0 && mainsSectionOptions.filter(x => x !== 'All').length > 0 && (
-              <View style={{ marginBottom: 4 }}>
+              <View 
+                onLayout={(e) => { sidebarSectionOffsets.current['mainsSections'] = e.nativeEvent.layout.y; }}
+                style={{ marginBottom: 4 }}
+              >
                 <Text style={{ fontSize: 10, fontWeight: '800', color: colors.textTertiary, letterSpacing: 1, marginBottom: 4 }}>
                   SECTIONS {(filters?.mainsSections?.length ?? 0) > 0 ? `(${filters.mainsSections?.length})` : ''}
                 </Text>
@@ -3974,7 +4006,10 @@ export default function IntegratedSearchScreen() {
 
             {/* 4. Microtopics (Appears ONLY when >= 1 section selected & microtopics exist) */}
             {(filters?.mainsSections?.length ?? 0) > 0 && mainsMicrotopicOptions.filter(x => x !== 'All').length > 0 && (
-              <View style={{ marginBottom: 4 }}>
+              <View 
+                onLayout={(e) => { sidebarSectionOffsets.current['mainsMicrotopics'] = e.nativeEvent.layout.y; sidebarSectionOffsets.current['microtopics'] = e.nativeEvent.layout.y; }}
+                style={{ marginBottom: 4 }}
+              >
                 <Text style={{ fontSize: 10, fontWeight: '800', color: colors.textTertiary, letterSpacing: 1, marginBottom: 4 }}>
                   MICROTOPICS {(filters?.mainsMicrotopics?.length ?? 0) > 0 ? `(${filters.mainsMicrotopics?.length})` : ''}
                 </Text>
@@ -4017,7 +4052,10 @@ export default function IntegratedSearchScreen() {
 
             {/* 5. Subtopics (Appears ONLY when >= 1 microtopic selected & subtopics exist) */}
             {(filters?.mainsMicrotopics?.length ?? 0) > 0 && mainsSubtopicOptions.filter(x => x !== 'All').length > 0 && (
-              <View style={{ marginBottom: 4 }}>
+              <View 
+                onLayout={(e) => { sidebarSectionOffsets.current['subtopics'] = e.nativeEvent.layout.y; }}
+                style={{ marginBottom: 4 }}
+              >
                 <Text style={{ fontSize: 10, fontWeight: '800', color: colors.textTertiary, letterSpacing: 1, marginBottom: 4 }}>
                   SUBTOPICS {(filters?.subtopics?.length ?? 0) > 0 ? `(${filters.subtopics.length})` : ''}
                 </Text>
@@ -4060,7 +4098,10 @@ export default function IntegratedSearchScreen() {
 
             {/* 6. Nanotopics (Appears ONLY when >= 1 subtopic selected & nanotopics exist) */}
             {(filters?.subtopics?.length ?? 0) > 0 && mainsNanotopicOptions.filter(x => x !== 'All').length > 0 && (
-              <View style={{ marginBottom: 4 }}>
+              <View 
+                onLayout={(e) => { sidebarSectionOffsets.current['nanotopics'] = e.nativeEvent.layout.y; }}
+                style={{ marginBottom: 4 }}
+              >
                 <Text style={{ fontSize: 10, fontWeight: '800', color: colors.textTertiary, letterSpacing: 1, marginBottom: 4 }}>
                   NANOTOPICS {(filters?.nanotopics?.length ?? 0) > 0 ? `(${filters.nanotopics.length})` : ''}
                 </Text>

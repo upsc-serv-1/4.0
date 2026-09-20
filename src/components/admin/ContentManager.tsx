@@ -17,7 +17,7 @@ import {
   Dimensions,
 } from 'react-native';
 import {
-  Database, Copy, Upload, Trash2, Edit, Search, CheckCircle,
+  Database, Copy, RefreshCw, Upload, Trash2, Edit, Search, CheckCircle,
   AlertTriangle, Play, X, Eye, Save, ChevronDown, Filter, PenLine, Clipboard as CopyIcon, Check,
   BookOpen, Menu, ChevronRight, UploadCloud, Sparkles, Layers, FileText, Code, Share2
 } from 'lucide-react-native';
@@ -921,6 +921,8 @@ export function ContentManager({ headerBlock, tabSelector }: { headerBlock?: Rea
   // Bulk mode
   const [bulkMode, setBulkMode] = useState(false);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [isBulkPublishing, setIsBulkPublishing] = useState(false);
+  const [isBulkDeleting, setIsBulkDeleting] = useState(false);
 
   useEffect(() => { setEditablePrompt(selectedHub.aiPromptTemplate); }, [selectedHub]);
 
@@ -1597,668 +1599,372 @@ export function ContentManager({ headerBlock, tabSelector }: { headerBlock?: Rea
     }
   };
 
+  const handleDirectFormSubmit = async (publishDirect = false) => {
+    try {
+      for (const field of selectedHub.formFields) {
+        if (field.required && (addFormValues[field.name] === undefined || addFormValues[field.name] === '')) {
+          Alert.alert('Required Field Missing', `Please fill in "${field.label}" before saving.`);
+          return;
+        }
+      }
+
+      const id = deterministicUUID(selectedHub.targetTable, `${selectedHub.id}_${Date.now()}`);
+      const payload = {
+        id,
+        ...addFormValues,
+        status: publishDirect ? 'published' : 'draft',
+        created_at: new Date().toISOString()
+      };
+
+      const { error } = await supabase.from(selectedHub.targetTable).upsert(payload, { onConflict: 'id' });
+      if (error) throw error;
+
+      Alert.alert(
+        publishDirect ? '🚀 Published Live!' : '📥 Added to Staging!',
+        `Successfully saved card to ${selectedHub.displayName} as ${publishDirect ? 'Live' : 'Draft'}!`
+      );
+      setAddFormValues({});
+      fetchItems(true);
+    } catch (e: any) {
+      Alert.alert('Save Error', e.message || 'Failed to save card');
+    }
+  };
+
   const hubInUse = detectedHub || selectedHub;
+
+  const HUB_CATEGORIES = [
+    {
+      title: 'CORE TEST REPOSITORIES',
+      hubs: [
+        { id: 'mains_questions', name: 'Question Bank', icon: '📝', badge: '3.4k' },
+        { id: 'topper_copies', name: 'Topper Copies (Scans)', icon: '📸', badge: '480' },
+        { id: 'prelims_questions', name: 'Prelims MCQs', icon: '🎯', badge: '14.8k' },
+      ]
+    },
+    {
+      title: 'VALUE ADDITIONS (MAINS & ESSAY)',
+      hubs: [
+        { id: 'mains_data_facts', name: 'Data & Facts', icon: '📊', badge: '1.2k' },
+        { id: 'mains_intro_conclusions', name: 'Intro & Conclusion', icon: '📑', badge: '850' },
+        { id: 'mains_essay_value_add', name: 'Quotes & Anecdotes', icon: '💬', badge: '620' },
+        { id: 'mains_mnemonics', name: 'Mnemonics', icon: '🧠', badge: '410' },
+        { id: 'mains_frameworks', name: 'Frameworks', icon: '📐', badge: '290' },
+      ]
+    },
+    {
+      title: 'GS4 ETHICS STUDIO',
+      hubs: [
+        { id: 'mains_ethics_keyword', name: 'Keywords (Definitions)', icon: '🔑', badge: '340' },
+        { id: 'mains_ethics_innovation', name: 'Case Studies / Innovations', icon: '🏆', badge: '180' },
+        { id: 'mains_ethics_dimension', name: 'Multidimensionality', icon: '🌐', badge: '120' },
+        { id: 'mains_ethics_comparison', name: 'Comparisons', icon: '⚖️', badge: '95' },
+        { id: 'mains_ethics_diagram', name: 'Diagrams', icon: '🖼️', badge: '75' },
+        { id: 'mains_ethics_pyq_quote', name: 'PYQ Quotes', icon: '📜', badge: '110' },
+        { id: 'mains_ethics_situation', name: 'Situational Analysis', icon: '🎭', badge: '85' },
+      ]
+    }
+  ];
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.bg }}>
-      {headerBlock}
-      {tabSelector}
-
-      {/* Main Studio Body: iPad 2-Column or Mobile Stack */}
+      
+      {/* 2-COLUMN MAIN STUDIO LAYOUT */}
       <View style={{ flex: 1, flexDirection: IS_TABLET ? 'row' : 'column' }}>
 
-        {/* ── LEFT MASTER PANEL (Tablet only, 320px width) ── */}
-        {IS_TABLET && (
-          <View style={{ width: 320, borderRightWidth: 1, borderRightColor: colors.border, backgroundColor: colors.surfaceStrong }}>
-            <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 14, paddingBottom: 40 }} showsVerticalScrollIndicator={false}>
+        {/* ── LEFT SIDEBAR: CONTENT CATEGORIES (15 Hubs) ── */}
+        {(sidebarOpen || !IS_TABLET) && (
+          <View style={{ 
+            width: IS_TABLET ? 280 : '100%', 
+            borderRightWidth: IS_TABLET ? 1 : 0, 
+            borderBottomWidth: IS_TABLET ? 0 : 1,
+            borderRightColor: colors.border, 
+            borderBottomColor: colors.border,
+            backgroundColor: colors.surfaceStrong 
+          }}>
+            <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 12, paddingBottom: 40 }} showsVerticalScrollIndicator={false}>
               
-              {/* Header: Content Categories */}
+              {/* Sidebar Header */}
               <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
-                <Text style={{ fontSize: 10.5, fontWeight: '900', color: colors.textTertiary, letterSpacing: 0.8, textTransform: 'uppercase' }}>
-                  CONTENT CATEGORIES
+                <View>
+                  <Text style={{ fontSize: 11, fontWeight: '900', color: colors.textPrimary, letterSpacing: 0.6, textTransform: 'uppercase' }}>
+                    CONTENT CATEGORIES
+                  </Text>
+                  <Text style={{ fontSize: 9.5, color: colors.textTertiary, marginTop: 1 }}>15 UPSC Hubs</Text>
+                </View>
+                {IS_TABLET && (
+                  <TouchableOpacity onPress={() => setSidebarOpen(false)} style={{ padding: 4 }}>
+                    <X size={15} color={colors.textTertiary} />
+                  </TouchableOpacity>
+                )}
+              </View>
+
+              {/* Grouped Categories */}
+              {HUB_CATEGORIES.map((cat) => (
+                <View key={cat.title} style={{ marginBottom: 14 }}>
+                  <Text style={{ fontSize: 9, fontWeight: '800', color: colors.textTertiary, letterSpacing: 0.5, marginBottom: 6, textTransform: 'uppercase' }}>
+                    {cat.title}
+                  </Text>
+                  <View style={{ gap: 3 }}>
+                    {cat.hubs.map(h => {
+                      const isSelected = selectedHub.id === h.id;
+                      return (
+                        <TouchableOpacity
+                          key={h.id}
+                          onPress={() => {
+                            const found = hubRegistry.find(hub => hub.id === h.id);
+                            if (found) {
+                              setSelectedHub(found);
+                              setPage(0);
+                            }
+                          }}
+                          style={{
+                            flexDirection: 'row',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                            paddingVertical: 7,
+                            paddingHorizontal: 9,
+                            borderRadius: 8,
+                            borderWidth: 1,
+                            borderColor: isSelected ? colors.primary : 'transparent',
+                            backgroundColor: isSelected ? (colors.primary + '18') : 'transparent',
+                          }}
+                        >
+                          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, flex: 1 }}>
+                            <Text style={{ fontSize: 13 }}>{h.icon}</Text>
+                            <Text 
+                              style={{ 
+                                fontSize: 11.5, 
+                                fontWeight: isSelected ? '800' : '600', 
+                                color: isSelected ? colors.primary : colors.textPrimary 
+                              }}
+                              numberOfLines={1}
+                            >
+                              {h.name}
+                            </Text>
+                          </View>
+                          <View style={{ 
+                            backgroundColor: isSelected ? (colors.primary + '30') : colors.surface, 
+                            paddingHorizontal: 5, 
+                            paddingVertical: 2, 
+                            borderRadius: 5 
+                          }}>
+                            <Text style={{ fontSize: 9, fontWeight: '700', color: isSelected ? colors.primary : colors.textTertiary }}>
+                              {h.badge}
+                            </Text>
+                          </View>
+                        </TouchableOpacity>
+                      );
+                    })}
+                  </View>
+                </View>
+              ))}
+
+              {/* Relational Filters Section (Collapsible) */}
+              <View style={{ marginTop: 6, borderTopWidth: 1, borderTopColor: colors.border, paddingTop: 10 }}>
+                <Text style={{ fontSize: 9, fontWeight: '800', color: colors.textTertiary, letterSpacing: 0.5, marginBottom: 8, textTransform: 'uppercase' }}>
+                  RELATIONAL FILTERS
                 </Text>
-                <View style={{ backgroundColor: 'rgba(56,189,248,0.15)', paddingHorizontal: 7, paddingVertical: 2, borderRadius: 6 }}>
-                  <Text style={{ fontSize: 9.5, fontWeight: '800', color: '#38bdf8' }}>4 Main Hubs</Text>
+
+                {/* PYQ Switcher */}
+                <View style={{ marginBottom: 10 }}>
+                  <Text style={{ fontSize: 9, fontWeight: '700', color: colors.textSecondary, marginBottom: 4 }}>PYQ STATUS</Text>
+                  <View style={{ flexDirection: 'row', gap: 4 }}>
+                    {(['all', 'pyq', 'non_pyq'] as const).map(mode => {
+                      const active = filterPyq === mode;
+                      return (
+                        <TouchableOpacity
+                          key={mode}
+                          onPress={() => setFilterPyq(mode)}
+                          style={{
+                            flex: 1,
+                            backgroundColor: active ? colors.primary : colors.surface,
+                            borderWidth: 1,
+                            borderColor: active ? colors.primary : colors.border,
+                            borderRadius: 6,
+                            paddingVertical: 4,
+                            alignItems: 'center'
+                          }}
+                        >
+                          <Text style={{ fontSize: 9, fontWeight: '800', color: active ? '#fff' : colors.textSecondary }}>
+                            {mode === 'all' ? 'All' : mode === 'pyq' ? 'PYQ' : 'Non'}
+                          </Text>
+                        </TouchableOpacity>
+                      );
+                    })}
+                  </View>
+                </View>
+
+                {/* Institute Answer Filter */}
+                <View style={{ marginBottom: 10 }}>
+                  <HierarchyFilter label="🏢 Institute" value={filterInstitute} options={instituteOpts} onSelect={setFilterInstitute} colors={colors} />
+                </View>
+
+                {/* Program Name Filter */}
+                <View style={{ marginBottom: 10 }}>
+                  <HierarchyFilter label="🎓 Program" value={filterProgram} options={programOpts} onSelect={setFilterProgram} colors={colors} />
                 </View>
               </View>
 
-              {/* Group 1: 🌟 Topper Copies */}
-              {(() => {
-                const isTopper = selectedHub.id === 'topper_copies';
-                return (
-                  <TouchableOpacity
-                    onPress={() => {
-                      const h = hubRegistry.find(hub => hub.id === 'topper_copies') || selectedHub;
-                      setSelectedHub(h);
-                      setActiveSubTab('upload');
-                    }}
-                    style={{
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                      padding: 12,
-                      borderRadius: 12,
-                      marginBottom: 8,
-                      borderWidth: 1.5,
-                      borderColor: isTopper ? '#a855f7' : colors.border,
-                      backgroundColor: isTopper ? 'rgba(168, 85, 247, 0.12)' : colors.surface,
-                    }}
-                  >
-                    <View style={{ width: 38, height: 38, borderRadius: 10, backgroundColor: isTopper ? '#a855f7' : 'rgba(255,255,255,0.06)', alignItems: 'center', justifyContent: 'center', marginRight: 10 }}>
-                      <UploadCloud size={18} color={isTopper ? '#ffffff' : '#c084fc'} />
-                    </View>
-                    <View style={{ flex: 1 }}>
-                      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-                        <Text style={{ fontSize: 12.5, fontWeight: '900', color: isTopper ? '#c084fc' : colors.textPrimary }}>
-                          Topper Copies
-                        </Text>
-                        <View style={{ backgroundColor: 'rgba(168,85,247,0.2)', paddingHorizontal: 5, paddingVertical: 1.5, borderRadius: 4 }}>
-                          <Text style={{ fontSize: 8.5, fontWeight: '800', color: '#c084fc' }}>R2 CDN</Text>
-                        </View>
-                      </View>
-                      <Text style={{ fontSize: 10, color: colors.textTertiary, marginTop: 2 }}>
-                        Handwritten Scans to Cloudflare R2
-                      </Text>
-                    </View>
-                  </TouchableOpacity>
-                );
-              })()}
+            </ScrollView>
+          </View>
+        )}
 
-              {/* Group 2: 🎯 Prelims PYQ / MCQ */}
-              {(() => {
-                const isPrelims = selectedHub.id === 'prelims_questions';
-                return (
-                  <TouchableOpacity
-                    onPress={() => {
-                      const h = hubRegistry.find(hub => hub.id === 'prelims_questions') || selectedHub;
-                      setSelectedHub(h);
-                      setActiveSubTab('json');
-                    }}
-                    style={{
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                      padding: 12,
-                      borderRadius: 12,
-                      marginBottom: 8,
-                      borderWidth: 1.5,
-                      borderColor: isPrelims ? '#10b981' : colors.border,
-                      backgroundColor: isPrelims ? 'rgba(16, 185, 129, 0.12)' : colors.surface,
-                    }}
-                  >
-                    <View style={{ width: 38, height: 38, borderRadius: 10, backgroundColor: isPrelims ? '#10b981' : 'rgba(255,255,255,0.06)', alignItems: 'center', justifyContent: 'center', marginRight: 10 }}>
-                      <CheckCircle size={18} color={isPrelims ? '#ffffff' : '#34d399'} />
-                    </View>
-                    <View style={{ flex: 1 }}>
-                      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-                        <Text style={{ fontSize: 12.5, fontWeight: '900', color: isPrelims ? '#34d399' : colors.textPrimary }}>
-                          Prelims PYQ / MCQ
-                        </Text>
-                        <View style={{ backgroundColor: 'rgba(16,185,129,0.2)', paddingHorizontal: 5, paddingVertical: 1.5, borderRadius: 4 }}>
-                          <Text style={{ fontSize: 8.5, fontWeight: '800', color: '#34d399' }}>MCQ</Text>
-                        </View>
-                      </View>
-                      <Text style={{ fontSize: 10, color: colors.textTertiary, marginTop: 2 }}>
-                        4 options, keys & multi-expl
-                      </Text>
-                    </View>
-                  </TouchableOpacity>
-                );
-              })()}
+        {/* ── RIGHT MAIN WORKSPACE PANE ── */}
+        <View style={{ flex: 1, backgroundColor: colors.bg }}>
 
-              {/* Group 3: ✍️ Mains Question Bank */}
-              {(() => {
-                const isMains = selectedHub.id === 'mains_questions';
-                return (
-                  <TouchableOpacity
-                    onPress={() => {
-                      const h = hubRegistry.find(hub => hub.id === 'mains_questions') || selectedHub;
-                      setSelectedHub(h);
-                      setActiveSubTab('json');
-                    }}
-                    style={{
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                      padding: 12,
-                      borderRadius: 12,
-                      marginBottom: 8,
-                      borderWidth: 1.5,
-                      borderColor: isMains ? '#38bdf8' : colors.border,
-                      backgroundColor: isMains ? 'rgba(56, 189, 248, 0.12)' : colors.surface,
-                    }}
-                  >
-                    <View style={{ width: 38, height: 38, borderRadius: 10, backgroundColor: isMains ? '#0284c7' : 'rgba(255,255,255,0.06)', alignItems: 'center', justifyContent: 'center', marginRight: 10 }}>
-                      <PenLine size={18} color={isMains ? '#ffffff' : '#38bdf8'} />
-                    </View>
-                    <View style={{ flex: 1 }}>
-                      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-                        <Text style={{ fontSize: 12.5, fontWeight: '900', color: isMains ? '#38bdf8' : colors.textPrimary }}>
-                          Mains Question Bank
-                        </Text>
-                        <View style={{ backgroundColor: 'rgba(56,189,248,0.2)', paddingHorizontal: 5, paddingVertical: 1.5, borderRadius: 4 }}>
-                          <Text style={{ fontSize: 8.5, fontWeight: '800', color: '#38bdf8' }}>4-LAYER</Text>
-                        </View>
-                      </View>
-                      <Text style={{ fontSize: 10, color: colors.textTertiary, marginTop: 2 }}>
-                        10M/15M multi-institute answers
-                      </Text>
-                    </View>
-                  </TouchableOpacity>
-                );
-              })()}
-
-              {/* Group 4: 📊 Value Add Hubs */}
-              {(() => {
-                const isVA = selectedHub.id.startsWith('mains_') && !['mains_questions', 'topper_copies'].includes(selectedHub.id);
-                return (
-                  <TouchableOpacity
-                    onPress={() => setHubModalVisible(true)}
-                    style={{
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                      padding: 12,
-                      borderRadius: 12,
-                      marginBottom: 12,
-                      borderWidth: 1.5,
-                      borderColor: isVA ? '#f59e0b' : colors.border,
-                      backgroundColor: isVA ? 'rgba(245, 158, 11, 0.12)' : colors.surface,
-                    }}
-                  >
-                    <View style={{ width: 38, height: 38, borderRadius: 10, backgroundColor: isVA ? '#f59e0b' : 'rgba(255,255,255,0.06)', alignItems: 'center', justifyContent: 'center', marginRight: 10 }}>
-                      <Database size={18} color={isVA ? '#ffffff' : '#fbbf24'} />
-                    </View>
-                    <View style={{ flex: 1 }}>
-                      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-                        <Text style={{ fontSize: 12.5, fontWeight: '900', color: isVA ? '#fbbf24' : colors.textPrimary }}>
-                          {isVA ? selectedHub.displayName : 'Value Add Hubs'}
-                        </Text>
-                        <View style={{ backgroundColor: 'rgba(245,158,11,0.2)', paddingHorizontal: 5, paddingVertical: 1.5, borderRadius: 4 }}>
-                          <Text style={{ fontSize: 8.5, fontWeight: '800', color: '#fbbf24' }}>6 HUBS</Text>
-                        </View>
-                      </View>
-                      <Text style={{ fontSize: 10, color: colors.textTertiary, marginTop: 2 }}>
-                        Data, Ethics, Intro/Concl, Mnemonics
-                      </Text>
-                    </View>
-                  </TouchableOpacity>
-                );
-              })()}
-
-              {/* Divider */}
-              <View style={{ height: 1, backgroundColor: colors.border, marginVertical: 8 }} />
-
-              {/* 1-Tap AI Prompt Box */}
-              <View style={{ backgroundColor: 'rgba(30, 27, 75, 0.5)', borderWidth: 1.5, borderColor: 'rgba(168, 85, 247, 0.4)', borderRadius: 14, padding: 14, marginBottom: 14 }}>
-                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 6 }}>
-                  <Sparkles size={16} color="#c084fc" />
-                  <Text style={{ fontSize: 12, fontWeight: '900', color: '#c084fc' }}>
-                    1-Tap Gemini / Claude Prompt
-                  </Text>
-                </View>
-                <Text style={{ fontSize: 10.5, color: colors.textSecondary, lineHeight: 15, marginBottom: 10 }}>
-                  Copies system prompt with exact 4-layer UPSC taxonomy. Paste into Gemini/Claude app on iPad to get 100% verified Supabase JSON.
-                </Text>
-                <TouchableOpacity
-                  onPress={async () => {
-                    await Clipboard.setStringAsync(selectedHub.aiPromptTemplate);
-                    setCopiedKey('system_prompt');
-                    Alert.alert('Prompt Copied!', `Copied 4-layer taxonomy prompt for ${selectedHub.displayName} to clipboard! Paste into Gemini or Claude.`);
-                    setTimeout(() => setCopiedKey(null), 3000);
-                  }}
+          {/* Top Studio Toolbar */}
+          <View style={{ 
+            flexDirection: 'row', 
+            alignItems: 'center', 
+            justifyContent: 'space-between', 
+            paddingHorizontal: 12, 
+            paddingVertical: 8, 
+            backgroundColor: colors.surface, 
+            borderBottomWidth: 1, 
+            borderBottomColor: colors.border 
+          }}>
+            
+            {/* Left: Sidebar Toggle & Subtabs */}
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+              {IS_TABLET && (
+                <TouchableOpacity 
+                  onPress={() => setSidebarOpen(s => !s)}
                   style={{
-                    backgroundColor: copiedKey === 'system_prompt' ? '#10b981' : '#9333ea',
-                    paddingVertical: 11,
-                    borderRadius: 9,
-                    alignItems: 'center',
-                    justifyContent: 'center',
                     flexDirection: 'row',
-                    gap: 6,
+                    alignItems: 'center',
+                    gap: 4,
+                    paddingHorizontal: 8,
+                    paddingVertical: 5,
+                    borderRadius: 6,
+                    borderWidth: 1,
+                    borderColor: colors.border,
+                    backgroundColor: colors.surfaceStrong
                   }}
                 >
-                  {copiedKey === 'system_prompt' ? <Check size={15} color="#fff" /> : <Copy size={15} color="#fff" />}
-                  <Text style={{ fontSize: 12, fontWeight: '900', color: '#ffffff' }}>
-                    {copiedKey === 'system_prompt' ? '✓ Prompt Copied!' : '📋 Copy System Prompt'}
+                  <Menu size={13} color={colors.textPrimary} />
+                  <Text style={{ fontSize: 10.5, fontWeight: '800', color: colors.textPrimary }}>
+                    {sidebarOpen ? 'Hide' : 'Hubs'}
                   </Text>
                 </TouchableOpacity>
-              </View>
+              )}
 
-              {/* Quick Hierarchy Copiers */}
-              <Text style={{ fontSize: 9.5, fontWeight: '800', color: colors.textTertiary, marginBottom: 6, textTransform: 'uppercase' }}>
-                QUICK SYLLABUS COPIERS:
-              </Text>
-              <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6 }}>
+              {/* Subtab Pills */}
+              <View style={{ flexDirection: 'row', backgroundColor: colors.surfaceStrong, borderRadius: 8, padding: 2.5, borderWidth: 1, borderColor: colors.border, gap: 2 }}>
                 {[
-                  { label: 'GS 1-4', text: gsHierarchyMd },
-                  { label: 'Anthro P1', text: anthroPaper1Text },
-                  { label: 'Anthro P2', text: anthroPaper2Text },
-                ].map(h => {
-                  const copied = copiedKey === h.label;
+                  { key: 'upload', label: '➕ Direct Form' },
+                  { key: 'json', label: '⚡ AI & Fast Ingest' },
+                  { key: 'staging', label: `⏳ Staging (${itemList.filter(i => i.status === 'draft').length})` },
+                  { key: 'live', label: `✅ Live (${itemList.length})` },
+                ].map(tab => {
+                  const active = activeSubTab === tab.key;
                   return (
                     <TouchableOpacity
-                      key={h.label}
-                      onPress={() => handleCopyHierarchy(h.text, h.label)}
+                      key={tab.key}
+                      onPress={() => setActiveSubTab(tab.key as any)}
                       style={{
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                        borderWidth: 1,
-                        borderRadius: 8,
-                        paddingHorizontal: 8,
+                        paddingHorizontal: 10,
                         paddingVertical: 5,
-                        backgroundColor: copied ? '#22c55e15' : colors.surface,
-                        borderColor: copied ? '#22c55e' : colors.border,
-                        gap: 4
+                        borderRadius: 6,
+                        backgroundColor: active ? colors.primary : 'transparent',
                       }}
                     >
-                      {copied ? <Check size={11} color="#22c55e" /> : <CopyIcon size={11} color={colors.textSecondary} />}
-                      <Text style={{ fontSize: 10.5, fontWeight: '700', color: copied ? '#22c55e' : colors.textSecondary }}>
-                        {copied ? 'Copied' : h.label}
+                      <Text style={{ fontSize: 11, fontWeight: '800', color: active ? '#ffffff' : colors.textSecondary }}>
+                        {tab.label}
                       </Text>
                     </TouchableOpacity>
                   );
                 })}
               </View>
-
-            </ScrollView>
-          </View>
-        )}
-
-        {/* ── RIGHT DETAIL & WORKSPACE PANEL ── */}
-        <View style={{ flex: 1, backgroundColor: colors.bg }}>
-
-          {/* Sub-Tab Pill Bar & Quick Action Controls */}
-          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 14, paddingVertical: 10, backgroundColor: colors.surface, borderBottomWidth: 1, borderBottomColor: colors.border }}>
-            
-            {/* Pill Tab Selector */}
-            <View style={{ flexDirection: 'row', backgroundColor: colors.surfaceStrong, borderRadius: 10, padding: 3, borderWidth: 1, borderColor: colors.border, gap: 4 }}>
-              {[
-                { key: 'upload', label: '📸 Upload Scans (R2)' },
-                { key: 'json', label: '⚡ Fast Auto-Detect JSON' },
-                { key: 'staging', label: `⏳ Staging Drafts` },
-                { key: 'live', label: '✅ Live Content' },
-              ].map(tab => {
-                const active = activeSubTab === tab.key;
-                return (
-                  <TouchableOpacity
-                    key={tab.key}
-                    onPress={() => setActiveSubTab(tab.key as any)}
-                    style={{
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                      paddingHorizontal: 12,
-                      paddingVertical: 6,
-                      borderRadius: 8,
-                      backgroundColor: active ? '#0284c7' : 'transparent',
-                    }}
-                  >
-                    <Text style={{ fontSize: 11.5, fontWeight: '800', color: active ? '#ffffff' : colors.textSecondary }}>
-                      {tab.label}
-                    </Text>
-                  </TouchableOpacity>
-                );
-              })}
             </View>
 
-            {/* Mobile Hub Picker & Action Buttons */}
+            {/* Right: Active Hub Indicator & Actions */}
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-              {!IS_TABLET && (
-                <TouchableOpacity
-                  onPress={() => setHubModalVisible(true)}
-                  style={{ flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: 10, paddingVertical: 6, borderRadius: 8, borderWidth: 1, borderColor: colors.border, backgroundColor: colors.surfaceStrong }}
-                >
-                  <Database size={13} color={colors.primary} />
-                  <Text style={{ fontSize: 11, fontWeight: '800', color: colors.textPrimary }} numberOfLines={1}>
-                    {selectedHub.displayName}
-                  </Text>
-                  <ChevronDown size={12} color={colors.textTertiary} />
-                </TouchableOpacity>
-              )}
-              {(activeSubTab === 'staging' || activeSubTab === 'live') && (
-                <>
-                  <TouchableOpacity 
-                    onPress={() => setSidebarOpen(s => !s)} 
-                    style={{ 
-                      paddingHorizontal: 10, 
-                      paddingVertical: 6, 
-                      borderRadius: 8, 
-                      borderWidth: 1, 
-                      borderColor: sidebarOpen ? colors.primary : colors.border, 
-                      backgroundColor: sidebarOpen ? colors.primary + '15' : colors.surfaceStrong 
-                    }}
-                  >
-                    <Text style={{ fontSize: 11, fontWeight: '800', color: sidebarOpen ? colors.primary : colors.textPrimary }}>
-                      {sidebarOpen ? '◧ Hide Sidebar' : '◨ Show Sidebar'}
-                    </Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity 
-                    onPress={() => {
-                      setBulkMode(b => !b);
-                      setSelectedIds(new Set());
-                    }} 
-                    style={{ 
-                      paddingHorizontal: 10, 
-                      paddingVertical: 6, 
-                      borderRadius: 8, 
-                      borderWidth: 1, 
-                      borderColor: bulkMode ? colors.primary : colors.border, 
-                      backgroundColor: bulkMode ? colors.primary + '15' : colors.surfaceStrong 
-                    }}
-                  >
-                    <Text style={{ fontSize: 11, fontWeight: '800', color: bulkMode ? colors.primary : colors.textPrimary }}>
-                      {bulkMode ? '✕ Cancel' : '☑ Multi-Select'}
-                    </Text>
-                  </TouchableOpacity>
-                </>
-              )}
+              <View style={{ 
+                backgroundColor: colors.primary + '15', 
+                borderWidth: 1, 
+                borderColor: colors.primary + '30', 
+                paddingHorizontal: 8, 
+                paddingVertical: 4, 
+                borderRadius: 6 
+              }}>
+                <Text style={{ fontSize: 10, fontWeight: '800', color: colors.primary }} numberOfLines={1}>
+                  {selectedHub.displayName}
+                </Text>
+              </View>
+              <TouchableOpacity 
+                onPress={() => fetchItems(true)} 
+                style={{ width: 28, height: 28, borderRadius: 6, backgroundColor: colors.surfaceStrong, borderWidth: 1, borderColor: colors.border, alignItems: 'center', justifyContent: 'center' }}
+              >
+                <RefreshCw size={12} color={colors.textSecondary} />
+              </TouchableOpacity>
             </View>
           </View>
 
-          {/* Body Content Area with Split Layout for Staging/Live */}
-          <View style={{ flex: 1, flexDirection: 'row' }}>
-        {/* Left Sidebar drawer */}
-        {sidebarOpen && (activeSubTab === 'staging' || activeSubTab === 'live') && (
-          <View style={{ width: 250, borderRightWidth: 0.5, borderRightColor: colors.border, backgroundColor: colors.surface }}>
-            <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 12, paddingBottom: 40 }} nestedScrollEnabled>
-              <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
-                <Text style={{ fontSize: 10, fontWeight: '900', color: colors.textTertiary, letterSpacing: 0.5 }}>RELATIONAL FILTERS</Text>
-                <TouchableOpacity onPress={() => setSidebarOpen(false)}><X size={14} color={colors.textTertiary} /></TouchableOpacity>
-              </View>
-
-              {/* PYQ Switcher */}
-              <View style={{ marginBottom: 16 }}>
-                <Text style={{ fontSize: 9.5, fontWeight: '800', color: colors.textTertiary, marginBottom: 5 }}>PYQ STATUS</Text>
-                <View style={{ flexDirection: 'row', gap: 6 }}>
-                  {(['all', 'pyq', 'non_pyq'] as const).map(mode => {
-                    const active = filterPyq === mode;
-                    return (
-                      <TouchableOpacity
-                        key={mode}
-                        onPress={() => setFilterPyq(mode)}
-                        style={{
-                          flex: 1,
-                          backgroundColor: active ? colors.primary : colors.surface,
-                          borderWidth: 1,
-                          borderColor: active ? colors.primary : colors.border,
-                          borderRadius: 6,
-                          paddingVertical: 5,
-                          alignItems: 'center'
-                        }}
-                      >
-                        <Text style={{ fontSize: 9, fontWeight: '800', color: active ? '#fff' : colors.textSecondary }}>
-                          {mode === 'all' ? 'All' : mode === 'pyq' ? 'PYQ' : 'Non'}
-                        </Text>
-                      </TouchableOpacity>
-                    );
-                  })}
-                </View>
-              </View>
-
-              {/* Institute Answer Filter */}
-              <View style={{ marginBottom: 16 }}>
-                <Text style={{ fontSize: 9.5, fontWeight: '800', color: colors.textTertiary, marginBottom: 5 }}>INSTITUTE ANSWER</Text>
-                <HierarchyFilter label="🏢 Select Institute" value={filterInstitute} options={instituteOpts} onSelect={setFilterInstitute} colors={colors} />
-              </View>
-
-              {/* Program Name Filter */}
-              <View style={{ marginBottom: 16 }}>
-                <Text style={{ fontSize: 9.5, fontWeight: '800', color: colors.textTertiary, marginBottom: 5 }}>PROGRAM NAME</Text>
-                <HierarchyFilter label="🎓 Select Program" value={filterProgram} options={programOpts} onSelect={setFilterProgram} colors={colors} />
-              </View>
-
-              {/* Ethics Type Tag Filters */}
-              {selectedHub.id.startsWith('mains_ethics_') && (
-                <View style={{ marginTop: 10 }}>
-                  <Text style={{ fontSize: 9.5, fontWeight: '800', color: colors.textTertiary, marginBottom: 5 }}>ETHICS TYPE</Text>
-                  {['All', 'keyword', 'diagram', 'dimension', 'comparison', 'innovation', 'pyq_quote', 'situation'].map(type => {
-                    const active = (filterEthicsType || 'All') === type;
-                    return (
-                      <TouchableOpacity
-                        key={type}
-                        onPress={() => setFilterEthicsType(type === 'All' ? '' : type)}
-                        style={{
-                          backgroundColor: active ? '#8b5cf6' : colors.surface,
-                          borderWidth: 1,
-                          borderColor: active ? '#8b5cf6' : colors.border,
-                          borderRadius: 6,
-                          paddingHorizontal: 8,
-                          paddingVertical: 4,
-                          marginBottom: 4
-                        }}
-                      >
-                        <Text style={{ fontSize: 9, fontWeight: '800', color: active ? '#fff' : colors.textSecondary, textTransform: 'uppercase' }}>
-                          {type}
-                        </Text>
-                      </TouchableOpacity>
-                    );
-                  })}
-                </View>
-              )}
-            </ScrollView>
-          </View>
-        )}
-
-        {/* Right main pane */}
-        <View style={{ flex: 1 }}>
-          {/* Cascading Horizontal Pills Row (Only in Staging or Live view) */}
-          {(activeSubTab === 'staging' || activeSubTab === 'live') && (
-            <View style={{ paddingHorizontal: 12, paddingVertical: 6, backgroundColor: colors.surface, borderBottomWidth: 0.5, borderBottomColor: colors.border }}>
-              <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ alignItems: 'center', gap: 6 }}>
-                {/* Browse Topics button */}
-                <TouchableOpacity
-                  onPress={() => setHierarchyModalVisible(true)}
-                  style={{
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    borderWidth: 1,
-                    borderColor: '#3b82f6',
-                    borderRadius: 20,
-                    paddingHorizontal: 10,
-                    paddingVertical: 5,
-                    backgroundColor: (filterPaper || filterSubject) ? '#3b82f6' : 'transparent'
-                  }}
-                >
-                  <BookOpen size={11} color={(filterPaper || filterSubject) ? '#fff' : '#3b82f6'} style={{ marginRight: 4 }} />
-                  <Text style={{ fontSize: 10, fontWeight: '700', color: (filterPaper || filterSubject) ? '#fff' : colors.textSecondary }}>
-                    {(filterNanotopic || filterSubtopic || filterMicro || filterSection || filterSubject || filterPaper || 'Browse Topics')}
-                  </Text>
-                  <ChevronDown size={11} color={(filterPaper || filterSubject) ? '#fff' : colors.textTertiary} style={{ marginLeft: 4 }} />
-                </TouchableOpacity>
-
-                <View style={{ width: 1, height: 14, backgroundColor: colors.border }} />
-
-                {/* Level 1: Paper Selector */}
-                {!filterPaper ? (
-                  paperOpts.filter(p => p !== 'All').map(p => (
-                    <TouchableOpacity
-                      key={p}
-                      onPress={() => { setFilterPaper(p); setFilterSubject(''); setFilterSection(''); setFilterMicro(''); setFilterSubtopic(''); setFilterNanotopic(''); }}
-                      style={{ borderWidth: 1, borderColor: colors.border, borderRadius: 20, paddingHorizontal: 10, paddingVertical: 5, backgroundColor: colors.surface }}
-                    >
-                      <Text style={{ fontSize: 10, color: colors.textSecondary }}>{p}</Text>
-                    </TouchableOpacity>
-                  ))
-                ) : (
-                  <>
-                    <TouchableOpacity
-                      onPress={() => { setFilterPaper(''); setFilterSubject(''); setFilterSection(''); setFilterMicro(''); setFilterSubtopic(''); setFilterNanotopic(''); }}
-                      style={{ borderWidth: 1, borderColor: '#ef4444', borderRadius: 20, paddingHorizontal: 10, paddingVertical: 5, backgroundColor: '#fee2e2' }}
-                    >
-                      <Text style={{ fontSize: 10, color: '#ef4444', fontWeight: '800' }}>📄 Paper: {filterPaper} ✕</Text>
-                    </TouchableOpacity>
-
-                    {/* Level 2: Subject */}
-                    {!filterSubject ? (
-                      subjectOpts.map(sub => (
-                        <TouchableOpacity
-                          key={sub}
-                          onPress={() => { setFilterSubject(sub); setFilterSection(''); setFilterMicro(''); setFilterSubtopic(''); setFilterNanotopic(''); }}
-                          style={{ borderWidth: 1, borderColor: '#8b5cf6', borderRadius: 20, paddingHorizontal: 10, paddingVertical: 5, backgroundColor: colors.surface }}
-                        >
-                          <Text style={{ fontSize: 10, color: '#8b5cf6' }}>{sub}</Text>
-                        </TouchableOpacity>
-                      ))
-                    ) : (
-                      <>
-                        <TouchableOpacity
-                          onPress={() => { setFilterSubject(''); setFilterSection(''); setFilterMicro(''); setFilterSubtopic(''); setFilterNanotopic(''); }}
-                          style={{ borderWidth: 1, borderColor: '#ef4444', borderRadius: 20, paddingHorizontal: 10, paddingVertical: 5, backgroundColor: '#fee2e2' }}
-                        >
-                          <Text style={{ fontSize: 10, color: '#ef4444', fontWeight: '800' }}>📚 Subject: {filterSubject} ✕</Text>
-                        </TouchableOpacity>
-
-                        {/* Level 3: Section Group */}
-                        {!filterSection ? (
-                          sectionOpts.map(sec => (
-                            <TouchableOpacity
-                              key={sec}
-                              onPress={() => { setFilterSection(sec); setFilterMicro(''); setFilterSubtopic(''); setFilterNanotopic(''); }}
-                              style={{ borderWidth: 1, borderColor: '#f59e0b', borderRadius: 20, paddingHorizontal: 10, paddingVertical: 5, backgroundColor: colors.surface }}
-                            >
-                              <Text style={{ fontSize: 10, color: '#f59e0b' }}>{sec}</Text>
-                            </TouchableOpacity>
-                          ))
-                        ) : (
-                          <>
-                            <TouchableOpacity
-                              onPress={() => { setFilterSection(''); setFilterMicro(''); setFilterSubtopic(''); setFilterNanotopic(''); }}
-                              style={{ borderWidth: 1, borderColor: '#ef4444', borderRadius: 20, paddingHorizontal: 10, paddingVertical: 5, backgroundColor: '#fee2e2' }}
-                            >
-                              <Text style={{ fontSize: 10, color: '#ef4444', fontWeight: '800' }}>📁 Section: {filterSection} ✕</Text>
-                            </TouchableOpacity>
-
-                            {/* Level 4: Microtopic */}
-                            {!filterMicro ? (
-                              microOpts.map(mt => (
-                                <TouchableOpacity
-                                  key={mt}
-                                  onPress={() => { setFilterMicro(mt); setFilterSubtopic(''); setFilterNanotopic(''); }}
-                                  style={{ borderWidth: 1, borderColor: '#10b981', borderRadius: 20, paddingHorizontal: 10, paddingVertical: 5, backgroundColor: colors.surface }}
-                                >
-                                  <Text style={{ fontSize: 10, color: '#10b981' }}>{mt}</Text>
-                                </TouchableOpacity>
-                              ))
-                            ) : (
-                              <>
-                                <TouchableOpacity
-                                  onPress={() => { setFilterMicro(''); setFilterSubtopic(''); setFilterNanotopic(''); }}
-                                  style={{ borderWidth: 1, borderColor: '#ef4444', borderRadius: 20, paddingHorizontal: 10, paddingVertical: 5, backgroundColor: '#fee2e2' }}
-                                >
-                                  <Text style={{ fontSize: 10, color: '#ef4444', fontWeight: '800' }}>🔍 Micro: {filterMicro} ✕</Text>
-                                </TouchableOpacity>
-
-                                {/* Level 5: Subtopic */}
-                                {!filterSubtopic ? (
-                                  subtopicOpts.map(st => (
-                                    <TouchableOpacity
-                                      key={st}
-                                      onPress={() => { setFilterSubtopic(st); setFilterNanotopic(''); }}
-                                      style={{ borderWidth: 1, borderColor: '#3b82f6', borderRadius: 20, paddingHorizontal: 10, paddingVertical: 5, backgroundColor: colors.surface }}
-                                    >
-                                      <Text style={{ fontSize: 10, color: '#3b82f6' }}>{st}</Text>
-                                    </TouchableOpacity>
-                                  ))
-                                ) : (
-                                  <>
-                                    <TouchableOpacity
-                                      onPress={() => { setFilterSubtopic(''); setFilterNanotopic(''); }}
-                                      style={{ borderWidth: 1, borderColor: '#ef4444', borderRadius: 20, paddingHorizontal: 10, paddingVertical: 5, backgroundColor: '#fee2e2' }}
-                                    >
-                                      <Text style={{ fontSize: 10, color: '#ef4444', fontWeight: '800' }}>📌 Sub: {filterSubtopic} ✕</Text>
-                                    </TouchableOpacity>
-
-                                    {/* Level 6: Nanotopic (Optionals only) */}
-                                    {filterPaper === 'Optional' && (
-                                      !filterNanotopic ? (
-                                        nanotopicOpts.map(nt => (
-                                          <TouchableOpacity
-                                            key={nt}
-                                            onPress={() => setFilterNanotopic(nt)}
-                                            style={{ borderWidth: 1, borderColor: '#ec4899', borderRadius: 20, paddingHorizontal: 10, paddingVertical: 5, backgroundColor: colors.surface }}
-                                          >
-                                            <Text style={{ fontSize: 10, color: '#ec4899' }}>{nt}</Text>
-                                          </TouchableOpacity>
-                                        ))
-                                      ) : (
-                                        <TouchableOpacity
-                                          onPress={() => setFilterNanotopic('')}
-                                          style={{ borderWidth: 1, borderColor: '#ef4444', borderRadius: 20, paddingHorizontal: 10, paddingVertical: 5, backgroundColor: '#fee2e2' }}
-                                        >
-                                          <Text style={{ fontSize: 10, color: '#ef4444', fontWeight: '800' }}>🌸 Nano: {filterNanotopic} ✕</Text>
-                                        </TouchableOpacity>
-                                      )
-                                    )}
-                                  </>
-                                )}
-                              </>
-                            )}
-                          </>
-                        )}
-                      </>
-                    )}
-                  </>
-                )}
-              </ScrollView>
-            </View>
-          )}
-
-          <ScrollView 
-            style={{ flex: 1 }}
-            contentContainerStyle={{ padding: 12, paddingBottom: 100 }}
-            keyboardShouldPersistTaps="handled"
-          >
-            {/* ══════ 1. DIRECT ADD / CATEGORY UPLOAD ══════ */}
-            {activeSubTab === 'upload' && (
-              <View style={{ backgroundColor: colors.surface, borderRadius: 16, padding: 16, borderWidth: 1, borderColor: colors.border }}>
-                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-                  <View>
-                    <Text style={{ fontSize: 16, fontWeight: '900', color: colors.textPrimary }}>Direct Form: {selectedHub.displayName}</Text>
-                    <Text style={{ fontSize: 12, color: colors.textSecondary, marginTop: 2 }}>Create single or structured value add cards directly for {selectedHub.displayName}.</Text>
-                  </View>
+          {/* ══════ SUB-TAB 1: DIRECT FORM / UPLOAD ══════ */}
+          {activeSubTab === 'upload' && (
+            <ScrollView 
+              style={{ flex: 1 }} 
+              contentContainerStyle={{ padding: 14, paddingBottom: 80 }}
+              keyboardShouldPersistTaps="handled"
+            >
+              <View style={{ backgroundColor: colors.surface, borderRadius: 14, padding: 16, borderWidth: 1, borderColor: colors.border }}>
+                
+                <View style={{ marginBottom: 14 }}>
+                  <Text style={{ fontSize: 15, fontWeight: '900', color: colors.textPrimary }}>Direct Form: {selectedHub.displayName}</Text>
+                  <Text style={{ fontSize: 11.5, color: colors.textSecondary, marginTop: 2 }}>Create single or structured value add cards directly for {selectedHub.displayName}.</Text>
                 </View>
 
+                {/* Topper Copies Multi-page Scan Dropzone */}
                 {selectedHub.id === 'topper_copies' && (
-                  <View>
+                  <View style={{ marginBottom: 14 }}>
                     <TouchableOpacity
                       onPress={handlePickTopperScans}
                       disabled={isUploadingImage}
                       style={{
-                        borderWidth: 2, borderColor: colors.primary, borderStyle: 'dashed', backgroundColor: colors.surfaceStrong,
-                        borderRadius: 16, padding: 24, alignItems: 'center', justifyContent: 'center', marginBottom: 16
+                        borderWidth: 2, 
+                        borderColor: colors.primary, 
+                        borderStyle: 'dashed', 
+                        backgroundColor: colors.surfaceStrong,
+                        borderRadius: 14, 
+                        padding: 20, 
+                        alignItems: 'center', 
+                        justifyContent: 'center', 
+                        marginBottom: 12
                       }}
                     >
                       {isUploadingImage ? (
-                        <View style={{ alignItems: 'center', gap: 8 }}>
-                          <ActivityIndicator size="large" color={colors.primary} />
-                          <Text style={{ fontSize: 13, fontWeight: '700', color: colors.primary }}>Uploading scanned pages to Cloudflare R2...</Text>
+                        <View style={{ alignItems: 'center', gap: 6 }}>
+                          <ActivityIndicator size="small" color={colors.primary} />
+                          <Text style={{ fontSize: 12, fontWeight: '700', color: colors.primary }}>Uploading scans to Cloudflare R2...</Text>
                         </View>
                       ) : (
                         <View style={{ alignItems: 'center' }}>
-                          <View style={{ width: 56, height: 56, borderRadius: 28, backgroundColor: colors.surfaceStrong, alignItems: 'center', justifyContent: 'center', marginBottom: 12 }}>
-                            <UploadCloud size={28} color={colors.primary} />
+                          <View style={{ width: 44, height: 44, borderRadius: 22, backgroundColor: colors.primary + '18', alignItems: 'center', justifyContent: 'center', marginBottom: 8 }}>
+                            <UploadCloud size={22} color={colors.primary} />
                           </View>
-                          <Text style={{ fontSize: 15, fontWeight: '900', color: colors.textPrimary, marginBottom: 4 }}>Tap to Select Multiple Pages from iPad Photos</Text>
-                          <Text style={{ fontSize: 12, color: colors.textSecondary, textAlign: 'center' }}>Auto-compressed & uploaded to Cloudflare R2</Text>
+                          <Text style={{ fontSize: 13, fontWeight: '900', color: colors.textPrimary, marginBottom: 2 }}>Tap to Select Answer Scans from iPad Photos</Text>
+                          <Text style={{ fontSize: 11, color: colors.textSecondary, textAlign: 'center' }}>Multi-page handwritten answer uploads straight to Cloudflare R2</Text>
                         </View>
                       )}
                     </TouchableOpacity>
 
                     {topperScans.length > 0 && (
-                      <View style={{ marginBottom: 18 }}>
-                        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
-                          <Text style={{ fontSize: 12, fontWeight: '900', color: colors.textPrimary, letterSpacing: 0.5 }}>UPLOADED SCANS ({topperScans.length} PAGES)</Text>
-                          <TouchableOpacity onPress={() => setTopperScans([])}><Text style={{ fontSize: 11, fontWeight: '700', color: colors.accent }}>Clear All Scans</Text></TouchableOpacity>
+                      <View style={{ marginBottom: 14 }}>
+                        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+                          <Text style={{ fontSize: 11, fontWeight: '900', color: colors.textPrimary, letterSpacing: 0.5 }}>UPLOADED SCANS ({topperScans.length} PAGES)</Text>
+                          <TouchableOpacity onPress={() => setTopperScans([])}><Text style={{ fontSize: 10.5, fontWeight: '700', color: '#ef4444' }}>Clear All</Text></TouchableOpacity>
                         </View>
-                        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 12 }}>
+                        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 10 }}>
                           {topperScans.map((url, idx) => (
-                            <View key={idx} style={{ width: 150, height: 200, borderRadius: 12, overflow: 'hidden', borderWidth: 1, borderColor: colors.border, backgroundColor: colors.surfaceStrong }}>
+                            <View key={idx} style={{ width: 120, height: 160, borderRadius: 10, overflow: 'hidden', borderWidth: 1, borderColor: colors.border, backgroundColor: colors.surfaceStrong }}>
                               <Image source={{ uri: url }} style={{ width: '100%', height: '100%' }} resizeMode="cover" />
-                              <View style={{ position: 'absolute', top: 6, left: 6, backgroundColor: 'rgba(0,0,0,0.75)', paddingHorizontal: 7, paddingVertical: 2, borderRadius: 6 }}>
-                                <Text style={{ fontSize: 10, fontWeight: '900', color: '#38bdf8' }}>Page {idx + 1}</Text>
+                              <View style={{ position: 'absolute', top: 4, left: 4, backgroundColor: 'rgba(0,0,0,0.75)', paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4 }}>
+                                <Text style={{ fontSize: 9, fontWeight: '900', color: '#38bdf8' }}>Page {idx + 1}</Text>
                               </View>
                               <TouchableOpacity onPress={() => setTopperScans(prev => prev.filter((_, i) => i !== idx))}
-                                style={{ position: 'absolute', top: 6, right: 6, width: 24, height: 24, borderRadius: 12, backgroundColor: 'rgba(239,68,68,0.9)', alignItems: 'center', justifyContent: 'center' }}>
-                                <X size={13} color="#fff" />
+                                style={{ position: 'absolute', top: 4, right: 4, width: 22, height: 22, borderRadius: 11, backgroundColor: 'rgba(239,68,68,0.9)', alignItems: 'center', justifyContent: 'center' }}>
+                                <X size={11} color="#fff" />
                               </TouchableOpacity>
-                              <View style={{ position: 'absolute', bottom: 6, left: 6, right: 6, backgroundColor: 'rgba(16,185,129,0.9)', paddingVertical: 3, borderRadius: 6, alignItems: 'center' }}>
-                                <Text style={{ fontSize: 9, fontWeight: '900', color: '#fff' }}>✓ R2 CDN LINK</Text>
-                              </View>
                             </View>
                           ))}
                         </ScrollView>
@@ -2267,22 +1973,22 @@ export function ContentManager({ headerBlock, tabSelector }: { headerBlock?: Rea
                   </View>
                 )}
 
-                {/* Dynamic Fields for ALL Content Categories */}
-                <View style={{ gap: 14 }}>
+                {/* Dynamic Form Fields for Current Category */}
+                <View style={{ gap: 12 }}>
                   {selectedHub.formFields.map((field: any) => {
                     const val = addFormValues[field.name] || '';
                     if (field.type === 'select' && field.options) {
                       return (
                         <View key={field.name}>
-                          <Text style={{ fontSize: 10, fontWeight: '800', color: colors.textSecondary, marginBottom: 4, textTransform: 'uppercase' }}>{field.label}{field.required ? ' *' : ''}</Text>
-                          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6 }}>
+                          <Text style={{ fontSize: 9.5, fontWeight: '800', color: colors.textSecondary, marginBottom: 4, textTransform: 'uppercase' }}>{field.label}{field.required ? ' *' : ''}</Text>
+                          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 5 }}>
                             {field.options.map((opt: string) => (
                               <TouchableOpacity
                                 key={opt}
                                 onPress={() => setAddFormValues(prev => ({ ...prev, [field.name]: opt }))}
-                                style={{ paddingHorizontal: 12, paddingVertical: 6, borderRadius: 8, borderWidth: 1, borderColor: val === opt ? colors.primary : colors.border, backgroundColor: val === opt ? colors.surface : colors.surfaceStrong }}
+                                style={{ paddingHorizontal: 10, paddingVertical: 5, borderRadius: 6, borderWidth: 1, borderColor: val === opt ? colors.primary : colors.border, backgroundColor: val === opt ? (colors.primary + '18') : colors.surfaceStrong }}
                               >
-                                <Text style={{ fontSize: 11, fontWeight: '800', color: val === opt ? colors.primary : colors.textPrimary }}>{opt}</Text>
+                                <Text style={{ fontSize: 10.5, fontWeight: '800', color: val === opt ? colors.primary : colors.textPrimary }}>{opt}</Text>
                               </TouchableOpacity>
                             ))}
                           </View>
@@ -2292,7 +1998,7 @@ export function ContentManager({ headerBlock, tabSelector }: { headerBlock?: Rea
                     
                     return (
                       <View key={field.name}>
-                        <Text style={{ fontSize: 10, fontWeight: '800', color: colors.textSecondary, marginBottom: 4, textTransform: 'uppercase' }}>{field.label}{field.required ? ' *' : ''}</Text>
+                        <Text style={{ fontSize: 9.5, fontWeight: '800', color: colors.textSecondary, marginBottom: 4, textTransform: 'uppercase' }}>{field.label}{field.required ? ' *' : ''}</Text>
                         <TextInput
                           multiline={field.type === 'markdown'}
                           value={val}
@@ -2301,9 +2007,13 @@ export function ContentManager({ headerBlock, tabSelector }: { headerBlock?: Rea
                           placeholderTextColor={colors.textTertiary}
                           style={{
                             backgroundColor: colors.surfaceStrong,
-                            borderWidth: 1, borderColor: colors.border, borderRadius: 10, padding: 12,
-                            color: colors.textPrimary, fontSize: 12,
-                            minHeight: field.type === 'markdown' ? 120 : 44,
+                            borderWidth: 1, 
+                            borderColor: colors.border, 
+                            borderRadius: 8, 
+                            padding: 10,
+                            color: colors.textPrimary, 
+                            fontSize: 11.5,
+                            minHeight: field.type === 'markdown' ? 100 : 40,
                             fontFamily: field.type === 'markdown' ? (Platform.OS === 'ios' ? 'Menlo' : 'monospace') : undefined,
                             textAlignVertical: field.type === 'markdown' ? 'top' : 'center'
                           }}
@@ -2313,966 +2023,598 @@ export function ContentManager({ headerBlock, tabSelector }: { headerBlock?: Rea
                   })}
                 </View>
 
-                {/* Publish Bar */}
-                <View style={{ flexDirection: 'row', justifyContent: 'flex-end', gap: 12, marginTop: 24, paddingTop: 16, borderTopWidth: 1, borderTopColor: colors.border }}>
-                  <TouchableOpacity onPress={() => { setAddFormValues({}); setTopperScans([]); }} style={{ paddingHorizontal: 16, paddingVertical: 12, borderRadius: 10, backgroundColor: colors.surfaceStrong }}>
-                    <Text style={{ fontSize: 12, fontWeight: '800', color: colors.textPrimary }}>✕ Clear All</Text>
+                {/* Form Action Buttons */}
+                <View style={{ flexDirection: 'row', justifyContent: 'flex-end', gap: 8, marginTop: 20, paddingTop: 14, borderTopWidth: 1, borderTopColor: colors.border }}>
+                  <TouchableOpacity onPress={() => { setAddFormValues({}); setTopperScans([]); }} style={{ paddingHorizontal: 12, paddingVertical: 9, borderRadius: 8, backgroundColor: colors.surfaceStrong, borderWidth: 1, borderColor: colors.border }}>
+                    <Text style={{ fontSize: 11, fontWeight: '800', color: colors.textSecondary }}>✕ Clear All</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity 
+                    onPress={() => handleDirectFormSubmit(false)} 
+                    style={{ paddingHorizontal: 12, paddingVertical: 9, borderRadius: 8, backgroundColor: colors.surfaceStrong, borderWidth: 1, borderColor: colors.border }}>
+                    <Text style={{ fontSize: 11, fontWeight: '800', color: colors.textPrimary }}>➕ Save to Staging</Text>
                   </TouchableOpacity>
                   <TouchableOpacity 
                     onPress={() => {
-                        alert("Added to Staging Queue successfully!");
+                      if (selectedHub.id === 'topper_copies') {
+                        handlePublishTopperDirect();
+                      } else {
+                        handleDirectFormSubmit(true);
+                      }
                     }} 
-                    style={{ paddingHorizontal: 16, paddingVertical: 12, borderRadius: 10, backgroundColor: colors.border }}>
-                    <Text style={{ fontSize: 12, fontWeight: '800', color: colors.textPrimary }}>➕ Save to Staging Queue</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity onPress={handlePublishTopperDirect} style={{ paddingHorizontal: 16, paddingVertical: 12, borderRadius: 10, backgroundColor: colors.primary, flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-                    <Sparkles size={14} color="#fff" />
-                    <Text style={{ fontSize: 12, fontWeight: '800', color: colors.buttonText }}>🚀 Publish Direct to Live Db</Text>
-                  </TouchableOpacity>
-                </View>
-
-              </View>
-            )}
-
-            {/* ══════ 2. FAST AUTO-DETECT JSON INGESTION ══════ */}
-            {activeSubTab === 'json' && (
-              <View>
-                {/* Feedback Alerts */}
-                {detectedHub && (
-                  <TouchableOpacity
-                    onPress={() => { setSelectedHub(detectedHub); setDetectedHub(null); }}
-                    style={[styles.feedback, { backgroundColor: '#f59e0b12', borderColor: '#f59e0b', marginBottom: 8 }]}
+                    style={{ paddingHorizontal: 14, paddingVertical: 9, borderRadius: 8, backgroundColor: colors.primary, flexDirection: 'row', alignItems: 'center', gap: 5 }}
                   >
-                    <Text style={{ fontSize: 11, color: '#b45309', flex: 1 }}>
-                      🔍 Detected: <Text style={{ fontWeight: '800' }}>{detectedHub.displayName}</Text> hub — tap to switch hub automatically
+                    <Sparkles size={13} color="#fff" />
+                    <Text style={{ fontSize: 11, fontWeight: '800', color: '#ffffff' }}>🚀 Publish Direct to Live</Text>
+                  </TouchableOpacity>
+                </View>
+
+              </View>
+            </ScrollView>
+          )}
+
+          {/* ══════ SUB-TAB 2: AI PROMPT & FAST INGEST ══════ */}
+          {activeSubTab === 'json' && (
+            <ScrollView 
+              style={{ flex: 1 }} 
+              contentContainerStyle={{ padding: 14, paddingBottom: 80 }}
+              keyboardShouldPersistTaps="handled"
+            >
+              {/* 1-Tap AI System Prompt Banner */}
+              <View style={{ backgroundColor: 'rgba(30, 27, 75, 0.4)', borderWidth: 1.5, borderColor: 'rgba(168, 85, 247, 0.4)', borderRadius: 12, padding: 12, marginBottom: 14 }}>
+                <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                    <Sparkles size={15} color="#c084fc" />
+                    <Text style={{ fontSize: 12, fontWeight: '900', color: '#c084fc' }}>
+                      AI System Prompt for {selectedHub.displayName}
+                    </Text>
+                  </View>
+                  <TouchableOpacity
+                    onPress={async () => {
+                      await Clipboard.setStringAsync(selectedHub.aiPromptTemplate);
+                      setCopiedKey('system_prompt');
+                      Alert.alert('Prompt Copied!', `Copied 4-layer taxonomy prompt for ${selectedHub.displayName} to clipboard! Paste into Gemini or Claude.`);
+                      setTimeout(() => setCopiedKey(null), 3000);
+                    }}
+                    style={{
+                      backgroundColor: copiedKey === 'system_prompt' ? '#10b981' : '#9333ea',
+                      paddingHorizontal: 10,
+                      paddingVertical: 6,
+                      borderRadius: 7,
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      gap: 4,
+                    }}
+                  >
+                    {copiedKey === 'system_prompt' ? <Check size={13} color="#fff" /> : <Copy size={13} color="#fff" />}
+                    <Text style={{ fontSize: 10.5, fontWeight: '800', color: '#ffffff' }}>
+                      {copiedKey === 'system_prompt' ? '✓ Copied' : '📋 Copy Prompt'}
                     </Text>
                   </TouchableOpacity>
-                )}
-
-                {parseError && (
-                  <View style={[styles.feedback, { backgroundColor: '#ef444412', borderColor: '#ef4444', marginBottom: 6 }]}>
-                    <AlertTriangle size={13} color="#ef4444" />
-                    <Text style={{ fontSize: 11, color: '#ef4444', flex: 1 }}>{parseError}</Text>
-                  </View>
-                )}
-                {importSuccess && (
-                  <View style={[styles.feedback, { backgroundColor: '#22c55e12', borderColor: '#22c55e', marginBottom: 6 }]}>
-                    <CheckCircle size={13} color="#22c55e" />
-                    <Text style={{ fontSize: 11, color: '#22c55e', fontWeight: '800', flex: 1 }}>{importSuccess}</Text>
-                  </View>
-                )}
-
-                {/* 2-Column Monaco Code Input & Real Card Live Preview */}
-                <View style={{ flexDirection: IS_TABLET ? 'row' : 'column', gap: 12, alignItems: 'flex-start' }}>
-                  
-                  {/* Left Sub-Column: Monaco JSON Code Editor */}
-                  <View style={{ flex: 1, width: '100%' }}>
-                    <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
-                      <Text style={[styles.sectionLabel, { color: colors.textTertiary }]}>PASTE RAW JSON FROM GEMINI / CLAUDE:</Text>
-                      <View style={{ flexDirection: 'row', gap: 6 }}>
-                        <TouchableOpacity
-                          onPress={async () => {
-                            const clip = await Clipboard.getStringAsync();
-                            if (clip) setPasteValue(clip);
-                          }}
-                          style={{ backgroundColor: 'rgba(56, 189, 248, 0.15)', paddingHorizontal: 8, paddingVertical: 3, borderRadius: 6 }}
-                        >
-                          <Text style={{ fontSize: 10, fontWeight: '800', color: '#38bdf8' }}>📋 Paste</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                          onPress={() => setPasteValue('')}
-                          style={{ backgroundColor: 'rgba(239, 68, 68, 0.15)', paddingHorizontal: 8, paddingVertical: 3, borderRadius: 6 }}
-                        >
-                          <Text style={{ fontSize: 10, fontWeight: '800', color: '#ef4444' }}>✕ Clear</Text>
-                        </TouchableOpacity>
-                      </View>
-                    </View>
-                    <TextInput
-                      multiline
-                      placeholder="Paste AI-generated JSON array here..."
-                      placeholderTextColor="#475569"
-                      value={pasteValue}
-                      onChangeText={setPasteValue}
-                      style={{
-                        backgroundColor: colors.surfaceStrong,
-                        borderWidth: 1,
-                        borderColor: colors.border,
-                        borderRadius: 12,
-                        padding: 12,
-                        color: '#38bdf8',
-                        fontSize: 11.5,
-                        fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace',
-                        minHeight: 280,
-                        maxHeight: 450,
-                      }}
-                    />
-                  </View>
-
-                  {/* Right Sub-Column: Live UPSC Card Preview */}
-                  <View style={{ flex: 1, width: '100%' }}>
-                    <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
-                      <Text style={[styles.sectionLabel, { color: colors.textTertiary }]}>LIVE UPSC CARD PREVIEW:</Text>
-                      {parsedPreview.length > 0 && (
-                        <View style={{ backgroundColor: '#10b98120', paddingHorizontal: 8, paddingVertical: 2, borderRadius: 6 }}>
-                          <Text style={{ fontSize: 10, fontWeight: '800', color: '#10b981' }}>{parsedPreview.length} Card{parsedPreview.length > 1 ? 's' : ''} Ready</Text>
-                        </View>
-                      )}
-                    </View>
-                    {parsedPreview.length === 0 ? (
-                      <View style={{ borderWidth: 1.5, borderStyle: 'dashed', borderColor: colors.border, backgroundColor: colors.surfaceStrong, borderRadius: 12, padding: 30, alignItems: 'center', justifyContent: 'center', minHeight: 280 }}>
-                        <Text style={{ fontSize: 11, color: colors.textTertiary, textAlign: 'center', fontStyle: 'italic', lineHeight: 18 }}>
-                          Paste JSON output on the left.{'\n'}Live UPSC questions, MCQs, or Topper Copies render here in real-time.
-                        </Text>
-                      </View>
-                    ) : (
-                      <View>
-                        {parsedPreview.map((item, idx) => (
-                          <View key={idx} style={{ marginBottom: 16 }}>
-                            {parsedPreview.length > 1 && (
-                              <View style={{ backgroundColor: colors.primary + '15', borderRadius: 6, paddingHorizontal: 8, paddingVertical: 3, marginBottom: 6, alignSelf: 'flex-start' }}>
-                                <Text style={{ fontSize: 9, fontWeight: '900', color: colors.primary }}>CARD {idx + 1} / {parsedPreview.length}</Text>
-                              </View>
-                            )}
-                            <HubCardPreview item={item} hub={hubInUse} colors={colors} />
-                          </View>
-                        ))}
-                      </View>
-                    )}
-                  </View>
                 </View>
+                <Text style={{ fontSize: 10.5, color: colors.textSecondary, lineHeight: 15 }}>
+                  Enforces full 4-layer taxonomy structure (paper → subject → unit → microtopic). Paste into Gemini/Claude on iPad.
+                </Text>
+              </View>
 
-                {/* Push to Staging Button */}
+              {/* Feedback Alerts */}
+              {detectedHub && (
                 <TouchableOpacity
-                  onPress={handleImport}
-                  disabled={isImporting || parsedPreview.length === 0}
-                  style={{
-                    backgroundColor: parsedPreview.length > 0 && !isImporting ? '#10b981' : colors.border,
-                    paddingVertical: 14,
-                    borderRadius: 12,
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    marginTop: 16,
-                  }}
+                  onPress={() => { setSelectedHub(detectedHub); setDetectedHub(null); }}
+                  style={[styles.feedback, { backgroundColor: '#f59e0b12', borderColor: '#f59e0b', marginBottom: 8 }]}
                 >
-                  {isImporting ? (
-                    <ActivityIndicator size={18} color="#FFF" />
-                  ) : (
-                    <Text style={{ fontSize: 13.5, fontWeight: '900', color: '#ffffff' }}>
-                      {parsedPreview.length > 0
-                        ? `🚀 Validate & Push ${parsedPreview.length} Card${parsedPreview.length > 1 ? 's' : ''} → Supabase Staging`
-                        : 'Validate & Push to Staging'}
-                    </Text>
-                  )}
+                  <Text style={{ fontSize: 11, color: '#b45309', flex: 1 }}>
+                    🔍 Detected: <Text style={{ fontWeight: '800' }}>{detectedHub.displayName}</Text> hub — tap to switch automatically
+                  </Text>
                 </TouchableOpacity>
-              </View>
-            )}
+              )}
 
-            {/* ══════ STAGING TAB CONTENT ══════ */}
-            {activeSubTab === 'staging' && (
-              <View>
-                <View style={[styles.searchBox, { borderColor: colors.border, backgroundColor: colors.surface, marginBottom: 10 }]}>
-                  <Search size={14} color={colors.textTertiary} />
-                  <TextInput placeholder="Search drafts…" placeholderTextColor={colors.textTertiary} value={liveSearch} onChangeText={setLiveSearch} style={{ flex: 1, color: colors.textPrimary, paddingLeft: 6, fontSize: 13 }} />
-                  {liveSearch.length > 0 && <TouchableOpacity onPress={() => setLiveSearch('')}><X size={13} color={colors.textTertiary} /></TouchableOpacity>}
+              {parseError && (
+                <View style={[styles.feedback, { backgroundColor: '#ef444412', borderColor: '#ef4444', marginBottom: 8 }]}>
+                  <AlertTriangle size={13} color="#ef4444" />
+                  <Text style={{ fontSize: 11, color: '#ef4444', flex: 1 }}>{parseError}</Text>
                 </View>
-
-                {loadingItems
-                  ? <ActivityIndicator color={colors.primary} style={{ marginTop: 30 }} />
-                  : filteredItems.length === 0
-                    ? <Text style={{ textAlign: 'center', color: colors.textTertiary, fontStyle: 'italic', marginTop: 30 }}>No draft items.</Text>
-                    : (
-                      <View>
-                        <Text style={{ fontSize: 10, color: colors.textTertiary, marginBottom: 6 }}>
-                          {filteredItems.length} of {itemList.length} drafts {bulkMode ? `(Selected: ${selectedIds.size})` : ''}
-                        </Text>
-                        {filteredItems.map(item => (
-                          <View key={item.id} style={{ flexDirection: 'row', alignItems: 'center' }}>
-                            {bulkMode && (
-                              <TouchableOpacity 
-                                onPress={() => toggleSelect(item.id)} 
-                                style={{
-                                  marginRight: 10,
-                                  width: 20,
-                                  height: 20,
-                                  borderRadius: 6,
-                                  borderWidth: 2,
-                                  borderColor: selectedIds.has(item.id) ? colors.primary : colors.border,
-                                  alignItems: 'center',
-                                  justifyContent: 'center',
-                                  backgroundColor: selectedIds.has(item.id) ? colors.primary : 'transparent'
-                                }}
-                              >
-                                {selectedIds.has(item.id) && <Check size={12} color="#fff" strokeWidth={3} />}
-                              </TouchableOpacity>
-                            )}
-                            <View style={{ flex: 1 }}>
-                              <ItemCard item={item} colors={colors} isStaging
-                                onPublish={() => handlePublish(item.id)}
-                                onEdit={() => handleOpenEdit(item)}
-                                onDelete={() => handleDelete(item.id)}
-                              />
-                            </View>
-                          </View>
-                        ))}
-
-                        {/* Staging Load More */}
-                        {hasMore && (
-                          <TouchableOpacity 
-                            onPress={() => fetchItems(false)} 
-                            disabled={loadingMore}
-                            style={{
-                              margin: 16,
-                              paddingVertical: 12,
-                              backgroundColor: colors.surfaceStrong,
-                              borderColor: colors.border,
-                              borderWidth: 1,
-                              borderRadius: 10,
-                              alignItems: 'center',
-                              justifyContent: 'center'
-                            }}
-                          >
-                            {loadingMore ? (
-                              <ActivityIndicator size={16} color={colors.primary} />
-                            ) : (
-                              <Text style={{ fontSize: 11.5, fontWeight: '800', color: colors.primary }}>
-                                Load More Items
-                              </Text>
-                            )}
-                          </TouchableOpacity>
-                        )}
-                      </View>
-                    )}
-              </View>
-            )}
-
-            {/* ══════ LIVE TAB CONTENT ══════ */}
-            {activeSubTab === 'live' && (
-              <View>
-                <View style={[styles.searchBox, { borderColor: colors.border, backgroundColor: colors.surface, marginBottom: 8 }]}>
-                  <Search size={14} color={colors.textTertiary} />
-                  <TextInput placeholder="Search live items…" placeholderTextColor={colors.textTertiary} value={liveSearch} onChangeText={setLiveSearch} style={{ flex: 1, color: colors.textPrimary, paddingLeft: 6, fontSize: 13 }} />
-                  {liveSearch.length > 0 && <TouchableOpacity onPress={() => setLiveSearch('')}><X size={13} color={colors.textTertiary} /></TouchableOpacity>}
-                </View>
-                
-                <Text style={{ fontSize: 10, color: colors.textTertiary, marginBottom: 6 }}>
-                  {filteredItems.length} of {itemList.length} items {bulkMode ? `(Selected: ${selectedIds.size})` : ''}
-                </Text>
-
-                {loadingItems
-                  ? <ActivityIndicator color={colors.primary} style={{ marginTop: 30 }} />
-                  : filteredItems.length === 0
-                    ? <Text style={{ textAlign: 'center', color: colors.textTertiary, fontStyle: 'italic', marginTop: 30 }}>No items match.</Text>
-                    : (
-                      <View>
-                        {filteredItems.map(item => (
-                          <View key={item.id} style={{ flexDirection: 'row', alignItems: 'center' }}>
-                            {bulkMode && (
-                              <TouchableOpacity 
-                                onPress={() => toggleSelect(item.id)} 
-                                style={{
-                                  marginRight: 10,
-                                  width: 20,
-                                  height: 20,
-                                  borderRadius: 6,
-                                  borderWidth: 2,
-                                  borderColor: selectedIds.has(item.id) ? colors.primary : colors.border,
-                                  alignItems: 'center',
-                                  justifyContent: 'center',
-                                  backgroundColor: selectedIds.has(item.id) ? colors.primary : 'transparent'
-                                }}
-                              >
-                                {selectedIds.has(item.id) && <Check size={12} color="#fff" strokeWidth={3} />}
-                              </TouchableOpacity>
-                            )}
-                            <View style={{ flex: 1 }}>
-                              <ItemCard item={item} colors={colors} isStaging={false}
-                                onPublish={() => {}} onEdit={() => handleOpenEdit(item)} onDelete={() => handleDelete(item.id)}
-                              />
-                            </View>
-                          </View>
-                        ))}
-
-                        {/* Live Load More */}
-                        {hasMore && (
-                          <TouchableOpacity 
-                            onPress={() => fetchItems(false)} 
-                            disabled={loadingMore}
-                            style={{
-                              margin: 16,
-                              paddingVertical: 12,
-                              backgroundColor: colors.surfaceStrong,
-                              borderColor: colors.border,
-                              borderWidth: 1,
-                              borderRadius: 10,
-                              alignItems: 'center',
-                              justifyContent: 'center'
-                            }}
-                          >
-                            {loadingMore ? (
-                              <ActivityIndicator size={16} color={colors.primary} />
-                            ) : (
-                              <Text style={{ fontSize: 11.5, fontWeight: '800', color: colors.primary }}>
-                                Load More Items
-                              </Text>
-                            )}
-                          </TouchableOpacity>
-                        )}
-                      </View>
-                    )}
-              </View>
-            )}
-          </ScrollView>
-        </View>
-      </View>
-      </View>
-      </View>
-
-      {/* ── BROWSE HIERARCHY SELECTOR MODAL ── */}
-      <Modal visible={hierarchyModalVisible} transparent animationType="slide">
-        <View style={styles.overlay}>
-          <View style={[styles.sheet, { backgroundColor: colors.surface, height: '85%' }]}>
-            <View style={styles.modalHeader}>
-              <Text style={{ fontSize: 15, fontWeight: '900', color: colors.textPrimary }}>Browse Syllabus Topics</Text>
-              <TouchableOpacity onPress={() => setHierarchyModalVisible(false)}><X size={20} color={colors.textTertiary} /></TouchableOpacity>
-            </View>
-
-            <ScrollView style={{ flex: 1, paddingHorizontal: 4 }} showsVerticalScrollIndicator={false}>
-              {Object.entries(syllabusData).map(([paper, subMap]) => {
-                const isPaperExpanded = !!expandedKeys[paper];
-                return (
-                  <View key={paper} style={{ marginBottom: 10 }}>
-                    <TouchableOpacity
-                      onPress={() => setExpandedKeys(prev => ({ ...prev, [paper]: !prev[paper] }))}
-                      style={{
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                        backgroundColor: isPaperExpanded ? `${colors.primary}10` : 'transparent',
-                        padding: 8,
-                        borderRadius: 8,
-                        marginBottom: 4
-                      }}
-                    >
-                      <ChevronRight size={16} color={colors.primary} style={{ transform: [{ rotate: isPaperExpanded ? '90deg' : '0deg' }], marginRight: 6 }} />
-                      <Text style={{ fontSize: 13, fontWeight: '900', color: colors.primary }}>{paper}</Text>
-                    </TouchableOpacity>
-
-                    {isPaperExpanded && Object.entries(subMap).map(([subject, secMap]) => {
-                      const subjectKey = `${paper}|${subject}`;
-                      const isSubjectExpanded = !!expandedKeys[subjectKey];
-                      return (
-                        <View key={subject} style={{ paddingLeft: 12, borderLeftWidth: 1.5, borderLeftColor: colors.border, marginBottom: 6, marginLeft: 8 }}>
-                          <TouchableOpacity
-                            onPress={() => setExpandedKeys(prev => ({ ...prev, [subjectKey]: !prev[subjectKey] }))}
-                            style={{
-                              flexDirection: 'row',
-                              alignItems: 'center',
-                              paddingVertical: 4
-                            }}
-                          >
-                            <ChevronRight size={14} color={colors.textPrimary} style={{ transform: [{ rotate: isSubjectExpanded ? '90deg' : '0deg' }], marginRight: 4 }} />
-                            <Text style={{ fontSize: 11.5, fontWeight: '800', color: colors.textPrimary }}>{subject}</Text>
-                          </TouchableOpacity>
-
-                          {isSubjectExpanded && Object.entries(secMap).map(([section, microMap]) => {
-                            const sectionKey = `${subjectKey}|${section}`;
-                            const isSectionExpanded = !!expandedKeys[sectionKey];
-                            return (
-                              <View key={section} style={{ paddingLeft: 12, marginBottom: 4 }}>
-                                <TouchableOpacity
-                                  onPress={() => setExpandedKeys(prev => ({ ...prev, [sectionKey]: !prev[sectionKey] }))}
-                                  style={{
-                                    flexDirection: 'row',
-                                    alignItems: 'center',
-                                    paddingVertical: 3
-                                  }}
-                                >
-                                  <ChevronRight size={12} color={colors.textSecondary} style={{ transform: [{ rotate: isSectionExpanded ? '90deg' : '0deg' }], marginRight: 4 }} />
-                                  <Text style={{ fontSize: 10.5, fontWeight: '700', color: colors.textSecondary }}>📁 {section}</Text>
-                                </TouchableOpacity>
-
-                                {isSectionExpanded && Object.entries(microMap).map(([micro, node]) => {
-                                  const microKey = `${sectionKey}|${micro}`;
-                                  const isMicroExpanded = !!expandedKeys[microKey];
-                                  const hasSubtopics = node.subtopics && node.subtopics.length > 0;
-                                  return (
-                                    <View key={micro} style={{ paddingLeft: 12, marginBottom: 2 }}>
-                                      <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                        {hasSubtopics && (
-                                          <TouchableOpacity
-                                            onPress={() => setExpandedKeys(prev => ({ ...prev, [microKey]: !prev[microKey] }))}
-                                            style={{ padding: 4 }}
-                                          >
-                                            <ChevronRight size={10} color={colors.textTertiary} style={{ transform: [{ rotate: isMicroExpanded ? '90deg' : '0deg' }] }} />
-                                          </TouchableOpacity>
-                                        )}
-                                        <TouchableOpacity
-                                          onPress={() => {
-                                            setFilterPaper(paper);
-                                            setFilterSubject(subject);
-                                            setFilterSection(section);
-                                            setFilterMicro(micro);
-                                            setFilterSubtopic('');
-                                            setFilterNanotopic('');
-                                            setHierarchyModalVisible(false);
-                                          }}
-                                          style={{ flex: 1, paddingVertical: 2, paddingLeft: hasSubtopics ? 0 : 12 }}
-                                        >
-                                          <Text style={{ fontSize: 10, fontWeight: '600', color: colors.textTertiary }}>🔍 {micro}</Text>
-                                        </TouchableOpacity>
-                                      </View>
-
-                                      {isMicroExpanded && hasSubtopics && node.subtopics.map(sub => (
-                                        <TouchableOpacity
-                                          key={sub}
-                                          onPress={() => {
-                                            setFilterPaper(paper);
-                                            setFilterSubject(subject);
-                                            setFilterSection(section);
-                                            setFilterMicro(micro);
-                                            setFilterSubtopic(sub);
-                                            setFilterNanotopic('');
-                                            setHierarchyModalVisible(false);
-                                          }}
-                                          style={{ paddingLeft: 24, paddingVertical: 2 }}
-                                        >
-                                          <Text style={{ fontSize: 9.5, color: '#3b82f6', textDecorationLine: 'underline' }}>📌 {sub}</Text>
-                                        </TouchableOpacity>
-                                      ))}
-                                    </View>
-                                  );
-                                })}
-                              </View>
-                            );
-                          })}
-                        </View>
-                      );
-                    })}
-                  </View>
-                );
-              })}
-            </ScrollView>
-          </View>
-        </View>
-      </Modal>
-
-      {/* ══════ EDIT MODAL (With Relational Question Editor Modal + Live Markdown Preview Tab) ══════ */}
-      <Modal visible={editModalVisible} transparent animationType="slide">
-        <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-          <View style={styles.overlay}>
-            <View style={[styles.sheet, { backgroundColor: colors.surface, height: '85%' }]}>
-              <View style={styles.modalHeader}>
-                <Text style={{ fontSize: 15, fontWeight: '900', color: colors.textPrimary }}>
-                  Edit {selectedHub.id === 'mains_questions' ? 'Question Bank Card' : 'Card'}
-                </Text>
-                <TouchableOpacity onPress={() => setEditModalVisible(false)}><X size={20} color={colors.textTertiary} /></TouchableOpacity>
-              </View>
-
-              {selectedHub.id === 'mains_questions' ? (
-                // ── RELATIONAL QUESTION BANK EDITOR LAYOUT ──
-                <View style={{ flex: 1, minHeight: 380 }}>
-                  {/* Segmented controls: Edit vs Preview */}
-                  <View style={{ flexDirection: 'row', borderBottomWidth: 1, borderBottomColor: colors.border, marginBottom: 12 }}>
-                    <TouchableOpacity 
-                      onPress={() => setEditActiveTab('edit')} 
-                      style={{ flex: 1, paddingVertical: 10, alignItems: 'center', borderBottomWidth: 2, borderBottomColor: editActiveTab === 'edit' ? colors.primary : 'transparent' }}
-                    >
-                      <Text style={{ fontSize: 11, fontWeight: '800', color: editActiveTab === 'edit' ? colors.primary : colors.textTertiary }}>✏️ Edit Fields</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity 
-                      onPress={() => setEditActiveTab('json')} 
-                      style={{ flex: 1, paddingVertical: 10, alignItems: 'center', borderBottomWidth: 2, borderBottomColor: editActiveTab === 'json' ? '#f59e0b' : 'transparent' }}
-                    >
-                      <Text style={{ fontSize: 11, fontWeight: '800', color: editActiveTab === 'json' ? '#f59e0b' : colors.textTertiary }}>{'{ }'} JSON</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity 
-                      onPress={() => setEditActiveTab('preview')} 
-                      style={{ flex: 1, paddingVertical: 10, alignItems: 'center', borderBottomWidth: 2, borderBottomColor: editActiveTab === 'preview' ? colors.primary : 'transparent' }}
-                    >
-                      <Text style={{ fontSize: 11, fontWeight: '800', color: editActiveTab === 'preview' ? colors.primary : colors.textTertiary }}>👁️ Preview</Text>
-                    </TouchableOpacity>
-                  </View>
-
-                  {editActiveTab === 'json' ? (
-                    // ── JSON PASTE EDITOR TAB ──
-                    <View style={{ flex: 1, marginBottom: 12 }}>
-                      <Text style={{ fontSize: 10, fontWeight: '800', color: colors.textTertiary, marginBottom: 6 }}>
-                        Paste ChatGPT JSON below — all fields + answers array will be applied.
-                      </Text>
-                      <TextInput
-                        multiline
-                        value={editJsonText}
-                        onChangeText={t => { setEditJsonText(t); setEditJsonError(''); }}
-                        style={[
-                          styles.formInput,
-                          { color: '#10b981', backgroundColor: colors.surface, fontFamily: 'monospace',
-                            fontSize: 11, minHeight: 260, flex: 1, borderColor: editJsonError ? '#ef4444' : '#334155' }
-                        ]}
-                        placeholder={'{\n  "questionText": "...",\n  "marks": "15",\n  "paper": "GS2",\n  "answers": [{ "institute": "Vision IAS", "answer_text": "..." }]\n}'}
-                        placeholderTextColor="#475569"
-                        autoCorrect={false}
-                        autoCapitalize="none"
-                      />
-                      {!!editJsonError && (
-                        <Text style={{ color: '#ef4444', fontSize: 10, marginTop: 4 }}>⚠️ {editJsonError}</Text>
-                      )}
-                      <TouchableOpacity
-                        onPress={async () => {
-                          await Clipboard.setStringAsync(editJsonText);
-                          Alert.alert('Copied', 'JSON copied to clipboard!');
-                        }}
-                        style={[styles.importBtn, { backgroundColor: colors.border, marginTop: 10, marginBottom: 4 }]}
-                      >
-                        <Text style={[styles.importBtnText, { color: colors.textPrimary }]}>📋 Copy JSON to Clipboard</Text>
-                      </TouchableOpacity>
-                      <TouchableOpacity
-                        onPress={() => {
-                          try {
-                            const parsed = JSON.parse(editJsonText);
-                            // Apply scalar fields to editFormValues
-                            const newVals: Record<string, any> = { ...editFormValues };
-                            Object.keys(parsed).forEach(key => {
-                              if (key !== 'answers' && key !== 'mains_answers') {
-                                newVals[key] = parsed[key];
-                              }
-                            });
-                            setEditFormValues(newVals);
-                            // Apply answers array if present
-                            const ans = parsed.answers || parsed.mains_answers;
-                            if (Array.isArray(ans)) {
-                              setEditingAnswers(ans.map((a: any, i: number) => ({
-                                id: (editingAnswers[i] || {}).id || undefined,
-                                institute: a.institute || a.source || `Answer ${i + 1}`,
-                                answer_text: a.answer_text || a.answerText || a.text || '',
-                              })));
-                            }
-                            setEditJsonError('');
-                            setEditActiveTab('edit'); // switch to field view to confirm
-                          } catch (e: any) {
-                            setEditJsonError(e.message);
-                          }
-                        }}
-                        style={[styles.importBtn, { backgroundColor: '#f59e0b', marginTop: 4 }]}
-                      >
-                        <Text style={styles.importBtnText}>⚡ Apply JSON → Fields</Text>
-                      </TouchableOpacity>
-                    </View>
-                  ) : editActiveTab === 'edit' ? (
-                    <ScrollView style={{ flex: 1, marginBottom: 12 }} showsVerticalScrollIndicator={false}>
-                      {/* Question Text */}
-                      <View style={{ marginBottom: 10 }}>
-                        <Text style={{ fontSize: 10, fontWeight: '800', color: colors.textTertiary, marginBottom: 3 }}>Question Text *</Text>
-                        <TextInput
-                          multiline
-                          value={editFormValues.questionText || ''}
-                          onChangeText={t => setEditFormValues(prev => ({ ...prev, questionText: t }))}
-                          style={[styles.formInput, { color: colors.textPrimary, borderColor: colors.border, minHeight: 80 }]}
-                        />
-                      </View>
-
-                      {/* Marks, Year & PYQ Status */}
-                      <View style={{ flexDirection: 'row', gap: 10, marginBottom: 10 }}>
-                        <View style={{ flex: 1 }}>
-                          <Text style={{ fontSize: 10, fontWeight: '800', color: colors.textTertiary, marginBottom: 3 }}>Marks *</Text>
-                          <TextInput
-                            value={editFormValues.marks || ''}
-                            onChangeText={t => setEditFormValues(prev => ({ ...prev, marks: t }))}
-                            style={[styles.formInput, { color: colors.textPrimary, borderColor: colors.border, minHeight: 36 }]}
-                          />
-                        </View>
-                        <View style={{ flex: 1 }}>
-                          <Text style={{ fontSize: 10, fontWeight: '800', color: colors.textTertiary, marginBottom: 3 }}>Exam Year *</Text>
-                          <TextInput
-                            value={editFormValues.year || ''}
-                            onChangeText={t => setEditFormValues(prev => ({ ...prev, year: t }))}
-                            style={[styles.formInput, { color: colors.textPrimary, borderColor: colors.border, minHeight: 36 }]}
-                          />
-                        </View>
-                        <View style={{ flex: 1, justifyContent: 'center' }}>
-                          <Text style={{ fontSize: 10, fontWeight: '800', color: colors.textTertiary, marginBottom: 3 }}>Is PYQ?</Text>
-                          <TouchableOpacity
-                            onPress={() => setEditFormValues(prev => ({ ...prev, is_pyq: !(prev.is_pyq === 'true' || prev.is_pyq === true) }))}
-                            style={{
-                              backgroundColor: editFormValues.is_pyq === 'true' || editFormValues.is_pyq === true ? '#22c55e' : colors.border,
-                              paddingVertical: 8,
-                              borderRadius: 8,
-                              alignItems: 'center'
-                            }}
-                          >
-                            <Text style={{ color: '#fff', fontSize: 11, fontWeight: '800' }}>
-                              {editFormValues.is_pyq === 'true' || editFormValues.is_pyq === true ? 'YES' : 'NO'}
-                            </Text>
-                          </TouchableOpacity>
-                        </View>
-                      </View>
-
-                      {/* Paper, Subject, Section Group */}
-                      <View style={{ marginBottom: 10 }}>
-                        <Text style={{ fontSize: 10, fontWeight: '800', color: colors.textTertiary, marginBottom: 3 }}>Paper *</Text>
-                        <TextInput
-                          value={editFormValues.paper || ''}
-                          onChangeText={t => setEditFormValues(prev => ({ ...prev, paper: t }))}
-                          style={[styles.formInput, { color: colors.textPrimary, borderColor: colors.border, minHeight: 36 }]}
-                        />
-                      </View>
-                      <View style={{ marginBottom: 10 }}>
-                        <Text style={{ fontSize: 10, fontWeight: '800', color: colors.textTertiary, marginBottom: 3 }}>Subject *</Text>
-                        <TextInput
-                          value={editFormValues.subject || ''}
-                          onChangeText={t => setEditFormValues(prev => ({ ...prev, subject: t }))}
-                          style={[styles.formInput, { color: colors.textPrimary, borderColor: colors.border, minHeight: 36 }]}
-                        />
-                      </View>
-                      <View style={{ marginBottom: 10 }}>
-                        <Text style={{ fontSize: 10, fontWeight: '800', color: colors.textTertiary, marginBottom: 3 }}>Section Group *</Text>
-                        <TextInput
-                          value={editFormValues.sectionGroup || ''}
-                          onChangeText={t => setEditFormValues(prev => ({ ...prev, sectionGroup: t }))}
-                          style={[styles.formInput, { color: colors.textPrimary, borderColor: colors.border, minHeight: 36 }]}
-                        />
-                      </View>
-                      <View style={{ marginBottom: 10 }}>
-                        <Text style={{ fontSize: 10, fontWeight: '800', color: colors.textTertiary, marginBottom: 3 }}>Microtopic</Text>
-                        <TextInput
-                          value={editFormValues.microTopic || ''}
-                          onChangeText={t => setEditFormValues(prev => ({ ...prev, microTopic: t }))}
-                          style={[styles.formInput, { color: colors.textPrimary, borderColor: colors.border, minHeight: 36 }]}
-                        />
-                      </View>
-                      <View style={{ marginBottom: 10 }}>
-                        <Text style={{ fontSize: 10, fontWeight: '800', color: colors.textTertiary, marginBottom: 3 }}>Subtopic</Text>
-                        <TextInput
-                          value={editFormValues.subTopic || ''}
-                          onChangeText={t => setEditFormValues(prev => ({ ...prev, subTopic: t }))}
-                          style={[styles.formInput, { color: colors.textPrimary, borderColor: colors.border, minHeight: 36 }]}
-                        />
-                      </View>
-                      <View style={{ marginBottom: 10 }}>
-                        <Text style={{ fontSize: 10, fontWeight: '800', color: colors.textTertiary, marginBottom: 3 }}>Nanotopic (5th layer)</Text>
-                        <TextInput
-                          value={editFormValues.nanotopic || ''}
-                          onChangeText={t => setEditFormValues(prev => ({ ...prev, nanotopic: t }))}
-                          style={[styles.formInput, { color: colors.textPrimary, borderColor: colors.border, minHeight: 36 }]}
-                        />
-                      </View>
-
-                      {/* Relational Answers Editing Section */}
-                      <View style={{ marginTop: 16, borderTopWidth: 1, borderTopColor: colors.border, paddingTop: 16 }}>
-                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-                          <Text style={{ fontSize: 12, fontWeight: '900', color: colors.textPrimary }}>Model Answers ({editingAnswers.length})</Text>
-                          <TouchableOpacity 
-                            onPress={() => setEditingAnswers(prev => [...prev, { institute: 'New Institute', answer_text: '' }])}
-                            style={{ backgroundColor: colors.primary + '15', paddingHorizontal: 10, paddingVertical: 6, borderRadius: 8 }}
-                          >
-                            <Text style={{ fontSize: 11, fontWeight: '800', color: colors.primary }}>+ Add Answer</Text>
-                          </TouchableOpacity>
-                        </View>
-
-                        {editingAnswers.map((ans, idx) => (
-                          <View key={idx} style={{ padding: 10, borderRadius: 10, borderWidth: 1, borderColor: colors.border, backgroundColor: colors.bg, marginBottom: 12 }}>
-                            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
-                              <Text style={{ fontSize: 10, fontWeight: '800', color: colors.textSecondary }}>Answer #{idx + 1}</Text>
-                              <TouchableOpacity 
-                                onPress={() => {
-                                  if (ans.id) {
-                                    setDeletedAnswerIds(prev => [...prev, ans.id]);
-                                  }
-                                  setEditingAnswers(prev => prev.filter((_, i) => i !== idx));
-                                }}
-                                style={{ padding: 4 }}
-                              >
-                                <Trash2 size={13} color="#ef4444" />
-                              </TouchableOpacity>
-                            </View>
-                            <View style={{ marginBottom: 6 }}>
-                              <Text style={{ fontSize: 9, fontWeight: '700', color: colors.textTertiary, marginBottom: 2 }}>Institute *</Text>
-                              <TextInput
-                                value={ans.institute}
-                                onChangeText={t => {
-                                  const next = [...editingAnswers];
-                                  next[idx].institute = t;
-                                  setEditingAnswers(next);
-                                }}
-                                style={[styles.formInput, { color: colors.textPrimary, borderColor: colors.border, minHeight: 32 }]}
-                              />
-                            </View>
-                            <View>
-                              <Text style={{ fontSize: 9, fontWeight: '700', color: colors.textTertiary, marginBottom: 2 }}>Answer Markdown *</Text>
-                              <TextInput
-                                multiline
-                                value={ans.answer_text}
-                                onChangeText={t => {
-                                  const next = [...editingAnswers];
-                                  next[idx].answer_text = t;
-                                  setEditingAnswers(next);
-                                }}
-                                style={[styles.formInput, { color: colors.textPrimary, borderColor: colors.border, minHeight: 120 }]}
-                              />
-                            </View>
-                          </View>
-                        ))}
-                      </View>
-                    </ScrollView>
-                  ) : (
-                    // ── LIVE MARKDOWN RENDERING PREVIEW TAB ──
-                    <View style={{ flex: 1, marginBottom: 12 }}>
-                      {editingAnswers.length === 0 ? (
-                        <Text style={{ fontStyle: 'italic', color: colors.textTertiary, textAlign: 'center', marginTop: 40 }}>No answers drafted yet.</Text>
-                      ) : (
-                        <View style={{ flex: 1 }}>
-                          {/* Horizontal selector for active answer preview */}
-                          <View style={{ marginBottom: 8 }}>
-                            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 6 }}>
-                              {editingAnswers.map((ans, idx) => {
-                                const active = activePreviewAnswerIndex === idx;
-                                return (
-                                  <TouchableOpacity
-                                    key={idx}
-                                    onPress={() => setActivePreviewAnswerIndex(idx)}
-                                    style={{
-                                      paddingHorizontal: 12,
-                                      paddingVertical: 6,
-                                      borderRadius: 14,
-                                      backgroundColor: active ? colors.primary : colors.border,
-                                    }}
-                                  >
-                                    <Text style={{ fontSize: 10, fontWeight: '800', color: active ? '#fff' : colors.textSecondary }}>
-                                      {ans.institute || `Answer ${idx + 1}`}
-                                    </Text>
-                                  </TouchableOpacity>
-                                );
-                              })}
-                            </ScrollView>
-                          </View>
-
-                          <ScrollView style={{ flex: 1, backgroundColor: colors.bg, padding: 12, borderRadius: 12, borderWidth: 1, borderColor: colors.border }}>
-                            <Text style={{ fontSize: 13, fontWeight: '900', color: colors.textPrimary, marginBottom: 12 }}>
-                              {editFormValues.questionText}
-                            </Text>
-                            <Markdown style={getMarkdownStyles(colors)}>
-                              {editingAnswers[activePreviewAnswerIndex]?.answer_text || ''}
-                            </Markdown>
-                          </ScrollView>
-                        </View>
-                      )}
-                    </View>
-                  )}
-                </View>
-              ) : (
-                // ── GENERIC CARD METADATA EDITOR ──
-                <View style={{ flex: 1, minHeight: 380 }}>
-                  {/* Tab bar: Fields | JSON */}
-                  <View style={{ flexDirection: 'row', borderBottomWidth: 1, borderBottomColor: colors.border, marginBottom: 12 }}>
-                    <TouchableOpacity
-                      onPress={() => setEditActiveTab('edit')}
-                      style={{ flex: 1, paddingVertical: 10, alignItems: 'center', borderBottomWidth: 2, borderBottomColor: editActiveTab === 'edit' ? colors.primary : 'transparent' }}
-                    >
-                      <Text style={{ fontSize: 11, fontWeight: '800', color: editActiveTab === 'edit' ? colors.primary : colors.textTertiary }}>✏️ Edit Fields</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      onPress={() => setEditActiveTab('json')}
-                      style={{ flex: 1, paddingVertical: 10, alignItems: 'center', borderBottomWidth: 2, borderBottomColor: editActiveTab === 'json' ? '#f59e0b' : 'transparent' }}
-                    >
-                      <Text style={{ fontSize: 11, fontWeight: '800', color: editActiveTab === 'json' ? '#f59e0b' : colors.textTertiary }}>{'{ }'} JSON</Text>
-                    </TouchableOpacity>
-                  </View>
-
-                  {editActiveTab === 'json' ? (
-                    <View style={{ flex: 1, marginBottom: 12 }}>
-                      <Text style={{ fontSize: 10, fontWeight: '800', color: colors.textTertiary, marginBottom: 6 }}>
-                        Paste ChatGPT JSON — all fields will be applied.
-                      </Text>
-                      <TextInput
-                        multiline
-                        value={editJsonText}
-                        onChangeText={t => { setEditJsonText(t); setEditJsonError(''); }}
-                        style={[
-                          styles.formInput,
-                          { color: '#10b981', backgroundColor: colors.surface, fontFamily: 'monospace',
-                            fontSize: 11, minHeight: 260, borderColor: editJsonError ? '#ef4444' : '#334155' }
-                        ]}
-                        placeholder={'{\n  "title": "...",\n  "content": "..."\n}'}
-                        placeholderTextColor="#475569"
-                        autoCorrect={false}
-                        autoCapitalize="none"
-                      />
-                      {!!editJsonError && (
-                        <Text style={{ color: '#ef4444', fontSize: 10, marginTop: 4 }}>⚠️ {editJsonError}</Text>
-                      )}
-                      <TouchableOpacity
-                        onPress={async () => {
-                          await Clipboard.setStringAsync(editJsonText);
-                          Alert.alert('Copied', 'JSON copied to clipboard!');
-                        }}
-                        style={[styles.importBtn, { backgroundColor: colors.border, marginTop: 10, marginBottom: 4 }]}
-                      >
-                        <Text style={[styles.importBtnText, { color: colors.textPrimary }]}>📋 Copy JSON to Clipboard</Text>
-                      </TouchableOpacity>
-                      <TouchableOpacity
-                        onPress={() => {
-                          try {
-                            const parsed = JSON.parse(editJsonText);
-                            const newVals: Record<string, any> = { ...editFormValues };
-                            Object.keys(parsed).forEach(key => { newVals[key] = parsed[key]; });
-                            setEditFormValues(newVals);
-                            setEditJsonError('');
-                            setEditActiveTab('edit');
-                          } catch (e: any) {
-                            setEditJsonError(e.message);
-                          }
-                        }}
-                        style={[styles.importBtn, { backgroundColor: '#f59e0b', marginTop: 4 }]}
-                      >
-                        <Text style={styles.importBtnText}>⚡ Apply JSON → Fields</Text>
-                      </TouchableOpacity>
-                    </View>
-                  ) : (
-                    <FlatList
-                      data={selectedHub.formFields}
-                      keyExtractor={f => f.name}
-                      style={{ maxHeight: 380, marginBottom: 12 }}
-                      renderItem={({ item: field }) => {
-                        const val = editFormValues[field.name] || '';
-                        return (
-                          <View style={{ marginBottom: 10 }}>
-                            <Text style={{ fontSize: 10, fontWeight: '800', color: colors.textTertiary, marginBottom: 3 }}>{field.label}{field.required ? ' *' : ''}</Text>
-                            <TextInput
-                              multiline={field.type === 'markdown'} numberOfLines={field.type === 'markdown' ? 4 : 1}
-                              value={val} onChangeText={t => setEditFormValues(prev => ({ ...prev, [field.name]: t }))}
-                              style={[styles.formInput, { color: colors.textPrimary, borderColor: colors.border, minHeight: field.type === 'markdown' ? 72 : 36 }]}
-                            />
-                          </View>
-                        );
-                      }}
-                    />
-                  )}
+              )}
+              {importSuccess && (
+                <View style={[styles.feedback, { backgroundColor: '#22c55e12', borderColor: '#22c55e', marginBottom: 8 }]}>
+                  <CheckCircle size={13} color="#22c55e" />
+                  <Text style={{ fontSize: 11, color: '#22c55e', fontWeight: '800', flex: 1 }}>{importSuccess}</Text>
                 </View>
               )}
 
-
-              <TouchableOpacity onPress={handleSaveEdit} disabled={isSavingEdit} style={[styles.importBtn, { backgroundColor: colors.primary }]}>
-                {isSavingEdit ? <ActivityIndicator size={16} color="#FFF" /> : <Text style={styles.importBtnText}>Save Changes</Text>}
-              </TouchableOpacity>
-            </View>
-          </View>
-        </KeyboardAvoidingView>
-      </Modal>
-
-      {/* ── FLOATING BULK OPERATIONS BOTTOM BAR ── */}
-      {bulkMode && selectedIds.size > 0 && (
-        <View style={[styles.bulkActionBar, { backgroundColor: colors.surfaceStrong, borderColor: colors.border }]}>
-          <Text style={{ fontSize: 12, fontWeight: '800', color: colors.textPrimary }}>
-            {selectedIds.size} Selected
-          </Text>
-          <View style={{ flexDirection: 'row', gap: 8 }}>
-            {activeSubTab === 'staging' && (
-              <TouchableOpacity onPress={handleBulkPublish} style={[styles.bulkBtn, { backgroundColor: '#22c55e' }]}>
-                <Play size={13} color="#fff" />
-                <Text style={styles.bulkBtnText}>Publish</Text>
-              </TouchableOpacity>
-            )}
-            <TouchableOpacity onPress={handleBulkDelete} style={[styles.bulkBtn, { backgroundColor: '#ef4444' }]}>
-              <Trash2 size={13} color="#fff" strokeWidth={2.5} />
-              <Text style={styles.bulkBtnText}>Delete</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      )}
-
-      {/* ── HUB SELECTOR MODAL ── */}
-      <Modal visible={hubModalVisible} transparent animationType="slide">
-        <View style={styles.overlay}>
-          <View style={[styles.sheet, { backgroundColor: colors.surface, height: '70%' }]}>
-            <View style={styles.modalHeader}>
-              <Text style={{ fontSize: 15, fontWeight: '900', color: colors.textPrimary }}>Select Database / Hub</Text>
-              <TouchableOpacity onPress={() => setHubModalVisible(false)}><X size={20} color={colors.textTertiary} /></TouchableOpacity>
-            </View>
-            <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false}>
-              {hubRegistry.map((h) => {
-                const active = selectedHub.id === h.id;
-                return (
-                  <TouchableOpacity
-                    key={h.id}
-                    onPress={() => {
-                      setSelectedHub(h);
-                      setHubModalVisible(false);
+              {/* 2-Column Monaco Code Input & Live Preview Studio */}
+              <View style={{ flexDirection: IS_TABLET ? 'row' : 'column', gap: 12, alignItems: 'flex-start' }}>
+                
+                {/* Left: JSON Input */}
+                <View style={{ flex: 1, width: '100%' }}>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
+                    <Text style={{ fontSize: 9.5, fontWeight: '800', color: colors.textTertiary, textTransform: 'uppercase' }}>
+                      PASTE RAW JSON FROM GEMINI / CLAUDE:
+                    </Text>
+                    <View style={{ flexDirection: 'row', gap: 5 }}>
+                      <TouchableOpacity
+                        onPress={async () => {
+                          const clip = await Clipboard.getStringAsync();
+                          if (clip) setPasteValue(clip);
+                        }}
+                        style={{ backgroundColor: 'rgba(56, 189, 248, 0.15)', paddingHorizontal: 7, paddingVertical: 3, borderRadius: 5 }}
+                      >
+                        <Text style={{ fontSize: 9.5, fontWeight: '800', color: '#38bdf8' }}>📋 Paste</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        onPress={() => setPasteValue('')}
+                        style={{ backgroundColor: 'rgba(239, 68, 68, 0.15)', paddingHorizontal: 7, paddingVertical: 3, borderRadius: 5 }}
+                      >
+                        <Text style={{ fontSize: 9.5, fontWeight: '800', color: '#ef4444' }}>✕ Clear</Text>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                  <TextInput
+                    multiline
+                    placeholder="Paste AI-generated JSON array here..."
+                    placeholderTextColor="#475569"
+                    value={pasteValue}
+                    onChangeText={setPasteValue}
+                    style={{
+                      backgroundColor: colors.surfaceStrong,
+                      borderWidth: 1,
+                      borderColor: colors.border,
+                      borderRadius: 10,
+                      padding: 10,
+                      color: '#38bdf8',
+                      fontSize: 11,
+                      fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace',
+                      minHeight: 280,
+                      maxHeight: 450,
                     }}
-                    style={[
-                      styles.hubOption,
-                      {
-                        borderBottomColor: colors.border,
-                        backgroundColor: active ? colors.primary + '15' : 'transparent',
-                      },
-                    ]}
-                  >
-                    <Database size={15} color={active ? colors.primary : colors.textSecondary} style={{ marginRight: 10 }} />
-                    <View style={{ flex: 1 }}>
-                      <Text style={{ fontSize: 12.5, fontWeight: '800', color: active ? colors.primary : colors.textPrimary }}>
-                        {h.displayName}
-                      </Text>
-                      <Text style={{ fontSize: 9.5, color: colors.textTertiary, marginTop: 1 }}>
-                        Table: {h.targetTable}
+                  />
+                </View>
+
+                {/* Right: Live UPSC Card Preview */}
+                <View style={{ flex: 1, width: '100%' }}>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
+                    <Text style={{ fontSize: 9.5, fontWeight: '800', color: colors.textTertiary, textTransform: 'uppercase' }}>
+                      LIVE UPSC CARD PREVIEW:
+                    </Text>
+                    {parsedPreview.length > 0 && (
+                      <View style={{ backgroundColor: '#10b98120', paddingHorizontal: 6, paddingVertical: 2, borderRadius: 5 }}>
+                        <Text style={{ fontSize: 9.5, fontWeight: '800', color: '#10b981' }}>{parsedPreview.length} Ready</Text>
+                      </View>
+                    )}
+                  </View>
+                  {parsedPreview.length === 0 ? (
+                    <View style={{ borderWidth: 1.5, borderStyle: 'dashed', borderColor: colors.border, backgroundColor: colors.surfaceStrong, borderRadius: 10, padding: 24, alignItems: 'center', justifyContent: 'center', minHeight: 280 }}>
+                      <Text style={{ fontSize: 11, color: colors.textTertiary, textAlign: 'center', fontStyle: 'italic', lineHeight: 16 }}>
+                        Paste JSON on the left.\nLive cards render here in real-time.
                       </Text>
                     </View>
-                    {active && <Check size={14} color={colors.primary} />}
+                  ) : (
+                    <View>
+                      {parsedPreview.map((item, idx) => (
+                        <View key={idx} style={{ marginBottom: 12 }}>
+                          {parsedPreview.length > 1 && (
+                            <View style={{ backgroundColor: colors.primary + '15', borderRadius: 5, paddingHorizontal: 7, paddingVertical: 2, marginBottom: 5, alignSelf: 'flex-start' }}>
+                              <Text style={{ fontSize: 8.5, fontWeight: '900', color: colors.primary }}>CARD {idx + 1} / {parsedPreview.length}</Text>
+                            </View>
+                          )}
+                          <HubCardPreview item={item} hub={hubInUse} colors={colors} />
+                        </View>
+                      ))}
+                    </View>
+                  )}
+                </View>
+              </View>
+
+              {/* Action Buttons */}
+              <TouchableOpacity
+                onPress={handleImport}
+                disabled={isImporting || parsedPreview.length === 0}
+                style={{
+                  backgroundColor: parsedPreview.length > 0 && !isImporting ? '#10b981' : colors.border,
+                  paddingVertical: 12,
+                  borderRadius: 10,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  marginTop: 14,
+                }}
+              >
+                {isImporting ? (
+                  <ActivityIndicator size={16} color="#FFF" />
+                ) : (
+                  <Text style={{ fontSize: 12.5, fontWeight: '900', color: '#ffffff' }}>
+                    {parsedPreview.length > 0
+                      ? `🚀 Validate & Push ${parsedPreview.length} Card${parsedPreview.length > 1 ? 's' : ''} → Supabase Staging`
+                      : 'Validate & Push to Staging'}
+                  </Text>
+                )}
+              </TouchableOpacity>
+            </ScrollView>
+          )}
+
+          {/* ══════ SUB-TAB 3: STAGING DRAFTS ══════ */}
+          {activeSubTab === 'staging' && (
+            <View style={{ flex: 1 }}>
+              {/* Search & Multi-Select Bar */}
+              <View style={{ 
+                flexDirection: 'row', 
+                alignItems: 'center', 
+                gap: 8, 
+                paddingHorizontal: 12, 
+                paddingVertical: 8, 
+                backgroundColor: colors.surface, 
+                borderBottomWidth: 1, 
+                borderBottomColor: colors.border 
+              }}>
+                <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', backgroundColor: colors.surfaceStrong, borderWidth: 1, borderColor: colors.border, borderRadius: 8, paddingHorizontal: 8, paddingVertical: 4 }}>
+                  <Search size={13} color={colors.textTertiary} />
+                  <TextInput 
+                    placeholder="Search drafts…" 
+                    placeholderTextColor={colors.textTertiary} 
+                    value={liveSearch} 
+                    onChangeText={setLiveSearch} 
+                    style={{ flex: 1, color: colors.textPrimary, paddingLeft: 6, fontSize: 11.5 }} 
+                  />
+                  {liveSearch.length > 0 && <TouchableOpacity onPress={() => setLiveSearch('')}><X size={12} color={colors.textTertiary} /></TouchableOpacity>}
+                </View>
+
+                <TouchableOpacity 
+                  onPress={() => setBulkMode(b => !b)}
+                  style={{ paddingHorizontal: 8, paddingVertical: 5, borderRadius: 6, borderWidth: 1, borderColor: bulkMode ? colors.primary : colors.border, backgroundColor: bulkMode ? (colors.primary + '18') : colors.surfaceStrong }}
+                >
+                  <Text style={{ fontSize: 10.5, fontWeight: '800', color: bulkMode ? colors.primary : colors.textSecondary }}>
+                    {bulkMode ? '✕ Cancel' : '☑ Multi-Select'}
+                  </Text>
+                </TouchableOpacity>
+
+                {bulkMode && selectedIds.size > 0 && (
+                  <View style={{ flexDirection: 'row', gap: 4 }}>
+                    <TouchableOpacity 
+                      onPress={handleBulkPublish}
+                      disabled={isBulkPublishing}
+                      style={{ backgroundColor: '#10b981', paddingHorizontal: 8, paddingVertical: 5, borderRadius: 6 }}
+                    >
+                      <Text style={{ fontSize: 10.5, fontWeight: '800', color: '#fff' }}>
+                        {isBulkPublishing ? '...' : `Approve (${selectedIds.size})`}
+                      </Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity 
+                      onPress={handleBulkDelete}
+                      disabled={isBulkDeleting}
+                      style={{ backgroundColor: '#ef4444', paddingHorizontal: 8, paddingVertical: 5, borderRadius: 6 }}
+                    >
+                      <Text style={{ fontSize: 10.5, fontWeight: '800', color: '#fff' }}>
+                        {isBulkDeleting ? '...' : `Delete (${selectedIds.size})`}
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+                )}
+              </View>
+
+              {/* Items List */}
+              <ScrollView 
+                style={{ flex: 1 }} 
+                contentContainerStyle={{ padding: 12, paddingBottom: 80 }}
+              >
+                {loadingItems ? (
+                  <ActivityIndicator color={colors.primary} style={{ marginTop: 30 }} />
+                ) : filteredItems.length === 0 ? (
+                  <Text style={{ textAlign: 'center', color: colors.textTertiary, fontStyle: 'italic', marginTop: 30, fontSize: 12 }}>
+                    No draft items in {selectedHub.displayName}.
+                  </Text>
+                ) : (
+                  <View>
+                    <Text style={{ fontSize: 9.5, color: colors.textTertiary, marginBottom: 8, fontWeight: '700' }}>
+                      {filteredItems.length} of {itemList.length} drafts {bulkMode ? `(Selected: ${selectedIds.size})` : ''}
+                    </Text>
+                    {filteredItems.map(item => (
+                      <View key={item.id} style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
+                        {bulkMode && (
+                          <TouchableOpacity 
+                            onPress={() => toggleSelect(item.id)} 
+                            style={{
+                              marginRight: 8,
+                              width: 18,
+                              height: 18,
+                              borderRadius: 5,
+                              borderWidth: 2,
+                              borderColor: selectedIds.has(item.id) ? colors.primary : colors.border,
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              backgroundColor: selectedIds.has(item.id) ? colors.primary : 'transparent'
+                            }}
+                          >
+                            {selectedIds.has(item.id) && <Check size={11} color="#fff" strokeWidth={3} />}
+                          </TouchableOpacity>
+                        )}
+                        <View style={{ flex: 1 }}>
+                          <ItemCard 
+                            item={item} 
+                            colors={colors} 
+                            isStaging
+                            onPublish={() => handlePublish(item.id)}
+                            onEdit={() => handleOpenEdit(item)}
+                            onDelete={() => handleDelete(item.id)}
+                          />
+                        </View>
+                      </View>
+                    ))}
+
+                    {/* Staging Load More */}
+                    {hasMore && (
+                      <TouchableOpacity 
+                        onPress={() => fetchItems(false)} 
+                        disabled={loadingMore}
+                        style={{
+                          marginTop: 10,
+                          paddingVertical: 10,
+                          backgroundColor: colors.surfaceStrong,
+                          borderColor: colors.border,
+                          borderWidth: 1,
+                          borderRadius: 8,
+                          alignItems: 'center',
+                          justifyContent: 'center'
+                        }}
+                      >
+                        {loadingMore ? (
+                          <ActivityIndicator size={14} color={colors.primary} />
+                        ) : (
+                          <Text style={{ fontSize: 11, fontWeight: '800', color: colors.primary }}>
+                            Load More Items
+                          </Text>
+                        )}
+                      </TouchableOpacity>
+                    )}
+                  </View>
+                )}
+              </ScrollView>
+            </View>
+          )}
+
+          {/* ══════ SUB-TAB 4: LIVE HUB DATABASE ══════ */}
+          {activeSubTab === 'live' && (
+            <View style={{ flex: 1 }}>
+              {/* Paper Filter Chips & Search */}
+              <View style={{ 
+                backgroundColor: colors.surface, 
+                borderBottomWidth: 1, 
+                borderBottomColor: colors.border,
+                paddingHorizontal: 12,
+                paddingVertical: 8
+              }}>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 6 }}>
+                  <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', backgroundColor: colors.surfaceStrong, borderWidth: 1, borderColor: colors.border, borderRadius: 8, paddingHorizontal: 8, paddingVertical: 4 }}>
+                    <Search size={13} color={colors.textTertiary} />
+                    <TextInput 
+                      placeholder="Search live records…" 
+                      placeholderTextColor={colors.textTertiary} 
+                      value={liveSearch} 
+                      onChangeText={setLiveSearch} 
+                      style={{ flex: 1, color: colors.textPrimary, paddingLeft: 6, fontSize: 11.5 }} 
+                    />
+                    {liveSearch.length > 0 && <TouchableOpacity onPress={() => setLiveSearch('')}><X size={12} color={colors.textTertiary} /></TouchableOpacity>}
+                  </View>
+                  <TouchableOpacity 
+                    onPress={() => setBulkMode(b => !b)}
+                    style={{ paddingHorizontal: 8, paddingVertical: 5, borderRadius: 6, borderWidth: 1, borderColor: bulkMode ? colors.primary : colors.border, backgroundColor: bulkMode ? (colors.primary + '18') : colors.surfaceStrong }}
+                  >
+                    <Text style={{ fontSize: 10.5, fontWeight: '800', color: bulkMode ? colors.primary : colors.textSecondary }}>
+                      {bulkMode ? '✕ Cancel' : '☑ Multi-Select'}
+                    </Text>
                   </TouchableOpacity>
-                );
-              })}
+                </View>
+
+                {/* Paper Pills */}
+                <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 5 }}>
+                  {['All', 'GS1', 'GS2', 'GS3', 'GS4', 'Essay', 'Optional'].map(p => {
+                    const active = (filterPaper || 'All') === p;
+                    return (
+                      <TouchableOpacity
+                        key={p}
+                        onPress={() => setFilterPaper(p === 'All' ? '' : p)}
+                        style={{
+                          paddingHorizontal: 8,
+                          paddingVertical: 3,
+                          borderRadius: 6,
+                          borderWidth: 1,
+                          borderColor: active ? colors.primary : colors.border,
+                          backgroundColor: active ? (colors.primary + '18') : colors.surfaceStrong
+                        }}
+                      >
+                        <Text style={{ fontSize: 10, fontWeight: '800', color: active ? colors.primary : colors.textSecondary }}>
+                          {p}
+                        </Text>
+                      </TouchableOpacity>
+                    );
+                  })}
+                </ScrollView>
+              </View>
+
+              {/* Items List */}
+              <ScrollView 
+                style={{ flex: 1 }} 
+                contentContainerStyle={{ padding: 12, paddingBottom: 80 }}
+              >
+                {loadingItems ? (
+                  <ActivityIndicator color={colors.primary} style={{ marginTop: 30 }} />
+                ) : filteredItems.length === 0 ? (
+                  <Text style={{ textAlign: 'center', color: colors.textTertiary, fontStyle: 'italic', marginTop: 30, fontSize: 12 }}>
+                    No live items match filter criteria.
+                  </Text>
+                ) : (
+                  <View>
+                    <Text style={{ fontSize: 9.5, color: colors.textTertiary, marginBottom: 8, fontWeight: '700' }}>
+                      {filteredItems.length} of {itemList.length} live records {bulkMode ? `(Selected: ${selectedIds.size})` : ''}
+                    </Text>
+                    {filteredItems.map(item => (
+                      <View key={item.id} style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
+                        {bulkMode && (
+                          <TouchableOpacity 
+                            onPress={() => toggleSelect(item.id)} 
+                            style={{
+                              marginRight: 8,
+                              width: 18,
+                              height: 18,
+                              borderRadius: 5,
+                              borderWidth: 2,
+                              borderColor: selectedIds.has(item.id) ? colors.primary : colors.border,
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              backgroundColor: selectedIds.has(item.id) ? colors.primary : 'transparent'
+                            }}
+                          >
+                            {selectedIds.has(item.id) && <Check size={11} color="#fff" strokeWidth={3} />}
+                          </TouchableOpacity>
+                        )}
+                        <View style={{ flex: 1 }}>
+                          <ItemCard 
+                            item={item} 
+                            colors={colors} 
+                            isStaging={false}
+                            onPublish={() => {}}
+                            onEdit={() => handleOpenEdit(item)}
+                            onDelete={() => handleDelete(item.id)}
+                          />
+                        </View>
+                      </View>
+                    ))}
+
+                    {/* Live Load More */}
+                    {hasMore && (
+                      <TouchableOpacity 
+                        onPress={() => fetchItems(false)} 
+                        disabled={loadingMore}
+                        style={{
+                          marginTop: 10,
+                          paddingVertical: 10,
+                          backgroundColor: colors.surfaceStrong,
+                          borderColor: colors.border,
+                          borderWidth: 1,
+                          borderRadius: 8,
+                          alignItems: 'center',
+                          justifyContent: 'center'
+                        }}
+                      >
+                        {loadingMore ? (
+                          <ActivityIndicator size={14} color={colors.primary} />
+                        ) : (
+                          <Text style={{ fontSize: 11, fontWeight: '800', color: colors.primary }}>
+                            Load More Records
+                          </Text>
+                        )}
+                      </TouchableOpacity>
+                    )}
+                  </View>
+                )}
+              </ScrollView>
+            </View>
+          )}
+
+        </View>
+      </View>
+
+      {/* ── EXISTING MODALS (Hierarchy, Edit, Prompt) ── */}
+      <Modal visible={hierarchyModalVisible} transparent animationType="fade">
+        <View style={styles.modalOverlay}>
+          <View style={[styles.modalBox, { backgroundColor: colors.surface, maxHeight: '80%' }]}>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+              <Text style={{ fontSize: 15, fontWeight: '900', color: colors.textPrimary }}>Complete 4-Layer Syllabus</Text>
+              <TouchableOpacity onPress={() => setHierarchyModalVisible(false)}><X size={16} color={colors.textSecondary} /></TouchableOpacity>
+            </View>
+            <ScrollView style={{ flex: 1 }}>
+              <Text style={{ fontSize: 11.5, color: colors.textSecondary, lineHeight: 18 }}>
+                {selectedHub.aiPromptTemplate}
+              </Text>
             </ScrollView>
           </View>
         </View>
       </Modal>
 
-      {/* ── AI PROMPT EDIT MODAL ── */}
-      <Modal visible={showPromptModal} transparent animationType="slide">
-        <View style={styles.overlay}>
-          <View style={[styles.sheet, { backgroundColor: colors.surface, height: '80%' }]}>
-            <View style={styles.modalHeader}>
-              <Text style={{ fontSize: 15, fontWeight: '900', color: colors.textPrimary }}>AI Prompt Template</Text>
-              <TouchableOpacity onPress={() => setShowPromptModal(false)}><X size={20} color={colors.textTertiary} /></TouchableOpacity>
+      {/* Edit Item Modal */}
+      <Modal visible={editModalVisible} transparent animationType="fade">
+        <View style={styles.modalOverlay}>
+          <View style={[styles.modalBox, { backgroundColor: colors.surface, maxHeight: '85%' }]}>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+              <Text style={{ fontSize: 15, fontWeight: '900', color: colors.textPrimary }}>Edit Item ({selectedHub.displayName})</Text>
+              <TouchableOpacity onPress={() => setEditModalVisible(false)}><X size={16} color={colors.textSecondary} /></TouchableOpacity>
             </View>
-            <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false}>
-              <TextInput
-                multiline
-                style={[
-                  styles.promptInput,
-                  {
-                    color: colors.textPrimary,
-                    borderColor: colors.border,
-                    backgroundColor: colors.bg,
-                  },
-                ]}
-                value={editablePrompt}
-                onChangeText={setEditablePrompt}
-              />
-              <View style={{ flexDirection: 'row', gap: 8, marginTop: 12 }}>
-                <TouchableOpacity
-                  onPress={() => {
-                    setEditablePrompt(selectedHub.aiPromptTemplate);
-                    Alert.alert('Reset', 'AI Prompt reset to registry default.');
-                  }}
-                  style={[styles.btn, { flex: 1, backgroundColor: colors.border }]}
-                >
-                  <Text style={[styles.btnText, { color: colors.textSecondary }]}>Reset to Default</Text>
+            <ScrollView style={{ flex: 1 }}>
+              {selectedHub.formFields.map((field: any) => (
+                <View key={field.name} style={{ marginBottom: 12 }}>
+                  <Text style={{ fontSize: 9.5, fontWeight: '800', color: colors.textSecondary, marginBottom: 4, textTransform: 'uppercase' }}>
+                    {field.label}
+                  </Text>
+                  <TextInput
+                    multiline={field.type === 'markdown'}
+                    value={editFormValues[field.name] || ''}
+                    onChangeText={t => setEditFormValues(prev => ({ ...prev, [field.name]: t }))}
+                    style={{
+                      backgroundColor: colors.surfaceStrong,
+                      borderWidth: 1,
+                      borderColor: colors.border,
+                      borderRadius: 8,
+                      padding: 10,
+                      color: colors.textPrimary,
+                      fontSize: 11.5,
+                      minHeight: field.type === 'markdown' ? 100 : 40,
+                    }}
+                  />
+                </View>
+              ))}
+              <View style={{ flexDirection: 'row', justifyContent: 'flex-end', gap: 8, marginTop: 14 }}>
+                <TouchableOpacity onPress={() => setEditModalVisible(false)} style={{ paddingHorizontal: 12, paddingVertical: 8, borderRadius: 6, backgroundColor: colors.surfaceStrong }}>
+                  <Text style={{ fontSize: 11, fontWeight: '800', color: colors.textSecondary }}>Cancel</Text>
                 </TouchableOpacity>
-                <TouchableOpacity
-                  onPress={() => {
-                    setShowPromptModal(false);
-                    Alert.alert('Saved', 'AI Prompt template updated for this session.');
-                  }}
-                  style={[styles.btn, { flex: 1, backgroundColor: colors.primary }]}
-                >
-                  <Text style={styles.btnText}>Save Prompt</Text>
+                <TouchableOpacity onPress={handleSaveEdit} disabled={isSavingEdit} style={{ paddingHorizontal: 14, paddingVertical: 8, borderRadius: 6, backgroundColor: colors.primary }}>
+                  <Text style={{ fontSize: 11, fontWeight: '800', color: '#fff' }}>
+                    {isSavingEdit ? 'Saving...' : 'Save Changes'}
+                  </Text>
                 </TouchableOpacity>
               </View>
             </ScrollView>
           </View>
         </View>
       </Modal>
+
+      {/* AI Prompt View/Edit Modal */}
+      <Modal visible={showPromptModal} transparent animationType="fade">
+        <View style={styles.modalOverlay}>
+          <View style={[styles.modalBox, { backgroundColor: colors.surface, maxHeight: '80%' }]}>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+              <Text style={{ fontSize: 15, fontWeight: '900', color: colors.textPrimary }}>AI Prompt Template</Text>
+              <TouchableOpacity onPress={() => setShowPromptModal(false)}><X size={16} color={colors.textSecondary} /></TouchableOpacity>
+            </View>
+            <ScrollView style={{ flex: 1 }}>
+              <TextInput
+                multiline
+                value={editablePrompt || selectedHub.aiPromptTemplate}
+                onChangeText={setEditablePrompt}
+                style={{
+                  backgroundColor: colors.surfaceStrong,
+                  borderWidth: 1,
+                  borderColor: colors.border,
+                  borderRadius: 8,
+                  padding: 10,
+                  color: colors.textPrimary,
+                  fontSize: 11,
+                  fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace',
+                  minHeight: 200,
+                }}
+              />
+              <View style={{ flexDirection: 'row', justifyContent: 'flex-end', gap: 8, marginTop: 12 }}>
+                <TouchableOpacity onPress={() => setShowPromptModal(false)} style={{ paddingHorizontal: 12, paddingVertical: 8, borderRadius: 6, backgroundColor: colors.surfaceStrong }}>
+                  <Text style={{ fontSize: 11, fontWeight: '800', color: colors.textSecondary }}>Close</Text>
+                </TouchableOpacity>
+              </View>
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
+
     </View>
   );
 }
 
 // ── Reusable item row ──────────────────────────────────────────────────────────
+
 function ItemCard({ item, colors, isStaging, onPublish, onEdit, onDelete }: any) {
   const [expanded, setExpanded] = useState(false);
   
@@ -3397,6 +2739,23 @@ function ItemCard({ item, colors, isStaging, onPublish, onEdit, onDelete }: any)
 }
 
 const styles = StyleSheet.create({
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.65)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 16,
+  },
+  modalBox: {
+    width: '100%',
+    maxWidth: 520,
+    backgroundColor: '#0f172a',
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.1)',
+    padding: 20,
+  },
+
   compactToolbar: { flexDirection: 'row', padding: 8, borderBottomWidth: 1, alignItems: 'center', gap: 6 },
   hubPickerBtn: { flex: 1.3, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', borderWidth: 1, borderRadius: 8, paddingHorizontal: 8, paddingVertical: 6, gap: 4 },
   toolbarActionBtn: { paddingHorizontal: 10, paddingVertical: 6, borderRadius: 8, alignItems: 'center', justifyContent: 'center' },

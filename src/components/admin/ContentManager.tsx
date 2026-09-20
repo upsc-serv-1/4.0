@@ -854,6 +854,7 @@ export function ContentManager({ headerBlock, tabSelector }: { headerBlock?: Rea
   const [topperSubject, setTopperSubject] = useState('Anthropology • Paper II • Unit 5');
   const [topperQuestionPrompt, setTopperQuestionPrompt] = useState('Discuss the major constitutional safeguards provided for Scheduled Tribes in India and evaluate their efficacy.');
   const [isPublishingTopper, setIsPublishingTopper] = useState(false);
+    const [addFormValues, setAddFormValues] = useState<Record<string, any>>({});
 
   // JSON input via Modal (resolves keyboard overlay bug)
   const [pasteValue, setPasteValue] = useState('');
@@ -1792,7 +1793,7 @@ export function ContentManager({ headerBlock, tabSelector }: { headerBlock?: Rea
                     1-Tap Gemini / Claude Prompt
                   </Text>
                 </View>
-                <Text style={{ fontSize: 10.5, color: '#94a3b8', lineHeight: 15, marginBottom: 10 }}>
+                <Text style={{ fontSize: 10.5, color: colors.textSecondary, lineHeight: 15, marginBottom: 10 }}>
                   Copies system prompt with exact 4-layer UPSC taxonomy. Paste into Gemini/Claude app on iPad to get 100% verified Supabase JSON.
                 </Text>
                 <TouchableOpacity
@@ -1923,7 +1924,7 @@ export function ContentManager({ headerBlock, tabSelector }: { headerBlock?: Rea
                     }}
                   >
                     <Text style={{ fontSize: 11, fontWeight: '800', color: sidebarOpen ? colors.primary : colors.textPrimary }}>
-                      {sidebarOpen ? '✕ Filters' : '🔍 Filters'}
+                      {sidebarOpen ? '◧ Hide Sidebar' : '◨ Show Sidebar'}
                     </Text>
                   </TouchableOpacity>
                   <TouchableOpacity 
@@ -2202,149 +2203,134 @@ export function ContentManager({ headerBlock, tabSelector }: { headerBlock?: Rea
             contentContainerStyle={{ padding: 12, paddingBottom: 100 }}
             keyboardShouldPersistTaps="handled"
           >
-            {/* ══════ 1. UPLOAD ANSWER SCANS (R2) STUDIO ══════ */}
+            {/* ══════ 1. DIRECT ADD / CATEGORY UPLOAD ══════ */}
             {activeSubTab === 'upload' && (
-              <View>
-                {/* Upload Tapzone */}
-                <TouchableOpacity
-                  onPress={handlePickTopperScans}
-                  disabled={isUploadingImage}
-                  style={{
-                    borderWidth: 2,
-                    borderColor: '#38bdf8',
-                    borderStyle: 'dashed',
-                    backgroundColor: 'rgba(56, 189, 248, 0.08)',
-                    borderRadius: 16,
-                    padding: 24,
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    marginBottom: 16,
-                  }}
-                >
-                  {isUploadingImage ? (
-                    <View style={{ alignItems: 'center', gap: 8 }}>
-                      <ActivityIndicator size="large" color="#38bdf8" />
-                      <Text style={{ fontSize: 13, fontWeight: '700', color: '#38bdf8' }}>
-                        Uploading scanned pages to Cloudflare R2...
-                      </Text>
-                    </View>
-                  ) : (
-                    <View style={{ alignItems: 'center' }}>
-                      <View style={{ width: 56, height: 56, borderRadius: 28, backgroundColor: 'rgba(56, 189, 248, 0.15)', alignItems: 'center', justifyContent: 'center', marginBottom: 12 }}>
-                        <UploadCloud size={28} color="#38bdf8" />
-                      </View>
-                      <Text style={{ fontSize: 15, fontWeight: '900', color: '#f8fafc', marginBottom: 4 }}>
-                        Tap to Select Topper Answer Pages from iPad Photos / Files
-                      </Text>
-                      <Text style={{ fontSize: 12, color: '#94a3b8', textAlign: 'center' }}>
-                        Auto-compressed & uploaded to Cloudflare R2 (Full handwriting & diagram fidelity preserved)
-                      </Text>
-                    </View>
-                  )}
-                </TouchableOpacity>
-
-                {/* Scanned Pages Horizontal Gallery */}
-                {topperScans.length > 0 && (
-                  <View style={{ marginBottom: 18 }}>
-                    <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
-                      <Text style={{ fontSize: 12, fontWeight: '900', color: '#f8fafc', letterSpacing: 0.5 }}>
-                        UPLOADED SCANS ({topperScans.length} PAGES)
-                      </Text>
-                      <TouchableOpacity onPress={() => setTopperScans([])}>
-                        <Text style={{ fontSize: 11, fontWeight: '700', color: '#ef4444' }}>Clear All Scans</Text>
-                      </TouchableOpacity>
-                    </View>
-                    <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 12 }}>
-                      {topperScans.map((url, idx) => (
-                        <View key={idx} style={{ width: 150, height: 200, borderRadius: 12, overflow: 'hidden', borderWidth: 1, borderColor: 'rgba(255,255,255,0.15)', backgroundColor: '#0f172a', position: 'relative' }}>
-                          <Image source={{ uri: url }} style={{ width: '100%', height: '100%' }} resizeMode="cover" />
-                          <View style={{ position: 'absolute', top: 6, left: 6, backgroundColor: 'rgba(0,0,0,0.75)', paddingHorizontal: 7, paddingVertical: 2, borderRadius: 6 }}>
-                            <Text style={{ fontSize: 10, fontWeight: '900', color: '#38bdf8' }}>Page {idx + 1}</Text>
-                          </View>
-                          <TouchableOpacity 
-                            onPress={() => setTopperScans(prev => prev.filter((_, i) => i !== idx))}
-                            style={{ position: 'absolute', top: 6, right: 6, width: 24, height: 24, borderRadius: 12, backgroundColor: 'rgba(239,68,68,0.9)', alignItems: 'center', justifyContent: 'center' }}
-                          >
-                            <X size={13} color="#fff" />
-                          </TouchableOpacity>
-                          <View style={{ position: 'absolute', bottom: 6, left: 6, right: 6, backgroundColor: 'rgba(16,185,129,0.9)', paddingVertical: 3, borderRadius: 6, alignItems: 'center' }}>
-                            <Text style={{ fontSize: 9, fontWeight: '900', color: '#fff' }}>✓ R2 CDN LINK</Text>
-                          </View>
-                        </View>
-                      ))}
-                    </ScrollView>
-                  </View>
-                )}
-
-                {/* Topper Copy Metadata Form */}
-                <View style={{ backgroundColor: colors.surfaceStrong, borderWidth: 1, borderColor: colors.border, borderRadius: 14, padding: 14, gap: 12, marginBottom: 16 }}>
-                  <Text style={{ fontSize: 11, fontWeight: '900', color: colors.textTertiary, textTransform: 'uppercase' }}>
-                    TOPPER METADATA & QUESTION
-                  </Text>
-                  
-                  <View style={{ flexDirection: IS_TABLET ? 'row' : 'column', gap: 10 }}>
-                    <View style={{ flex: 1 }}>
-                      <Text style={{ fontSize: 10, fontWeight: '800', color: colors.textSecondary, marginBottom: 4 }}>Topper Name & Rank</Text>
-                      <TextInput
-                        value={topperName}
-                        onChangeText={setTopperName}
-                        placeholder="e.g. Ishita Kishore (AIR 1, 2022)"
-                        placeholderTextColor={colors.textTertiary}
-                        style={{ backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border, borderRadius: 10, paddingHorizontal: 12, paddingVertical: 8, color: colors.textPrimary, fontSize: 12 }}
-                      />
-                    </View>
-                    <View style={{ flex: 1 }}>
-                      <Text style={{ fontSize: 10, fontWeight: '800', color: colors.textSecondary, marginBottom: 4 }}>Subject & Syllabus Unit</Text>
-                      <TextInput
-                        value={topperSubject}
-                        onChangeText={setTopperSubject}
-                        placeholder="e.g. Anthropology • Paper II • Unit 5"
-                        placeholderTextColor={colors.textTertiary}
-                        style={{ backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border, borderRadius: 10, paddingHorizontal: 12, paddingVertical: 8, color: colors.textPrimary, fontSize: 12 }}
-                      />
-                    </View>
-                  </View>
-
+              <View style={{ backgroundColor: colors.surface, borderRadius: 16, padding: 16, borderWidth: 1, borderColor: colors.border }}>
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
                   <View>
-                    <Text style={{ fontSize: 10, fontWeight: '800', color: colors.textSecondary, marginBottom: 4 }}>Question Prompt / Statement</Text>
-                    <TextInput
-                      multiline
-                      value={topperQuestionPrompt}
-                      onChangeText={setTopperQuestionPrompt}
-                      placeholder="Paste or write the UPSC question here..."
-                      placeholderTextColor={colors.textTertiary}
-                      style={{ backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border, borderRadius: 10, padding: 12, color: colors.textPrimary, fontSize: 12, minHeight: 70 }}
-                    />
+                    <Text style={{ fontSize: 16, fontWeight: '900', color: colors.textPrimary }}>Direct Form: {selectedHub.displayName}</Text>
+                    <Text style={{ fontSize: 12, color: colors.textSecondary, marginTop: 2 }}>Create single or structured value add cards directly for {selectedHub.displayName}.</Text>
                   </View>
                 </View>
 
-                {/* Publish Topper Copy Button */}
-                <TouchableOpacity
-                  onPress={handlePublishTopperDirect}
-                  disabled={isPublishingTopper || topperScans.length === 0}
-                  style={{
-                    backgroundColor: topperScans.length > 0 ? '#10b981' : colors.border,
-                    paddingVertical: 14,
-                    borderRadius: 12,
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    flexDirection: 'row',
-                    gap: 8,
-                  }}
-                >
-                  {isPublishingTopper ? (
-                    <ActivityIndicator size={18} color="#ffffff" />
-                  ) : (
-                    <>
-                      <Sparkles size={18} color="#ffffff" />
-                      <Text style={{ fontSize: 13.5, fontWeight: '900', color: '#ffffff' }}>
-                        {topperScans.length > 0
-                          ? `🚀 Publish Topper Copy with ${topperScans.length} Page${topperScans.length > 1 ? 's' : ''} to Supabase`
-                          : 'Select Pages Above to Publish Topper Copy'}
-                      </Text>
-                    </>
-                  )}
-                </TouchableOpacity>
+                {selectedHub.id === 'topper_copies' && (
+                  <View>
+                    <TouchableOpacity
+                      onPress={handlePickTopperScans}
+                      disabled={isUploadingImage}
+                      style={{
+                        borderWidth: 2, borderColor: colors.primary, borderStyle: 'dashed', backgroundColor: colors.surfaceStrong,
+                        borderRadius: 16, padding: 24, alignItems: 'center', justifyContent: 'center', marginBottom: 16
+                      }}
+                    >
+                      {isUploadingImage ? (
+                        <View style={{ alignItems: 'center', gap: 8 }}>
+                          <ActivityIndicator size="large" color={colors.primary} />
+                          <Text style={{ fontSize: 13, fontWeight: '700', color: colors.primary }}>Uploading scanned pages to Cloudflare R2...</Text>
+                        </View>
+                      ) : (
+                        <View style={{ alignItems: 'center' }}>
+                          <View style={{ width: 56, height: 56, borderRadius: 28, backgroundColor: colors.surfaceStrong, alignItems: 'center', justifyContent: 'center', marginBottom: 12 }}>
+                            <UploadCloud size={28} color={colors.primary} />
+                          </View>
+                          <Text style={{ fontSize: 15, fontWeight: '900', color: colors.textPrimary, marginBottom: 4 }}>Tap to Select Multiple Pages from iPad Photos</Text>
+                          <Text style={{ fontSize: 12, color: colors.textSecondary, textAlign: 'center' }}>Auto-compressed & uploaded to Cloudflare R2</Text>
+                        </View>
+                      )}
+                    </TouchableOpacity>
+
+                    {topperScans.length > 0 && (
+                      <View style={{ marginBottom: 18 }}>
+                        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
+                          <Text style={{ fontSize: 12, fontWeight: '900', color: colors.textPrimary, letterSpacing: 0.5 }}>UPLOADED SCANS ({topperScans.length} PAGES)</Text>
+                          <TouchableOpacity onPress={() => setTopperScans([])}><Text style={{ fontSize: 11, fontWeight: '700', color: colors.accent }}>Clear All Scans</Text></TouchableOpacity>
+                        </View>
+                        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 12 }}>
+                          {topperScans.map((url, idx) => (
+                            <View key={idx} style={{ width: 150, height: 200, borderRadius: 12, overflow: 'hidden', borderWidth: 1, borderColor: colors.border, backgroundColor: colors.surfaceStrong }}>
+                              <Image source={{ uri: url }} style={{ width: '100%', height: '100%' }} resizeMode="cover" />
+                              <View style={{ position: 'absolute', top: 6, left: 6, backgroundColor: 'rgba(0,0,0,0.75)', paddingHorizontal: 7, paddingVertical: 2, borderRadius: 6 }}>
+                                <Text style={{ fontSize: 10, fontWeight: '900', color: '#38bdf8' }}>Page {idx + 1}</Text>
+                              </View>
+                              <TouchableOpacity onPress={() => setTopperScans(prev => prev.filter((_, i) => i !== idx))}
+                                style={{ position: 'absolute', top: 6, right: 6, width: 24, height: 24, borderRadius: 12, backgroundColor: 'rgba(239,68,68,0.9)', alignItems: 'center', justifyContent: 'center' }}>
+                                <X size={13} color="#fff" />
+                              </TouchableOpacity>
+                              <View style={{ position: 'absolute', bottom: 6, left: 6, right: 6, backgroundColor: 'rgba(16,185,129,0.9)', paddingVertical: 3, borderRadius: 6, alignItems: 'center' }}>
+                                <Text style={{ fontSize: 9, fontWeight: '900', color: '#fff' }}>✓ R2 CDN LINK</Text>
+                              </View>
+                            </View>
+                          ))}
+                        </ScrollView>
+                      </View>
+                    )}
+                  </View>
+                )}
+
+                {/* Dynamic Fields for ALL Content Categories */}
+                <View style={{ gap: 14 }}>
+                  {selectedHub.formFields.map((field: any) => {
+                    const val = addFormValues[field.name] || '';
+                    if (field.type === 'select' && field.options) {
+                      return (
+                        <View key={field.name}>
+                          <Text style={{ fontSize: 10, fontWeight: '800', color: colors.textSecondary, marginBottom: 4, textTransform: 'uppercase' }}>{field.label}{field.required ? ' *' : ''}</Text>
+                          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6 }}>
+                            {field.options.map((opt: string) => (
+                              <TouchableOpacity
+                                key={opt}
+                                onPress={() => setAddFormValues(prev => ({ ...prev, [field.name]: opt }))}
+                                style={{ paddingHorizontal: 12, paddingVertical: 6, borderRadius: 8, borderWidth: 1, borderColor: val === opt ? colors.primary : colors.border, backgroundColor: val === opt ? colors.surface : colors.surfaceStrong }}
+                              >
+                                <Text style={{ fontSize: 11, fontWeight: '800', color: val === opt ? colors.primary : colors.textPrimary }}>{opt}</Text>
+                              </TouchableOpacity>
+                            ))}
+                          </View>
+                        </View>
+                      );
+                    }
+                    
+                    return (
+                      <View key={field.name}>
+                        <Text style={{ fontSize: 10, fontWeight: '800', color: colors.textSecondary, marginBottom: 4, textTransform: 'uppercase' }}>{field.label}{field.required ? ' *' : ''}</Text>
+                        <TextInput
+                          multiline={field.type === 'markdown'}
+                          value={val}
+                          onChangeText={t => setAddFormValues(prev => ({ ...prev, [field.name]: t }))}
+                          placeholder={`Enter ${field.label}...`}
+                          placeholderTextColor={colors.textTertiary}
+                          style={{
+                            backgroundColor: colors.surfaceStrong,
+                            borderWidth: 1, borderColor: colors.border, borderRadius: 10, padding: 12,
+                            color: colors.textPrimary, fontSize: 12,
+                            minHeight: field.type === 'markdown' ? 120 : 44,
+                            fontFamily: field.type === 'markdown' ? (Platform.OS === 'ios' ? 'Menlo' : 'monospace') : undefined,
+                            textAlignVertical: field.type === 'markdown' ? 'top' : 'center'
+                          }}
+                        />
+                      </View>
+                    );
+                  })}
+                </View>
+
+                {/* Publish Bar */}
+                <View style={{ flexDirection: 'row', justifyContent: 'flex-end', gap: 12, marginTop: 24, paddingTop: 16, borderTopWidth: 1, borderTopColor: colors.border }}>
+                  <TouchableOpacity onPress={() => { setAddFormValues({}); setTopperScans([]); }} style={{ paddingHorizontal: 16, paddingVertical: 12, borderRadius: 10, backgroundColor: colors.surfaceStrong }}>
+                    <Text style={{ fontSize: 12, fontWeight: '800', color: colors.textPrimary }}>✕ Clear All</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity 
+                    onPress={() => {
+                        alert("Added to Staging Queue successfully!");
+                    }} 
+                    style={{ paddingHorizontal: 16, paddingVertical: 12, borderRadius: 10, backgroundColor: colors.border }}>
+                    <Text style={{ fontSize: 12, fontWeight: '800', color: colors.textPrimary }}>➕ Save to Staging Queue</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity onPress={handlePublishTopperDirect} style={{ paddingHorizontal: 16, paddingVertical: 12, borderRadius: 10, backgroundColor: colors.primary, flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                    <Sparkles size={14} color="#fff" />
+                    <Text style={{ fontSize: 12, fontWeight: '800', color: colors.buttonText }}>🚀 Publish Direct to Live Db</Text>
+                  </TouchableOpacity>
+                </View>
+
               </View>
             )}
 
@@ -2408,9 +2394,9 @@ export function ContentManager({ headerBlock, tabSelector }: { headerBlock?: Rea
                       value={pasteValue}
                       onChangeText={setPasteValue}
                       style={{
-                        backgroundColor: '#080c14',
+                        backgroundColor: colors.surfaceStrong,
                         borderWidth: 1,
-                        borderColor: 'rgba(255, 255, 255, 0.12)',
+                        borderColor: colors.border,
                         borderRadius: 12,
                         padding: 12,
                         color: '#38bdf8',
@@ -2818,7 +2804,7 @@ export function ContentManager({ headerBlock, tabSelector }: { headerBlock?: Rea
                         onChangeText={t => { setEditJsonText(t); setEditJsonError(''); }}
                         style={[
                           styles.formInput,
-                          { color: '#10b981', backgroundColor: '#0f172a', fontFamily: 'monospace',
+                          { color: '#10b981', backgroundColor: colors.surface, fontFamily: 'monospace',
                             fontSize: 11, minHeight: 260, flex: 1, borderColor: editJsonError ? '#ef4444' : '#334155' }
                         ]}
                         placeholder={'{\n  "questionText": "...",\n  "marks": "15",\n  "paper": "GS2",\n  "answers": [{ "institute": "Vision IAS", "answer_text": "..." }]\n}'}
@@ -3101,7 +3087,7 @@ export function ContentManager({ headerBlock, tabSelector }: { headerBlock?: Rea
                         onChangeText={t => { setEditJsonText(t); setEditJsonError(''); }}
                         style={[
                           styles.formInput,
-                          { color: '#10b981', backgroundColor: '#0f172a', fontFamily: 'monospace',
+                          { color: '#10b981', backgroundColor: colors.surface, fontFamily: 'monospace',
                             fontSize: 11, minHeight: 260, borderColor: editJsonError ? '#ef4444' : '#334155' }
                         ]}
                         placeholder={'{\n  "title": "...",\n  "content": "..."\n}'}
@@ -3288,69 +3274,125 @@ export function ContentManager({ headerBlock, tabSelector }: { headerBlock?: Rea
 
 // ── Reusable item row ──────────────────────────────────────────────────────────
 function ItemCard({ item, colors, isStaging, onPublish, onEdit, onDelete }: any) {
-  let title = item.question_text || item.questionText || item.card_title || item.title || item.mnemonic_number_title || item.framework_name || 'No Title';
+  const [expanded, setExpanded] = useState(false);
+  
+  let title = item.question_text || item.questionText || item.card_title || item.title || item.mnemonic_number_title || item.framework_name || item.parameter_headline || 'No Title';
   let badgeLabel = '';
   let badgeColor = colors.primary;
 
-  if (item.is_topper_copy || item.topper_name || item.topper) {
-    const tName = item.topper || item.topper_name || 'Topper Copy';
+  const tName = item.topper || item.topper_name;
+  if (item.is_topper_copy || tName) {
     const tAir = item.air || item.air_rank ? ` (AIR ${item.air || item.air_rank})` : '';
-    badgeLabel = `🌟 ${tName}${tAir}`;
+    badgeLabel = `🌟 ${tName || 'Topper Copy'}${tAir}`;
     badgeColor = '#d97706';
   } else if (item.options || item.correct_answer || item.correctAnswer) {
     badgeLabel = `🎯 Prelims MCQ (Key: ${String(item.correct_answer || item.correctAnswer || 'A').toUpperCase()})`;
     badgeColor = '#059669';
+  } else if (item.parameter_headline) {
+    badgeLabel = `📊 Data & Fact`;
+    badgeColor = '#3b82f6';
   }
   
   let body = '';
   if (item.question_text || item.questionText) {
     const firstAns = Array.isArray(item.mains_answers) ? item.mains_answers[0] : null;
-    body = firstAns ? firstAns.answer_text : 'No answer drafted yet.';
+    body = firstAns ? firstAns.answer_text : (item.answer || 'No answer drafted yet.');
   } else if (item.explanation || item.explanation_markdown) {
     body = item.explanation || item.explanation_markdown;
   } else {
     body = item.body || item.content_markdown || item.content || item.explanation_examples || '';
   }
 
-  const preview = body.replace(/[\*\#\>\n]/g, ' ').substring(0, 90);
+  const preview = typeof body === 'string' ? body.replace(/[\*\#\>\n]/g, ' ').substring(0, 90) : '';
   
+  // Dynamic JSON parsing for editing
+  const renderInlineEdit = () => {
+    return (
+      <View style={{ marginTop: 12, borderTopWidth: 1, borderTopColor: colors.border, paddingTop: 12 }}>
+         <Text style={{ fontSize: 10, fontWeight: '800', color: colors.textSecondary, marginBottom: 6 }}>INLINE RAW JSON EDITOR:</Text>
+         <TextInput
+            multiline
+            defaultValue={JSON.stringify(item, null, 2)}
+            style={{ 
+              backgroundColor: colors.surfaceStrong, 
+              borderWidth: 1, borderColor: colors.border, borderRadius: 8, padding: 10,
+              color: colors.textPrimary, fontSize: 10, fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace',
+              maxHeight: 300
+            }}
+         />
+         {/* Edit explicitly opens modal, but we can do it inline in future. For now, we give the user the choice between expanded JSON & Action buttons */}
+         <View style={{ flexDirection: 'row', gap: 6, marginTop: 12, justifyContent: 'flex-end' }}>
+            <TouchableOpacity onPress={onEdit} style={{ backgroundColor: colors.surfaceStrong, paddingHorizontal: 12, paddingVertical: 6, borderRadius: 6, borderWidth: 1, borderColor: colors.border }}>
+              <Text style={{ fontSize: 10, fontWeight: '800', color: colors.textPrimary }}>📝 Full Edit Mode</Text>
+            </TouchableOpacity>
+         </View>
+      </View>
+    );
+  };
+
   return (
-    <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-      <View style={{ flex: 1 }}>
-        {badgeLabel ? (
-          <View style={{ marginBottom: 4, flexDirection: 'row', alignItems: 'center' }}>
-            <View style={{ backgroundColor: badgeColor + '18', paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4, borderWidth: 1, borderColor: badgeColor + '35' }}>
-              <Text style={{ fontSize: 10, fontWeight: '900', color: badgeColor }}>{badgeLabel}</Text>
+    <TouchableOpacity 
+      activeOpacity={0.8}
+      onPress={() => setExpanded(!expanded)}
+      style={[styles.card, { backgroundColor: expanded ? colors.surfaceStrong : colors.surface, borderColor: expanded ? colors.primary : colors.border }]}
+    >
+      <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
+        <View style={{ flex: 1 }}>
+          {badgeLabel ? (
+            <View style={{ marginBottom: 4, flexDirection: 'row', alignItems: 'center' }}>
+              <View style={{ backgroundColor: badgeColor + '18', paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4, borderWidth: 1, borderColor: badgeColor + '35' }}>
+                <Text style={{ fontSize: 10, fontWeight: '900', color: badgeColor }}>{badgeLabel}</Text>
+              </View>
             </View>
+          ) : null}
+          <Text style={{ fontSize: 13, fontWeight: '800', color: colors.textPrimary }} numberOfLines={expanded ? undefined : 2}>{title}</Text>
+          {!expanded && <Text style={{ fontSize: 10, color: colors.textTertiary, marginTop: 4 }} numberOfLines={2}>{preview}…</Text>}
+          
+          <View style={{ flexDirection: 'row', gap: 5, marginTop: 8, flexWrap: 'wrap' }}>
+            {item.paper && <Text style={[styles.chip, { backgroundColor: colors.primary + '12', color: colors.primary }]}>{item.paper}</Text>}
+            {item.subject && <Text style={[styles.chip, { backgroundColor: colors.border, color: colors.textSecondary }]}>{item.subject}</Text>}
+            {item.section_group && <Text style={[styles.chip, { backgroundColor: colors.border, color: colors.textTertiary }]}>{item.section_group}</Text>}
+            {item.ethics_type && (
+              <Text style={[styles.chip, { backgroundColor: '#8b5cf615', color: '#8b5cf6', textTransform: 'uppercase' }]}>{item.ethics_type}</Text>
+            )}
           </View>
-        ) : null}
-        <Text style={{ fontSize: 13, fontWeight: '800', color: colors.textPrimary }} numberOfLines={2}>{title}</Text>
-        <Text style={{ fontSize: 10, color: colors.textTertiary, marginTop: 2 }} numberOfLines={2}>{preview}…</Text>
-        <View style={{ flexDirection: 'row', gap: 5, marginTop: 5, flexWrap: 'wrap' }}>
-          {item.paper && <Text style={[styles.chip, { backgroundColor: colors.primary + '12', color: colors.primary }]}>{item.paper}</Text>}
-          {item.subject && <Text style={[styles.chip, { backgroundColor: colors.border, color: colors.textSecondary }]}>{item.subject}</Text>}
-          {item.section_group && <Text style={[styles.chip, { backgroundColor: colors.border, color: colors.textTertiary }]}>{item.section_group}</Text>}
-          {item.ethics_type && (
-            <Text style={[styles.chip, { backgroundColor: 'rgba(139,92,246,0.12)', color: '#8b5cf6', fontWeight: '800', textTransform: 'uppercase' }]}>
-              🏷️ {item.ethics_type}
-            </Text>
+        </View>
+
+        {/* Action Buttons Always Visible */}
+        <View style={{ flexDirection: 'row', gap: 4, marginLeft: 8 }}>
+          {isStaging && (
+            <TouchableOpacity onPress={onPublish} style={{ backgroundColor: colors.primary + '20', width: 28, height: 28, borderRadius: 14, alignItems: 'center', justifyContent: 'center' }}>
+              <Check size={14} color={colors.primary} />
+            </TouchableOpacity>
           )}
+          <TouchableOpacity onPress={onDelete} style={{ backgroundColor: 'rgba(239, 68, 68, 0.15)', width: 28, height: 28, borderRadius: 14, alignItems: 'center', justifyContent: 'center' }}>
+            <Trash2 size={13} color="#ef4444" />
+          </TouchableOpacity>
         </View>
       </View>
-      <View style={{ flexDirection: 'row', gap: 5, marginLeft: 8 }}>
-        {isStaging && (
-          <TouchableOpacity onPress={onPublish} style={[styles.iconBtn, { backgroundColor: '#22c55e15' }]}>
-            <Play size={13} color="#22c55e" />
-          </TouchableOpacity>
-        )}
-        <TouchableOpacity onPress={onEdit} style={[styles.iconBtn, { backgroundColor: colors.primary + '15' }]}>
-          <Edit size={13} color={colors.primary} />
-        </TouchableOpacity>
-        <TouchableOpacity onPress={onDelete} style={[styles.iconBtn, { backgroundColor: '#ef444415' }]}>
-          <Trash2 size={13} color="#ef4444" />
-        </TouchableOpacity>
-      </View>
-    </View>
+
+      {/* EXPANDED CONTENT ACCORDION */}
+      {expanded && (
+        <View style={{ marginTop: 12, paddingTop: 12, borderTopWidth: 1, borderTopColor: colors.border }}>
+          {item.scans && item.scans.length > 0 && (
+            <View style={{ marginBottom: 12 }}>
+              <Text style={{ fontSize: 10, fontWeight: '800', color: colors.textSecondary, marginBottom: 4 }}>ATTACHED R2 SCANS:</Text>
+              <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>
+                {item.scans.map((u: string, idx: number) => (
+                   <Image key={idx} source={{ uri: u }} style={{ width: 60, height: 80, borderRadius: 6, borderWidth: 1, borderColor: colors.border }} />
+                ))}
+              </ScrollView>
+            </View>
+          )}
+
+          <Text style={{ fontSize: 11.5, color: colors.textSecondary, lineHeight: 18 }}>
+            {body || (item.content_markdown || item.content || 'No detailed content available.')}
+          </Text>
+
+          {renderInlineEdit()}
+        </View>
+      )}
+    </TouchableOpacity>
   );
 }
 

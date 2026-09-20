@@ -840,7 +840,13 @@ export default function HomeScreen() {
         />
       </View>
 
-      <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+      <ScrollView 
+        style={styles.container} 
+        showsVerticalScrollIndicator={false}
+        automaticallyAdjustKeyboardInsets={true}
+        keyboardShouldPersistTaps="handled"
+        keyboardDismissMode="on-drag"
+      >
         {/* ── FOREGROUND CONTENT (No background block, purely flowing) ── */}
         <View style={styles.contentContainer}>
           
@@ -1432,7 +1438,7 @@ export default function HomeScreen() {
                 )}
               </ScrollView>
 
-              <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 'auto', backgroundColor: '#FFFFFF', borderRadius: 14, paddingHorizontal: 14, height: 46, shadowColor: '#7C3AED', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.06, shadowRadius: 8, elevation: 2 }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 'auto', backgroundColor: '#FFFFFF', borderRadius: 14, paddingHorizontal: 14, height: 46, width: IS_TABLET ? '50%' : '100%', shadowColor: '#7C3AED', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.06, shadowRadius: 8, elevation: 2 }}>
                 <TextInput 
                   style={{ flex: 1, fontSize: 13, color: '#334155', fontWeight: '500', height: '100%' }}
                   placeholder="Quick add a new task..."

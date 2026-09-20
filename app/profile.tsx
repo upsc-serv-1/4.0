@@ -980,7 +980,7 @@ export default function Profile() {
       <Modal
         visible={userSubAdminVisible}
         transparent
-        animationType="slide"
+        animationType="fade"
         onRequestClose={() => {
           if (!savingAdminSub) {
             setUserSubAdminVisible(false);
@@ -989,7 +989,7 @@ export default function Profile() {
         }}
       >
         <View style={styles.syncOverlay}>
-          <View style={[styles.modalContent, { backgroundColor: colors.surface, width: '100%', height: '90%', borderTopLeftRadius: 28, borderTopRightRadius: 28 }]}>
+          <View style={[styles.modalContent, { backgroundColor: colors.surface, width: '100%', maxWidth: 560, maxHeight: '85%' }]}>
             <View style={styles.modalHeader}>
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
                 <Crown size={22} color={colors.primary} />
@@ -1405,8 +1405,8 @@ const styles = StyleSheet.create({
   rowS: { fontSize: 12, marginTop: 2 },
   logout: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, padding: 18, borderRadius: radius.md, borderWidth: 1, marginTop: 32 },
   logoutText: { color: '#FF3B30', fontWeight: '900', letterSpacing: 1 },
-  modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' },
-  modalContent: { borderTopLeftRadius: 32, borderTopRightRadius: 32, padding: 24, maxHeight: '80%' },
+  modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.65)', justifyContent: 'center', alignItems: 'center', padding: 20 },
+  modalContent: { borderRadius: 24, padding: 22, maxHeight: '80%', width: '100%', maxWidth: 480, borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)', shadowColor: '#000', shadowOffset: { width: 0, height: 16 }, shadowOpacity: 0.4, shadowRadius: 30, elevation: 12 },
   modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 },
   modalTitle: { fontSize: 20, fontWeight: '900' },
   pickerItem: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 18, borderBottomWidth: 1 },

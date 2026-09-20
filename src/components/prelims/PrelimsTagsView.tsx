@@ -1258,12 +1258,12 @@ const styles = StyleSheet.create({
   floatingZenExit: { position: 'absolute', top: 60, right: 20, zIndex: 9999, width: 44, height: 44, borderRadius: 22, backgroundColor: 'rgba(67, 52, 34, 0.1)', alignItems: 'center', justifyContent: 'center' },
 
   modalBackdrop: { flex: 1, backgroundColor: 'rgba(0,0,0,0.3)' },
-  modalBackdropStrong: { flex: 1, backgroundColor: 'rgba(0,0,0,0.55)', justifyContent: 'flex-end' },
+  modalBackdropStrong: { flex: 1, backgroundColor: 'rgba(0,0,0,0.65)', justifyContent: 'center', alignItems: 'center', padding: 20 },
   actionMenu: { position: 'absolute', top: 120, right: 24, borderWidth: 1, borderRadius: 14, paddingVertical: 8, minWidth: 180 },
   menuItem: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingHorizontal: 12, paddingVertical: 10 },
   menuText: { fontSize: 14, fontWeight: '700' },
 
-  sheet: { borderTopLeftRadius: 24, borderTopRightRadius: 24, borderTopWidth: 1, maxHeight: '90%' },
+  sheet: { borderRadius: 24, borderWidth: 1, maxHeight: '85%', width: '100%', maxWidth: 520, overflow: 'hidden', shadowColor: '#000', shadowOffset: { width: 0, height: 16 }, shadowOpacity: 0.4, shadowRadius: 30, elevation: 12 },
   sheetHead: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 14, borderBottomWidth: 1 },
   sheetTitle: { fontSize: 17, fontWeight: '900' },
   addTagRow: { padding: 16, flexDirection: 'row', alignItems: 'center', gap: 10 },

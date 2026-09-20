@@ -229,7 +229,7 @@ export function UnifiedExportModal({
   };
 
   return (
-    <Modal visible={visible} animationType="slide" transparent onRequestClose={onClose}>
+    <Modal visible={visible} animationType="fade" transparent onRequestClose={onClose}>
       <View style={styles.backdrop}>
         <View style={styles.sheet}>
           {/* Header */}
@@ -396,15 +396,22 @@ function FilterChipGroup({ title, items, active, onToggle, testIdPrefix }: Filte
 const styles = StyleSheet.create({
   backdrop: {
     flex: 1,
-    backgroundColor: 'rgba(15,23,42,0.55)',
-    justifyContent: 'flex-end',
+    backgroundColor: 'rgba(15,23,42,0.65)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
   },
   sheet: {
     backgroundColor: '#fff',
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
-    maxHeight: '88%',
-    minHeight: '60%',
+    borderRadius: 24,
+    width: '100%',
+    maxWidth: 560,
+    maxHeight: '85%',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 16 },
+    shadowOpacity: 0.4,
+    shadowRadius: 30,
+    elevation: 12,
   },
   header: {
     flexDirection: 'row',

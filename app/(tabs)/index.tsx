@@ -1632,7 +1632,7 @@ export default function HomeScreen() {
           </View>
 
           {/* ── 6. ADD TASK MODAL ── */}
-          <Modal visible={addTaskModalVisible} transparent animationType="slide">
+          <Modal visible={addTaskModalVisible} transparent animationType="fade">
             <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.modalOverlay}>
               <View style={styles.modalContent}>
                 <View style={styles.modalHeader}>
@@ -2074,8 +2074,8 @@ const styles = StyleSheet.create({
     elevation: 4,
   },
   floatingFooterTxt: { fontSize: 11, fontWeight: '700', color: '#334155', marginRight: 4 },
-  modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.4)', justifyContent: 'flex-end' },
-  modalContent: { backgroundColor: '#FFF', borderTopLeftRadius: 24, borderTopRightRadius: 24, padding: 20 },
+  modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.65)', justifyContent: 'center', alignItems: 'center', padding: 20 },
+  modalContent: { backgroundColor: '#FFF', borderRadius: 24, padding: 22, width: '100%', maxWidth: 480, shadowColor: '#000', shadowOffset: { width: 0, height: 16 }, shadowOpacity: 0.35, shadowRadius: 28, elevation: 10 },
   modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 },
   modalTitle: { fontSize: 16, fontWeight: '700', color: '#0F172A' },
   modalInput: { backgroundColor: '#F8FAFC', borderWidth: 1, borderColor: '#E2E8F0', borderRadius: 12, padding: 12, marginBottom: 12, fontSize: 14 },

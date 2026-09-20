@@ -112,9 +112,9 @@ export default function SubscriptionSheet({ visible, onClose }: Props) {
   const currentPlanName = currentSub?.access_plans?.name || 'Free';
 
   return (
-    <Modal visible={visible} animationType="slide" transparent onRequestClose={onClose}>
+    <Modal visible={visible} animationType="fade" transparent onRequestClose={onClose}>
       <View style={styles.overlay}>
-        <View style={[styles.sheet, { backgroundColor: colors.bg }]}>
+        <View style={[styles.sheet, { backgroundColor: colors.bg, borderColor: colors.border }]}>
           {/* Header */}
           <View style={styles.header}>
             <View style={styles.headerLeft}>
@@ -231,14 +231,23 @@ export default function SubscriptionSheet({ visible, onClose }: Props) {
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    justifyContent: 'flex-end',
+    backgroundColor: 'rgba(0,0,0,0.65)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
   },
   sheet: {
-    maxHeight: '90%',
-    borderTopLeftRadius: 28,
-    borderTopRightRadius: 28,
-    paddingBottom: 40,
+    width: '100%',
+    maxWidth: 540,
+    maxHeight: '85%',
+    borderRadius: 24,
+    overflow: 'hidden',
+    borderWidth: 1,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 16 },
+    shadowOpacity: 0.4,
+    shadowRadius: 30,
+    elevation: 12,
   },
   header: {
     flexDirection: 'row',

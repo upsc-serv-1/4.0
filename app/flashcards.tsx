@@ -915,7 +915,7 @@ function FlashcardsHub() {
         <Modal visible={!!createModal} transparent animationType="fade">
           <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
             <View style={styles.modalOverlay}>
-              <Pressable style={{ flex: 1 }} onPress={() => setCreateModal(null)} />
+              <Pressable style={StyleSheet.absoluteFill} onPress={() => setCreateModal(null)} />
               <View style={[styles.createSheet, { backgroundColor: colors.surface }]}>
                 <View style={styles.modalHeader}>
                   <Text style={[styles.modalTitle, { color: colors.textPrimary }]}>
@@ -979,7 +979,7 @@ function FlashcardsHub() {
         <Modal visible={!!renameModal} transparent animationType="fade">
           <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
             <View style={styles.modalOverlay}>
-              <Pressable style={{ flex: 1 }} onPress={() => setRenameModal(null)} />
+              <Pressable style={StyleSheet.absoluteFill} onPress={() => setRenameModal(null)} />
               <View style={[styles.modalContent, { backgroundColor: colors.surface }]}>
                 <Text style={[styles.modalTitle, { color: colors.textPrimary }]}>Rename</Text>
                 <TextInput placeholder="New name" placeholderTextColor={colors.textTertiary} style={[styles.modalInput, { color: colors.textPrimary, borderColor: colors.border }]} value={nameDraft} onChangeText={setNameDraft} autoFocus />
@@ -1059,8 +1059,8 @@ const styles = StyleSheet.create({
 
   fab: { position: 'absolute', bottom: 30, right: 20, width: 64, height: 64, borderRadius: 32, alignItems: 'center', justifyContent: 'center', elevation: 8, shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 8 },
   empty: { padding: 80, alignItems: 'center' },
-  modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.6)', justifyContent: 'flex-end' },
-  modalContent: { borderRadius: 24, padding: 24, width: '100%', maxWidth: 500, alignSelf: 'center' },
+  modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.65)', justifyContent: 'center', alignItems: 'center', padding: 20 },
+  modalContent: { borderRadius: 24, padding: 24, width: '100%', maxWidth: 500, alignSelf: 'center', shadowColor: '#000', shadowOffset: { width: 0, height: 16 }, shadowOpacity: 0.4, shadowRadius: 30, elevation: 12 },
   modalTitle: { fontSize: 22, fontWeight: '900', marginBottom: 20 },
   modalInput: { borderWidth: 1, borderRadius: 16, padding: 16, fontSize: 16, fontWeight: '600', marginBottom: 20 },
   modalBtns: { flexDirection: 'row', gap: 12 },
@@ -1068,13 +1068,13 @@ const styles = StyleSheet.create({
   modalCreate: { flex: 1, alignItems: 'center', padding: 16, borderRadius: 16 },
   
   modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 },
-  addMenuContent: { borderTopLeftRadius: 32, borderTopRightRadius: 32, padding: 24, paddingBottom: 40, width: '100%', position: 'absolute', bottom: 0 },
+  addMenuContent: { borderRadius: 24, padding: 24, width: '100%', maxWidth: 480, alignSelf: 'center', shadowColor: '#000', shadowOffset: { width: 0, height: 16 }, shadowOpacity: 0.4, shadowRadius: 30, elevation: 12, borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)' },
   addMenuItem: { flexDirection: 'row', alignItems: 'center', paddingVertical: 16, gap: 16 },
   addItemIcon: { width: 48, height: 48, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
   addItemContent: { flex: 1 },
   addItemTitle: { fontSize: 18, fontWeight: '700' },
   addItemSub: { fontSize: 13, marginTop: 2 },
-  createSheet: { borderTopLeftRadius: 32, borderTopRightRadius: 32, padding: 24, paddingBottom: 40, width: '100%', position: 'absolute', bottom: 0 },
+  createSheet: { borderRadius: 24, padding: 24, width: '100%', maxWidth: 480, alignSelf: 'center', shadowColor: '#000', shadowOffset: { width: 0, height: 16 }, shadowOpacity: 0.4, shadowRadius: 30, elevation: 12, borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)' },
   closeBtn: { width: 32, height: 32, borderRadius: 16, backgroundColor: '#f2f2f7', alignItems: 'center', justifyContent: 'center' },
   premiumInput: { height: 64, borderRadius: 20, paddingHorizontal: 20, fontSize: 18, fontWeight: '600', marginVertical: 20 },
   iconColorSection: { marginBottom: 30 },

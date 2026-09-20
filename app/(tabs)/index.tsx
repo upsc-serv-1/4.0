@@ -912,7 +912,7 @@ export default function HomeScreen() {
 
 
           {/* ── 4. ROW 1 (3-COLUMN GRID) ── */}
-          <View style={[styles.rowGrid, { alignItems: 'flex-start', marginBottom: 8 }]}>
+          <View style={[styles.rowGrid, { alignItems: 'flex-start', marginBottom: 0 }]}>
             {/* COLUMN 1: My Preparation (44% Width) */}
             <View style={[styles.card, styles.col1Card, { overflow: 'hidden', backgroundColor: '#F8FAFC', borderWidth: 1, borderColor: '#E2E8F0' }]}>
               {/* Premium Geometric Backgrounds */}
@@ -1343,7 +1343,7 @@ export default function HomeScreen() {
           </View>
 
           {/* ── 5. ROW 2 (TODAY TASK LIST + DAILY CHALLENGE) ── */}
-          <View style={[styles.rowGrid, { alignItems: 'flex-start' }]}>
+          <View style={[styles.rowGrid, { alignItems: 'flex-start', marginTop: -10 }]}>
             {/* COLUMN 1: Today Task List Card (Expanded to take full width/focus) */}
             <View style={[styles.card, { flex: IS_TABLET ? 1.3 : undefined, minHeight: 270, overflow: 'hidden', backgroundColor: '#F5F3FF', borderWidth: 1, borderColor: '#EDE9FE' }]}>
               {/* Premium Geometric Backgrounds */}

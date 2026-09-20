@@ -16,7 +16,6 @@ import { useTheme } from '../../context/ThemeContext';
 import { useAuth } from '../../context/AuthContext';
 import { LinearGradient } from 'expo-linear-gradient';
 import { buildCanonicalExplanations, getPYQCategorization, normalizeInstituteLabel, normalizeProgramLabel, normalizeExplText, extractYearFromText, toBool, getExamInfo } from '../../utils/questionUtils';
-import { AIExplanationChat } from './AIExplanationChat';
 import { AdvancedCopyModal } from './AdvancedCopyModal';
 
 const { width, height } = Dimensions.get('window');

@@ -704,13 +704,13 @@ export default function IntegratedSearchScreen() {
   // Active answer tab selected for each Mains question ID
   const [activeMainsTabs, setActiveMainsTabs] = useState<Record<string, string>>({});
 
-  // 6 Accordion Sections (prelims, mains & searchIn OPEN by default, institutes/revision/display CLOSED by default)
+  // 6 Accordion Sections (prelims & mains OPEN by default, searchIn/institutes/revision/display CLOSED by default)
   const [openSections, setOpenSections] = useState<Record<string, boolean>>({
     prelims: true,
     mains: true,
     institutes: false,
     revision: false,
-    searchIn: true,
+    searchIn: false,
     display: false,
   });
   const [pyqExpanded, setPyqExpanded] = useState(false);
@@ -1233,12 +1233,14 @@ export default function IntegratedSearchScreen() {
         }
 
         const inst = r.rawItem?.institute || (Array.isArray(r.rawItem?.tests) ? r.rawItem.tests[0]?.institute : r.rawItem?.tests?.institute) || '';
-        if (inst) insts.add(inst);
+        if (inst && inst !== 'Topper Copy') insts.add(inst);
         if (r.type === 'topper' || r.rawItem?.is_topper_copy || r.rawItem?.answers?.some((a: any) => a.is_topper || a.topper)) {
-          insts.add('Topper Copy');
+          insts.add('Topper Copies');
         }
       });
-      (filters.institutes || []).forEach(i => insts.add(i));
+      (filters.institutes || []).forEach(i => {
+        if (i && i !== 'Topper Copy') insts.add(i);
+      });
     } else {
       if (filters.showPrelims && paperFilter.length === 0) {
         coursePrelims.forEach((q: any) => {
@@ -1248,7 +1250,7 @@ export default function IntegratedSearchScreen() {
           }
           const tests = Array.isArray(q.tests) ? q.tests[0] : q.tests;
           const inst = tests?.institute || q.provider || q.source?.institute || '';
-          if (inst) insts.add(inst);
+          if (inst && inst !== 'Topper Copy') insts.add(inst);
         });
       }
 
@@ -1260,14 +1262,15 @@ export default function IntegratedSearchScreen() {
             const qSub = (q.subject || '').trim().toLowerCase();
             if (!qSub || !subjectFilters.includes(qSub)) return;
           }
-          if (q.institute) insts.add(q.institute);
+          if (q.institute && q.institute !== 'Topper Copy') insts.add(q.institute);
           if (q.is_topper_copy || q.answers?.some((a: any) => a.is_topper || a.topper)) {
-            insts.add('Topper Copy');
+            insts.add('Topper Copies');
           }
         });
       }
     }
 
+    insts.delete('Topper Copy');
     return ['All', ...Array.from(insts).sort()];
   }, [mainsQuestions, coursePrelims, filters.showPrelims, filters.showMains, filters.showToppers, filters.mainsPapers, filters.subjects, filters.institutes, hasSearched, results]);
 
@@ -1795,11 +1798,11 @@ export default function IntegratedSearchScreen() {
 
     const matchesInstitute = (item: UnifiedSearchResult) => {
       if (filters.institutes.length === 0) return true;
-      const isTopperItem = item.type === 'topper' || !!item.rawItem?.is_topper_copy || (Array.isArray(item.rawItem?.answers) && item.rawItem.answers.some((a: any) => a?.is_topper || a?.topper || a?.is_topper_copy));
-      if (filters.institutes.includes('Topper Copy') && isTopperItem) {
+      const isTopperItem = item.type === 'topper' || !!item.rawItem?.is_topper_copy || item.rawItem?.institute === 'Topper Copies' || (Array.isArray(item.rawItem?.answers) && item.rawItem.answers.some((a: any) => a?.is_topper || a?.topper || a?.is_topper_copy));
+      if ((filters.institutes.includes('Topper Copies') || filters.institutes.includes('Topper Copy')) && isTopperItem) {
         return true;
       }
-      if (item.type === 'topper') return filters.institutes.includes('Topper Copy');
+      if (item.type === 'topper') return filters.institutes.includes('Topper Copies') || filters.institutes.includes('Topper Copy');
       if (item.type === 'prelims') {
         const tests = Array.isArray(item.rawItem?.tests) ? item.rawItem.tests[0] : item.rawItem?.tests;
         const inst = tests?.institute || item.rawItem?.provider || item.rawItem?.source?.institute || '';
@@ -2363,11 +2366,11 @@ export default function IntegratedSearchScreen() {
     // Filter by institute
     if (filters.institutes.length > 0) {
       list = list.filter(item => {
-        const isTopperItem = item.type === 'topper' || !!item.rawItem?.is_topper_copy || (Array.isArray(item.rawItem?.answers) && item.rawItem.answers.some((a: any) => a?.is_topper || a?.topper || a?.is_topper_copy));
-        if (filters.institutes.includes('Topper Copy') && isTopperItem) {
+        const isTopperItem = item.type === 'topper' || !!item.rawItem?.is_topper_copy || item.rawItem?.institute === 'Topper Copies' || (Array.isArray(item.rawItem?.answers) && item.rawItem.answers.some((a: any) => a?.is_topper || a?.topper || a?.is_topper_copy));
+        if ((filters.institutes.includes('Topper Copies') || filters.institutes.includes('Topper Copy')) && isTopperItem) {
           return true;
         }
-        if (item.type === 'topper') return filters.institutes.includes('Topper Copy');
+        if (item.type === 'topper') return filters.institutes.includes('Topper Copies') || filters.institutes.includes('Topper Copy');
         if (item.type === 'prelims') {
           const tests = Array.isArray(item.rawItem.tests) ? item.rawItem.tests[0] : item.rawItem.tests;
           const inst = tests?.institute || item.rawItem.provider || item.rawItem.source?.institute || '';
@@ -3285,6 +3288,9 @@ export default function IntegratedSearchScreen() {
 
   const LeftPanelFilters = (
     <ScrollView ref={sidebarScrollViewRef} style={{ flex: 1 }} contentContainerStyle={{ padding: 16 }} showsVerticalScrollIndicator={true}>
+      {/* Spacer so Floating Home/Back button never overlaps Result Breakdown or top filters */}
+      {IS_IPAD && <View style={{ height: Math.max(insets.top, 12) + 40 }} />}
+
       {/* Result Breakdown - stats pills with indicator dots on top and counts below (Requirement 9) */}
       {hasSearched && results.length > 0 && (
         <View style={{ marginBottom: 14, paddingBottom: 12, borderBottomWidth: 0.5, borderBottomColor: colors.border }}>

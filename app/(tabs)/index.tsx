@@ -1309,12 +1309,9 @@ export default function HomeScreen() {
             </View>
 
             {/* COLUMN 3: Open Background & Quote (30% Width) */}
-            <View style={{ flex: IS_TABLET ? 1.5 : undefined, flexDirection: 'column', minHeight: 290 }}>
-              {/* Spacer to push quote to bottom and leave top empty for background image */}
-              <View style={{ flex: 1 }} />
-
+            <View style={{ flex: IS_TABLET ? 1.5 : undefined, flexDirection: 'column', justifyContent: 'flex-start' }}>
               {/* Bottom Card: Kalam Quote Card with Soft Mountain Graphic */}
-              <TouchableOpacity activeOpacity={0.8} onPress={handleNextQuote} style={[styles.card, styles.kalamQuoteCard, { marginTop: 16 }]}>
+              <TouchableOpacity activeOpacity={0.8} onPress={handleNextQuote} style={[styles.card, styles.kalamQuoteCard]}>
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 2 }}>
                   <Text style={styles.kalamQuoteMark}>“</Text>
                   <View style={{ flexDirection: 'row', gap: 12, alignItems: 'center', zIndex: 10 }}>
@@ -1345,7 +1342,7 @@ export default function HomeScreen() {
           {/* ── 5. ROW 2 (TODAY TASK LIST + DAILY CHALLENGE) ── */}
           <View style={[styles.rowGrid, { alignItems: 'flex-start' }]}>
             {/* COLUMN 1: Today Task List Card (Expanded to take full width/focus) */}
-            <View style={[styles.card, { flex: IS_TABLET ? 1.6 : undefined, minHeight: 270, overflow: 'hidden', backgroundColor: '#F5F3FF', borderWidth: 1, borderColor: '#EDE9FE' }]}>
+            <View style={[styles.card, { flex: IS_TABLET ? 1.3 : undefined, minHeight: 270, overflow: 'hidden', backgroundColor: '#F5F3FF', borderWidth: 1, borderColor: '#EDE9FE' }]}>
               {/* Premium Geometric Backgrounds */}
               <View style={{ position: 'absolute', top: -40, right: -40, width: 160, height: 160, borderRadius: 80, backgroundColor: 'rgba(124, 58, 237, 0.04)', zIndex: 0 }} />
               
@@ -1452,7 +1449,7 @@ export default function HomeScreen() {
             </View>
 
             {/* COLUMN 2: Daily PYQ / Arena Challenge */}
-            <View style={[styles.card, { flex: IS_TABLET ? 1.1 : undefined, backgroundColor: '#FFF8E7', borderWidth: 1, borderColor: '#FDE68A', padding: 20, overflow: 'hidden', minHeight: 270 }]}>
+            <View style={[styles.card, { flex: IS_TABLET ? 1.4 : undefined, backgroundColor: '#FFF8E7', borderWidth: 1, borderColor: '#FDE68A', padding: 20, overflow: 'hidden', minHeight: 270 }]}>
               {/* Decorative background shapes */}
               <View style={{ position: 'absolute', right: -20, top: -20, width: 100, height: 100, borderRadius: 50, backgroundColor: 'rgba(217, 119, 6, 0.15)', zIndex: 0 }} />
               <View style={{ position: 'absolute', right: 40, bottom: -30, width: 80, height: 80, borderRadius: 40, backgroundColor: 'rgba(245, 158, 11, 0.1)', zIndex: 0 }} />
@@ -1478,7 +1475,7 @@ export default function HomeScreen() {
               
               {inlineQuestion ? (
                 <View style={{ zIndex: 2, flex: 1 }}>
-                  <ScrollView style={{ maxHeight: 300, marginBottom: 12 }} showsVerticalScrollIndicator={true} nestedScrollEnabled={true}>
+                  <View style={{ marginBottom: 14 }}>
                     <Markdown style={{ paragraph: { marginVertical: 0 }, body: { color: '#1E293B', fontSize: 14, lineHeight: 22, fontWeight: '500' } }}>{inlineQuestion.question}</Markdown>
                     {(() => {
                       const pyqCat = getPYQCategorization(inlineQuestion);
@@ -1490,7 +1487,7 @@ export default function HomeScreen() {
                         </Text>
                       );
                     })()}
-                  </ScrollView>
+                  </View>
                   
                   <View style={{ gap: 8, marginBottom: 16 }}>
                     {(Array.isArray(inlineQuestion.parsedOptions) ? inlineQuestion.parsedOptions : []).map((opt: any, idx: number) => {

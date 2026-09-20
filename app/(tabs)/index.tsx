@@ -856,9 +856,13 @@ export default function HomeScreen() {
 
             {/* Right Section: Bell, Avatar, Vertical 3-Line Tagline */}
             <View style={styles.headerRight}>
-              <TouchableOpacity style={styles.iconCircleButton} onPress={() => Alert.alert('Notifications', 'No new unread notifications.')}>
+              <TouchableOpacity
+                style={styles.iconCircleButton}
+                onPress={() => Alert.alert('Notifications', 'You are all caught up! No new notifications.')}
+                accessibilityRole="button"
+                accessibilityLabel="Notifications"
+              >
                 <Bell size={18} color="#475569" />
-                <View style={styles.notifBadge} />
               </TouchableOpacity>
               
               <TouchableOpacity

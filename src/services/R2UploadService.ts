@@ -127,6 +127,25 @@ class R2UploadService {
       };
     }
   }
+
+  /**
+   * Batch uploads multiple image assets for topper copies to R2.
+   * Returns an array of public CDN URLs.
+   */
+  async pickAndUploadMultipleImages(folderPath: string = 'topper_copies'): Promise<string[]> {
+    const assets = await this.pickMultipleImages();
+    if (!assets || assets.length === 0) return [];
+
+    const urls: string[] = [];
+    for (let i = 0; i < assets.length; i++) {
+      const asset = assets[i];
+      const res = await this.uploadImage(asset, folderPath);
+      if (res.success && res.publicUrl) {
+        urls.push(res.publicUrl);
+      }
+    }
+    return urls;
+  }
 }
 
 export const r2UploadService = new R2UploadService();

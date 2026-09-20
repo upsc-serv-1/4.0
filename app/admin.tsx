@@ -1101,57 +1101,135 @@ export default function AdminScreen() {
         {activeTab === 'content' ? (
           <ContentManager
             headerBlock={
-              <View style={[styles.headerBlock, { backgroundColor: colors.surfaceStrong, borderBottomColor: colors.border }]}>
-                <View style={styles.headerTitleRow}>
-                  <TouchableOpacity onPress={() => router.back()} style={styles.iconButton}>
-                    <ArrowLeft size={22} color={colors.textPrimary} />
-                  </TouchableOpacity>
-                  <View style={{ flex: 1, marginLeft: 8 }}>
-                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-                      <ShieldCheck size={20} color="#ef4444" />
-                      <Text style={[styles.headerTitle, { color: colors.textPrimary }]}>Admin Console</Text>
+              <View style={{ backgroundColor: colors.surfaceStrong, borderBottomWidth: 1, borderBottomColor: colors.border, paddingHorizontal: 16, paddingTop: 12, paddingBottom: 10 }}>
+                <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+                    <TouchableOpacity 
+                      onPress={() => router.back()} 
+                      style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border, alignItems: 'center', justifyContent: 'center' }}
+                    >
+                      <ArrowLeft size={18} color={colors.textPrimary} />
+                    </TouchableOpacity>
+                    <View>
+                      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                        <Text style={{ fontSize: 17, fontWeight: '900', color: colors.textPrimary, letterSpacing: -0.3 }}>Pilot Studio</Text>
+                        <View style={{ backgroundColor: '#10b98118', borderColor: '#10b98140', borderWidth: 1, paddingHorizontal: 6, paddingVertical: 2, borderRadius: 6, flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                          <View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: '#10b981' }} />
+                          <Text style={{ fontSize: 10, fontWeight: '800', color: '#10b981' }}>CONNECTED</Text>
+                        </View>
+                      </View>
+                      <Text style={{ fontSize: 11, color: colors.textTertiary }}>{userEmail}</Text>
                     </View>
-                    <Text style={{ fontSize: 11, color: colors.textTertiary }}>{userEmail}</Text>
                   </View>
-                  <TouchableOpacity onPress={() => loadTabContent(activeTab)} style={styles.iconButton}>
-                    <RefreshCw size={18} color={colors.primary} />
-                  </TouchableOpacity>
+
+                  {/* Right Stats & Refresh */}
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: colors.surface, paddingHorizontal: 10, paddingVertical: 6, borderRadius: 10, borderWidth: 1, borderColor: colors.border }}>
+                      <Text style={{ fontSize: 11, fontWeight: '800', color: colors.textPrimary }}>{stats.usersCount}</Text>
+                      <Text style={{ fontSize: 10, color: colors.textTertiary }}>Users</Text>
+                      <View style={{ width: 1, height: 12, backgroundColor: colors.border }} />
+                      <Text style={{ fontSize: 11, fontWeight: '800', color: '#10b981' }}>{stats.subsCount}</Text>
+                      <Text style={{ fontSize: 10, color: colors.textTertiary }}>Active</Text>
+                    </View>
+                    <TouchableOpacity 
+                      onPress={() => loadTabContent(activeTab)} 
+                      style={{ width: 36, height: 36, borderRadius: 10, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border, alignItems: 'center', justifyContent: 'center' }}
+                    >
+                      <RefreshCw size={15} color={colors.primary} />
+                    </TouchableOpacity>
+                  </View>
                 </View>
 
-                {/* Stats Bar */}
-                <View style={styles.statsBar}>
-                  <View style={styles.statBox}>
-                    <Text style={[styles.statNum, { color: colors.textPrimary }]}>{stats.usersCount}</Text>
-                    <Text style={{ fontSize: 9, color: colors.textTertiary }}>Users</Text>
-                  </View>
-                  <View style={[styles.statDivider, { backgroundColor: colors.border }]} />
-                  <View style={styles.statBox}>
-                    <Text style={[styles.statNum, { color: colors.textPrimary }]}>{stats.plansCount}</Text>
-                    <Text style={{ fontSize: 9, color: colors.textTertiary }}>Plans</Text>
-                  </View>
-                  <View style={[styles.statDivider, { backgroundColor: colors.border }]} />
-                  <View style={styles.statBox}>
-                    <Text style={[styles.statNum, { color: colors.textPrimary }]}>{stats.featuresCount}</Text>
-                    <Text style={{ fontSize: 9, color: colors.textTertiary }}>Features</Text>
-                  </View>
-                  <View style={[styles.statDivider, { backgroundColor: colors.border }]} />
-                  <View style={styles.statBox}>
-                    <Text style={[styles.statNum, { color: colors.textPrimary }]}>{stats.subsCount}</Text>
-                    <Text style={{ fontSize: 9, color: colors.textTertiary }}>Active Subs</Text>
-                  </View>
+                {/* Modern Pill Tab Selector */}
+                <View style={{ flexDirection: 'row', backgroundColor: colors.surface, borderRadius: 12, padding: 3, borderWidth: 1, borderColor: colors.border, gap: 4 }}>
+                  {[
+                    { key: 'content', label: '⚡ Content Studio', icon: Database },
+                    { key: 'users', label: '👥 Users', icon: Users },
+                    { key: 'features', label: '🔑 Features', icon: Key },
+                    { key: 'plans', label: '💳 Plans', icon: CreditCard },
+                    { key: 'config', label: '⚙️ Config', icon: Settings },
+                  ].map((t) => {
+                    const active = activeTab === t.key;
+                    return (
+                      <TouchableOpacity
+                        key={t.key}
+                        onPress={() => {
+                          setActiveTab(t.key as TabType);
+                          setSelectedUser(null);
+                          setSelectedPlan(null);
+                        }}
+                        style={{
+                          flex: 1,
+                          flexDirection: 'row',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: 5,
+                          paddingVertical: 7,
+                          borderRadius: 9,
+                          backgroundColor: active ? colors.primary : 'transparent',
+                        }}
+                      >
+                        <Text style={{ fontSize: 11.5, fontWeight: '800', color: active ? '#ffffff' : colors.textSecondary }}>
+                          {t.label}
+                        </Text>
+                      </TouchableOpacity>
+                    );
+                  })}
                 </View>
               </View>
             }
-            tabSelector={
-              <View style={[styles.tabBar, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
+          />
+        ) : (
+          <>
+            {/* Modern Header Block for Non-Content Tabs */}
+            <View style={{ backgroundColor: colors.surfaceStrong, borderBottomWidth: 1, borderBottomColor: colors.border, paddingHorizontal: 16, paddingTop: 12, paddingBottom: 10 }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+                  <TouchableOpacity 
+                    onPress={() => router.back()} 
+                    style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border, alignItems: 'center', justifyContent: 'center' }}
+                  >
+                    <ArrowLeft size={18} color={colors.textPrimary} />
+                  </TouchableOpacity>
+                  <View>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                      <Text style={{ fontSize: 17, fontWeight: '900', color: colors.textPrimary, letterSpacing: -0.3 }}>Pilot Studio</Text>
+                      <View style={{ backgroundColor: '#10b98118', borderColor: '#10b98140', borderWidth: 1, paddingHorizontal: 6, paddingVertical: 2, borderRadius: 6, flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                        <View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: '#10b981' }} />
+                        <Text style={{ fontSize: 10, fontWeight: '800', color: '#10b981' }}>CONNECTED</Text>
+                      </View>
+                    </View>
+                    <Text style={{ fontSize: 11, color: colors.textTertiary }}>{userEmail}</Text>
+                  </View>
+                </View>
+
+                {/* Right Stats & Refresh */}
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: colors.surface, paddingHorizontal: 10, paddingVertical: 6, borderRadius: 10, borderWidth: 1, borderColor: colors.border }}>
+                    <Text style={{ fontSize: 11, fontWeight: '800', color: colors.textPrimary }}>{stats.usersCount}</Text>
+                    <Text style={{ fontSize: 10, color: colors.textTertiary }}>Users</Text>
+                    <View style={{ width: 1, height: 12, backgroundColor: colors.border }} />
+                    <Text style={{ fontSize: 11, fontWeight: '800', color: '#10b981' }}>{stats.subsCount}</Text>
+                    <Text style={{ fontSize: 10, color: colors.textTertiary }}>Active</Text>
+                  </View>
+                  <TouchableOpacity 
+                    onPress={() => loadTabContent(activeTab)} 
+                    style={{ width: 36, height: 36, borderRadius: 10, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border, alignItems: 'center', justifyContent: 'center' }}
+                  >
+                    <RefreshCw size={15} color={colors.primary} />
+                  </TouchableOpacity>
+                </View>
+              </View>
+
+              {/* Modern Pill Tab Selector */}
+              <View style={{ flexDirection: 'row', backgroundColor: colors.surface, borderRadius: 12, padding: 3, borderWidth: 1, borderColor: colors.border, gap: 4 }}>
                 {[
-                  { key: 'users', label: 'Users', icon: Users },
-                  { key: 'features', label: 'Features', icon: Key },
-                  { key: 'plans', label: 'Plans', icon: CreditCard },
-                  { key: 'config', label: 'Global Config', icon: Settings },
-                  { key: 'content', label: 'Content', icon: Database },
+                  { key: 'content', label: '⚡ Content Studio', icon: Database },
+                  { key: 'users', label: '👥 Users', icon: Users },
+                  { key: 'features', label: '🔑 Features', icon: Key },
+                  { key: 'plans', label: '💳 Plans', icon: CreditCard },
+                  { key: 'config', label: '⚙️ Config', icon: Settings },
                 ].map((t) => {
-                  const Icon = t.icon;
                   const active = activeTab === t.key;
                   return (
                     <TouchableOpacity
@@ -1161,96 +1239,24 @@ export default function AdminScreen() {
                         setSelectedUser(null);
                         setSelectedPlan(null);
                       }}
-                      style={[
-                        styles.tabButton,
-                        active && { borderBottomColor: colors.primary },
-                      ]}
+                      style={{
+                        flex: 1,
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: 5,
+                        paddingVertical: 7,
+                        borderRadius: 9,
+                        backgroundColor: active ? colors.primary : 'transparent',
+                      }}
                     >
-                      <Icon size={16} color={active ? colors.primary : colors.textTertiary} />
-                      <Text style={[styles.tabLabel, { color: active ? colors.primary : colors.textTertiary }]}>
+                      <Text style={{ fontSize: 11.5, fontWeight: '800', color: active ? '#ffffff' : colors.textSecondary }}>
                         {t.label}
                       </Text>
                     </TouchableOpacity>
                   );
                 })}
               </View>
-            }
-          />
-        ) : (
-          <>
-            {/* Header Block */}
-            <View style={[styles.headerBlock, { backgroundColor: colors.surfaceStrong, borderBottomColor: colors.border }]}>
-              <View style={styles.headerTitleRow}>
-                <TouchableOpacity onPress={() => router.back()} style={styles.iconButton}>
-                  <ArrowLeft size={22} color={colors.textPrimary} />
-                </TouchableOpacity>
-                <View style={{ flex: 1, marginLeft: 8 }}>
-                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-                    <ShieldCheck size={20} color="#ef4444" />
-                    <Text style={[styles.headerTitle, { color: colors.textPrimary }]}>Admin Console</Text>
-                  </View>
-                  <Text style={{ fontSize: 11, color: colors.textTertiary }}>{userEmail}</Text>
-                </View>
-                <TouchableOpacity onPress={() => loadTabContent(activeTab)} style={styles.iconButton}>
-                  <RefreshCw size={18} color={colors.primary} />
-                </TouchableOpacity>
-              </View>
-
-              {/* Stats Bar */}
-              <View style={styles.statsBar}>
-                <View style={styles.statBox}>
-                  <Text style={[styles.statNum, { color: colors.textPrimary }]}>{stats.usersCount}</Text>
-                  <Text style={{ fontSize: 9, color: colors.textTertiary }}>Users</Text>
-                </View>
-                <View style={[styles.statDivider, { backgroundColor: colors.border }]} />
-                <View style={styles.statBox}>
-                  <Text style={[styles.statNum, { color: colors.textPrimary }]}>{stats.plansCount}</Text>
-                  <Text style={{ fontSize: 9, color: colors.textTertiary }}>Plans</Text>
-                </View>
-                <View style={[styles.statDivider, { backgroundColor: colors.border }]} />
-                <View style={styles.statBox}>
-                  <Text style={[styles.statNum, { color: colors.textPrimary }]}>{stats.featuresCount}</Text>
-                  <Text style={{ fontSize: 9, color: colors.textTertiary }}>Features</Text>
-                </View>
-                <View style={[styles.statDivider, { backgroundColor: colors.border }]} />
-                <View style={styles.statBox}>
-                  <Text style={[styles.statNum, { color: colors.textPrimary }]}>{stats.subsCount}</Text>
-                  <Text style={{ fontSize: 9, color: colors.textTertiary }}>Active Subs</Text>
-                </View>
-              </View>
-            </View>
-
-            {/* Tab Selector */}
-            <View style={[styles.tabBar, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
-              {[
-                { key: 'users', label: 'Users', icon: Users },
-                { key: 'features', label: 'Features', icon: Key },
-                { key: 'plans', label: 'Plans', icon: CreditCard },
-                { key: 'config', label: 'Global Config', icon: Settings },
-                { key: 'content', label: 'Content', icon: Database },
-              ].map((t) => {
-                const Icon = t.icon;
-                const active = activeTab === t.key;
-                return (
-                  <TouchableOpacity
-                    key={t.key}
-                    onPress={() => {
-                      setActiveTab(t.key as TabType);
-                      setSelectedUser(null);
-                      setSelectedPlan(null);
-                    }}
-                    style={[
-                      styles.tabButton,
-                      active && { borderBottomColor: colors.primary },
-                    ]}
-                  >
-                    <Icon size={16} color={active ? colors.primary : colors.textTertiary} />
-                    <Text style={[styles.tabLabel, { color: active ? colors.primary : colors.textTertiary }]}>
-                      {t.label}
-                    </Text>
-                  </TouchableOpacity>
-                );
-              })}
             </View>
 
             <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 40 }}>

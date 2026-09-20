@@ -14,6 +14,7 @@ import {
   KeyboardAvoidingView,
   Image,
   Keyboard,
+  Dimensions,
 } from 'react-native';
 import {
   Database, Copy, Upload, Trash2, Edit, Search, CheckCircle,
@@ -48,6 +49,9 @@ function deterministicUUID(tableName: string, uniqueStr: string): string {
   const x4 = ((h1 & h2) >>> 0).toString(16).padStart(8, '0');
   return `${x1}-${x2.slice(0, 4)}-4${x3.slice(1, 4)}-${((h2 & 0x3fff) | 0x8000).toString(16)}-${(x3 + x4).slice(0, 12)}`;
 }
+
+const { width: SCREEN_WIDTH } = Dimensions.get('window');
+const IS_TABLET = SCREEN_WIDTH >= 768;
 
 // ── Auto-detect hub and resolve field mappings for flexibility ────────────────
 function detectHubAndNormalize(item: any): { hub: HubConfig | null, normalized: any } {
@@ -1524,6 +1528,19 @@ export function ContentManager({ headerBlock, tabSelector }: { headerBlock?: Rea
     finally { setIsUploadingImage(false); }
   };
 
+  const handlePickTopperScans = async () => {
+    setIsUploadingImage(true);
+    try {
+      const urls = await r2UploadService.pickAndUploadMultipleImages('topper_copies');
+      if (urls.length > 0) {
+        const jsonSnippet = JSON.stringify(urls, null, 2);
+        await Clipboard.setStringAsync(jsonSnippet);
+        Alert.alert('Scans Uploaded!', `Uploaded ${urls.length} page(s) to R2!\nURLs copied to clipboard.`);
+      }
+    } catch (e) { Alert.alert('Upload Error', (e as Error).message); }
+    finally { setIsUploadingImage(false); }
+  };
+
   const hubInUse = detectedHub || selectedHub;
 
   return (
@@ -1531,116 +1548,254 @@ export function ContentManager({ headerBlock, tabSelector }: { headerBlock?: Rea
       {headerBlock}
       {tabSelector}
 
-      {/* ── Compact Toolbar Row ── */}
-      <View style={[styles.compactToolbar, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
-        <TouchableOpacity
-          onPress={() => setHubModalVisible(true)}
-          style={[styles.hubPickerBtn, { borderColor: colors.border }]}
-        >
-          <Database size={12} color={colors.primary} />
-          <Text style={{ fontSize: 11, fontWeight: '800', color: colors.textPrimary, flex: 1, marginRight: 4 }} numberOfLines={1}>
-            {selectedHub.displayName}
-          </Text>
-          <ChevronDown size={11} color={colors.textTertiary} />
-        </TouchableOpacity>
+      {/* Main Studio Body: iPad 2-Column or Mobile Stack */}
+      <View style={{ flex: 1, flexDirection: IS_TABLET ? 'row' : 'column' }}>
 
-        {/* Toggle Sidebar Filter Button */}
-        {activeSubTab !== 'import' && (
-          <TouchableOpacity 
-            onPress={() => setSidebarOpen(s => !s)} 
-            style={[styles.toolbarActionBtn, { 
-              borderColor: sidebarOpen ? colors.primary : colors.border, 
-              borderWidth: 1, 
-              backgroundColor: sidebarOpen ? colors.primary + '15' : 'transparent' 
-            }]}
-          >
-            <Text style={{ fontSize: 10.5, fontWeight: '800', color: sidebarOpen ? colors.primary : colors.textPrimary }}>
-              {sidebarOpen ? '✕ Filters' : '🔍 Filters'}
-            </Text>
-          </TouchableOpacity>
+        {/* ── LEFT MASTER PANEL (Tablet only, 320px width) ── */}
+        {IS_TABLET && (
+          <View style={{ width: 320, borderRightWidth: 1, borderRightColor: colors.border, backgroundColor: colors.surfaceStrong }}>
+            <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 14, paddingBottom: 40 }} showsVerticalScrollIndicator={false}>
+              
+              {/* Header: Studio Hubs */}
+              <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
+                <Text style={{ fontSize: 10, fontWeight: '900', color: colors.textTertiary, letterSpacing: 0.8, textTransform: 'uppercase' }}>
+                  STUDIO HUBS
+                </Text>
+                <View style={{ backgroundColor: colors.primary + '18', paddingHorizontal: 6, paddingVertical: 2, borderRadius: 6 }}>
+                  <Text style={{ fontSize: 9.5, fontWeight: '800', color: colors.primary }}>{hubRegistry.length} Hubs</Text>
+                </View>
+              </View>
+
+              {/* Hub Cards List */}
+              {hubRegistry.map(hub => {
+                const isSelected = selectedHub.id === hub.id;
+                return (
+                  <TouchableOpacity
+                    key={hub.id}
+                    onPress={() => {
+                      setSelectedHub(hub);
+                      setFilterPaper('');
+                      setFilterSubject('');
+                      setFilterSection('');
+                      setFilterMicro('');
+                    }}
+                    style={{
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      padding: 10,
+                      borderRadius: 12,
+                      marginBottom: 6,
+                      borderWidth: 1.5,
+                      borderColor: isSelected ? colors.primary : colors.border,
+                      backgroundColor: isSelected ? colors.primary + '18' : colors.surface,
+                    }}
+                  >
+                    <View style={{ width: 34, height: 34, borderRadius: 9, backgroundColor: isSelected ? colors.primary : colors.surfaceStrong, alignItems: 'center', justifyContent: 'center', marginRight: 10 }}>
+                      <Database size={16} color={isSelected ? '#ffffff' : colors.textSecondary} />
+                    </View>
+                    <View style={{ flex: 1 }}>
+                      <Text style={{ fontSize: 12, fontWeight: '800', color: isSelected ? colors.primary : colors.textPrimary }} numberOfLines={1}>
+                        {hub.displayName}
+                      </Text>
+                      <Text style={{ fontSize: 10, color: colors.textTertiary }} numberOfLines={1}>
+                        {hub.targetTable}
+                      </Text>
+                    </View>
+                    {isSelected && (
+                      <View style={{ width: 7, height: 7, borderRadius: 3.5, backgroundColor: colors.primary }} />
+                    )}
+                  </TouchableOpacity>
+                );
+              })}
+
+              {/* Divider */}
+              <View style={{ height: 1, backgroundColor: colors.border, marginVertical: 14 }} />
+
+              {/* Header: AI & Cloud Pipeline */}
+              <Text style={{ fontSize: 10, fontWeight: '900', color: colors.textTertiary, letterSpacing: 0.8, marginBottom: 10, textTransform: 'uppercase' }}>
+                AI & CLOUD PIPELINE
+              </Text>
+
+              {/* 1-Tap Copy Prompt */}
+              <TouchableOpacity
+                onPress={() => setShowPromptModal(true)}
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  backgroundColor: colors.primary + '15',
+                  borderColor: colors.primary + '40',
+                  borderWidth: 1.5,
+                  padding: 12,
+                  borderRadius: 12,
+                  marginBottom: 8,
+                  gap: 10,
+                }}
+              >
+                <Copy size={16} color={colors.primary} />
+                <View style={{ flex: 1 }}>
+                  <Text style={{ fontSize: 12, fontWeight: '800', color: colors.primary }}>
+                    ✦ Copy AI Prompt
+                  </Text>
+                  <Text style={{ fontSize: 10, color: colors.textTertiary }}>
+                    4-layer taxonomy instructions
+                  </Text>
+                </View>
+              </TouchableOpacity>
+
+              {/* Upload Topper / Diagram */}
+              <TouchableOpacity
+                onPress={selectedHub.id === 'topper_copies' ? handlePickTopperScans : handlePickImage}
+                disabled={isUploadingImage}
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  backgroundColor: colors.surface,
+                  borderColor: colors.border,
+                  borderWidth: 1,
+                  padding: 12,
+                  borderRadius: 12,
+                  marginBottom: 12,
+                  gap: 10,
+                }}
+              >
+                {isUploadingImage ? <ActivityIndicator size={16} color={colors.primary} /> : <Upload size={16} color={colors.textPrimary} />}
+                <View style={{ flex: 1 }}>
+                  <Text style={{ fontSize: 12, fontWeight: '800', color: colors.textPrimary }}>
+                    {selectedHub.id === 'topper_copies' ? '📸 Multi-Page Scan Upload' : '📸 Upload Diagram to R2'}
+                  </Text>
+                  <Text style={{ fontSize: 10, color: colors.textTertiary }}>
+                    Cloudflare CDN high-resolution
+                  </Text>
+                </View>
+              </TouchableOpacity>
+
+              {/* Quick Hierarchy Copiers */}
+              <Text style={{ fontSize: 9.5, fontWeight: '800', color: colors.textTertiary, marginBottom: 6 }}>
+                QUICK SYLLABUS COPIERS:
+              </Text>
+              <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6 }}>
+                {[
+                  { label: 'GS 1-4', text: gsHierarchyMd },
+                  { label: 'Anthro P1', text: anthroPaper1Text },
+                  { label: 'Anthro P2', text: anthroPaper2Text },
+                ].map(h => {
+                  const copied = copiedKey === h.label;
+                  return (
+                    <TouchableOpacity
+                      key={h.label}
+                      onPress={() => handleCopyHierarchy(h.text, h.label)}
+                      style={{
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        borderWidth: 1,
+                        borderRadius: 8,
+                        paddingHorizontal: 8,
+                        paddingVertical: 5,
+                        backgroundColor: copied ? '#22c55e15' : colors.surface,
+                        borderColor: copied ? '#22c55e' : colors.border,
+                        gap: 4
+                      }}
+                    >
+                      {copied ? <Check size={11} color="#22c55e" /> : <CopyIcon size={11} color={colors.textSecondary} />}
+                      <Text style={{ fontSize: 10.5, fontWeight: '700', color: copied ? '#22c55e' : colors.textSecondary }}>
+                        {copied ? 'Copied' : h.label}
+                      </Text>
+                    </TouchableOpacity>
+                  );
+                })}
+              </View>
+
+            </ScrollView>
+          </View>
         )}
 
-        {/* AI Prompt Button */}
-        <TouchableOpacity 
-          onPress={() => setShowPromptModal(true)} 
-          style={[styles.toolbarActionBtn, { backgroundColor: colors.primary + '15' }]}
-        >
-          <Text style={{ fontSize: 10.5, fontWeight: '800', color: colors.primary }}>✦ AI Prompt</Text>
-        </TouchableOpacity>
+        {/* ── RIGHT DETAIL & WORKSPACE PANEL ── */}
+        <View style={{ flex: 1, backgroundColor: colors.bg }}>
 
-        {/* Diagram Picker */}
-        <TouchableOpacity 
-          onPress={handlePickImage} 
-          disabled={isUploadingImage} 
-          style={[styles.toolbarActionBtn, { borderColor: colors.border, borderWidth: 1 }]}
-        >
-          <Text style={{ fontSize: 10.5, fontWeight: '800', color: colors.textPrimary }}>📸 Diagram</Text>
-        </TouchableOpacity>
+          {/* Sub-Tab Pill Bar & Quick Action Controls */}
+          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 14, paddingVertical: 10, backgroundColor: colors.surface, borderBottomWidth: 1, borderBottomColor: colors.border }}>
+            
+            {/* Pill Tab Selector */}
+            <View style={{ flexDirection: 'row', backgroundColor: colors.surfaceStrong, borderRadius: 10, padding: 3, borderWidth: 1, borderColor: colors.border, gap: 4 }}>
+              {(['import', 'staging', 'live'] as const).map(tab => {
+                const active = activeSubTab === tab;
+                return (
+                  <TouchableOpacity
+                    key={tab}
+                    onPress={() => setActiveSubTab(tab)}
+                    style={{
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      paddingHorizontal: 12,
+                      paddingVertical: 6,
+                      borderRadius: 8,
+                      backgroundColor: active ? colors.primary : 'transparent',
+                    }}
+                  >
+                    <Text style={{ fontSize: 11.5, fontWeight: '800', color: active ? '#ffffff' : colors.textSecondary }}>
+                      {tab === 'import' ? '📥 AI Import' : tab === 'staging' ? `⏳ Staging Drafts` : '✅ Live Content'}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
 
-        {/* Bulk Select Mode Toggle */}
-        <TouchableOpacity 
-          onPress={() => {
-            setBulkMode(b => !b);
-            setSelectedIds(new Set());
-          }} 
-          style={[styles.toolbarActionBtn, { 
-            borderColor: bulkMode ? colors.primary : colors.border, 
-            borderWidth: 1, 
-            backgroundColor: bulkMode ? colors.primary + '15' : 'transparent' 
-          }]}
-        >
-          <Text style={{ fontSize: 10.5, fontWeight: '800', color: bulkMode ? colors.primary : colors.textPrimary }}>
-            {bulkMode ? '✕ Cancel' : '☑ Select'}
-          </Text>
-        </TouchableOpacity>
-      </View>
-
-      {/* ── Sub-tabs ── */}
-      <View style={[styles.subTabSegmentRow, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
-        {(['import', 'staging', 'live'] as const).map(tab => {
-          const active = activeSubTab === tab;
-          return (
-            <TouchableOpacity
-              key={tab}
-              onPress={() => setActiveSubTab(tab)}
-              style={[styles.subTabSegmentBtn, active && { borderBottomColor: colors.primary }]}
-            >
-              <Text style={{ fontSize: 12, fontWeight: '800', color: active ? colors.primary : colors.textTertiary }}>
-                {tab === 'import' ? '⬆ Import Source' : tab === 'staging' ? '📥 Staging Drafts' : '✅ Live Content'}
-              </Text>
-            </TouchableOpacity>
-          );
-        })}
-      </View>
-
-      {/* ── Hierarchy clipboard Quick Copiers (Only in import) ── */}
-      {activeSubTab === 'import' && (
-        <View style={[styles.hierarchyBar, { backgroundColor: colors.surfaceStrong, borderBottomColor: colors.border }]}>
-          <Text style={{ fontSize: 9.5, fontWeight: '800', color: colors.textTertiary, marginRight: 6 }}>HIERARCHY COPIERS:</Text>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-            {[
-              { label: 'GS 1-4', text: gsHierarchyMd },
-              { label: 'Anthro P1', text: anthroPaper1Text },
-              { label: 'Anthro P2', text: anthroPaper2Text },
-            ].map(h => {
-              const copied = copiedKey === h.label;
-              return (
+            {/* Mobile Hub Picker & Action Buttons */}
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+              {!IS_TABLET && (
                 <TouchableOpacity
-                  key={h.label}
-                  onPress={() => handleCopyHierarchy(h.text, h.label)}
-                  style={[styles.hierarchyBtn, { backgroundColor: copied ? '#22c55e15' : colors.surface, borderColor: copied ? '#22c55e' : colors.border }]}
+                  onPress={() => setHubModalVisible(true)}
+                  style={{ flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: 10, paddingVertical: 6, borderRadius: 8, borderWidth: 1, borderColor: colors.border, backgroundColor: colors.surfaceStrong }}
                 >
-                  {copied ? <Check size={10} color="#22c55e" /> : <CopyIcon size={10} color={colors.textSecondary} />}
-                  <Text style={{ fontSize: 10, fontWeight: '700', color: copied ? '#22c55e' : colors.textSecondary }}>{copied ? 'Copied' : h.label}</Text>
+                  <Database size={13} color={colors.primary} />
+                  <Text style={{ fontSize: 11, fontWeight: '800', color: colors.textPrimary }} numberOfLines={1}>
+                    {selectedHub.displayName}
+                  </Text>
+                  <ChevronDown size={12} color={colors.textTertiary} />
                 </TouchableOpacity>
-              );
-            })}
-          </ScrollView>
-        </View>
-      )}
+              )}
+              {activeSubTab !== 'import' && (
+                <>
+                  <TouchableOpacity 
+                    onPress={() => setSidebarOpen(s => !s)} 
+                    style={{ 
+                      paddingHorizontal: 10, 
+                      paddingVertical: 6, 
+                      borderRadius: 8, 
+                      borderWidth: 1, 
+                      borderColor: sidebarOpen ? colors.primary : colors.border, 
+                      backgroundColor: sidebarOpen ? colors.primary + '15' : colors.surfaceStrong 
+                    }}
+                  >
+                    <Text style={{ fontSize: 11, fontWeight: '800', color: sidebarOpen ? colors.primary : colors.textPrimary }}>
+                      {sidebarOpen ? '✕ Filters' : '🔍 Filters'}
+                    </Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity 
+                    onPress={() => {
+                      setBulkMode(b => !b);
+                      setSelectedIds(new Set());
+                    }} 
+                    style={{ 
+                      paddingHorizontal: 10, 
+                      paddingVertical: 6, 
+                      borderRadius: 8, 
+                      borderWidth: 1, 
+                      borderColor: bulkMode ? colors.primary : colors.border, 
+                      backgroundColor: bulkMode ? colors.primary + '15' : colors.surfaceStrong 
+                    }}
+                  >
+                    <Text style={{ fontSize: 11, fontWeight: '800', color: bulkMode ? colors.primary : colors.textPrimary }}>
+                      {bulkMode ? '✕ Cancel' : '☑ Multi-Select'}
+                    </Text>
+                  </TouchableOpacity>
+                </>
+              )}
+            </View>
+          </View>
 
-      {/* Split layout: Collapsible Sidebar + Main Content List */}
-      <View style={{ flex: 1, flexDirection: 'row' }}>
+          {/* Body Content Area with Split Layout for Staging/Live */}
+          <View style={{ flex: 1, flexDirection: 'row' }}>
         {/* Left Sidebar drawer */}
         {sidebarOpen && activeSubTab !== 'import' && (
           <View style={{ width: 250, borderRightWidth: 0.5, borderRightColor: colors.border, backgroundColor: colors.surface }}>
@@ -2136,6 +2291,8 @@ export function ContentManager({ headerBlock, tabSelector }: { headerBlock?: Rea
             )}
           </ScrollView>
         </View>
+      </View>
+      </View>
       </View>
 
       {/* ── BROWSE HIERARCHY SELECTOR MODAL ── */}

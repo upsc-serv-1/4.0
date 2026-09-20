@@ -40,7 +40,6 @@ import { SharedQuestionCard } from '../../../src/components/unified/SharedQuesti
 import { getPYQCategorization, buildCanonicalExplanations } from '../../../src/utils/questionUtils';
 import { enrichWithCrossInstituteExplanations } from '../../../src/utils/merger';
 import { PilotV2SaveSheet } from '../../../src/components/pilot-v2/PilotV2SaveSheet';
-import { QuizCaptureSheet } from '../../../src/components/hardnotes/QuizCaptureSheet';
 import { MyVitaminEditorSheet } from '../../../src/components/unified/MyVitaminEditorSheet';
 import { fetchBestAnswer, saveBestAnswer, deleteBestAnswer } from '../../../src/services/BestAnswerService';
 import { DetailedBreakdown } from '../../../src/components/unified/DetailedBreakdown';
@@ -68,10 +67,6 @@ export default function ResultScreen() {
   // Export states
   const [exportSheetVisible, setExportSheetVisible] = useState(false);
   const [exportPayload, setExportPayload] = useState<any>(null);
-
-  // Hardnotes states
-  const [hardnotesPickerVisible, setHardnotesPickerVisible] = useState(false);
-  const [hardnotesPayload, setHardnotesPayload] = useState<{ markdown: string; title: string } | null>(null);
 
   // AI Chat FAB states
   const [activeAiQuestion, setActiveAiQuestion] = useState<any>(null);
@@ -134,19 +129,6 @@ export default function ResultScreen() {
     setPilotSaveTargetQuestion(q);
     setPilotSaveHtml(markdownToHtml(activeText));
     setPilotV2SaveOpen(true);
-  };
-
-  const openHardnoteFromQuestion = (
-    q: any,
-    explanationText?: string,
-    opts?: { closeExplanation?: boolean }
-  ) => {
-    const activeText = explanationText || q.explanation_markdown || '';
-    setHardnotesPayload({
-      markdown: activeText,
-      title: q.question_text?.slice(0, 50) || 'Question Explanation'
-    });
-    setHardnotesPickerVisible(true);
   };
 
   const handleAiChat = useCallback((item: any) => {
@@ -833,7 +815,6 @@ export default function ResultScreen() {
             isFlashcarded={inFlashcardDeck[item.id]}
             isSavingFlashcard={savingFlashcard[item.id]}
             openNotebookFromQuestion={openNotebookFromQuestion}
-            openHardnoteFromQuestion={openHardnoteFromQuestion}
             onEditVitamin={handleEditVitamin}
             bestAnswers={bestAnswers}
             ensureBestAnswerLoaded={ensureBestAnswerLoaded}
@@ -1235,13 +1216,6 @@ export default function ResultScreen() {
         seedQuestion={pilotSaveTargetQuestion || null}
         initialBody={pilotSaveHtml}
         source={pilotSaveTargetQuestion ? `Quiz / ${pilotSaveTargetQuestion.subject || ''} ${pilotSaveTargetQuestion.exam_year || ''}`.trim() : 'Quiz'}
-      />
-
-      <QuizCaptureSheet
-        visible={hardnotesPickerVisible}
-        onClose={() => setHardnotesPickerVisible(false)}
-        initialMarkdown={hardnotesPayload?.markdown || ''}
-        initialTitle={hardnotesPayload?.title || ''}
       />
     </View>
   );

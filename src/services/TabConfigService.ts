@@ -1,15 +1,20 @@
 /**
- * Capsule navigation customization — adds capsule to the tab order ordering
- * helper so the bottom tab bar exposes the new tab.
+ * Tab navigation customization helper for user-customized tab orders.
  */
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-export type TabKey = 'index' | 'search' | 'arena' | 'prelims' | 'analyse' | 'mains' | 'pyq' | 'flashcards' | 'tags' | 'hardnotes' | 'capsule' | 'softnotes' | 'revise' | 'tracker' | 'ai-search' | 'pilot-v2' | 'browser';
+export type TabKey = 'index' | 'search' | 'arena' | 'prelims' | 'analyse' | 'mains' | 'pyq' | 'flashcards' | 'tags' | 'revise' | 'tracker' | 'ai-search' | 'pilot-v2' | 'browser';
 
-const DEFAULT_TAB_ORDER: TabKey[] = ['index', 'search', 'arena', 'prelims', 'analyse', 'mains', 'pyq', 'flashcards', 'ai-search', 'tags', 'pilot-v2', 'hardnotes', 'softnotes', 'capsule', 'revise', 'tracker', 'browser'];
+const DEFAULT_TAB_ORDER: TabKey[] = ['index', 'search', 'arena', 'prelims', 'analyse', 'mains', 'pyq', 'flashcards', 'ai-search', 'tags', 'pilot-v2', 'revise', 'tracker', 'browser'];
 
 const normalizeOrder = (order: TabKey[]): TabKey[] => {
-  const cleaned = order.filter((key, index) => order.indexOf(key) === index && key !== 'notes');
+  const cleaned = order.filter((key, index) => 
+    order.indexOf(key) === index && 
+    key !== ('notes' as any) && 
+    key !== ('hardnotes' as any) && 
+    key !== ('softnotes' as any) && 
+    key !== ('capsule' as any)
+  );
   DEFAULT_TAB_ORDER.forEach((key) => {
     if (!cleaned.includes(key)) cleaned.push(key);
   });

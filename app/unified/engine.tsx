@@ -106,7 +106,6 @@ import { uuidv4 } from '../../src/utils/uuid';
 import { FlashcardSvc } from '../../src/services/FlashcardService';
 import { AddToFlashcardSheet } from '../../src/components/flashcards/AddToFlashcardSheet';
 import { PilotV2SaveSheet } from '../../src/components/pilot-v2/PilotV2SaveSheet';
-import { QuizCaptureSheet } from '../../src/components/hardnotes/QuizCaptureSheet';
 import { OfflineManager } from '../../src/services/OfflineManager';
 import { LocalQuery } from '../../src/services/LocalQuery';
 import { NetworkStatus } from '../../src/lib/networkStatus';
@@ -798,9 +797,6 @@ export default function UnifiedQuizEngine() {
   const searchPanelScrollRef = React.useRef<any>(null);
   const searchPanelScrollOffset = React.useRef<number>(0);
 
-  // Hardnotes bridge (Phase 3) — send quiz explanation into a Skia canvas note
-  const [hardnotesPickerVisible, setHardnotesPickerVisible] = useState(false);
-  const [hardnotesPayload, setHardnotesPayload] = useState<{ markdown: string; title: string } | null>(null);
   const [showPYQTags, setShowPYQTags] = useState(showPYQTagsParam);
   const [activeExplIndex, setActiveExplIndex] = useState<Record<string, number>>({});
   const [activeExplSource, setActiveExplSource] = useState<Record<string, string>>({});
@@ -2608,18 +2604,6 @@ const isPyqUpscsearch = params.pyqFilter === 'PYQ Only' && params.year_start && 
     }, closeOpts);
   };
 
-  const openHardnoteFromQuestion = (
-    q: Question,
-    explanationText?: string,
-    opts?: { closeExplanation?: boolean }
-  ) => {
-    runAfterPaperOverlayClose(() => {
-      const activeText = explanationText || q.explanation_markdown || '';
-      setHardnotesPayload({ markdown: activeText, title: q.micro_topic || q.question_text?.slice(0, 40) || 'Quiz Note' });
-      setHardnotesPickerVisible(true);
-    }, opts);
-  };
-
   // Paper mode helper: close transient overlays first, then execute the same
   // add-to-flashcard flow used by list/card modes.
   const handlePaperAddToFlashcards = (q: Question, opts?: { closeExplanation?: boolean }) => {
@@ -3226,7 +3210,6 @@ const isPyqUpscsearch = params.pyqFilter === 'PYQ Only' && params.year_start && 
         aiSumLoading={aiSumLoading}
         handleAiSummarize={handleAiSummarize}
         openNotebookFromQuestion={openNotebookFromQuestion}
-        openHardnoteFromQuestion={openHardnoteFromQuestion}
         savedFlash={savedFlash}
         fontSize={fontSize}
         mdStyles={mdStyles}
@@ -4650,17 +4633,17 @@ const isPyqUpscsearch = params.pyqFilter === 'PYQ Only' && params.year_start && 
 
                     <TouchableOpacity
                       onPress={() => {
-                        openHardnoteFromQuestion(
+                        openNotebookFromQuestion(
                           q,
                           text,
                           { closeExplanation: true }
                         );
                       }}
                       style={[stylesPaper.stickyBtn, { backgroundColor: colors.surfaceStrong, borderColor: colors.border }]}
-                      testID="paper-modal-hardnote"
+                      testID="paper-modal-pilot-v2"
                     >
                       <PenTool size={14} color={colors.textPrimary} />
-                      <Text style={[stylesPaper.stickyBtnText, { color: colors.textPrimary }]}>Hardnote</Text>
+                      <Text style={[stylesPaper.stickyBtnText, { color: colors.textPrimary }]}>Pilot Note</Text>
                     </TouchableOpacity>
 
                     <TouchableOpacity
@@ -5150,15 +5133,6 @@ const isPyqUpscsearch = params.pyqFilter === 'PYQ Only' && params.year_start && 
           }
         />
 
-        {session?.user?.id && hardnotesPayload && (
-          <QuizCaptureSheet
-            visible={hardnotesPickerVisible}
-            userId={session.user.id}
-            explanationMarkdown={hardnotesPayload.markdown}
-            suggestedTitle={hardnotesPayload.title}
-            onClose={() => setHardnotesPickerVisible(false)}
-          />
-        )}
         <AddToFlashcardSheet
           visible={aff.visible}
           onClose={() => setAff((prev: any) => ({ ...prev, visible: false }))}

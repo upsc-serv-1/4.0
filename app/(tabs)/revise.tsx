@@ -88,20 +88,12 @@ function ReviseTab() {
 
   const REVISE_SECTIONS = [
     {
-      id: 'hardnotes',
-      title: 'Hardnotes',
-      desc: 'Premium structured notes with drawing.',
+      id: 'pilot-v2',
+      title: 'Pilot Notes V2',
+      desc: 'Next-gen canvas notebooks & smart captures.',
       icon: StickyNote,
-      color: '#5856D6',
-      route: '/hardnotes'
-    },
-    {
-      id: 'softnotes',
-      title: 'Softnotes',
-      desc: 'Handwritten notebooks and sketches.',
-      icon: Book,
-      color: '#34C759',
-      route: '/softnotes'
+      color: '#10b981',
+      route: '/pilot-v2'
     },
     {
       id: 'flashcards',
@@ -134,14 +126,6 @@ function ReviseTab() {
       icon: Database,
       color: '#34C759',
       route: '/repo'
-    },
-    {
-      id: 'capsule',
-      title: 'Capsule',
-      desc: 'Daily current affairs and updates.',
-      icon: Sparkles,
-      color: '#FFD700',
-      route: '/capsule'
     }
   ];
 

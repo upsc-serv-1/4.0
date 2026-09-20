@@ -72,9 +72,6 @@ export default function TabsLayout() {
     revise: '#3b82f6',      // Blue (Repo)
     tracker: '#f97316',     // Orange (Syllabus)
     'ai-search': '#6366f1', // Indigo
-    hardnotes: '#ef4444',   // Red
-    capsule: '#eab308',     // Yellow
-    softnotes: '#14b8a6',   // Teal
   };
 
   const TAB_DEFINITIONS: Record<TabKey, { title: string; icon: any }> = {
@@ -87,11 +84,8 @@ export default function TabsLayout() {
     pyq: { title: 'PYQ Analysis', icon: BarChart3 },
     flashcards: { title: 'Flashcards', icon: Layers },
     tags: { title: 'Tags', icon: Tag },
-    hardnotes: { title: 'Hardnotes', icon: PenTool },
-    capsule: { title: 'Capsule', icon: Sparkles },
     'pilot-v2': { title: 'Notes', icon: Compass },
     browser: { title: 'Ghost', icon: Globe },
-    softnotes: { title: 'Softnotes', icon: BookOpen },
     revise: { title: 'Repo', icon: RotateCcw },
     tracker: { title: 'Syllabus', icon: LayoutList },
     'ai-search': { title: 'Search', icon: Search },
@@ -126,17 +120,13 @@ function ScrollableTabBar({ state, descriptors, navigation, colors, order, defs,
 
   const visibleOrder = order.filter((tabKey: TabKey) => 
     !!defs[tabKey] && 
-    tabKey !== 'hardnotes' && 
-    tabKey !== 'softnotes' &&
-    tabKey !== 'capsule' &&
-    tabKey !== 'arena' &&
-    tabKey !== 'analyse' &&
-    tabKey !== 'pyq' &&
-    tabKey !== 'tracker' &&
-    tabKey !== 'ai-search' &&
-    tabKey !== 'revise' &&
-    tabKey !== 'tags' &&
-    tabKey !== 'drupsc_hub'
+    tabKey !== 'arena' && 
+    tabKey !== 'analyse' && 
+    tabKey !== 'pyq' && 
+    tabKey !== 'tracker' && 
+    tabKey !== 'ai-search' && 
+    tabKey !== 'revise' && 
+    tabKey !== 'tags'
   );
   const tabletItemWidth = isTablet
     ? Math.max(74, Math.floor((Math.max(width, 768) - 20) / Math.max(1, visibleOrder.length)))

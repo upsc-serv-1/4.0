@@ -14,10 +14,7 @@ const ALL_TABS: { key: TabKey; title: string; icon: any }[] = [
   { key: 'pyq', title: 'PYQs', icon: BarChart3 },
   { key: 'flashcards', title: 'Cards', icon: Layers },
   { key: 'tags', title: 'Tags', icon: Tag },
-  { key: 'notes', title: 'Notes', icon: FileText },
-  { key: 'hardnotes', title: 'Hardnotes', icon: PenTool },
-  { key: 'softnotes', title: 'Softnotes', icon: BookOpen },
-  { key: 'pilot-v2', title: 'Notes', icon: Compass },
+  { key: 'pilot-v2', title: 'Pilot Notes V2', icon: Compass },
   { key: 'revise', title: 'Revise', icon: RotateCcw },
   { key: 'tracker', title: 'Tracker', icon: LayoutList },
 ];

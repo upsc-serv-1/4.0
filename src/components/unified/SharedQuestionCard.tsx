@@ -76,7 +76,6 @@ export const SharedQuestionCard = ({
   aiSumLoading = {},
   handleAiSummarize,
   openNotebookFromQuestion,
-  openHardnoteFromQuestion,
   savedFlash = {},
   fontSize = 15,
   showNotebookButton = false,

@@ -95,14 +95,14 @@ export default function MainsFrameworksCard({
       ) : null}
 
       {/* Render diagram content preamble */}
-      {cleanDiagram ? (
+      {cleanDiagram && cleanMarkdownContent(cleanDiagram).trim().length > 0 ? (
         <Markdown style={markdownStyles} rules={dynamicRules}>
           {cleanMarkdownContent(cleanDiagram)}
         </Markdown>
       ) : null}
 
       {/* Render the ENTIRE breakdown list inside one single styled box */}
-      {breakdownContent ? (
+      {breakdownContent && cleanMarkdownContent(breakdownContent).trim().length > 0 ? (
         <View
           style={[
             localStyles.fwBox,

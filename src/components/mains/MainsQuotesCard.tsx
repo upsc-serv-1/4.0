@@ -1,7 +1,9 @@
-import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import Markdown from 'react-native-markdown-display';
+import { Home } from 'lucide-react-native';
 import { cleanMarkdownContent, getMarkdownStyles } from '../../../app/mains';
+import { addQuoteToHomescreen, removeQuoteFromHomescreen, isQuoteOnHomescreenSync } from '../../services/homescreenQuotesService';
 
 export default function MainsQuotesCard({
   item,
@@ -69,13 +71,6 @@ export default function MainsQuotesCard({
   const isQuote = !isConnectingWords && (item.entry_type === 'quote' || !item.entry_type || !isAnecdote);
 
   // ----- Old-format content parser ----------------------------------------
-  // Some entries have content in the legacy markdown format:
-  //   **Category:** `Theme`
-  //   - **Quote:**
-  //     - "Actual quote text"
-  //   - **Author:**
-  //     - Author Name
-  // Extract the plain quote and author so we don't render those headings.
   const rawText = item.quoteText || item.rawContent || '';
   const hasOldFormat = /\*\*Quote:\*\*|\*\*Author:\*\*/i.test(rawText);
 
@@ -83,24 +78,45 @@ export default function MainsQuotesCard({
   let displayAuthor = item.author || '';
 
   if (hasOldFormat) {
-    // Old format pattern:  "- **Quote:**\n  - \u201cActual text.\u201d"
-    // The inner bullet uses 2-space indent and Unicode curly/smart quotes
     const quoteMatch = rawText.match(
       /\*\*Quote:\*\*\s*\n\s*[-\u2022]\s*[\u201c\u201d"]?([^\n]+?)[\u201c\u201d"]?\s*(?=\n|$)/i
     );
     if (quoteMatch) {
-      // Strip any surrounding smart/straight quotes from extracted text
       displayQuoteText = quoteMatch[1].trim()
         .replace(/^[\u201c"]+/, '')
         .replace(/[\u201d"]+$/, '');
     }
-    // Extract author from old format only if not already set
     if (!displayAuthor) {
       const authorMatch = rawText.match(/\*\*Author:\*\*\s*\n\s*[-\u2022]\s*([^\n]+)/i);
       if (authorMatch) displayAuthor = authorMatch[1].trim();
     }
   }
-  // -------------------------------------------------------------------------
+
+  // State for whether this quote is pinned to the homescreen quote widget
+  const [isPinned, setIsPinned] = useState(() => {
+    return isQuoteOnHomescreenSync(item.id) || isQuoteOnHomescreenSync(displayQuoteText);
+  });
+  const [isSavingPin, setIsSavingPin] = useState(false);
+
+  const handleToggleHomescreenPin = async () => {
+    if (isSavingPin) return;
+    setIsSavingPin(true);
+    try {
+      if (isPinned) {
+        await removeQuoteFromHomescreen(item.id);
+        setIsPinned(false);
+      } else {
+        const textToSave = cleanMarkdownContent(displayQuoteText).trim();
+        const authorToSave = displayAuthor || item.author || 'Mains Quotes';
+        await addQuoteToHomescreen({ id: item.id, text: textToSave, author: authorToSave, source: item.source });
+        setIsPinned(true);
+      }
+    } catch (e) {
+      console.warn('Error toggling homescreen pin:', e);
+    } finally {
+      setIsSavingPin(false);
+    }
+  };
 
   return (
     <View>
@@ -127,6 +143,28 @@ export default function MainsQuotesCard({
             </Text>
           </View>
         )}
+
+        {/* Button to add/remove quote to homescreen quote widget */}
+        <TouchableOpacity
+          onPress={handleToggleHomescreenPin}
+          activeOpacity={0.7}
+          style={[
+            localStyles.badge,
+            {
+              backgroundColor: isPinned ? (colors.isDark ? '#f59e0b25' : '#fef3c7') : (colors.isDark ? 'rgba(255,255,255,0.06)' : '#f8fafc'),
+              borderColor: isPinned ? '#f59e0b' : colors.border,
+              flexDirection: 'row',
+              alignItems: 'center',
+              gap: 4,
+              marginLeft: 'auto',
+            }
+          ]}
+        >
+          <Home size={10} color={isPinned ? '#d97706' : colors.textSecondary} />
+          <Text style={[localStyles.badgeText, { color: isPinned ? '#d97706' : colors.textSecondary, fontSize: 9 * zoomScale }]}>
+            {isPinned ? 'Homescreen Quote ✓' : '+ Homescreen Widget'}
+          </Text>
+        </TouchableOpacity>
       </View>
 
       {/* Quote or Anecdote body */}

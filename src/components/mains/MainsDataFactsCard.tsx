@@ -10,7 +10,8 @@ const splitSubThemes = (text: string | undefined | null) => {
   const subThemes: { title: string; content: string }[] = [];
 
   const firstPreamble = parts[0]?.trim();
-  if (firstPreamble && parts.length > 1) {
+  const cleanedPreamble = firstPreamble ? firstPreamble.replace(/<!--[\s\S]*?-->/g, '').trim() : '';
+  if (cleanedPreamble && parts.length > 1) {
     subThemes.push({ title: '', content: firstPreamble });
   }
 
@@ -22,11 +23,17 @@ const splitSubThemes = (text: string | undefined | null) => {
       /^(?:<br\s*\/?>|\s)*(?:•\s*)?(?:<b><u>|<u><b>|\*\*)?[^<\n\r]{0,120}(?:<\/u><\/b>|<\/b><\/u>|\*\*|<\/b>|<\/u>)?(?:<br\s*\/?>|\s)*/i,
       ''
     );
-    subThemes.push({ title, content });
+    const cleanedContent = content.replace(/<!--[\s\S]*?-->/g, '').trim();
+    if (title || cleanedContent) {
+      subThemes.push({ title, content });
+    }
   }
 
   if (subThemes.length === 0 && text) {
-    subThemes.push({ title: '', content: text });
+    const cleanedText = text.replace(/<!--[\s\S]*?-->/g, '').trim();
+    if (cleanedText) {
+      subThemes.push({ title: '', content: text });
+    }
   }
   return subThemes;
 };
@@ -49,18 +56,25 @@ const splitSubSubThemeBlocks = (text: string | undefined | null) => {
   const blocks: { title: string; content: string }[] = [];
 
   const firstPreamble = parts[0]?.trim();
-  if (firstPreamble && parts.length > 1) {
+  const cleanedPreamble = firstPreamble ? firstPreamble.replace(/<!--[\s\S]*?-->/g, '').trim() : '';
+  if (cleanedPreamble && parts.length > 1) {
     blocks.push({ title: '', content: firstPreamble });
   }
 
   for (let i = 1; i < parts.length; i += 2) {
     const title = parts[i].trim();
     const content = parts[i + 1] || '';
-    blocks.push({ title, content });
+    const cleanedContent = content.replace(/<!--[\s\S]*?-->/g, '').trim();
+    if (title || cleanedContent) {
+      blocks.push({ title, content });
+    }
   }
 
   if (blocks.length === 0 && text) {
-    blocks.push({ title: '', content: text });
+    const cleanedText = text.replace(/<!--[\s\S]*?-->/g, '').trim();
+    if (cleanedText) {
+      blocks.push({ title: '', content: text });
+    }
   }
   return blocks;
 };
@@ -172,11 +186,12 @@ export default function MainsDataFactsCard({
 
   const matchedSubThemes = subThemes.filter((st: any) => {
     if (!st) return false;
-    const title = st.title || '';
-    const content = st.content || '';
+    const title = (st.title || '').trim();
+    const content = (st.content || '').trim();
+    const cleanedContent = cleanDataFactsMarkdown(content, item).trim();
     
-    // Exclude empty blocks
-    if (!title.trim() && !content.trim()) return false;
+    // Exclude empty blocks: must have a title or non-empty cleaned markdown content
+    if (!title && !cleanedContent) return false;
     
     const matchSearch = !search ||
       title.toLowerCase().includes(search.toLowerCase()) ||
@@ -200,10 +215,16 @@ export default function MainsDataFactsCard({
   return (
     <View style={{ gap: 10 }}>
       {matchedSubThemes.map((st: any, sIdx: number) => {
+        const cleanedSubThemeContent = cleanDataFactsMarkdown(st.content, item).trim();
+        const hasTitle = !!st.title?.trim();
+        if (!hasTitle && !cleanedSubThemeContent) return null;
+
         const palette = boxPalette[sIdx % boxPalette.length];
         const isSubThemeTitleMatched = activeSubThemes.includes(st.title);
         const subSubThemes = splitSubSubThemeBlocks(st.content);
         const matchedSstBlocks = subSubThemes.filter(sst => {
+          const sstCleaned = cleanDataFactsMarkdown(sst.content, item).trim();
+          if (!sst.title?.trim() && !sstCleaned) return false;
           const matchSearch = !search ||
             sst.title.toLowerCase().includes(search.toLowerCase()) ||
             sst.content.toLowerCase().includes(search.toLowerCase());
@@ -226,7 +247,7 @@ export default function MainsDataFactsCard({
             }}
           >
             {/* Sub-theme heading in blue */}
-            {st.title ? (
+            {hasTitle ? (
               <Text style={[
                 localStyles.subThemeHeader,
                 {

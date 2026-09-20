@@ -94,6 +94,7 @@ import {
   AppState,
   AppStateStatus,
   BackHandler,
+  ToastAndroid,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
@@ -102,6 +103,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Clipboard from 'expo-clipboard';
 import { useRouter, useLocalSearchParams, useFocusEffect } from 'expo-router';
 import {
+  Home,
   Search,
   Bookmark,
   ChevronRight,
@@ -202,15 +204,34 @@ import { UnifiedExportSheet } from '../src/components/export/UnifiedExportSheet'
 import * as Print from 'expo-print';
 import * as Sharing from 'expo-sharing';
 import {
-  getCachedMainsNotes,
-  fetchMainsNotesFromSupabase,
-  insertMainsNote,
-  updateMainsNote,
-  deleteMainsNote,
-  MainsNoteItem
-} from '../src/data/mainsNotesLoader';
-import { buildNotesPdfHtml } from '../src/utils/notesPdfEngine';
+  addQuoteToHomescreen,
+  removeQuoteFromHomescreen,
+  isQuoteOnHomescreenSync,
+} from '../src/services/homescreenQuotesService';
 import { cacheGetString, safeSetItem } from '../src/lib/safeAsyncStorage';
+
+export const VALUE_ADD_SUBMODULES = [
+  { id: 'data_facts', title: 'Data & Facts', color: '#3b82f6' },
+  { id: 'intro_conclusion', title: 'Intro & Conclusion', color: '#10b981' },
+  { id: 'quotes', title: 'Quotes & Anecdotes', color: '#8b5cf6' },
+  { id: 'mnemonics', title: 'Mnemonics', color: '#f59e0b' },
+  { id: 'frameworks', title: 'Frameworks', color: '#f43f5e' },
+  { id: 'ethics', title: 'Ethics Specific Hub', color: '#06b6d4' },
+  { id: 'keywords_hub', title: 'Keywords', color: '#ec4899' },
+  { id: 'case_studies_hub', title: 'Case Studies', color: '#f97316' },
+  { id: 'sc_judgments_hub', title: 'SC Judgments', color: '#ef4444' },
+  { id: 'va_hub', title: 'Value Additions Hub', color: '#7c3aed' },
+];
+
+export function getVaCategoryMeta(category?: string) {
+  const found = VALUE_ADD_SUBMODULES.find(s => s.id === category);
+  if (found) return found;
+  return {
+    id: category || 'value_add',
+    title: (category || 'Value Addition').replace(/_/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase()),
+    color: '#7c3aed'
+  };
+}
 
 
 const getQuestionSection = (q: any): string => q.sectionGroup || q.section_group || q.sectiongroup || '';
@@ -1479,165 +1500,7 @@ export function MainsScreenInner() {
   const [questions, setQuestions] = useState<ConsolidatedQuestion[]>(() => getInitialMainsQuestions());
   const [valueAddItems, setValueAddItems] = useState<ValueAdditionItem[]>(() => getInitialValueAdditions());
 
-  // Mains Notes States
-  const [mainsNotes, setMainsNotes] = useState<MainsNoteItem[]>([]);
-  const [noteViewerVisible, setNoteViewerVisible] = useState(false);
-  const [noteViewerItem, setNoteViewerItem] = useState<MainsNoteItem | null>(null);
-  const [loadingNotes, setLoadingNotes] = useState(false);
-  const [editingNote, setEditingNote] = useState<MainsNoteItem | null>(null);
-  const [noteEditorVisible, setNoteEditorVisible] = useState(false);
-  const [noteTitle, setNoteTitle] = useState('');
-  const [noteMarkdown, setNoteMarkdown] = useState('');
-  const [noteHierarchy, setNoteHierarchy] = useState<Partial<MainsNoteItem>>({
-    paper: '',
-    subject: '',
-    section_group: '',
-    microtopic: '',
-    subtopic: '',
-    nanotopic: ''
-  });
-  const [editorTab, setEditorTab] = useState<'write' | 'preview'>('write');
-  const [isNoteEditorSelectingHierarchy, setIsNoteEditorSelectingHierarchy] = useState(false);
-  const [noteHierarchyModalVisible, setNoteHierarchyModalVisible] = useState(false);
-  const [noteHierarchyFilters, setNoteHierarchyFilters] = useState<MainsFilters>(DEFAULT_MAINS_FILTERS);
 
-  // Note hierarchy dropdown options computed from questions and valueAddItems
-  const noteAllPapers = useMemo(() => {
-    const paperSet = new Set<string>();
-    questions.forEach(q => { if (q.paper) paperSet.add(q.paper); });
-    valueAddItems.forEach(va => { if (va.paper) paperSet.add(va.paper); });
-    return Array.from(paperSet).sort();
-  }, [questions, valueAddItems]);
-
-  const noteSubjectOptions = useMemo(() => {
-    const paperFilter = noteHierarchyFilters.paper !== 'All' ? noteHierarchyFilters.paper.split('|') : [];
-    const subSet = new Set<string>();
-    questions.forEach(q => {
-      if (paperFilter.length === 0 || paperFilter.includes(q.paper)) {
-        if (q.subject) subSet.add(q.subject);
-      }
-    });
-    valueAddItems.forEach(va => {
-      if (paperFilter.length === 0 || paperFilter.includes(va.paper || '')) {
-        if (va.subject) subSet.add(va.subject);
-      }
-    });
-    return Array.from(subSet).sort();
-  }, [questions, valueAddItems, noteHierarchyFilters.paper]);
-
-  const noteSectionOptions = useMemo(() => {
-    const paperFilter = noteHierarchyFilters.paper !== 'All' ? noteHierarchyFilters.paper.split('|') : [];
-    const subjectFilter = noteHierarchyFilters.subjects !== 'All' ? noteHierarchyFilters.subjects.split('|') : [];
-    const secSet = new Set<string>();
-    questions.forEach(q => {
-      const matchPaper = paperFilter.length === 0 || paperFilter.includes(q.paper);
-      const matchSubject = subjectFilter.length === 0 || subjectFilter.includes(q.subject);
-      const sGroup = getQuestionSection(q);
-      if (matchPaper && matchSubject && sGroup) {
-        secSet.add(sGroup);
-      }
-    });
-    valueAddItems.forEach(va => {
-      const matchPaper = paperFilter.length === 0 || paperFilter.includes(va.paper || '');
-      const matchSubject = subjectFilter.length === 0 || subjectFilter.includes(va.subject || '');
-      const sGroup = va.sectionGroup || va.section_group;
-      if (matchPaper && matchSubject && sGroup) {
-        secSet.add(sGroup);
-      }
-    });
-    return Array.from(secSet).sort();
-  }, [questions, valueAddItems, noteHierarchyFilters.paper, noteHierarchyFilters.subjects]);
-
-  const noteMicrotopicOptions = useMemo(() => {
-    const paperFilter = noteHierarchyFilters.paper !== 'All' ? noteHierarchyFilters.paper.split('|') : [];
-    const subjectFilter = noteHierarchyFilters.subjects !== 'All' ? noteHierarchyFilters.subjects.split('|') : [];
-    const sectionFilter = noteHierarchyFilters.sections !== 'All' ? noteHierarchyFilters.sections.split('|') : [];
-    const microSet = new Set<string>();
-    questions.forEach(q => {
-      const matchPaper = paperFilter.length === 0 || paperFilter.includes(q.paper);
-      const matchSubject = subjectFilter.length === 0 || subjectFilter.includes(q.subject);
-      const matchSection = sectionFilter.length === 0 || sectionFilter.includes(getQuestionSection(q));
-      const micro = getQuestionMicro(q);
-      if (matchPaper && matchSubject && matchSection && micro) {
-        microSet.add(micro);
-      }
-    });
-    valueAddItems.forEach(va => {
-      const matchPaper = paperFilter.length === 0 || paperFilter.includes(va.paper || '');
-      const matchSubject = subjectFilter.length === 0 || subjectFilter.includes(va.subject || '');
-      const matchSection = sectionFilter.length === 0 || sectionFilter.includes(va.sectionGroup || va.section_group || '');
-      const micro = va.microtopic || va.micro_topic;
-      if (matchPaper && matchSubject && matchSection && micro) {
-        microSet.add(micro);
-      }
-    });
-    return Array.from(microSet).sort();
-  }, [questions, valueAddItems, noteHierarchyFilters.paper, noteHierarchyFilters.subjects, noteHierarchyFilters.sections]);
-
-  const noteSubtopicOptions = useMemo(() => {
-    const paperFilter = noteHierarchyFilters.paper !== 'All' ? noteHierarchyFilters.paper.split('|') : [];
-    const subjectFilter = noteHierarchyFilters.subjects !== 'All' ? noteHierarchyFilters.subjects.split('|') : [];
-    const sectionFilter = noteHierarchyFilters.sections !== 'All' ? noteHierarchyFilters.sections.split('|') : [];
-    const microFilter = noteHierarchyFilters.microtopics !== 'All' ? noteHierarchyFilters.microtopics.split('|') : [];
-    const subSet = new Set<string>();
-    questions.forEach(q => {
-      const matchPaper = paperFilter.length === 0 || paperFilter.includes(q.paper);
-      const matchSubject = subjectFilter.length === 0 || subjectFilter.includes(q.subject);
-      const matchSection = sectionFilter.length === 0 || sectionFilter.includes(getQuestionSection(q));
-      const matchMicro = microFilter.length === 0 || microFilter.includes(getQuestionMicro(q));
-      const sub = getQuestionSub(q);
-      if (matchPaper && matchSubject && matchSection && matchMicro && sub) {
-        subSet.add(sub);
-      }
-    });
-    valueAddItems.forEach(va => {
-      const matchPaper = paperFilter.length === 0 || paperFilter.includes(va.paper || '');
-      const matchSubject = subjectFilter.length === 0 || subjectFilter.includes(va.subject || '');
-      const matchSection = sectionFilter.length === 0 || sectionFilter.includes(va.sectionGroup || va.section_group || '');
-      const matchMicro = microFilter.length === 0 || microFilter.includes(va.microtopic || va.micro_topic || '');
-      const sub = va.subtopic || va.sub_topic;
-      if (matchPaper && matchSubject && matchSection && matchMicro && sub) {
-        subSet.add(sub);
-      }
-    });
-    return Array.from(subSet).sort();
-  }, [questions, valueAddItems, noteHierarchyFilters.paper, noteHierarchyFilters.subjects, noteHierarchyFilters.sections, noteHierarchyFilters.microtopics]);
-
-  const handleUpdateNoteHierarchyFilters = useCallback((newFilters: MainsFilters) => {
-    setNoteHierarchyFilters(newFilters);
-    setNoteHierarchy({
-      paper: newFilters.paper === 'All' ? '' : newFilters.paper,
-      subject: newFilters.subjects === 'All' ? '' : newFilters.subjects,
-      section_group: newFilters.sections === 'All' ? '' : newFilters.sections,
-      microtopic: newFilters.microtopics === 'All' ? '' : newFilters.microtopics,
-      subtopic: newFilters.subtopics === 'All' ? '' : newFilters.subtopics,
-      nanotopic: newFilters.nanotopics === 'All' ? '' : newFilters.nanotopics,
-    });
-  }, []);
-
-  // Load and sync Mains Notes
-  useEffect(() => {
-    const loadCachedAndSyncNotes = async () => {
-      const userId = session?.user?.id;
-      if (!userId) return;
-
-      // 1. Get cached notes instantly
-      const cached = getCachedMainsNotes(userId);
-      setMainsNotes(cached);
-
-      // 2. Fetch from Supabase in background
-      try {
-        setLoadingNotes(true);
-        const remoteNotes = await fetchMainsNotesFromSupabase(userId);
-        setMainsNotes(remoteNotes);
-      } catch (err) {
-        console.log('[MainsScreen] Failed to sync mains notes from Supabase:', err);
-      } finally {
-        setLoadingNotes(false);
-      }
-    };
-    loadCachedAndSyncNotes();
-  }, [session?.user?.id]);
 
   // Load state on mount
   useEffect(() => {
@@ -1750,175 +1613,6 @@ export function MainsScreenInner() {
     }
   };
 
-  // Mains Notes Handlers
-  const handleAddNewNoteClick = useCallback(async () => {
-    setEditingNote(null);
-    setNoteTitle('');
-    setNoteMarkdown('');
-    
-    // Try to load last selected hierarchy from AsyncStorage
-    try {
-      const savedHierarchyStr = await AsyncStorage.getItem('mains_notes_last_hierarchy');
-      if (savedHierarchyStr) {
-        setNoteHierarchy(JSON.parse(savedHierarchyStr));
-      } else {
-        setNoteHierarchy({
-          paper: '',
-          subject: '',
-          section_group: '',
-          microtopic: '',
-          subtopic: '',
-          nanotopic: ''
-        });
-      }
-    } catch (err) {
-      console.warn('Failed to load last note hierarchy:', err);
-    }
-    
-    setEditorTab('write');
-    setNoteEditorVisible(true);
-  }, []);
-
-  const handleEditNote = useCallback((note: MainsNoteItem) => {
-    setEditingNote(note);
-    setNoteTitle(note.title || '');
-    setNoteMarkdown(note.content_markdown || '');
-    setNoteHierarchy({
-      paper: note.paper || '',
-      subject: note.subject || '',
-      section_group: note.section_group || '',
-      microtopic: note.microtopic || '',
-      subtopic: note.subtopic || '',
-      nanotopic: note.nanotopic || ''
-    });
-    setEditorTab('write');
-    setNoteEditorVisible(true);
-  }, []);
-
-  const handleDeleteNote = useCallback((note: MainsNoteItem) => {
-    const userId = session?.user?.id;
-    Alert.alert(
-      "Delete Note",
-      `Are you sure you want to delete "${note.title || 'this note'}"?`,
-      [
-        { text: "Cancel", style: "cancel" },
-        {
-          text: "Delete",
-          style: "destructive",
-          onPress: async () => {
-            try {
-              await deleteMainsNote(userId || '', note.id);
-              setMainsNotes(prev => prev.filter(n => n.id !== note.id));
-            } catch (err) {
-              console.error('Failed to delete note:', err);
-              Alert.alert("Error", "Could not delete note from server.");
-            }
-          }
-        }
-      ]
-    );
-  }, [session?.user?.id]);
-
-  const handleViewNoteFullscreen = useCallback((note: MainsNoteItem) => {
-    setNoteViewerItem(note);
-    setNoteViewerVisible(true);
-  }, []);
-
-  const handleSaveNote = async () => {
-    const userId = session?.user?.id;
-    if (!userId) {
-      Alert.alert("Sign In Required", "Please sign in to save notes.");
-      return;
-    }
-    if (!noteTitle.trim()) {
-      Alert.alert("Required", "Please enter a note title.");
-      return;
-    }
-    
-    try {
-      setLoadingNotes(true);
-      // Save last selected hierarchy to AsyncStorage
-      await AsyncStorage.setItem('mains_notes_last_hierarchy', JSON.stringify(noteHierarchy));
-      
-      const payload = {
-        title: noteTitle.trim(),
-        content_markdown: noteMarkdown,
-        paper: noteHierarchy.paper || '',
-        subject: noteHierarchy.subject || '',
-        section_group: noteHierarchy.section_group || '',
-        microtopic: noteHierarchy.microtopic || '',
-        subtopic: noteHierarchy.subtopic || '',
-        nanotopic: noteHierarchy.nanotopic || '',
-        is_favorite: false as boolean,
-        revision_tags: [] as string[],
-      };
-      
-      if (editingNote) {
-        const updated = await updateMainsNote(userId, editingNote.id, payload);
-        setMainsNotes(prev => prev.map(n => n.id === updated.id ? updated : n));
-      } else {
-        const created = await insertMainsNote(userId, payload);
-        setMainsNotes(prev => [created, ...prev]);
-      }
-      
-      setNoteEditorVisible(false);
-      setEditingNote(null);
-      setNoteTitle('');
-      setNoteMarkdown('');
-    } catch (err) {
-      console.error('Failed to save note:', err);
-      Alert.alert("Error", "Could not save note to database.");
-    } finally {
-      setLoadingNotes(false);
-    }
-  };
-
-  const handleExportNotePdf = useCallback(async (note: MainsNoteItem) => {
-    try {
-      const hasTable = note.content_markdown?.includes('|') && note.content_markdown?.includes('-|-');
-      const html = buildNotesPdfHtml({
-        title: note.title || 'Untitled Note',
-        subject: note.subject || 'General',
-        content: note.content_markdown,
-        entries: [],
-        columns: 1,
-        config: {
-          fontSize: 14,
-          subheadingColor: '#0f172a',
-          paperStyle: 'plain',
-          theme: 'modern',
-          watermark: '',
-          footerText: 'Mains Notes Hub',
-          showTOC: false,
-          includeChecklist: false,
-          spacing: 'comfortable',
-          fontFamily: 'sans',
-          pageMarginTopCm: 1.5,
-          pageMarginRightCm: 1.5,
-          pageMarginBottomCm: 1.5,
-          pageMarginLeftCm: 1.5,
-          qaBackgroundColor: '#f8fafc',
-          qaLayoutMode: 'unified',
-          continuousPage: hasTable ? false : true, // standard paging works better for landscape tables
-          landscape: hasTable,
-        }
-      });
-      
-      if (Platform.OS === 'ios') {
-        const { uri } = await Print.printToFileAsync({ html });
-        await Promise.race([
-          Sharing.shareAsync(uri, { mimeType: 'application/pdf' }),
-          new Promise<void>((resolve) => setTimeout(resolve, 20000)),
-        ]).catch(() => {});
-      } else {
-        await Print.printAsync({ html });
-      }
-    } catch (err) {
-      console.error('Failed to export PDF:', err);
-      Alert.alert("Error", "Could not export PDF.");
-    }
-  }, []);
-
   const handleCopy = useCallback(async (id: string, text: string) => {
     await Clipboard.setStringAsync(text);
     setCopiedId(id);
@@ -1934,7 +1628,7 @@ export function MainsScreenInner() {
             colors={['#e0f2fe', '#fef3c7', '#fce7f3', '#d1fae5']}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
-            style={StyleSheet.absoluteFillObject}
+            style={StyleSheet.absoluteFill}
           />
         )}
 
@@ -2180,12 +1874,6 @@ export function MainsScreenInner() {
               onCreateTag={handleCreateDetailedTag}
               vaFavorites={vaFavorites}
               onToggleVaFavorite={handleToggleVaFavorite}
-              onEditNote={handleEditNote}
-              onDeleteNote={handleDeleteNote}
-              onExportNotePdf={handleExportNotePdf}
-              onAddNewNoteClick={handleAddNewNoteClick}
-              mainsNotes={mainsNotes}
-              onViewNoteFullscreen={handleViewNoteFullscreen}
               textColorMode={textColorMode}
               onChangeTextColorMode={handleUpdateTextColorMode}
               keyBoxMode={keyBoxMode}
@@ -2321,7 +2009,7 @@ export function MainsScreenInner() {
               if (saved) {
                 setDetailedBestAnswer(saved);
                 if (Platform.OS === 'android') {
-                  (global as any).ToastAndroid?.show('My Vitamin saved!', (global as any).ToastAndroid?.SHORT);
+                  ToastAndroid.show('My Vitamin saved!', ToastAndroid.SHORT);
                 } else {
                   Alert.alert('Saved', 'My Vitamin saved successfully.');
                 }
@@ -2337,423 +2025,6 @@ export function MainsScreenInner() {
           questionText={detailedQuestion?.questionText || ''}
           seedQuestion={detailedQuestion}
         />
-
-        {/* Mains Notes Editor Modal */}
-        <Modal
-          visible={noteEditorVisible}
-          animationType="slide"
-          transparent={false}
-          onRequestClose={() => {
-            setNoteEditorVisible(false);
-            setEditingNote(null);
-          }}
-        >
-          <View style={{ flex: 1, backgroundColor: colors.bg }}>
-            {/* Modal Header */}
-            <View style={{
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              paddingTop: insets.top + 10,
-              paddingHorizontal: 16,
-              paddingBottom: 10,
-              borderBottomWidth: 1,
-              borderBottomColor: colors.border,
-              backgroundColor: colors.surface,
-            }}>
-              <TouchableOpacity
-                onPress={() => {
-                  setNoteEditorVisible(false);
-                  setEditingNote(null);
-                }}
-                style={{ padding: 8 }}
-              >
-                <X size={20} color={colors.textPrimary} />
-              </TouchableOpacity>
-              <Text style={{ fontSize: 16, fontWeight: '700', color: colors.textPrimary }}>
-                {editingNote ? 'Edit Note' : 'Create New Note'}
-              </Text>
-              <TouchableOpacity
-                onPress={handleSaveNote}
-                disabled={loadingNotes}
-                style={{
-                  backgroundColor: '#06b6d4',
-                  paddingHorizontal: 16,
-                  paddingVertical: 8,
-                  borderRadius: 8,
-                  opacity: loadingNotes ? 0.6 : 1,
-                }}
-              >
-                <Text style={{ color: '#fff', fontSize: 13, fontWeight: '700' }}>
-                  {loadingNotes ? 'Saving...' : 'Save'}
-                </Text>
-              </TouchableOpacity>
-            </View>
-
-            {/* Modal Body */}
-            <KeyboardAvoidingView
-              behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-              style={{ flex: 1 }}
-            >
-              <ScrollView contentContainerStyle={{ padding: 16, paddingBottom: 40 }} keyboardShouldPersistTaps="handled">
-                {/* Title Input */}
-                <Text style={{ fontSize: 12, fontWeight: '800', color: colors.textTertiary, textTransform: 'uppercase', marginBottom: 6 }}>Title</Text>
-                <TextInput
-                  placeholder="e.g. DNA Fingerprinting, Carbon Dating..."
-                  placeholderTextColor={colors.textTertiary}
-                  value={noteTitle}
-                  onChangeText={setNoteTitle}
-                  style={{
-                    backgroundColor: colors.surface + '88',
-                    borderWidth: 1,
-                    borderColor: colors.border,
-                    borderRadius: 10,
-                    paddingHorizontal: 14,
-                    paddingVertical: 12,
-                    fontSize: 15,
-                    color: colors.textPrimary,
-                    marginBottom: 16,
-                  }}
-                />
-
-                {/* Hierarchy Selector Button */}
-                <Text style={{ fontSize: 12, fontWeight: '800', color: colors.textTertiary, textTransform: 'uppercase', marginBottom: 6 }}>Taxonomy Hierarchy</Text>
-                <TouchableOpacity
-                  activeOpacity={0.8}
-                  onPress={() => {
-                    setNoteHierarchyFilters({
-                      ...DEFAULT_MAINS_FILTERS,
-                      paper: noteHierarchy.paper || 'All',
-                      subjects: noteHierarchy.subject || 'All',
-                      sections: noteHierarchy.section_group || 'All',
-                      microtopics: noteHierarchy.microtopic || 'All',
-                      subtopics: noteHierarchy.subtopic || 'All',
-                      nanotopics: noteHierarchy.nanotopic || 'All',
-                    });
-                    setIsNoteEditorSelectingHierarchy(true);
-                    setNoteHierarchyModalVisible(true);
-                  }}
-                  style={{
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    backgroundColor: colors.surface + '88',
-                    borderWidth: 1,
-                    borderColor: colors.border,
-                    borderRadius: 10,
-                    paddingHorizontal: 14,
-                    paddingVertical: 12,
-                    marginBottom: 16,
-                  }}
-                >
-                  <View style={{ flex: 1, marginRight: 8 }}>
-                    {noteHierarchy.paper || noteHierarchy.subject ? (
-                      <Text style={{ fontSize: 13, color: colors.textPrimary, fontWeight: '600' }} numberOfLines={2}>
-                        {[
-                          noteHierarchy.paper,
-                          noteHierarchy.subject,
-                          noteHierarchy.section_group,
-                          noteHierarchy.microtopic,
-                          noteHierarchy.subtopic,
-                          noteHierarchy.nanotopic
-                        ].filter(Boolean).join('  ›  ')}
-                      </Text>
-                    ) : (
-                      <Text style={{ fontSize: 14, color: colors.textTertiary, fontStyle: 'italic' }}>
-                        Choose syllabus hierarchy...
-                      </Text>
-                    )}
-                  </View>
-                  <ChevronRight size={16} color={colors.textTertiary} />
-                </TouchableOpacity>
-
-                {/* Tab Switcher / Split Screen Layout */}
-                {isTablet ? (
-                  /* Side-by-side tablet split layout */
-                  <View style={{ flexDirection: 'row', gap: 16, marginTop: 8 }}>
-                    {/* Left Pane: Editor */}
-                    <View style={{ flex: 1 }}>
-                      <Text style={{ fontSize: 12, fontWeight: '800', color: colors.textTertiary, textTransform: 'uppercase', marginBottom: 6 }}>Markdown Editor</Text>
-                      <TextInput
-                        multiline
-                        placeholder="Paste Gemini/ChatGPT notes in Markdown here..."
-                        placeholderTextColor={colors.textTertiary}
-                        value={noteMarkdown}
-                        onChangeText={setNoteMarkdown}
-                        textAlignVertical="top"
-                        style={{
-                          backgroundColor: colors.surface + '88',
-                          borderWidth: 1,
-                          borderColor: colors.border,
-                          borderRadius: 12,
-                          padding: 14,
-                          fontSize: 14,
-                          fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace',
-                          color: colors.textPrimary,
-                          minHeight: 400,
-                        }}
-                      />
-                    </View>
-
-                    {/* Right Pane: Live Preview */}
-                    <View style={{ flex: 1 }}>
-                      <Text style={{ fontSize: 12, fontWeight: '800', color: colors.textTertiary, textTransform: 'uppercase', marginBottom: 6 }}>Preview</Text>
-                      <View style={{
-                        backgroundColor: colors.surface,
-                        borderWidth: 1,
-                        borderColor: colors.border,
-                        borderRadius: 12,
-                        padding: 16,
-                        minHeight: 400,
-                      }}>
-                        {noteMarkdown ? (
-                          <Markdown style={getMarkdownStyles(colors)} rules={getMarkdownRules(colors, isDark)}>
-                            {noteMarkdown}
-                          </Markdown>
-                        ) : (
-                          <Text style={{ fontStyle: 'italic', color: colors.textTertiary }}>Nothing to preview yet.</Text>
-                        )}
-                      </View>
-                    </View>
-                  </View>
-                ) : (
-                  /* Segmented Tab Switcher on mobile */
-                  <View style={{ marginTop: 8 }}>
-                    <View style={{
-                      flexDirection: 'row',
-                      backgroundColor: colors.border + '33',
-                      borderRadius: 10,
-                      padding: 3,
-                      marginBottom: 12,
-                    }}>
-                      <TouchableOpacity
-                        activeOpacity={0.8}
-                        onPress={() => setEditorTab('write')}
-                        style={{
-                          flex: 1,
-                          paddingVertical: 8,
-                          alignItems: 'center',
-                          borderRadius: 8,
-                          backgroundColor: editorTab === 'write' ? colors.surface : 'transparent',
-                        }}
-                      >
-                        <Text style={{ fontSize: 13, fontWeight: '700', color: editorTab === 'write' ? colors.primary : colors.textSecondary }}>Write</Text>
-                      </TouchableOpacity>
-                      <TouchableOpacity
-                        activeOpacity={0.8}
-                        onPress={() => setEditorTab('preview')}
-                        style={{
-                          flex: 1,
-                          paddingVertical: 8,
-                          alignItems: 'center',
-                          borderRadius: 8,
-                          backgroundColor: editorTab === 'preview' ? colors.surface : 'transparent',
-                        }}
-                      >
-                        <Text style={{ fontSize: 13, fontWeight: '700', color: editorTab === 'preview' ? colors.primary : colors.textSecondary }}>Preview</Text>
-                      </TouchableOpacity>
-                    </View>
-
-                    {editorTab === 'write' ? (
-                      <TextInput
-                        multiline
-                        placeholder="Paste Gemini/ChatGPT notes in Markdown here..."
-                        placeholderTextColor={colors.textTertiary}
-                        value={noteMarkdown}
-                        onChangeText={setNoteMarkdown}
-                        textAlignVertical="top"
-                        style={{
-                          backgroundColor: colors.surface + '88',
-                          borderWidth: 1,
-                          borderColor: colors.border,
-                          borderRadius: 12,
-                          padding: 14,
-                          fontSize: 14,
-                          fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace',
-                          color: colors.textPrimary,
-                          minHeight: 320,
-                        }}
-                      />
-                    ) : (
-                      <View style={{
-                        backgroundColor: colors.surface,
-                        borderWidth: 1,
-                        borderColor: colors.border,
-                        borderRadius: 12,
-                        padding: 16,
-                        minHeight: 320,
-                      }}>
-                        {noteMarkdown ? (
-                          <Markdown style={getMarkdownStyles(colors)} rules={getMarkdownRules(colors, isDark)}>
-                            {noteMarkdown}
-                          </Markdown>
-                        ) : (
-                          <Text style={{ fontStyle: 'italic', color: colors.textTertiary }}>Nothing to preview yet.</Text>
-                        )}
-                      </View>
-                    )}
-                  </View>
-                )}
-              </ScrollView>
-            </KeyboardAvoidingView>
-
-            {/* Hierarchy selector - must live INSIDE the Modal to appear on top */}
-            <HierarchyModal
-              visible={noteHierarchyModalVisible && isNoteEditorSelectingHierarchy}
-              onClose={() => {
-                setNoteHierarchyModalVisible(false);
-                setIsNoteEditorSelectingHierarchy(false);
-              }}
-              colors={colors}
-              filters={noteHierarchyFilters}
-              onUpdateFilters={handleUpdateNoteHierarchyFilters}
-              allPapers={noteAllPapers}
-              subjectOptions={noteSubjectOptions}
-              sectionOptions={noteSectionOptions}
-              microtopicOptions={noteMicrotopicOptions}
-              subtopicOptions={noteSubtopicOptions}
-              macrotagOptions={[]}
-              microtagOptions={[]}
-              isTablet={isTablet}
-              columnLabels={{
-                paper: 'Paper',
-                subject: 'Subject',
-                section: 'Section Group',
-                microtopic: 'Microtopic',
-                subtopic: 'Subtopic'
-              }}
-              questions={questions}
-            />
-          </View>
-        </Modal>
-
-        {/* Mains Notes Full Screen Viewer Modal */}
-        <Modal
-          visible={noteViewerVisible}
-          animationType="slide"
-          transparent={false}
-          onRequestClose={() => {
-            setNoteViewerVisible(false);
-            setNoteViewerItem(null);
-          }}
-        >
-          <View style={{ flex: 1, backgroundColor: colors.bg }}>
-            {/* Modal Header */}
-            <View style={{
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              paddingTop: insets.top + 10,
-              paddingHorizontal: 16,
-              paddingBottom: 10,
-              borderBottomWidth: 1,
-              borderBottomColor: colors.border,
-              backgroundColor: colors.surface,
-            }}>
-              <TouchableOpacity
-                onPress={() => {
-                  setNoteViewerVisible(false);
-                  setNoteViewerItem(null);
-                }}
-                style={{ padding: 8 }}
-              >
-                <ChevronLeft size={24} color={colors.textPrimary} />
-              </TouchableOpacity>
-              <Text 
-                numberOfLines={1} 
-                style={{ 
-                  flex: 1, 
-                  fontSize: 18, 
-                  fontWeight: '700', 
-                  color: colors.textPrimary,
-                  textAlign: 'center',
-                  marginHorizontal: 12 
-                }}
-              >
-                {noteViewerItem?.title || 'View Note'}
-              </Text>
-              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
-                {noteViewerItem && (
-                  <TouchableOpacity
-                    onPress={() => {
-                      setNoteViewerVisible(false);
-                      handleEditNote(noteViewerItem);
-                    }}
-                    style={{ padding: 8 }}
-                  >
-                    <Edit size={20} color={colors.primary} />
-                  </TouchableOpacity>
-                )}
-                <TouchableOpacity
-                  onPress={() => {
-                    setNoteViewerVisible(false);
-                    setNoteViewerItem(null);
-                  }}
-                  style={{ padding: 8 }}
-                >
-                  <X size={20} color={colors.textPrimary} />
-                </TouchableOpacity>
-              </View>
-            </View>
-
-            {/* Note Metadata Sub-header */}
-            {noteViewerItem && (noteViewerItem.paper || noteViewerItem.subject || noteViewerItem.microtopic) && (
-              <View style={{ 
-                flexDirection: 'row', 
-                flexWrap: 'wrap', 
-                gap: 6, 
-                paddingHorizontal: 16, 
-                paddingVertical: 8, 
-                backgroundColor: colors.surface + '80',
-                borderBottomWidth: 0.5,
-                borderBottomColor: colors.border 
-              }}>
-                {noteViewerItem.paper ? (
-                  <View style={{ backgroundColor: isDark ? '#1e3a5f' : '#dbeafe', borderRadius: 4, paddingHorizontal: 8, paddingVertical: 3 }}>
-                    <Text style={{ fontSize: 11, color: isDark ? '#93c5fd' : '#1d4ed8', fontWeight: '700' }}>{noteViewerItem.paper}</Text>
-                  </View>
-                ) : null}
-                {noteViewerItem.subject ? (
-                  <View style={{ backgroundColor: isDark ? '#1a3a2a' : '#d1fae5', borderRadius: 4, paddingHorizontal: 8, paddingVertical: 3 }}>
-                    <Text style={{ fontSize: 11, color: isDark ? '#6ee7b7' : '#065f46', fontWeight: '700' }}>{noteViewerItem.subject}</Text>
-                  </View>
-                ) : null}
-                {noteViewerItem.microtopic ? (
-                  <View style={{ backgroundColor: isDark ? '#3b2a1a' : '#fef3c7', borderRadius: 4, paddingHorizontal: 8, paddingVertical: 3 }}>
-                    <Text style={{ fontSize: 11, color: isDark ? '#fcd34d' : '#92400e', fontWeight: '700' }}>{noteViewerItem.microtopic}</Text>
-                  </View>
-                ) : null}
-                {noteViewerItem.subtopic ? (
-                  <View style={{ backgroundColor: isDark ? '#2e1f3a' : '#f3e8ff', borderRadius: 4, paddingHorizontal: 8, paddingVertical: 3 }}>
-                    <Text style={{ fontSize: 11, color: isDark ? '#d8b4fe' : '#6b21a8', fontWeight: '700' }}>{noteViewerItem.subtopic}</Text>
-                  </View>
-                ) : null}
-                {noteViewerItem.nanotopic ? (
-                  <View style={{ backgroundColor: isDark ? '#3c1e2e' : '#fce7f3', borderRadius: 4, paddingHorizontal: 8, paddingVertical: 3 }}>
-                    <Text style={{ fontSize: 11, color: isDark ? '#f9a8d4' : '#9d174d', fontWeight: '700' }}>{noteViewerItem.nanotopic}</Text>
-                  </View>
-                ) : null}
-              </View>
-            )}
-
-            {/* Note Content Viewer with standard vertical scrolling */}
-            <ScrollView 
-              style={{ flex: 1 }} 
-              contentContainerStyle={{ padding: 16, paddingBottom: 60 }}
-              showsVerticalScrollIndicator={true}
-            >
-              {noteViewerItem?.content_markdown ? (
-                <Markdown style={getMarkdownStyles(colors)} rules={getMarkdownRules(colors, isDark)}>
-                  {noteViewerItem.content_markdown}
-                </Markdown>
-              ) : (
-                <Text style={{ color: colors.textTertiary, fontStyle: 'italic', fontSize: 14, marginTop: 20 }}>No content in this note yet.</Text>
-              )}
-            </ScrollView>
-          </View>
-        </Modal>
-
-        {/* Notes Hierarchy selector moved inside NoteEditorModal above */}
       </View>
     </Provider>
   );
@@ -2812,13 +2083,6 @@ function HubView({
       description: 'Consolidated value additions hub',
       color: '#7c3aed',
       icon: Zap,
-    },
-    {
-      id: 'notes',
-      title: 'Mains Notes Hub',
-      description: 'Your personal structured study notes',
-      color: '#06b6d4',
-      icon: FileText,
     },
     {
       id: 'syllabus',
@@ -2946,9 +2210,6 @@ function HubView({
                   });
                 } else if (card.id === 'va-hub') {
                   onSelectVaHub?.('va_hub');
-                } else if (card.id === 'notes') {
-                  // Navigate to value-add screen with notes category pre-selected
-                  onSelectVaHub?.('notes');
                 } else {
                   onSelect(card.id as any);
                 }
@@ -3041,7 +2302,8 @@ const splitSubThemes = (text: string | undefined | null) => {
   const subThemes: { title: string; content: string }[] = [];
 
   const firstPreamble = parts[0]?.trim();
-  if (firstPreamble && parts.length > 1) {
+  const cleanedPreamble = firstPreamble ? firstPreamble.replace(/<!--[\s\S]*?-->/g, '').trim() : '';
+  if (cleanedPreamble && parts.length > 1) {
     subThemes.push({ title: '', content: firstPreamble });
   }
 
@@ -3052,11 +2314,17 @@ const splitSubThemes = (text: string | undefined | null) => {
     const titleEscaped = title.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
     const regex = new RegExp(`^(?:<br\\s*/?>|\\s)*(?:[•-]\\s*)?(?:<b><u>|<u><b>|\\*\\*|<b>|<u>)?(${titleEscaped})(?:</u></b>|</b></u>|\\*\\*|</b>|</u>)?(?:<br\\s*/?>|\\s)*`, 'i');
     content = content.replace(regex, '');
-    subThemes.push({ title, content });
+    const cleanedContent = content.replace(/<!--[\s\S]*?-->/g, '').trim();
+    if (title || cleanedContent) {
+      subThemes.push({ title, content });
+    }
   }
 
   if (subThemes.length === 0 && text) {
-    subThemes.push({ title: '', content: text });
+    const cleanedText = text.replace(/<!--[\s\S]*?-->/g, '').trim();
+    if (cleanedText) {
+      subThemes.push({ title: '', content: text });
+    }
   }
   return subThemes;
 };
@@ -3238,6 +2506,9 @@ export const cleanDataFactsMarkdown = (text: string | undefined | null, item: an
   // 3.1 Fallback: replace any remaining Sub-Sub-Theme comments
   cleaned = cleaned.replace(/<!--\s*Sub-Sub-Theme:\s*(.*?)\s*-->/gi, '\n\n#### $1\n\n');
 
+  // 3.2 Strip any remaining HTML comments
+  cleaned = cleaned.replace(/<!--[\s\S]*?-->/g, '');
+
   // 4. Replace <br> tags with \n
   cleaned = cleaned.replace(/<br\s*\/?>/gi, '\n');
 
@@ -3302,7 +2573,7 @@ const parseMarkdownToSections = (text: string | undefined | null): MarkdownSecti
   while ((match = regex.exec(text)) !== null) {
     if (lastIndex > 0 || currentHeading) {
       const content = text.slice(lastIndex, match.index).trim();
-      if (content || currentHeading) {
+      if (content && cleanMarkdownContent(content).trim().length > 0) {
         sections.push({ heading: currentHeading || 'General', content });
       }
     }
@@ -3311,7 +2582,7 @@ const parseMarkdownToSections = (text: string | undefined | null): MarkdownSecti
   }
   
   const content = text.slice(lastIndex).trim();
-  if (content || currentHeading) {
+  if (content && cleanMarkdownContent(content).trim().length > 0) {
     sections.push({ heading: currentHeading || 'General', content });
   }
   
@@ -3376,7 +2647,6 @@ export function ValueAddCardBody({
   onAddFlashcardClick,
   zoomScale,
   onImagePress,
-  onViewNoteFullscreen,
   filters,
   search,
 }: {
@@ -3387,7 +2657,6 @@ export function ValueAddCardBody({
   onAddFlashcardClick?: (front: string, back: string) => void;
   zoomScale?: number;
   onImagePress?: (uri: string) => void;
-  onViewNoteFullscreen?: (item: any) => void;
   filters?: any;
   search?: string;
 }) {
@@ -3412,7 +2681,6 @@ export function ValueAddCardBody({
           colors={colors}
           templateFilter={templateFilter || 'All'}
           zoomScale={scale}
-          onImagePress={onImagePress}
         />
       )}
 
@@ -3460,27 +2728,6 @@ export function ValueAddCardBody({
           onImagePress={onImagePress}
         />
       )}
-
-      {item.category === 'notes' && (
-        <View style={{ paddingVertical: 6, paddingHorizontal: 2 }}>
-          {/* Hierarchy metadata row */}
-          {(item.paper || item.subject || item.microtopic) ? (
-            <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 4, marginBottom: 8 }}>
-              {item.paper ? <View style={{ backgroundColor: isDark ? '#1e3a5f' : '#dbeafe', borderRadius: 4, paddingHorizontal: 6, paddingVertical: 2 }}><Text style={{ fontSize: 10 * scale, color: isDark ? '#93c5fd' : '#1d4ed8', fontWeight: '700' }}>{item.paper}</Text></View> : null}
-              {item.subject ? <View style={{ backgroundColor: isDark ? '#1a3a2a' : '#d1fae5', borderRadius: 4, paddingHorizontal: 6, paddingVertical: 2 }}><Text style={{ fontSize: 10 * scale, color: isDark ? '#6ee7b7' : '#065f46', fontWeight: '700' }}>{item.subject}</Text></View> : null}
-              {item.microtopic ? <View style={{ backgroundColor: isDark ? '#3b2a1a' : '#fef3c7', borderRadius: 4, paddingHorizontal: 6, paddingVertical: 2 }}><Text style={{ fontSize: 10 * scale, color: isDark ? '#fcd34d' : '#92400e', fontWeight: '700' }}>{item.microtopic}</Text></View> : null}
-            </View>
-          ) : null}
-          {/* Content preview — first 400 chars */}
-          {item.content_markdown ? (
-            <Markdown style={getMarkdownStyles(colors)} rules={getMarkdownRules(colors, isDark)}>
-              {item.content_markdown.slice(0, 400) + (item.content_markdown.length > 400 ? '\n\n*...tap 🔍 to read full note*' : '')}
-            </Markdown>
-          ) : (
-            <Text style={{ color: colors.textTertiary, fontStyle: 'italic', fontSize: 13 * scale }}>No content yet. Tap ✏️ to edit.</Text>
-          )}
-        </View>
-      )}
     </View>
   );
 }
@@ -3508,10 +2755,6 @@ export const ValueAdditionCard = React.memo(function ValueAdditionCard({
   onCreateTag,
   vaFavorites,
   onToggleVaFavorite,
-  onEditNote,
-  onDeleteNote,
-  onExportNotePdf,
-  onViewNoteFullscreen,
   filters,
   search,
 }: {
@@ -3535,15 +2778,14 @@ export const ValueAdditionCard = React.memo(function ValueAdditionCard({
   onCreateTag?: (tag: string) => void;
   vaFavorites?: Set<string>;
   onToggleVaFavorite?: (cardId: string) => void;
-  onEditNote?: (item: any) => void;
-  onDeleteNote?: (item: any) => void;
-  onExportNotePdf?: (item: any) => void;
-  onViewNoteFullscreen?: (item: any) => void;
   filters?: any;
   search?: string;
 }) {
   const [collapsed, setCollapsed] = useState(initialCollapsed ?? true);
   const [showTagsSelector, setShowTagsSelector] = useState(false);
+  const [isQuotePinned, setIsQuotePinned] = useState(() =>
+    item.category === 'quotes' ? isQuoteOnHomescreenSync(item.id || item.quoteText || item.title) : false
+  );
   const isCopied = copiedId === item.id;
 
   useEffect(() => {
@@ -3554,20 +2796,7 @@ export const ValueAdditionCard = React.memo(function ValueAdditionCard({
     }
   }, [forceExpandCollapse]);
 
-  const submodules = [
-    { id: 'data_facts', title: 'Data & Facts', color: '#3b82f6' },
-    { id: 'intro_conclusion', title: 'Intro & Conclusion', color: '#10b981' },
-    { id: 'quotes', title: 'Quotes & Anecdotes', color: '#8b5cf6' },
-    { id: 'mnemonics', title: 'Mnemonics', color: '#f59e0b' },
-    { id: 'frameworks', title: 'Frameworks', color: '#f43f5e' },
-    { id: 'ethics', title: 'Ethics Specific Hub', color: '#06b6d4' },
-    { id: 'keywords_hub', title: 'Keywords', color: '#ec4899' },
-    { id: 'case_studies_hub', title: 'Case Studies', color: '#f97316' },
-    { id: 'sc_judgments_hub', title: 'SC Judgments', color: '#ef4444' },
-    { id: 'va_hub', title: 'Value Additions Hub', color: '#7c3aed' },
-    { id: 'notes', title: 'Mains Notes Hub', color: '#06b6d4' },
-  ];
-  const categoryTitle = submodules.find(s => s.id === item.category)?.title || item.category;
+  const catMeta = getVaCategoryMeta(item.category);
 
   return (
     <View
@@ -3587,20 +2816,36 @@ export const ValueAdditionCard = React.memo(function ValueAdditionCard({
           onPress={() => setCollapsed(!collapsed)}
           style={{ flex: 1, marginRight: 8 }}
         >
-          {activeCategory === 'va_hub' && (
-            <View style={{
-              alignSelf: 'flex-start',
-              backgroundColor: (submodules.find(s => s.id === item.category)?.color || colors.primary) + '22',
-              borderColor: (submodules.find(s => s.id === item.category)?.color || colors.primary) + '55',
-              borderWidth: 0.5,
-              paddingHorizontal: 6,
-              paddingVertical: 2,
-              borderRadius: 4,
-              marginBottom: 6
-            }}>
-              <Text style={{ fontSize: 9, fontWeight: '800', color: submodules.find(s => s.id === item.category)?.color || colors.primary }}>
-                {(submodules.find(s => s.id === item.category)?.title || item.category).toUpperCase()}
-              </Text>
+          {item.category && (
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, flexWrap: 'wrap', marginBottom: 6 }}>
+              <View style={{
+                alignSelf: 'flex-start',
+                backgroundColor: (catMeta.color || colors.primary) + '22',
+                borderColor: (catMeta.color || colors.primary) + '55',
+                borderWidth: 0.5,
+                paddingHorizontal: 6,
+                paddingVertical: 2,
+                borderRadius: 4,
+              }}>
+                <Text style={{ fontSize: 9, fontWeight: '800', color: catMeta.color || colors.primary }}>
+                  {catMeta.title.toUpperCase()}
+                </Text>
+              </View>
+              {(item.paper || item.subject) ? (
+                <View style={{
+                  alignSelf: 'flex-start',
+                  backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)',
+                  borderColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)',
+                  borderWidth: 0.5,
+                  paddingHorizontal: 6,
+                  paddingVertical: 2,
+                  borderRadius: 4,
+                }}>
+                  <Text style={{ fontSize: 9, fontWeight: '700', color: colors.textSecondary }}>
+                    {item.paper || ''}{item.paper && item.subject ? ' · ' : ''}{item.subject || ''}
+                  </Text>
+                </View>
+              ) : null}
             </View>
           )}
           <Text
@@ -3674,44 +2919,53 @@ export const ValueAdditionCard = React.memo(function ValueAdditionCard({
             onAddFlashcardClick={(front, back) => onAddFlashcardClick?.(item, front, back)}
             zoomScale={zoomScale}
             onImagePress={onImagePress}
-            onViewNoteFullscreen={onViewNoteFullscreen}
             filters={filters}
             search={search}
           />
           <View style={{ flexDirection: 'row', justifyContent: 'flex-end', marginTop: 10, paddingRight: 4, gap: 8 }}>
-            {item.category === 'notes' && onViewNoteFullscreen && (
+            {item.category === 'quotes' && (
               <TouchableOpacity
-                onPress={() => onViewNoteFullscreen(item)}
-                style={[styles.copyButton, { borderColor: '#6366f1', backgroundColor: '#6366f112' }]}
+                onPress={async () => {
+                  const quoteId = item.id || item.quoteText || item.title || `quote_${Date.now()}`;
+                  if (isQuotePinned) {
+                    setIsQuotePinned(false);
+                    await removeQuoteFromHomescreen(quoteId);
+                    if (Platform.OS === 'android') {
+                      ToastAndroid.show('Removed from homescreen widget', ToastAndroid.SHORT);
+                    }
+                  } else {
+                    setIsQuotePinned(true);
+                    const rawText = item.quoteText || item.quote || item.title || item.rawContent || '';
+                    const cleanText = cleanMarkdownContent(rawText).trim();
+                    const quoteAuthor = item.author || item.thinker || item.philosopher || 'Mains Quotes';
+                    await addQuoteToHomescreen({
+                      id: quoteId,
+                      text: cleanText,
+                      author: quoteAuthor,
+                      source: item.source || 'Mains Value Add',
+                    });
+                    if (Platform.OS === 'android') {
+                      ToastAndroid.show('Pinned to homescreen widget!', ToastAndroid.SHORT);
+                    }
+                  }
+                }}
+                style={[
+                  styles.copyButton,
+                  {
+                    borderColor: isQuotePinned ? '#8b5cf6' : (isDark ? 'rgba(255,255,255,0.15)' : '#e2e8f0'),
+                    backgroundColor: isQuotePinned ? '#8b5cf618' : 'transparent',
+                    paddingHorizontal: 8,
+                    paddingVertical: 6,
+                    minHeight: 28,
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                  }
+                ]}
               >
-                <Maximize2 size={12} color="#6366f1" />
-              </TouchableOpacity>
-            )}
-
-            {item.category === 'notes' && onEditNote && (
-              <TouchableOpacity
-                onPress={() => onEditNote(item)}
-                style={[styles.copyButton, { borderColor: '#06b6d4', backgroundColor: '#06b6d412' }]}
-              >
-                <Edit size={12} color="#06b6d4" />
-              </TouchableOpacity>
-            )}
-
-            {item.category === 'notes' && onDeleteNote && (
-              <TouchableOpacity
-                onPress={() => onDeleteNote(item)}
-                style={[styles.copyButton, { borderColor: '#ef4444', backgroundColor: '#ef444412' }]}
-              >
-                <Trash2 size={12} color="#ef4444" />
-              </TouchableOpacity>
-            )}
-
-            {item.category === 'notes' && onExportNotePdf && (
-              <TouchableOpacity
-                onPress={() => onExportNotePdf(item)}
-                style={[styles.copyButton, { borderColor: '#10b981', backgroundColor: '#10b98112' }]}
-              >
-                <FileDown size={12} color="#10b981" />
+                <Home
+                  size={12}
+                  color={isQuotePinned ? '#8b5cf6' : colors.textSecondary}
+                />
               </TouchableOpacity>
             )}
 
@@ -4303,7 +3557,7 @@ function MainsLeftPanel({
                     key={`${kw}-${i}`}
                     onPress={() => toggleExcludedKeyword(kw)}
                     activeOpacity={0.7}
-                    style={[styles.keywordPill, {
+                    style={[(styles as any).keywordPill || styles.filterPill, {
                       backgroundColor: isExcluded ? colors.border + '30' : '#f5f3ff',
                       borderColor: isExcluded ? colors.border : '#ddd6fe',
                       opacity: isExcluded ? 0.5 : 1,
@@ -7158,16 +6412,7 @@ function QuestionBankView({
               if (kind === 'valueAdd' || ((rawItem as any).category !== undefined && !(rawItem as any).questionText)) {
                 const va = rawItem as ValueAdditionItem;
                 return (
-                  <View key={va.id} style={[styles.figmaQuestionCard, { backgroundColor: 'rgba(236,253,245,0.7)', borderColor: 'rgba(16,185,129,0.3)', marginBottom: 12, borderWidth: 1.5 }]}>
-                    {/* VA Header badge */}
-                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 16, paddingTop: 10, paddingBottom: 4 }}>
-                      <View style={{ backgroundColor: '#d1fae5', borderRadius: 6, paddingHorizontal: 6, paddingVertical: 2 }}>
-                        <Text style={{ fontSize: 9, fontWeight: '900', color: '#059669', letterSpacing: 0.5 }}>VALUE ADDITION</Text>
-                      </View>
-                      <View style={{ backgroundColor: '#f0fdf4', borderRadius: 6, paddingHorizontal: 6, paddingVertical: 2, borderWidth: 1, borderColor: '#bbf7d0' }}>
-                        <Text style={{ fontSize: 9, fontWeight: '800', color: '#047857' }}>{va.paper || ''}{va.paper && va.subject ? ' · ' : ''}{va.subject || ''}</Text>
-                      </View>
-                    </View>
+                  <View key={va.id} style={{ marginBottom: 4 }}>
                     <ValueAdditionCard
                       item={va}
                       colors={colors}
@@ -7175,6 +6420,7 @@ function QuestionBankView({
                       copiedId={copiedId}
                       onCopy={onCopy}
                       width="100%"
+                      activeCategory={va.category}
                       onAddFlashcardClick={onAddFlashcardClick}
                       zoomScale={zoomScale}
                       userTags={userTags}
@@ -7375,12 +6621,6 @@ function ValueAdditionView({
   userTags = [],
   vaFavorites = new Set<string>(),
   onToggleVaFavorite,
-  onEditNote,
-  onDeleteNote,
-  onExportNotePdf,
-  onAddNewNoteClick,
-  mainsNotes = [],
-  onViewNoteFullscreen,
   textColorMode = 'default',
   onChangeTextColorMode,
   keyBoxMode = 'boxed',
@@ -7405,12 +6645,6 @@ function ValueAdditionView({
   userTags?: string[];
   vaFavorites?: Set<string>;
   onToggleVaFavorite?: (cardId: string) => void;
-  onEditNote?: (item: any) => void;
-  onDeleteNote?: (item: any) => void;
-  onExportNotePdf?: (item: any) => void;
-  onAddNewNoteClick?: () => void;
-  mainsNotes?: any[];
-  onViewNoteFullscreen?: (item: any) => void;
   textColorMode?: 'default' | 'black';
   onChangeTextColorMode?: (mode: 'default' | 'black') => void;
   keyBoxMode?: 'boxed' | 'bold';
@@ -7552,8 +6786,7 @@ function ValueAdditionView({
     { id: 'keywords_hub', title: 'Keywords', subtitle: 'Mains Keywords Hub', icon: Hash, color: '#ec4899', desc: 'Core vocabulary and definition keys to elevate your writing.' },
     { id: 'case_studies_hub', title: 'Case Studies', subtitle: 'Landmark Examples', icon: Briefcase, color: '#f97316', desc: 'Real-world case studies and examples to validate arguments.' },
     { id: 'sc_judgments_hub', title: 'SC Judgments', subtitle: 'Supreme Court Rulings', icon: Scale, color: '#ef4444', desc: 'Landmark court judgments and articles for legal arguments.' },
-    { id: 'va_hub', title: 'Value Additions Hub', subtitle: 'Consolidated Value Additions', icon: Zap, color: '#7c3aed', desc: 'A unified view of data facts, templates, quotes, frameworks, ethics, mnemonics, keywords, case studies, and SC judgments.' },
-    { id: 'notes', title: 'Mains Notes Hub', subtitle: 'Personal Study Notes', icon: FileText, color: '#06b6d4', desc: 'Your structured Markdown study notes sorted by syllabus topics.' }
+    { id: 'va_hub', title: 'Value Additions Hub', subtitle: 'Consolidated Value Additions', icon: Zap, color: '#7c3aed', desc: 'A unified view of data facts, templates, quotes, frameworks, ethics, mnemonics, keywords, case studies, and SC judgments.' }
   ];
 
   const activeVaTags = useMemo(() => {
@@ -7606,20 +6839,8 @@ function ValueAdditionView({
     });
   }, [valueAddItems]);
 
-  // Dynamic Options extraction for HierarchyModal based on value addition items or notes
+  // Dynamic Options extraction for HierarchyModal based on value addition items
   const activeCategoryItems = useMemo(() => {
-    if (effectiveCategory === 'notes') {
-      return (mainsNotes || []).map(note => ({
-        ...note,
-        category: 'notes',
-        sectionGroup: note.section_group,
-        paper: note.paper,
-        subject: note.subject,
-        microtopic: note.microtopic,
-        subtopic: note.subtopic,
-        nanotopic: note.nanotopic,
-      }));
-    }
     return uniqueValueAddItems.filter(item => {
       if (effectiveCategory !== 'va_hub' && item.category !== effectiveCategory) return false;
 
@@ -7669,7 +6890,7 @@ function ValueAdditionView({
 
       return true;
     });
-  }, [uniqueValueAddItems, activeCategory, ethicsTab, khemkaSubTab, quotesEntryTypeTab, mainsNotes]);
+  }, [uniqueValueAddItems, activeCategory, ethicsTab, khemkaSubTab, quotesEntryTypeTab]);
 
   const allPapers = useMemo(() => {
     const paperSet = new Set<string>();
@@ -7856,24 +7077,7 @@ function ValueAdditionView({
 
   const nanotopicOptions: string[] = [];
 
-  const itemsToFilter = useMemo(() => {
-    if (effectiveCategory === 'notes') {
-      return (mainsNotes || []).map(note => ({
-        ...note,
-        category: 'notes',
-        rawContent: note.content_markdown,
-        content_markdown: note.content_markdown,
-        searchableText: `${note.title || ''} ${note.content_markdown || ''}`.toLowerCase(),
-        sectionGroup: note.section_group,
-        paper: note.paper,
-        subject: note.subject,
-        microtopic: note.microtopic,
-        subtopic: note.subtopic,
-        nanotopic: note.nanotopic,
-      }));
-    }
-    return uniqueValueAddItems;
-  }, [effectiveCategory, uniqueValueAddItems, mainsNotes]);
+  const itemsToFilter = uniqueValueAddItems;
 
   const filteredItems = useMemo(() => {
     const paperFilter = filters.paper !== 'All' ? filters.paper.split('|') : [];
@@ -8273,29 +7477,6 @@ function ValueAdditionView({
                     {submodules.find(s => s.id === effectiveCategory)?.title || 'Value Additions Hub'}
                   </Text>
                 </View>
-                {effectiveCategory === 'notes' && onAddNewNoteClick && (
-                  <TouchableOpacity
-                    activeOpacity={0.8}
-                    onPress={onAddNewNoteClick}
-                    style={{
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                      backgroundColor: '#06b6d4',
-                      paddingHorizontal: 14,
-                      paddingVertical: 10,
-                      borderRadius: 12,
-                      gap: 6,
-                      shadowColor: '#06b6d4',
-                      shadowOffset: { width: 0, height: 2 },
-                      shadowOpacity: 0.25,
-                      shadowRadius: 3.84,
-                      elevation: 5,
-                    }}
-                  >
-                    <Plus size={16} color="#fff" />
-                    <Text style={{ color: '#fff', fontSize: 13, fontWeight: '700' }}>New Note</Text>
-                  </TouchableOpacity>
-                )}
               </View>
 
               {/* Search bar + Layout columns toggle side-by-side */}
@@ -9031,10 +8212,6 @@ function ValueAdditionView({
                         onCreateTag={onCreateTag}
                         vaFavorites={vaFavorites}
                         onToggleVaFavorite={onToggleVaFavorite}
-                        onEditNote={onEditNote}
-                        onDeleteNote={onDeleteNote}
-                        onExportNotePdf={onExportNotePdf}
-                        onViewNoteFullscreen={onViewNoteFullscreen}
                         filters={filters}
                         search={search}
                       />
@@ -9064,10 +8241,6 @@ function ValueAdditionView({
                         onCreateTag={onCreateTag}
                         vaFavorites={vaFavorites}
                         onToggleVaFavorite={onToggleVaFavorite}
-                        onEditNote={onEditNote}
-                        onDeleteNote={onDeleteNote}
-                        onExportNotePdf={onExportNotePdf}
-                        onViewNoteFullscreen={onViewNoteFullscreen}
                         filters={filters}
                         search={search}
                       />
@@ -9099,10 +8272,6 @@ function ValueAdditionView({
                 onCreateTag={onCreateTag}
                 vaFavorites={vaFavorites}
                 onToggleVaFavorite={onToggleVaFavorite}
-                onEditNote={onEditNote}
-                onDeleteNote={onDeleteNote}
-                onExportNotePdf={onExportNotePdf}
-                onViewNoteFullscreen={onViewNoteFullscreen}
                 filters={filters}
                 search={search}
               />
@@ -11303,8 +10472,8 @@ function MainsAISearchView({
                     item.topper_name ||
                     item.source_attribution_label ||
                     item.institute ||
-                    (item.answers || []).find(a => a.institute && a.institute.trim() && a.institute.toLowerCase() !== 'model answer')?.institute ||
-                    (item.answers || []).find(a => a.topper && a.topper.trim())?.topper ||
+                    (item.answers || []).find((a: any) => a.institute && a.institute.trim() && a.institute.toLowerCase() !== 'model answer')?.institute ||
+                    (item.answers || []).find((a: any) => a.topper && a.topper.trim())?.topper ||
                     '';
 
                   return (
@@ -11378,7 +10547,7 @@ function MainsAISearchView({
                           </Text>
                           {/* Answer match snippet if matched in answers */}
                           {(() => {
-                            if (!query?.trim() || !activeFilters.searchAcross.includes('Answers')) return null;
+                            if (!query?.trim() || !filters.searchAcross?.includes('Answers')) return null;
                             const snippet = buildAnswerSnippet(item.answers || [], query);
                             if (!snippet) return null;
                             return (

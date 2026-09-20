@@ -22,24 +22,27 @@ const parseMarkdownToSections = (text: string | undefined | null): MarkdownSecti
     const bMatch = trimmed.match(/^(?:[-*]\s*)?\*\*([^*]+?):\*\*\s*$/);
     
     if (hMatch) {
-      if (currentLines.length > 0 || currentHeading) {
-        sections.push({ heading: currentHeading || 'General', content: currentLines.join('\n') });
-        currentLines = [];
+      const content = currentLines.join('\n').trim();
+      if (content && cleanMarkdownContent(content).trim().length > 0) {
+        sections.push({ heading: currentHeading || 'General', content });
       }
+      currentLines = [];
       currentHeading = hMatch[1].trim();
     } else if (bMatch) {
-      if (currentLines.length > 0 || currentHeading) {
-        sections.push({ heading: currentHeading || 'General', content: currentLines.join('\n') });
-        currentLines = [];
+      const content = currentLines.join('\n').trim();
+      if (content && cleanMarkdownContent(content).trim().length > 0) {
+        sections.push({ heading: currentHeading || 'General', content });
       }
+      currentLines = [];
       currentHeading = bMatch[1].trim();
     } else {
       currentLines.push(line);
     }
   }
   
-  if (currentLines.length > 0 || currentHeading) {
-    sections.push({ heading: currentHeading || 'General', content: currentLines.join('\n') });
+  const content = currentLines.join('\n').trim();
+  if (content && cleanMarkdownContent(content).trim().length > 0) {
+    sections.push({ heading: currentHeading || 'General', content });
   }
   
   // Post-process: If a 'General' section starts with '>', change its heading to 'Quote'
@@ -281,7 +284,9 @@ export default function MainsIntroConclusionCard({
     }
   }), [onImagePress, colors.border]);
 
-  let sections = parseMarkdownToSections(item.introduction || '');
+  let sections = parseMarkdownToSections(item.introduction || '').filter(
+    sec => cleanMarkdownContent(sec.content).trim().length > 0
+  );
 
   return (
     <View style={{ gap: 12 }}>

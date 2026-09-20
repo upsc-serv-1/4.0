@@ -41,7 +41,7 @@ export default function MainsMnemonicsCard({
           </View>
         ))}
       </View>
-      {item.context ? (
+      {item.context && cleanMarkdownContent(item.context).trim().length > 0 ? (
         <View style={{ marginTop: 12, borderTopWidth: 0.5, borderTopColor: colors.border, paddingTop: 10 }}>
           <Text style={[localStyles.subPartHeader, { color: '#f59e0b', fontSize: 11 * zoomScale, marginBottom: 4 }]}>EXPLANATION & EXAMPLES</Text>
           <Markdown style={subPartBodyMarkdownStyle}>{cleanMarkdownContent(item.context)}</Markdown>

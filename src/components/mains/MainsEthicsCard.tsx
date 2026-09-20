@@ -206,7 +206,7 @@ export default function MainsEthicsCard({
       )}
 
       {/* 2. Dimensions - raw content preserves nested bullets */}
-      {(type === 'dimension' || type === 'dimensions') && (
+      {(type === 'dimension' || type === 'dimensions') && cleanMarkdownContent(item.rawContent || '').trim().length > 0 && (
         <View style={[
           localStyles.templateBox,
           {

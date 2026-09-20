@@ -221,7 +221,8 @@ function HubCardPreview({ item, hub, colors }: { item: any; hub: HubConfig; colo
       const subThemes: { title: string; content: string }[] = [];
 
       const firstPreamble = parts[0]?.trim();
-      if (firstPreamble && parts.length > 1) {
+      const cleanedPreamble = firstPreamble ? firstPreamble.replace(/<!--[\s\S]*?-->/g, '').trim() : '';
+      if (cleanedPreamble && parts.length > 1) {
         subThemes.push({ title: '', content: firstPreamble });
       }
 
@@ -232,11 +233,17 @@ function HubCardPreview({ item, hub, colors }: { item: any; hub: HubConfig; colo
           /^(?:<br\s*\/?>|\s)*(?:•\s*)?(?:<b><u>|<u><b>|\*\*)?[^<\n\r]{0,120}(?:<\/u><\/b>|<\/b><\/u>|\*\*|<\/b>|<\/u>)?(?:<br\s*\/?>|\s)*/i,
           ''
         );
-        subThemes.push({ title, content });
+        const cleanedContent = content.replace(/<!--[\s\S]*?-->/g, '').trim();
+        if (title || cleanedContent) {
+          subThemes.push({ title, content });
+        }
       }
 
       if (subThemes.length === 0 && text) {
-        subThemes.push({ title: '', content: text });
+        const cleanedText = text.replace(/<!--[\s\S]*?-->/g, '').trim();
+        if (cleanedText) {
+          subThemes.push({ title: '', content: text });
+        }
       }
       return subThemes;
     };
@@ -280,6 +287,8 @@ function HubCardPreview({ item, hub, colors }: { item: any; hub: HubConfig; colo
         </View>
         <View style={{ gap: 8 }}>
           {subThemes.map((st: any, sIdx: number) => {
+            const cleanedContent = cleanDataFactsMarkdown(st.content, item).trim();
+            if (!st.title?.trim() && !cleanedContent) return null;
             const palette = boxPalette[sIdx % boxPalette.length];
             return (
               <View

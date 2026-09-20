@@ -15,6 +15,7 @@ import {
   TextInput,
   ActivityIndicator,
   Platform,
+  useWindowDimensions,
 } from 'react-native';
 import { Image } from 'expo-image';
 import { 
@@ -82,6 +83,8 @@ const spacing = {
 };
 
 export default function Profile() {
+  const { width } = useWindowDimensions();
+  const isTablet = width >= 768;
   const { colors } = useTheme();
   const { session, signOut } = useAuth();
   const { displayName, avatarId, updateProfile: updateProfileContext } = useProfile();
@@ -618,282 +621,286 @@ export default function Profile() {
           colors={colors}
         />
 
-        <Text style={[styles.small, { color: colors.textTertiary, marginTop: 24, marginBottom: 12 }]}>COURSE PREFERENCES</Text>
-        <View style={[styles.settingsGroup, { backgroundColor: colors.surface + '50', borderColor: colors.border }]}>
-          <Row 
-            icon={<BookOpen color={colors.primary} size={20} />} 
-            label="Select Course" 
-            sub={selectedCourse} 
+        {/* ── ACADEMIC & SUBSCRIPTION PREFERENCES CHIPS ────── */}
+        <Text style={[styles.small, { color: colors.textTertiary, marginTop: 20, marginBottom: 10 }]}>ACADEMIC & SUBSCRIPTION PREFERENCES</Text>
+        <View style={[styles.prefGrid, isTablet ? styles.prefGridTablet : styles.prefGridMobile]}>
+          {/* Chip 1: Course */}
+          <TouchableOpacity 
+            style={[styles.prefChip, { backgroundColor: colors.surface + '80', borderColor: colors.border, width: isTablet ? '23.8%' : '48%' }]}
             onPress={() => setCoursePickerVisible(true)}
-          />
-          <Row 
-            icon={<BookOpen color={colors.primary} size={20} />} 
-            label="Optional Subject" 
-            sub={optional} 
+            activeOpacity={0.7}
+          >
+            <View style={styles.prefChipTop}>
+              <View style={[styles.prefChipIcon, { backgroundColor: colors.primary + '18' }]}>
+                <BookOpen size={15} color={colors.primary} />
+              </View>
+              <View style={[styles.prefChipTag, { backgroundColor: colors.primary + '20' }]}>
+                <Text style={[styles.prefChipTagText, { color: colors.primary }]}>ACTIVE</Text>
+              </View>
+            </View>
+            <Text style={[styles.prefChipLabel, { color: colors.textTertiary }]}>COURSE</Text>
+            <Text style={[styles.prefChipValue, { color: colors.textPrimary }]} numberOfLines={1}>{selectedCourse}</Text>
+          </TouchableOpacity>
+
+          {/* Chip 2: Optional Subject */}
+          <TouchableOpacity 
+            style={[styles.prefChip, { backgroundColor: colors.surface + '80', borderColor: colors.border, width: isTablet ? '23.8%' : '48%' }]}
             onPress={showOptionalPicker}
-            isLast
-          />
+            activeOpacity={0.7}
+          >
+            <View style={styles.prefChipTop}>
+              <View style={[styles.prefChipIcon, { backgroundColor: '#06b6d418' }]}>
+                <BookOpen size={15} color="#06b6d4" />
+              </View>
+              <View style={[styles.prefChipTag, { backgroundColor: '#06b6d420' }]}>
+                <Text style={[styles.prefChipTagText, { color: '#06b6d4' }]}>PAPERS 1 & 2</Text>
+              </View>
+            </View>
+            <Text style={[styles.prefChipLabel, { color: colors.textTertiary }]}>OPTIONAL</Text>
+            <Text style={[styles.prefChipValue, { color: colors.textPrimary }]} numberOfLines={1}>{optional}</Text>
+          </TouchableOpacity>
+
+          {/* Chip 3: Subscription */}
+          <TouchableOpacity 
+            style={[styles.prefChip, { backgroundColor: colors.surface + '80', borderColor: colors.border, width: isTablet ? '23.8%' : '48%' }]}
+            onPress={emitShowSubscription}
+            activeOpacity={0.7}
+          >
+            <View style={styles.prefChipTop}>
+              <View style={[styles.prefChipIcon, { backgroundColor: '#f59e0b18' }]}>
+                <Crown size={15} color="#f59e0b" />
+              </View>
+              <View style={[styles.prefChipTag, { backgroundColor: featureMap.pyq ? '#10b98120' : colors.surfaceStrong }]}>
+                <Text style={[styles.prefChipTagText, { color: featureMap.pyq ? '#10b981' : colors.textTertiary }]}>
+                  {featureMap.pyq ? 'ACTIVE' : 'FREE'}
+                </Text>
+              </View>
+            </View>
+            <Text style={[styles.prefChipLabel, { color: colors.textTertiary }]}>SUBSCRIPTION</Text>
+            <Text style={[styles.prefChipValue, { color: colors.textPrimary }]} numberOfLines={1}>
+              {featureMap.pyq ? 'Pro Plan Active' : 'Free Tier'}
+            </Text>
+          </TouchableOpacity>
+
+          {/* Chip 4: AI Tutor Engine */}
+          <TouchableOpacity 
+            style={[styles.prefChip, { backgroundColor: colors.surface + '80', borderColor: colors.border, width: isTablet ? '23.8%' : '48%' }]}
+            onPress={() => router.push('/ai-settings')}
+            activeOpacity={0.7}
+          >
+            <View style={styles.prefChipTop}>
+              <View style={[styles.prefChipIcon, { backgroundColor: '#8b5cf618' }]}>
+                <Brain size={15} color="#8b5cf6" />
+              </View>
+              <View style={[styles.prefChipTag, { backgroundColor: '#8b5cf620' }]}>
+                <Text style={[styles.prefChipTagText, { color: '#8b5cf6' }]}>
+                  {aiProvider === 'custom' ? 'CUSTOM' : aiProvider.toUpperCase()}
+                </Text>
+              </View>
+            </View>
+            <Text style={[styles.prefChipLabel, { color: colors.textTertiary }]}>AI TUTOR</Text>
+            <Text style={[styles.prefChipValue, { color: colors.textPrimary }]} numberOfLines={1}>
+              {aiProvider === 'gemini' ? 'Gemini 2.5' : aiProvider.toUpperCase()}
+            </Text>
+          </TouchableOpacity>
         </View>
 
-        {/* ── SUBSCRIPTION SECTION ───────────────────────────── */}
-        <Text style={[styles.small, { color: colors.textTertiary, marginTop: 24, marginBottom: 12 }]}>SUBSCRIPTION</Text>
-        <TouchableOpacity
-          onPress={emitShowSubscription}
-          style={[styles.settingsGroup, {
-            backgroundColor: colors.surface + '50',
-            borderColor: colors.border,
-            flexDirection: 'row', alignItems: 'center',
-            padding: 16, gap: 12,
-          }]}
-        >
-          <Crown size={20} color={colors.primary} />
-          <View style={{ flex: 1 }}>
-            <Text style={{ fontSize: 15, fontWeight: '700', color: colors.textPrimary }}>
-              View Plans & Subscription
-            </Text>
-            <Text style={{ fontSize: 12, color: colors.textTertiary, marginTop: 2 }}>
-              {featureMap.pyq ? 'Pro plan active' : 'Free tier — upgrade for more'}
-            </Text>
+        {/* ── DATA & OFFLINE STORAGE HUB (SUPER-CARD) ─────────── */}
+        <Text style={[styles.small, { color: colors.textTertiary, marginTop: 22, marginBottom: 10 }]}>DATA & OFFLINE STORAGE HUB</Text>
+        <View style={[styles.offlineSuperCard, { backgroundColor: colors.surface + '70', borderColor: colors.border }]}>
+          {/* Master Header */}
+          <View style={[styles.superCardHeader, { borderBottomColor: colors.border }]}>
+            <View style={styles.superCardTitleGroup}>
+              <View style={[styles.superCardIcon, { backgroundColor: colors.primary + '18' }]}>
+                <Database size={20} color={colors.primary} />
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text style={[styles.superCardTitle, { color: colors.textPrimary }]}>Offline Storage Hub</Text>
+                <Text style={[styles.superCardSub, { color: colors.textTertiary }]}>
+                  {downloadStats
+                    ? `${downloadStats.questions.done.toLocaleString()} Questions • ${downloadStats.topperCopies.done.toLocaleString()} Topper Copies • ${downloadStats.images.done.toLocaleString()} Cards`
+                    : offlineMeta?.totalQuestions
+                    ? `${offlineMeta.totalQuestions.toLocaleString()} Questions • ${offlineMeta.topperImageCount?.toLocaleString() ?? 0} Topper Copies`
+                    : 'All offline questions, topper sheets & card photos'}
+                </Text>
+              </View>
+            </View>
+            <View style={styles.superCardActions}>
+              <TouchableOpacity 
+                style={[styles.masterPill, { backgroundColor: colors.primary }]}
+                onPress={startFullDownload}
+                activeOpacity={0.7}
+              >
+                <Download size={13} color="#fff" />
+                <Text style={styles.masterPillTextPrimary}>Sync All</Text>
+              </TouchableOpacity>
+              <TouchableOpacity 
+                style={[styles.masterPill, { backgroundColor: colors.surfaceStrong, borderColor: colors.border, borderWidth: 1 }]}
+                onPress={handleRefreshSync}
+                activeOpacity={0.7}
+              >
+                <RefreshCw size={12} color={colors.textSecondary} />
+                <Text style={[styles.masterPillText, { color: colors.textSecondary }]}>Check Updates</Text>
+              </TouchableOpacity>
+              <TouchableOpacity 
+                style={[styles.masterPill, { backgroundColor: '#ef444415', borderColor: '#ef444430', borderWidth: 1 }]}
+                onPress={handleClearOffline}
+                activeOpacity={0.7}
+              >
+                <Trash2 size={12} color="#ef4444" />
+                <Text style={[styles.masterPillText, { color: '#ef4444' }]}>Clear All</Text>
+              </TouchableOpacity>
+            </View>
           </View>
-          <View style={{
-            backgroundColor: featureMap.pyq ? colors.primary + '20' : colors.surfaceStrong,
-            borderRadius: 6, paddingHorizontal: 8, paddingVertical: 2,
-          }}>
-            <Text style={{ fontSize: 9, fontWeight: '900', color: featureMap.pyq ? colors.primary : colors.textTertiary }}>
-              {featureMap.pyq ? 'ACTIVE' : 'FREE'}
-            </Text>
+
+          {/* 2x2 Sub-Boxes Grid */}
+          <View style={[styles.offlineGrid, isTablet ? styles.offlineGridTablet : styles.offlineGridMobile]}>
+            {/* Box 1: Questions & Value-Adds */}
+            <View style={[styles.offlineSubBox, { backgroundColor: colors.surface + '90', borderColor: colors.border, width: isTablet ? '48.8%' : '100%' }]}>
+              <View style={styles.subBoxHeader}>
+                <View style={[styles.subBoxIcon, { backgroundColor: colors.primary + '15' }]}>
+                  <BookOpen size={16} color={colors.primary} />
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Text style={[styles.subBoxTitle, { color: colors.textPrimary }]}>Questions & Value-Adds</Text>
+                  <Text style={[styles.subBoxStat, { color: colors.textSecondary }]}>
+                    {downloadStats
+                      ? `${downloadStats.questions.done.toLocaleString()} / ${downloadStats.questions.total > 0 ? downloadStats.questions.total.toLocaleString() : '?'} Qs • ${(downloadStats.valueAdds.done ?? 0).toLocaleString()} VAs`
+                      : offlineMeta?.totalQuestions
+                      ? `${offlineMeta.totalQuestions.toLocaleString()} Qs • ${(offlineMeta.totalValueAdds ?? 0).toLocaleString()} VAs`
+                      : 'Question bank + mains value-adds'}
+                  </Text>
+                </View>
+              </View>
+              <View style={styles.subBoxButtons}>
+                <TouchableOpacity 
+                  style={[styles.subBoxBtn, { backgroundColor: colors.primary + '15', borderColor: colors.primary + '30' }]} 
+                  onPress={handleDownloadQuestions}
+                >
+                  <Download size={13} color={colors.primary} />
+                  <Text style={[styles.subBoxBtnText, { color: colors.primary }]}>Download</Text>
+                </TouchableOpacity>
+                <TouchableOpacity 
+                  style={[styles.subBoxBtn, { backgroundColor: colors.surfaceStrong, borderColor: colors.border }]} 
+                  onPress={handleRefreshQuestions}
+                >
+                  <RefreshCw size={13} color={colors.textSecondary} />
+                  <Text style={[styles.subBoxBtnText, { color: colors.textSecondary }]}>Check Delta</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+
+            {/* Box 2: Topper Copies */}
+            <View style={[styles.offlineSubBox, { backgroundColor: colors.surface + '90', borderColor: colors.border, width: isTablet ? '48.8%' : '100%' }]}>
+              <View style={styles.subBoxHeader}>
+                <View style={[styles.subBoxIcon, { backgroundColor: '#06b6d415' }]}>
+                  <ImageIcon size={16} color="#06b6d4" />
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Text style={[styles.subBoxTitle, { color: colors.textPrimary }]}>Topper Answer Copies</Text>
+                  <Text style={[styles.subBoxStat, { color: colors.textSecondary }]}>
+                    {downloadStats
+                      ? `${downloadStats.topperCopies.done.toLocaleString()} / ${downloadStats.topperCopies.total > 0 ? downloadStats.topperCopies.total.toLocaleString() : '?'} copies`
+                      : offlineMeta?.topperImageCount
+                      ? `${offlineMeta.topperImageCount.toLocaleString()} copies cached`
+                      : 'Topper copies'}
+                  </Text>
+                </View>
+              </View>
+              <View style={styles.subBoxButtons}>
+                <TouchableOpacity 
+                  style={[styles.subBoxBtn, { backgroundColor: '#06b6d415', borderColor: '#06b6d430' }]} 
+                  onPress={handleDownloadTopperImages}
+                >
+                  <Download size={13} color="#06b6d4" />
+                  <Text style={[styles.subBoxBtnText, { color: '#06b6d4' }]}>Download</Text>
+                </TouchableOpacity>
+                <TouchableOpacity 
+                  style={[styles.subBoxBtn, { backgroundColor: '#ef444412', borderColor: '#ef444425' }]} 
+                  onPress={() => handleClearCategory('topperImages')}
+                >
+                  <Trash2 size={13} color="#ef4444" />
+                  <Text style={[styles.subBoxBtnText, { color: '#ef4444' }]}>Clear</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+
+            {/* Box 3: Flashcard Images */}
+            <View style={[styles.offlineSubBox, { backgroundColor: colors.surface + '90', borderColor: colors.border, width: isTablet ? '48.8%' : '100%' }]}>
+              <View style={styles.subBoxHeader}>
+                <View style={[styles.subBoxIcon, { backgroundColor: '#8b5cf615' }]}>
+                  <Layers size={16} color="#8b5cf6" />
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Text style={[styles.subBoxTitle, { color: colors.textPrimary }]}>Flashcard Photos & Media</Text>
+                  <Text style={[styles.subBoxStat, { color: colors.textSecondary }]}>
+                    {downloadStats
+                      ? `${downloadStats.images.done.toLocaleString()} / ${downloadStats.images.total > 0 ? downloadStats.images.total.toLocaleString() : '?'} photos`
+                      : offlineMeta?.cardImageCount
+                      ? `${offlineMeta.cardImageCount.toLocaleString()} photos cached`
+                      : 'Card attachments'}
+                  </Text>
+                </View>
+              </View>
+              <View style={styles.subBoxButtons}>
+                <TouchableOpacity 
+                  style={[styles.subBoxBtn, { backgroundColor: '#8b5cf615', borderColor: '#8b5cf630' }]} 
+                  onPress={handleDownloadCardImages}
+                >
+                  <Download size={13} color="#8b5cf6" />
+                  <Text style={[styles.subBoxBtnText, { color: '#8b5cf6' }]}>Download</Text>
+                </TouchableOpacity>
+                <TouchableOpacity 
+                  style={[styles.subBoxBtn, { backgroundColor: '#ef444412', borderColor: '#ef444425' }]} 
+                  onPress={() => handleClearCategory('cardImages')}
+                >
+                  <Trash2 size={13} color="#ef4444" />
+                  <Text style={[styles.subBoxBtnText, { color: '#ef4444' }]}>Clear</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+
+            {/* Box 4: Airplane Diagnostic Test */}
+            <View style={[styles.offlineSubBox, { backgroundColor: colors.surface + '90', borderColor: colors.border, width: isTablet ? '48.8%' : '100%' }]}>
+              <View style={styles.subBoxHeader}>
+                <View style={[styles.subBoxIcon, { backgroundColor: '#10b98115' }]}>
+                  <Wifi size={16} color="#10b981" />
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Text style={[styles.subBoxTitle, { color: colors.textPrimary }]}>Airplane Diagnostic Test</Text>
+                  <Text style={[styles.subBoxStat, { color: colors.textSecondary }]}>
+                    {offlineMeta?.lastFullSync ? `Synced: ${OfflineManager.formatSyncAge(offlineMeta.lastFullSync)}` : 'Test all screens in airplane mode'}
+                  </Text>
+                </View>
+              </View>
+              <View style={styles.subBoxButtons}>
+                <TouchableOpacity 
+                  style={[styles.subBoxBtn, { backgroundColor: '#10b98118', borderColor: '#10b98135', flex: 1 }]} 
+                  onPress={() => router.push('/offline-diag')}
+                >
+                  <Wifi size={13} color="#10b981" />
+                  <Text style={[styles.subBoxBtnText, { color: '#10b981' }]}>Run Diagnostic</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
           </View>
-          <ChevronRight size={16} color={colors.textTertiary} />
-        </TouchableOpacity>
 
-        <Text style={[styles.small, { color: colors.textTertiary, marginTop: 24, marginBottom: 12 }]}>APP GUIDE</Text>
-        <View style={[styles.settingsGroup, { backgroundColor: colors.surface + '50', borderColor: colors.border }]}>
-          <Row
-            testID="profile-app-guide"
-            icon={<BookOpen color={colors.primary} size={20} />}
-            label="App Guide"
-            sub="Learn about every feature"
-            onPress={() => setShowAppGuide(true)}
-            isLast
-          />
-        </View>
-
-        <Text style={[styles.small, { color: colors.textTertiary, marginTop: 24, marginBottom: 12 }]}>SETTINGS</Text>
-        <View style={[styles.settingsGroup, { backgroundColor: colors.surface + '50', borderColor: colors.border }]}>
-          <Row testID="profile-algorithm" icon={<Settings2 color={colors.primary} size={20} />} label="Algorithm Defaults" sub="Set global spaced repetition rules" onPress={() => setAlgorithmModalVisible(true)} />
-          <Row testID="profile-theme" icon={<Palette color={colors.primary} size={20} />} label="Zen Theme" sub="Change global appearance" onPress={() => router.push('/theme-preview')} />
-          <Row testID="profile-tabs" icon={<LayoutList color={colors.primary} size={20} />} label="Customize Tabs" sub="Reorder bottom bar" onPress={() => router.push('/customize_tabs')} />
-          <Row testID="profile-dedup" icon={<Layers color={colors.primary} size={20} />} label="Dedup Manager" sub="Smart-merge UPSC PYQs across institutes" onPress={() => router.push('/dedup-manager')} />
-          <Row 
-            testID="profile-widgets" 
-            icon={<BarChart3 color={colors.primary} size={20} />} 
-            label="Manage Widgets" 
-            sub="Configure syllabus tracking & layout" 
-            onPress={() => { 
-              router.push('/(tabs)/' as any); 
-              setTimeout(() => {
-                Alert.alert(
-                  'Widget Configuration', 
-                  '1. Long-press the Syllabus Tracker to configure PYQ Mode & Report Type.\n\n2. Scroll down & tap "Manage Dashboard Widgets" to show/hide widgets.'
-                );
-              }, 500);
-            }} 
-          />
-          {isAnalyticsAdmin ? (
-            <>
-              <Row 
-                testID="profile-admin-panel" 
-                icon={<ShieldCheck color="#ef4444" size={20} />} 
-                label="Admin Panel" 
-                sub="Manage users, features, paywalls & configurations" 
-                onPress={() => router.push('/admin')} 
-              />
-              <Row testID="profile-analytics-layout" icon={<BarChart3 color={colors.primary} size={20} />} label="Analytics Layout Admin" sub="Arrange review and overall cards" onPress={() => setLayoutAdminVisible(true)} />
-            </>
-          ) : null}
-          <Row testID="profile-reset" icon={<UserIcon color={colors.primary} size={20} />} label="Reset Password" sub="Send reset link to email" onPress={requestPasswordReset} />
-          <Row testID="profile-identity" icon={<UserIcon color={colors.textPrimary} size={20} />} label="Account" sub={email} onPress={() => {}} isLast />
-        </View>
-
-        {/* ── AI SETTINGS SECTION ──────────────────────────────── */}
-        <Text style={[styles.small, { color: colors.textTertiary, marginTop: 24, marginBottom: 12 }]}>
-          AI SETTINGS
-        </Text>
-        <TouchableOpacity
-          onPress={() => router.push('/ai-settings')}
-          style={[styles.settingsGroup, {
-            backgroundColor: colors.surface + '50',
-            borderColor: colors.border,
-            flexDirection: 'row', alignItems: 'center',
-            padding: 16, gap: 12,
-          }]}
-        >
-          <Brain size={20} color="#7c3aed" />
-          <View style={{ flex: 1 }}>
-            <Text style={{ fontSize: 15, fontWeight: '700', color: colors.textPrimary }}>
-              AI Settings
-            </Text>
-            <Text style={{ fontSize: 12, color: colors.textTertiary, marginTop: 2 }}>
-              Provider, model, API keys, prompts
-            </Text>
-          </View>
-          {/* Active provider badge */}
-          <View style={{
-            backgroundColor: aiProvider === 'groq' ? '#f97316' : aiProvider === 'openrouter' ? '#0891b2' : aiProvider === 'deepseek' ? '#0ea5e9' : aiProvider === 'custom' ? '#10b981' : '#7c3aed',
-            borderRadius: 6, paddingHorizontal: 8, paddingVertical: 2,
-          }}>
-            <Text style={{ fontSize: 9, fontWeight: '900', color: '#fff' }}>
-              {aiProvider === 'custom' ? 'CUSTOM' : aiProvider.toUpperCase()}
-            </Text>
-          </View>
-          <ChevronRight size={16} color={colors.textTertiary} />
-        </TouchableOpacity>
-
-        {/* ── DATA & OFFLINE SECTION ─────────────────────────── */}
-        <Text style={[styles.small, { color: colors.textTertiary, marginTop: 24, marginBottom: 12 }]}>DATA & OFFLINE</Text>
-        <View style={[styles.settingsGroup, { backgroundColor: colors.surface + '50', borderColor: colors.border }]}>
-          <Row
-            testID="profile-download"
-            icon={<Download color={colors.primary} size={20} />}
-            label="Download everything"
-            sub={offlineMeta?.lastFullSync ? `Last downloaded: ${OfflineManager.formatSyncAge(offlineMeta.lastFullSync)}` : 'Questions, value-adds & every image'}
-            onPress={startFullDownload}
-          />
-          <Row
-            testID="profile-refresh"
-            icon={<RefreshCw color={colors.primary} size={20} />}
-            label="Check for updates"
-            sub={offlineMeta?.lastCatalogScan ? `Checked: ${OfflineManager.formatSyncAge(offlineMeta.lastCatalogScan)}` : 'New tests, images & your data'}
-            onPress={handleRefreshSync}
-          />
-          <Row
-            testID="profile-clear-cache"
-            icon={<Trash2 color="#ef4444" size={20} />}
-            label="Clear offline data"
-            sub={offlineMeta?.totalQuestions ? `${offlineMeta.totalQuestions.toLocaleString()} questions cached` : 'No data cached'}
-            onPress={handleClearOffline}
-            isLast
-          />
-        </View>
-
-        {/* ── 1. QUESTIONS & VALUE-ADDS ──────────────────────── */}
-        <Text style={[styles.small, { color: colors.textTertiary, marginTop: 24, marginBottom: 12 }]}>QUESTIONS & VALUE-ADDS</Text>
-        <View style={[styles.settingsGroup, { backgroundColor: colors.surface + '50', borderColor: colors.border }]}>
-          <Row
-            testID="profile-download-questions"
-            icon={<BookOpen color={colors.primary} size={20} />}
-            label="Download questions"
-            sub={
-              downloadStats
-                ? `${downloadStats.questions.done.toLocaleString()} / ${downloadStats.questions.total > 0 ? downloadStats.questions.total.toLocaleString() : '?'} questions • ${(downloadStats.valueAdds.done ?? 0).toLocaleString()} / ${downloadStats.valueAdds.total > 0 ? downloadStats.valueAdds.total.toLocaleString() : '?'} value-adds`
-                : offlineMeta?.totalQuestions
-                ? `${offlineMeta.totalQuestions.toLocaleString()} questions • ${(offlineMeta.totalValueAdds ?? 0).toLocaleString()} value-adds`
-                : 'Question bank + mains value-adds'
-            }
-            onPress={handleDownloadQuestions}
-          />
-          <Row
-            testID="profile-refresh-questions"
-            icon={<RefreshCw color={colors.textSecondary} size={20} />}
-            label="Check questions for updates"
-            sub={activeCategory === 'questions' && isSyncing ? 'Checking…' : 'Only downloads new or changed items'}
-            onPress={handleRefreshQuestions}
-            isLast
-          />
-        </View>
-
-        {/* ── 2. TOPPER IMAGES ───────────────────────────────── */}
-        <Text style={[styles.small, { color: colors.textTertiary, marginTop: 24, marginBottom: 12 }]}>TOPPER COPIES</Text>
-        <View style={[styles.settingsGroup, { backgroundColor: colors.surface + '50', borderColor: colors.border }]}>
-          <Row
-            testID="profile-download-topper"
-            icon={<ImageIcon color={colors.primary} size={20} />}
-            label="Download topper images"
-            sub={
-              downloadStats
-                ? `${downloadStats.topperCopies.done.toLocaleString()} / ${downloadStats.topperCopies.total > 0 ? downloadStats.topperCopies.total.toLocaleString() : '?'} topper copies`
-                : offlineMeta?.topperImageCount
-                ? `${offlineMeta.topperImageCount.toLocaleString()} topper copies`
-                : 'Topper answer sheets'
-            }
-            onPress={handleDownloadTopperImages}
-          />
-          <Row
-            testID="profile-refresh-topper"
-            icon={<RefreshCw color={colors.textSecondary} size={20} />}
-            label="Check for new topper images"
-            sub={activeCategory === 'topperImages' && isSyncing ? 'Checking…' : 'Skips pages already on device'}
-            onPress={handleRefreshTopperImages}
-          />
-          <Row
-            testID="profile-clear-topper"
-            icon={<Trash2 color="#ef4444" size={20} />}
-            label="Clear topper images"
-            sub="Keep questions, free up the most space"
-            onPress={() => handleClearCategory('topperImages')}
-            isLast
-          />
-        </View>
-
-        {/* ── 3. FLASHCARD IMAGES ────────────────────────────── */}
-        <Text style={[styles.small, { color: colors.textTertiary, marginTop: 24, marginBottom: 12 }]}>FLASHCARD IMAGES</Text>
-        <View style={[styles.settingsGroup, { backgroundColor: colors.surface + '50', borderColor: colors.border }]}>
-          <Row
-            testID="profile-download-card-images"
-            icon={<Layers color={colors.primary} size={20} />}
-            label="Download flashcard images"
-            sub={
-              downloadStats
-                ? `${downloadStats.images.done.toLocaleString()} / ${downloadStats.images.total > 0 ? downloadStats.images.total.toLocaleString() : '?'} photos cached`
-                : offlineMeta?.cardImageCount
-                ? `${offlineMeta.cardImageCount.toLocaleString()} photos cached`
-                : 'Front / back photos on your cards'
-            }
-            onPress={handleDownloadCardImages}
-          />
-          <Row
-            testID="profile-refresh-card-images"
-            icon={<RefreshCw color={colors.textSecondary} size={20} />}
-            label="Check for new flashcard images"
-            sub={activeCategory === 'cardImages' && isSyncing ? 'Checking…' : 'Skips photos already on device'}
-            onPress={handleRefreshCardImages}
-          />
-          <Row
-            testID="profile-clear-card-images"
-            icon={<Trash2 color="#ef4444" size={20} />}
-            label="Clear flashcard images"
-            sub="Keeps your cards, removes cached photos"
-            onPress={() => handleClearCategory('cardImages')}
-            isLast
-          />
-        </View>
-
-        {offlineMeta?.mediaPhaseCancelled ? (
-          <View style={[styles.settingsGroup, { backgroundColor: colors.surface + '50', borderColor: colors.border, marginTop: 12 }]}>
-            <Row
-              testID="profile-download-images"
-              icon={<ImageIcon color="#f59e0b" size={20} />}
-              label="Download remaining images"
-              sub={isMediaSyncing ? 'Caching images...' : 'A previous image download was cancelled'}
+          {offlineMeta?.mediaPhaseCancelled ? (
+            <TouchableOpacity 
+              style={[styles.mediaCancelledAlert, { backgroundColor: '#f59e0b12', borderColor: '#f59e0b30' }]}
               onPress={handleDownloadRemainingImages}
-              isLast
-            />
-          </View>
-        ) : null}
-
-        <View style={[styles.settingsGroup, { backgroundColor: colors.surface + '50', borderColor: colors.border, marginTop: 12 }]}>
-          <Row
-            testID="profile-offline-diag"
-            icon={<Wifi color="#8b5cf6" size={20} />}
-            label="Offline Diagnostic Test"
-            sub="Test which screens work in airplane mode"
-            onPress={() => router.push('/offline-diag')}
-            isLast
-          />
+            >
+              <ImageIcon color="#f59e0b" size={16} />
+              <Text style={{ color: '#f59e0b', fontSize: 12, fontWeight: '700', flex: 1, marginLeft: 8 }}>
+                {isMediaSyncing ? 'Caching remaining images...' : 'A previous image download was cancelled — tap to finish.'}
+              </Text>
+              <ChevronRight size={16} color="#f59e0b" />
+            </TouchableOpacity>
+          ) : null}
         </View>
 
         {offlineMeta?.lastFullSync ? (
-          <View style={[styles.cacheInfoCard, { backgroundColor: colors.primary + '08', borderColor: colors.primary + '20' }]}>
+          <View style={[styles.cacheInfoCard, { backgroundColor: colors.primary + '08', borderColor: colors.primary + '20', marginBottom: 6 }]}>
             <Database color={colors.primary} size={16} />
             <View style={{ flex: 1, marginLeft: 10 }}>
               <Text style={[styles.cacheInfoTitle, { color: colors.textPrimary }]}>Offline Cache Active</Text>
@@ -903,6 +910,71 @@ export default function Profile() {
             </View>
           </View>
         ) : null}
+
+        {/* ── SETTINGS & TOOLS CONFIGURATION (2-COLUMN GRID) ──── */}
+        <Text style={[styles.small, { color: colors.textTertiary, marginTop: 22, marginBottom: 10 }]}>SETTINGS & TOOLS CONFIGURATION</Text>
+        <View style={[styles.settings2Col, isTablet ? styles.settings2ColTablet : styles.settings2ColMobile]}>
+          {/* Column 1: Study & Algorithm Tools */}
+          <View style={[styles.settingsPanel, { backgroundColor: colors.surface + '70', borderColor: colors.border, width: isTablet ? '48.8%' : '100%' }]}>
+            <Text style={[styles.panelHeaderTitle, { color: colors.textTertiary }]}>STUDY & ENGINE TOOLS</Text>
+            <View style={styles.panelRows}>
+              <Row testID="profile-algorithm" icon={<Settings2 color={colors.primary} size={18} />} label="Algorithm Defaults" sub="Set global spaced repetition rules" onPress={() => setAlgorithmModalVisible(true)} />
+              <Row testID="profile-theme" icon={<Palette color={colors.primary} size={18} />} label="Zen Themes & Colors" sub="Custom palettes & OLED mode" onPress={() => router.push('/theme-preview')} />
+              <Row testID="profile-tabs" icon={<LayoutList color={colors.primary} size={18} />} label="Customize Tabs" sub="Reorder & toggle bottom bar" onPress={() => router.push('/customize_tabs')} />
+              <Row testID="profile-dedup" icon={<Layers color={colors.primary} size={18} />} label="Dedup Manager" sub="Smart-merge UPSC PYQs across institutes" onPress={() => router.push('/dedup-manager')} isLast />
+            </View>
+          </View>
+
+          {/* Column 2: System, Account & Workspace */}
+          <View style={[styles.settingsPanel, { backgroundColor: colors.surface + '70', borderColor: colors.border, width: isTablet ? '48.8%' : '100%' }]}>
+            <Text style={[styles.panelHeaderTitle, { color: colors.textTertiary }]}>SYSTEM & WORKSPACE</Text>
+            <View style={styles.panelRows}>
+              <Row 
+                testID="profile-widgets" 
+                icon={<BarChart3 color={colors.primary} size={18} />} 
+                label="Manage Dashboard Widgets" 
+                sub="Configure syllabus tracking & rows" 
+                onPress={() => { 
+                  router.push('/(tabs)/' as any); 
+                  setTimeout(() => {
+                    Alert.alert(
+                      'Widget Configuration', 
+                      '1. Long-press the Syllabus Tracker to configure PYQ Mode & Report Type.\n\n2. Scroll down & tap "Manage Dashboard Widgets" to show/hide widgets.'
+                    );
+                  }, 500);
+                }} 
+              />
+              <Row 
+                testID="profile-ai-settings" 
+                icon={<Brain color="#8b5cf6" size={18} />} 
+                label="AI Settings & Models" 
+                sub="Provider, API keys & custom prompts" 
+                onPress={() => router.push('/ai-settings')} 
+              />
+              <Row
+                testID="profile-app-guide"
+                icon={<BookOpen color={colors.primary} size={18} />}
+                label="App Feature Guide"
+                sub="Learn about every feature"
+                onPress={() => setShowAppGuide(true)}
+              />
+              {isAnalyticsAdmin ? (
+                <>
+                  <Row 
+                    testID="profile-admin-panel" 
+                    icon={<ShieldCheck color="#ef4444" size={18} />} 
+                    label="Admin Control Panel" 
+                    sub="Manage users, features & plans" 
+                    onPress={() => router.push('/admin')} 
+                  />
+                  <Row testID="profile-analytics-layout" icon={<BarChart3 color={colors.primary} size={18} />} label="Analytics Layout Admin" sub="Arrange review and overall cards" onPress={() => setLayoutAdminVisible(true)} />
+                </>
+              ) : null}
+              <Row testID="profile-reset" icon={<UserIcon color={colors.primary} size={18} />} label="Reset Password" sub="Send reset link to email" onPress={requestPasswordReset} />
+              <Row testID="profile-logout" icon={<LogOut color="#ef4444" size={18} />} label="Sign Out" sub={email} onPress={confirmLogout} isLast />
+            </View>
+          </View>
+        </View>
 
       {/* User Subscription Admin Modal */}
       <Modal
@@ -1345,6 +1417,222 @@ const styles = StyleSheet.create({
   layoutActions: { flexDirection: 'row', gap: 8 },
   layoutBtn: { width: 34, height: 34, borderRadius: 10, borderWidth: 1, alignItems: 'center', justifyContent: 'center' },
   // ── Offline / Sync Styles ──
+  prefGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 10,
+    marginBottom: 8,
+  },
+  prefGridTablet: {
+    justifyContent: 'space-between',
+  },
+  prefGridMobile: {
+    justifyContent: 'space-between',
+  },
+  prefChip: {
+    borderRadius: 14,
+    borderWidth: 1,
+    padding: 12,
+    minHeight: 84,
+    justifyContent: 'space-between',
+  },
+  prefChipTop: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 6,
+  },
+  prefChipIcon: {
+    width: 28,
+    height: 28,
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  prefChipTag: {
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 6,
+  },
+  prefChipTagText: {
+    fontSize: 9,
+    fontWeight: '900',
+    letterSpacing: 0.4,
+  },
+  prefChipLabel: {
+    fontSize: 10,
+    fontWeight: '800',
+    letterSpacing: 0.5,
+    marginBottom: 2,
+  },
+  prefChipValue: {
+    fontSize: 13,
+    fontWeight: '700',
+  },
+
+  /* Super Card Styles */
+  offlineSuperCard: {
+    borderRadius: 18,
+    borderWidth: 1,
+    overflow: 'hidden',
+    marginBottom: 12,
+  },
+  superCardHeader: {
+    padding: 16,
+    borderBottomWidth: 1,
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 12,
+  },
+  superCardTitleGroup: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    flex: 1,
+    minWidth: 240,
+  },
+  superCardIcon: {
+    width: 38,
+    height: 38,
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  superCardTitle: {
+    fontSize: 16,
+    fontWeight: '800',
+    letterSpacing: -0.2,
+  },
+  superCardSub: {
+    fontSize: 12,
+    fontWeight: '500',
+    marginTop: 2,
+  },
+  superCardActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    flexWrap: 'wrap',
+  },
+  masterPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingHorizontal: 12,
+    paddingVertical: 7,
+    borderRadius: 10,
+  },
+  masterPillTextPrimary: {
+    color: '#ffffff',
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  masterPillText: {
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  offlineGrid: {
+    padding: 14,
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 12,
+  },
+  offlineGridTablet: {
+    justifyContent: 'space-between',
+  },
+  offlineGridMobile: {
+    flexDirection: 'column',
+  },
+  offlineSubBox: {
+    borderRadius: 14,
+    borderWidth: 1,
+    padding: 14,
+    justifyContent: 'space-between',
+    minHeight: 105,
+  },
+  subBoxHeader: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 10,
+    marginBottom: 10,
+  },
+  subBoxIcon: {
+    width: 32,
+    height: 32,
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  subBoxTitle: {
+    fontSize: 13,
+    fontWeight: '700',
+  },
+  subBoxStat: {
+    fontSize: 11,
+    fontWeight: '500',
+    marginTop: 2,
+  },
+  subBoxButtons: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  subBoxBtn: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 5,
+    paddingVertical: 7,
+    paddingHorizontal: 10,
+    borderRadius: 8,
+    borderWidth: 1,
+  },
+  subBoxBtnText: {
+    fontSize: 11,
+    fontWeight: '700',
+  },
+  mediaCancelledAlert: {
+    marginHorizontal: 14,
+    marginBottom: 14,
+    padding: 12,
+    borderRadius: 10,
+    borderWidth: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+
+  /* 2-Column Settings Layout */
+  settings2Col: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 14,
+  },
+  settings2ColTablet: {
+    justifyContent: 'space-between',
+  },
+  settings2ColMobile: {
+    flexDirection: 'column',
+  },
+  settingsPanel: {
+    borderRadius: 16,
+    borderWidth: 1,
+    overflow: 'hidden',
+    paddingTop: 12,
+  },
+  panelHeaderTitle: {
+    fontSize: 10,
+    fontWeight: '800',
+    letterSpacing: 0.6,
+    paddingHorizontal: 16,
+    paddingBottom: 8,
+  },
+  panelRows: {
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(150, 150, 150, 0.1)',
+  },
   cacheInfoCard: { flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderRadius: radius.md, padding: 14, marginTop: 12 },
   cacheInfoTitle: { fontSize: 13, fontWeight: '800' },
   cacheInfoSub: { fontSize: 11, marginTop: 2, lineHeight: 16 },

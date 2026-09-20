@@ -12353,6 +12353,8 @@ export function DetailedQuestionView({
           contentContainerStyle={{ padding: 16, paddingTop: insets.top + 64, paddingBottom: 60 }}
           scrollEventThrottle={16}
           keyboardShouldPersistTaps="handled"
+          automaticallyAdjustKeyboardInsets={true}
+          keyboardDismissMode="on-drag"
         >
           {/* Question Text */}
           <View style={{

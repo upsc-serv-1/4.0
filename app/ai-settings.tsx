@@ -414,7 +414,12 @@ function AISettings() {
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={{ flex: 1 }}
       >
-        <ScrollView contentContainerStyle={{ padding: 16, paddingBottom: 120 }}>
+        <ScrollView 
+          contentContainerStyle={{ padding: 16, paddingBottom: 120 }}
+          automaticallyAdjustKeyboardInsets={true}
+          keyboardShouldPersistTaps="handled"
+          keyboardDismissMode="on-drag"
+        >
         
         {/* ── PROVIDER TOGGLE ───────────────────────────────── */}
         <Text style={styles.sectionTitle}>AI PROVIDER</Text>

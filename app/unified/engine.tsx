@@ -4226,6 +4226,8 @@ const isPyqUpscsearch = params.pyqFilter === 'PYQ Only' && params.year_start && 
                   renderItem={renderQuestionBlock}
                   keyExtractor={(item) => item.id}
                   extraData={currentAnswers}
+                  automaticallyAdjustKeyboardInsets={true}
+                  keyboardShouldPersistTaps="handled"
                   // initialScrollIndex only used for first mount from Navigator/Index jump.
                   // DO NOT remove – but we rely on onScrollToIndexFailed to handle
                   // out-of-range gracefully rather than crashing.
@@ -4286,6 +4288,9 @@ const isPyqUpscsearch = params.pyqFilter === 'PYQ Only' && params.year_start && 
                   <ScrollView 
                     onScroll={handleScroll}
                     scrollEventThrottle={16}
+                    automaticallyAdjustKeyboardInsets={true}
+                    keyboardShouldPersistTaps="handled"
+                    keyboardDismissMode="on-drag"
                     contentContainerStyle={!isPaperMode && { paddingTop: 80 }}
                   >{renderQuestionBlock({ item: questions[currentIndex], index: currentIndex })}</ScrollView>
                   <View style={[styles.cardNav, { backgroundColor: colors.surface, borderTopColor: colors.border }]}>

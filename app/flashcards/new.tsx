@@ -365,6 +365,8 @@ export default function NewCard() {
           contentContainerStyle={s.scrollContent} 
           showsVerticalScrollIndicator={false} 
           keyboardShouldPersistTaps="handled"
+          automaticallyAdjustKeyboardInsets={true}
+          keyboardDismissMode="on-drag"
         >
           {/* Tab selector for AI vs Manual mode */}
           <View style={[s.tabContainer, { borderBottomColor: colors.border }]}>
